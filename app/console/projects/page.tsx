@@ -102,7 +102,7 @@ export default async function Projects({ searchParams }: Props) {
             </div>
           ) : null}
 
-          <div className="divide-y divide-gray-200 overflow-hidden rounded-sm bg-gray-200 dark:bg-gray-900 shadow sm:grid sm:grid-cols-2 sm:gap-px sm:divide-y-0">
+          <div className="divide-y divide-gray-200 dark:divide-gray-800 overflow-hidden rounded-sm bg-gray-200 dark:bg-gray-900 shadow sm:grid sm:grid-cols-2 sm:gap-px sm:divide-y-0">
             {projects.map(({ id, name, description }, idx) => (
               <div
                 key={id}

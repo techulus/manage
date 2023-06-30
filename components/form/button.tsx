@@ -6,7 +6,7 @@ import { experimental_useFormStatus as useFormStatus } from "react-dom";
 import { Spinner } from "../core/loaders";
 import { Button } from "../ui/button";
 
-export const DeleteButton = () => {
+export const DeleteButton = ({ action = "Delete" }: { action?: string }) => {
   const { pending } = useFormStatus();
 
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -19,7 +19,7 @@ export const DeleteButton = () => {
         ) : (
           <>
             <CheckIcon className="mr-2 h-5 w-5" aria-hidden="true" />
-            Confirm Delete
+            Confirm {action}
           </>
         )}
       </Button>
@@ -36,7 +36,7 @@ export const DeleteButton = () => {
       variant="ghost"
     >
       <TrashIcon className="mr-2 h-5 w-5" aria-hidden="true" />
-      Delete
+      {action}
     </Button>
   );
 };

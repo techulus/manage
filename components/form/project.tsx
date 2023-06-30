@@ -1,18 +1,10 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import * as z from "zod";
 import { Textarea } from "../ui/textarea";
+import { Project } from "@prisma/client";
 
-export const projectSchema = z.object({
-  name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
-  }),
-  description: z.string().optional(),
-  status: z.enum(["active", "archived"]),
-});
-
-export default function CreateProjectForm() {
+export default function ProjectForm({ project }: { project?: Project | null }) {
   return (
     <div className="space-y-6 sm:space-y-8">
       <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
@@ -23,7 +15,7 @@ export default function CreateProjectForm() {
           Name
         </label>
         <div className="mt-2 sm:col-span-2 sm:mt-0">
-          <Input type="text" name="name" />
+          <Input type="text" name="name" defaultValue={project?.name ?? ""} />
         </div>
       </div>
 
@@ -35,7 +27,10 @@ export default function CreateProjectForm() {
           Description
         </label>
         <div className="mt-2 sm:col-span-2 sm:mt-0">
-          <Textarea name="description" />
+          <Textarea
+            name="description"
+            defaultValue={project?.description ?? ""}
+          />
         </div>
       </div>
     </div>
