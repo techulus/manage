@@ -32,7 +32,7 @@ export default function InlineTaskForm() {
           Name
         </label>
         <div className="mt-2 sm:col-span-2 sm:mt-0">
-          <Input type="text" name="name" />
+          <Input type="text" name="name" defaultValue="" />
         </div>
         <SaveButton />
       </div>

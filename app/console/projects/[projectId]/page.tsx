@@ -2,6 +2,7 @@ import { ContentBlock } from "@/components/core/content-block";
 import { DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
 import { buttonVariants } from "@/components/ui/button";
+import { CardContent, CardHeader } from "@/components/ui/card";
 import { prisma } from "@/lib/utils/db";
 import { getOwner } from "@/lib/utils/useOwner";
 import Link from "next/link";
@@ -45,8 +46,8 @@ export default async function ProjectDetails({ params }: Props) {
         actionLink={`/console/projects/${projectId}/edit`}
       />
 
-      <div className="mx-auto max-w-5xl px-4 lg:px-0 my-12">
-        <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-none">
+      <ContentBlock>
+        <CardHeader>
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-semibold leading-7 text-gray-900">
               Tasklists
@@ -68,9 +69,12 @@ export default async function ProjectDetails({ params }: Props) {
               </a>
             </div>
           </div>
+        </CardHeader>
+
+        <CardContent>
           <ul
             role="list"
-            className="mt-6 grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-3 xl:gap-x-8"
+            className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-2 xl:gap-x-8"
           >
             {taskLists.map((taskList) => (
               <Link
@@ -85,17 +89,56 @@ export default async function ProjectDetails({ params }: Props) {
                 </div>
               </Link>
             ))}
-
-            <li className="overflow-hidden rounded-xl border border-gray-200">
-              <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6">
-                <div className="text-sm font-medium leading-6 text-gray-900">
-                  Create new list
-                </div>
-              </div>
-            </li>
           </ul>
-        </div>
-      </div>
+        </CardContent>
+      </ContentBlock>
+
+      <ContentBlock>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-semibold leading-7 text-gray-900">
+              Documents
+            </h2>
+
+            <div>
+              <a
+                href={`/console/projects/${projectId}/tasklists/new`}
+                className={buttonVariants({ variant: "link" })}
+              >
+                Create<span className="sr-only">, document</span>
+              </a>
+
+              <a
+                href={`/console/projects/${projectId}/documents`}
+                className={buttonVariants({ variant: "link" })}
+              >
+                View all<span className="sr-only">, documents</span>
+              </a>
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent>
+          <ul
+            role="list"
+            className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-2 xl:gap-x-8"
+          >
+            {taskLists.map((taskList) => (
+              <Link
+                key={taskList.id}
+                href={`/console/projects/${projectId}/tasklists`}
+                className="overflow-hidden rounded-xl border border-gray-200"
+              >
+                <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6">
+                  <div className="text-sm font-medium leading-6 text-gray-900">
+                    {taskList.name}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </ul>
+        </CardContent>
+      </ContentBlock>
 
       {/* Toolbar*/}
       <ContentBlock>
