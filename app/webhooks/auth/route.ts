@@ -15,11 +15,10 @@ export async function POST(request: Request) {
   let msg;
   try {
     msg = wh.verify(body, headers);
+    console.log("POST /webhooks/auth Message:", msg);
+    return new Response("OK");
   } catch (err) {
+    console.log("POST /webhooks/auth Error:", err);
     new Response("Invalid signature", { status: 401 });
   }
-
-  console.log("POST /webhooks/auth", msg);
-
-  return new Response("OK");
 }
