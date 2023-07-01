@@ -1,24 +1,22 @@
 "use client";
 
 import { useDetectSticky } from "@/lib/hooks/useDetectSticky";
-import { SignedIn, useUser } from "@clerk/nextjs";
+import { SignedIn } from "@clerk/nextjs";
 import { Transition } from "@headlessui/react";
 import classNames from "classnames";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import logo from "../../public/images/logo.png";
 import { ThemedOrgSwitcher, ThemedUserButton } from "../core/auth";
 import { createToastWrapper } from "../core/toast";
 
 type Props = {
-  isPublicPage?: boolean;
   appearance: string;
 };
 
-export default function NavBar({ isPublicPage = false, appearance }: Props) {
-  const { isLoaded, user } = useUser();
+export default function NavBar({ appearance }: Props) {
   const path = usePathname();
 
   const [isSticky, ref] = useDetectSticky();
@@ -43,17 +41,6 @@ export default function NavBar({ isPublicPage = false, appearance }: Props) {
     ],
     [path]
   );
-
-  useEffect(() => {
-    if (isPublicPage) {
-      return;
-    }
-
-    if (isLoaded && !user) {
-      window.location.href = "/";
-    }
-  }, [user, isLoaded, isPublicPage]);
-
   return (
     <>
       {createToastWrapper(appearance)}
@@ -61,7 +48,7 @@ export default function NavBar({ isPublicPage = false, appearance }: Props) {
         <div className="mx-auto px-4 lg:px-8">
           <div className="relative flex h-16 items-center justify-between">
             <div className="flex">
-              <Link href="/" className="ml-1">
+              <Link href="/console/projects" className="ml-1">
                 <div className="flex items-center lg:px-0">
                   <Image
                     src={logo}
@@ -70,17 +57,6 @@ export default function NavBar({ isPublicPage = false, appearance }: Props) {
                     height={32}
                     className="mr-2 rounded-md"
                   />
-                  {isPublicPage ? (
-                    <Link href="/" className="-m-1.5 p-1.5">
-                      <span className="sr-only">Manage</span>
-                      <p className="hero relative">
-                        Manage
-                        <sup className="absolute top-0 left-[calc(100%+.1rem)] text-xs">
-                          [beta]
-                        </sup>
-                      </p>
-                    </Link>
-                  ) : null}
                 </div>
               </Link>
 
@@ -116,8 +92,7 @@ export default function NavBar({ isPublicPage = false, appearance }: Props) {
       <div
         className={classNames(
           "flex px-4 lg:px-8 min-w-full bg-background border-b border-gray-200 dark:border-gray-800 -mb-px self-start sticky -top-[1px] z-10",
-          isSticky ? "pt-[1px] bg-red shadow-md" : "",
-          isPublicPage ? "hidden" : ""
+          isSticky ? "pt-[1px] bg-red shadow-md" : ""
         )}
         ref={ref}
         aria-label="Tabs"
