@@ -35,7 +35,7 @@ export default function PageTitle({
         <div className="absolute inset-x-0 bottom-0 h-px bg-gray-900/5" />
       </div>
 
-      <div className="flex w-full justify-between max-w-7xl">
+      <div className="flex w-full justify-between max-w-5xl">
         <div className="flex items-center">
           {backUrl && (
             <SignedIn>

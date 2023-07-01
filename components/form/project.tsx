@@ -6,8 +6,8 @@ import { Project } from "@prisma/client";
 
 export default function ProjectForm({ project }: { project?: Project | null }) {
   return (
-    <div className="space-y-6 sm:space-y-8">
-      <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+    <div className="pt-4 space-y-2 sm:space-y-3">
+      <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 py-2">
         <label
           htmlFor="name"
           className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5"
@@ -19,7 +19,7 @@ export default function ProjectForm({ project }: { project?: Project | null }) {
         </div>
       </div>
 
-      <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+      <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 py-2">
         <label
           htmlFor="description"
           className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5"

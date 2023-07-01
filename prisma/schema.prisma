@@ -18,7 +18,7 @@ datasource db {
 
 model Project {
   id          Int        @id @default(autoincrement())
-  ownerId     String // Can be user or organisaiton id
+  ownerId     String
   name        String
   description String?
   status      String
@@ -33,6 +33,7 @@ model Project {
 
 model TaskList {
   id          Int       @id @default(autoincrement())
+  ownerId     String
   projectId   Int
   name        String
   description String?
@@ -42,6 +43,8 @@ model TaskList {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
 }
 
 model Task {
@@ -54,10 +57,13 @@ model Task {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   taskList    TaskList  @relation(fields: [taskListId], references: [id], onDelete: Cascade)
+
+  @@index([taskListId])
 }
 
 model Document {
   id          Int      @id @default(autoincrement())
+  ownerId     String
   projectId   Int
   name        String
   description String?
@@ -65,4 +71,6 @@ model Document {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
 }

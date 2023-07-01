@@ -1,41 +1,27 @@
 import { ContentBlock } from "@/components/core/content-block";
-import { SaveButton } from "@/components/form/button";
 import ProjectForm from "@/components/form/project";
 import PageTitle from "@/components/layout/page-title";
+import { SaveButton } from "@/components/form/button";
 import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
-import { prisma } from "@/lib/utils/db";
-import { updateProject } from "../../actions";
 import Link from "next/link";
+import { createTaskList } from "../actions";
 
-interface Props {
+type Props = {
   params: {
-    id: string;
+    projectId: string;
   };
-}
+};
 
-export default async function EditProject({ params }: Props) {
-  const { id } = params;
-
-  const project = await prisma.project.findUnique({
-    where: {
-      id: Number(id),
-    },
-  });
-
-  if (!project) {
-    return <div>Project not found</div>;
-  }
-
+export default async function CreateTaskList({ params }: Props) {
   return (
     <>
-      <PageTitle title={project.name} backUrl="/console/projects" />
-
-      <form action={updateProject}>
+      <PageTitle title="Create Task list" backUrl="/console/projects" />
+      <form action={createTaskList}>
+        <input type="hidden" name="projectId" value={params.projectId} />
         <ContentBlock>
           <CardContent>
-            <input type="hidden" name="id" value={id} />
-            <ProjectForm project={project} />
+            <ProjectForm />
           </CardContent>
           <CardFooter>
             <div className="flex items-center justify-end gap-x-6">

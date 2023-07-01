@@ -1,9 +1,9 @@
 "use server";
 
 import { prisma } from "@/lib/utils/db";
+import { getOwner } from "@/lib/utils/useOwner";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs";
 import * as z from "zod";
 
 const projectSchema = z.object({
@@ -16,15 +16,14 @@ const projectSchema = z.object({
 });
 
 export async function createProject(payload: FormData) {
-  const { userId, orgId } = auth();
-
+  const ownerId = getOwner();
   const name = payload.get("name") as string;
   const description = payload.get("description") as string;
 
   const data = projectSchema.parse({
     name,
     description,
-    ownerId: orgId || userId || "",
+    ownerId,
     status: "active",
   });
 
@@ -37,8 +36,7 @@ export async function createProject(payload: FormData) {
 }
 
 export async function updateProject(payload: FormData) {
-  const { userId, orgId } = auth();
-
+  const ownerId = getOwner();
   const id = Number(payload.get("id"));
   const name = payload.get("name") as string;
   const description = payload.get("description") as string;
@@ -46,7 +44,7 @@ export async function updateProject(payload: FormData) {
   const data = projectSchema.parse({
     name,
     description,
-    ownerId: orgId || userId || "",
+    ownerId,
     status: "active",
   });
 
