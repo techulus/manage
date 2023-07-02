@@ -18,7 +18,7 @@ const taskSchema = z.object({
     message: "Name must be at least 2 characters.",
   }),
   description: z.string().optional(),
-  status: z.enum(["active", "archived"]),
+  status: z.enum(["todo", "done"]),
 });
 
 export async function createTaskList(payload: FormData) {
@@ -47,16 +47,21 @@ export async function createTaskList(payload: FormData) {
   redirect(`/console/projects/${projectId}/tasklists`);
 }
 
-export async function createTask(payload: FormData) {
-  const name = payload.get("name") as string;
-  const description = (payload.get("description") as string) ?? "";
-  const taskListId = payload.get("taskListId") as string;
-  const projectId = payload.get("projectId") as string;
-
+export async function createTask({
+  taskListId,
+  projectId,
+  name,
+  description = "",
+}: {
+  taskListId: number;
+  projectId: number;
+  name: string;
+  description?: string;
+}) {
   const data = taskSchema.parse({
     name,
     description,
-    status: "active",
+    status: "todo",
   });
 
   await prisma.task.create({
@@ -64,12 +69,32 @@ export async function createTask(payload: FormData) {
       ...data,
       taskList: {
         connect: {
-          id: Number(taskListId),
+          id: taskListId,
         },
       },
     },
   });
 
   revalidatePath(`/console/projects/${projectId}/tasklists`);
-  redirect(`/console/projects/${projectId}/tasklists`);
+}
+
+export async function updateTask({
+  id,
+  status,
+  projectId,
+}: {
+  id: number;
+  status: string;
+  projectId: number;
+}) {
+  await prisma.task.update({
+    where: {
+      id: Number(id),
+    },
+    data: {
+      status,
+    },
+  });
+
+  revalidatePath(`/console/projects/${projectId}/tasklists`);
 }

@@ -1,11 +1,11 @@
+import { cn } from "@/lib/utils";
 import { Project } from "@prisma/client";
-import classNames from "classnames";
 
 export const ProjecItem = ({ id, name, description }: Project) => {
   return (
     <div
       key={id}
-      className={classNames(
+      className={cn(
         "group relative bg-white dark:bg-black p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-teal-500"
       )}
     >

@@ -1,6 +1,6 @@
+import { cn } from "@/lib/utils";
 import { SignedIn } from "@clerk/nextjs";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
-import classNames from "classnames";
 import Link from "next/link";
 import { buttonVariants } from "../ui/button";
 
@@ -44,7 +44,7 @@ export default function PageTitle({
                 className="flex items-center text-md font-medium text-gray-600 hover:text-gray-900 mr-2"
               >
                 <ArrowLeftIcon
-                  className={classNames(
+                  className={cn(
                     "flex-shrink-0 h-6 w-6 text-gray-600 hover:text-gray-900",
                     "dark:text-gray-400 dark:hover:text-gray-300"
                   )}

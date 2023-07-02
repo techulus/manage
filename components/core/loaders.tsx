@@ -1,4 +1,4 @@
-import classnames from "classnames";
+import { cn } from "@/lib/utils";
 
 export function Spinner({
   message = null,
@@ -10,7 +10,7 @@ export function Spinner({
   return (
     <div className="flex items-center justify-center">
       <svg
-        className={classnames("animate-spin h-5 w-5 text-teal-500", className)}
+        className={cn("animate-spin h-5 w-5 text-teal-500", className)}
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"

@@ -1,16 +1,23 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { experimental_useFormStatus as useFormStatus } from "react-dom";
 import { Button } from "../ui/button";
 import { SaveButton } from "./button";
 
 export default function InlineTaskForm() {
+  const { pending } = useFormStatus();
   const [isCreating, setIsCreating] = useState(false);
+
+  useEffect(() => {
+    setIsCreating(false);
+  }, [pending]);
 
   if (!isCreating) {
     return (
       <Button
+        variant="outline"
         type="button"
         onClick={(e) => {
           e.preventDefault();
@@ -23,19 +30,11 @@ export default function InlineTaskForm() {
   }
 
   return (
-    <div className="pt-4 space-y-2 sm:space-y-3">
-      <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 py-2">
-        <label
-          htmlFor="name"
-          className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5"
-        >
-          Name
-        </label>
-        <div className="mt-2 sm:col-span-2 sm:mt-0">
-          <Input type="text" name="name" defaultValue="" />
-        </div>
-        <SaveButton />
+    <div className="py-4 space-y-2 sm:space-y-3">
+      <div className="mt-2 sm:col-span-2 sm:mt-0">
+        <Input type="text" name="name" defaultValue="" disabled={pending} />
       </div>
+      <SaveButton />
     </div>
   );
 }

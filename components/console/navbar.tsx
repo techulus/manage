@@ -1,9 +1,9 @@
 "use client";
 
 import { useDetectSticky } from "@/lib/hooks/useDetectSticky";
+import { cn } from "@/lib/utils";
 import { SignedIn } from "@clerk/nextjs";
 import { Transition } from "@headlessui/react";
-import classNames from "classnames";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -90,7 +90,7 @@ export default function NavBar({ appearance }: Props) {
       </nav>
 
       <div
-        className={classNames(
+        className={cn(
           "flex px-4 lg:px-8 min-w-full bg-background border-b border-gray-200 dark:border-gray-800 -mb-px self-start sticky -top-[1px] z-10",
           isSticky ? "pt-[1px] bg-red shadow-md" : ""
         )}
@@ -119,7 +119,7 @@ export default function NavBar({ appearance }: Props) {
         </Transition>
 
         <div
-          className={classNames(
+          className={cn(
             "flex space-x-1 overflow-y-scroll",
             "transition ease-in-out duration-300",
             isSticky ? "translate-x-[40px]" : "translate-x-0"
@@ -129,7 +129,7 @@ export default function NavBar({ appearance }: Props) {
             <Link
               key={tab.name}
               href={tab.href}
-              className={classNames(
+              className={cn(
                 tab.current
                   ? "border-teal-500 text-teal-600 dark:text-teal-500"
                   : "border-transparent text-gray-500 dark:text-gray-400",

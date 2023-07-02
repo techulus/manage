@@ -2,9 +2,9 @@ import { ClerkProvider } from "@clerk/nextjs/app-beta";
 import { Analytics } from "@vercel/analytics/react";
 
 import { SITE_METADATA } from "@/data/marketing";
-import classNames from "classnames";
-import "./globals.css";
+import { cn } from "@/lib/utils";
 import { cookies } from "next/headers";
+import "./globals.css";
 
 export const metadata = {
   title: SITE_METADATA.TITLE,
@@ -19,7 +19,7 @@ export default function RootLayout({
   const theme = cookies().get("theme")?.value ?? "light";
 
   return (
-    <html lang="en" className={classNames("flex min-w-full min-h-full", theme)}>
+    <html lang="en" className={cn("flex min-w-full min-h-full", theme)}>
       <head>
         <meta
           name="viewport"
@@ -201,7 +201,7 @@ export default function RootLayout({
 
       <ClerkProvider>
         <body
-          className={classNames(
+          className={cn(
             "flex-1 min-h-full min-w-full",
             "rounded-tl-xl rounded-tr-xl md:rounded-none"
           )}
