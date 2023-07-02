@@ -122,7 +122,11 @@ export default async function Projects({ searchParams }: Props) {
             <div className="flex flex-1 justify-between sm:justify-end">
               {currentPage > 1 ? (
                 <form action="/console/projects">
-                  <input type="hidden" name="page" value={currentPage - 1} />
+                  <input
+                    type="hidden"
+                    name="page"
+                    defaultValue={currentPage - 1}
+                  />
                   <Button type="submit" variant="ghost">
                     Previous
                   </Button>
@@ -131,7 +135,11 @@ export default async function Projects({ searchParams }: Props) {
 
               {(currentPage - 1) * LIMIT + projects.length < count ? (
                 <form action="/console/projects">
-                  <input type="hidden" name="page" value={currentPage + 1} />
+                  <input
+                    type="hidden"
+                    name="page"
+                    defaultValue={currentPage + 1}
+                  />
                   <Button type="submit" variant="ghost">
                     Next
                   </Button>

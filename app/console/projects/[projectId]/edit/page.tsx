@@ -5,8 +5,8 @@ import PageTitle from "@/components/layout/page-title";
 import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import { prisma } from "@/lib/utils/db";
-import { updateProject } from "../../actions";
 import Link from "next/link";
+import { updateProject } from "../../actions";
 
 interface Props {
   params: {
@@ -34,7 +34,7 @@ export default async function EditProject({ params }: Props) {
       <form action={updateProject}>
         <ContentBlock>
           <CardContent>
-            <input type="hidden" name="id" value={projectId} />
+            <input type="hidden" name="id" defaultValue={projectId} />
             <ProjectForm project={project} />
           </CardContent>
           <CardFooter>

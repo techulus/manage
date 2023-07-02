@@ -45,8 +45,8 @@ async function TaskListDetails({
 
         <form action={createTask}>
           <div className="flex items-center mt-4">
-            <input type="hidden" name="taskListId" value={taskListId} />
-            <input type="hidden" name="projectId" value={projectId} />
+            <input type="hidden" name="taskListId" defaultValue={taskListId} />
+            <input type="hidden" name="projectId" defaultValue={projectId} />
             <InlineTaskForm />
           </div>
         </form>

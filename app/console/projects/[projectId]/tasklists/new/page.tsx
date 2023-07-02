@@ -1,7 +1,7 @@
 import { ContentBlock } from "@/components/core/content-block";
+import { SaveButton } from "@/components/form/button";
 import ProjectForm from "@/components/form/project";
 import PageTitle from "@/components/layout/page-title";
-import { SaveButton } from "@/components/form/button";
 import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import Link from "next/link";
@@ -18,7 +18,7 @@ export default async function CreateTaskList({ params }: Props) {
     <>
       <PageTitle title="Create Task list" backUrl="/console/projects" />
       <form action={createTaskList}>
-        <input type="hidden" name="projectId" value={params.projectId} />
+        <input type="hidden" name="projectId" defaultValue={params.projectId} />
         <ContentBlock>
           <CardContent>
             <ProjectForm />
