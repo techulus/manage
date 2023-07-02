@@ -25,7 +25,7 @@ export async function getProjectsForOwner({
 }> {
   const dbQuery: Prisma.ProjectFindManyArgs = {
     where: {
-      ownerId: {
+      organizationId: {
         equals: ownerId,
       },
     },
@@ -46,7 +46,7 @@ export async function getProjectsForOwner({
     prisma.project.findMany(dbQuery),
     prisma.project.count({
       where: {
-        ownerId: {
+        organizationId: {
           equals: ownerId,
         },
       },
