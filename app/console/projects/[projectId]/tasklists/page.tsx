@@ -2,6 +2,7 @@ import InlineTaskForm from "@/components/form/task";
 import PageTitle from "@/components/layout/page-title";
 import { Checkbox } from "@/components/ui/checkbox";
 import { prisma } from "@/lib/utils/db";
+import { getOwner } from "@/lib/utils/useOwner";
 import { createTask } from "./actions";
 
 type Props = {
@@ -55,17 +56,22 @@ async function TaskListDetails({
 }
 
 export default async function ProjectDetails({ params }: Props) {
+  const ownerId = getOwner();
   const { projectId } = params;
 
-  const project = await prisma.project.findUnique({
+  const project = await prisma.project.findFirst({
     where: {
       id: Number(projectId),
+      organizationId: ownerId,
     },
   });
 
   const taskLists = await prisma.taskList.findMany({
     where: {
       projectId: Number(projectId),
+      project: {
+        organizationId: ownerId,
+      },
     },
   });
 

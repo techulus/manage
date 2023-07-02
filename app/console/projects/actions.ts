@@ -11,7 +11,6 @@ const projectSchema = z.object({
     message: "Name must be at least 2 characters.",
   }),
   description: z.string().optional(),
-  ownerId: z.string(),
   status: z.enum(["active", "archived"]),
 });
 
@@ -23,12 +22,11 @@ export async function createProject(payload: FormData) {
   const data = projectSchema.parse({
     name,
     description,
-    ownerId,
     status: "active",
   });
 
   await prisma.project.create({
-    data,
+    data: { ...data, organization: { connect: { id: ownerId } } },
   });
 
   revalidatePath("/console/projects");

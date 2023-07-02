@@ -1,7 +1,6 @@
 "use server";
 
 import { prisma } from "@/lib/utils/db";
-import { getOwner } from "@/lib/utils/useOwner";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
@@ -10,7 +9,6 @@ const taskListSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
   }),
-  ownerId: z.string(),
   description: z.string().optional(),
   status: z.enum(["active", "archived"]),
 });
@@ -24,7 +22,6 @@ const taskSchema = z.object({
 });
 
 export async function createTaskList(payload: FormData) {
-  const ownerId = getOwner();
   const name = payload.get("name") as string;
   const description = payload.get("description") as string;
   const projectId = payload.get("projectId") as string;
@@ -32,11 +29,10 @@ export async function createTaskList(payload: FormData) {
   const data = taskListSchema.parse({
     name,
     description,
-    ownerId,
     status: "active",
   });
 
-  const taskList = await prisma.taskList.create({
+  await prisma.taskList.create({
     data: {
       ...data,
       project: {
@@ -47,7 +43,8 @@ export async function createTaskList(payload: FormData) {
     },
   });
 
-  redirect(`/console/projects/${projectId}/tasklists/${taskList.id}`);
+  revalidatePath(`/console/projects/${projectId}/tasklists`);
+  redirect(`/console/projects/${projectId}/tasklists`);
 }
 
 export async function createTask(payload: FormData) {
@@ -73,6 +70,6 @@ export async function createTask(payload: FormData) {
     },
   });
 
-  revalidatePath(`/console/projects/${projectId}/tasklists/${taskListId}`);
-  redirect(`/console/projects/${projectId}/tasklists/${taskListId}`);
+  revalidatePath(`/console/projects/${projectId}/tasklists`);
+  redirect(`/console/projects/${projectId}/tasklists`);
 }
