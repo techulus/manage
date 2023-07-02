@@ -28,35 +28,34 @@ model User {
 }
 
 model Organization {
-  id            String   @id
+  id            String    @id
   name          String
   image_url     String?
   logo_url      String?
   rawData       Json?
   createdByUser String
-  createdBy     User     @relation(fields: [createdByUser], references: [id])
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdBy     User      @relation(fields: [createdByUser], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  projects      Project[]
 }
 
 model Project {
-  id          Int        @id @default(autoincrement())
-  ownerId     String
-  name        String
-  description String?
-  status      String
-  deadline    DateTime?
-  taskLists   TaskList[]
-  documents   Document[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
-  @@index([ownerId])
+  id             Int           @id @default(autoincrement())
+  name           String
+  description    String?
+  status         String
+  deadline       DateTime?
+  taskLists      TaskList[]
+  documents      Document[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  Organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String?
 }
 
 model TaskList {
   id          Int       @id @default(autoincrement())
-  ownerId     String
   projectId   Int
   name        String
   description String?
@@ -66,8 +65,6 @@ model TaskList {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
-  @@index([ownerId])
 }
 
 model Task {
@@ -80,13 +77,10 @@ model Task {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   taskList    TaskList  @relation(fields: [taskListId], references: [id], onDelete: Cascade)
-
-  @@index([taskListId])
 }
 
 model Document {
   id          Int      @id @default(autoincrement())
-  ownerId     String
   projectId   Int
   name        String
   description String?
@@ -94,6 +88,4 @@ model Document {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
-  @@index([ownerId])
 }

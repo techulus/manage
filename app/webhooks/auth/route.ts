@@ -46,6 +46,21 @@ export async function POST(request: Request) {
             rawData: data,
           },
         });
+        // Create a personal organization for the user
+        await prisma.organization.create({
+          data: {
+            id: data.id,
+            name: "Personal",
+            image_url: data.image_url,
+            logo_url: data.image_url,
+            rawData: data,
+            createdBy: {
+              connect: {
+                id: data.id,
+              },
+            },
+          },
+        });
         break;
       case "user.updated":
         await prisma.user.update({
