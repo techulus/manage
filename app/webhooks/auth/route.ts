@@ -95,7 +95,7 @@ export async function POST(request: Request) {
           },
         });
       default:
-        throw new Error("Invalid message type");
+        console.log("POST /webhooks/auth Unknown message type:", msg.type);
     }
 
     return new Response("OK");
