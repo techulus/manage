@@ -37,30 +37,32 @@ export async function POST(request: Request) {
 
     switch (msg.type) {
       case "user.created":
-        await prisma.user.create({
-          data: {
-            id: data.id,
-            email: data.email_addresses[0].email_address,
-            first_name: data.first_name,
-            last_name: data.last_name,
-            rawData: data,
-          },
-        });
-        // Create a personal organization for the user
-        await prisma.organization.create({
-          data: {
-            id: data.id,
-            name: "Personal",
-            image_url: data.image_url,
-            logo_url: data.image_url,
-            rawData: data,
-            createdBy: {
-              connect: {
-                id: data.id,
+        await prisma.$transaction([
+          prisma.user.create({
+            data: {
+              id: data.id,
+              email: data.email_addresses[0].email_address,
+              first_name: data.first_name,
+              last_name: data.last_name,
+              rawData: data,
+            },
+          }),
+          // Create a personal organization for the user
+          prisma.organization.create({
+            data: {
+              id: data.id,
+              name: "Personal",
+              image_url: data.image_url,
+              logo_url: data.image_url,
+              rawData: data,
+              createdBy: {
+                connect: {
+                  id: data.id,
+                },
               },
             },
-          },
-        });
+          }),
+        ]);
         break;
       case "user.updated":
         await prisma.user.update({
