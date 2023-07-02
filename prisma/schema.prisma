@@ -34,7 +34,7 @@ model Organization {
   logo_url      String?
   rawData       Json?
   createdByUser String
-  createdBy     User      @relation(fields: [createdByUser], references: [id])
+  createdBy     User      @relation(fields: [createdByUser], references: [id], onDelete: Cascade)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   projects      Project[]
@@ -50,7 +50,7 @@ model Project {
   documents      Document[]
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
-  Organization   Organization? @relation(fields: [organizationId], references: [id])
+  Organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String?
 }
 

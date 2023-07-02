@@ -21,14 +21,13 @@ export default async function ProjectDetails({ params }: Props) {
   const project = await prisma.project.findFirstOrThrow({
     where: {
       id: Number(projectId),
-      ownerId,
+      organizationId: ownerId,
     },
   });
 
   const taskLists = await prisma.taskList.findMany({
     where: {
       projectId: Number(projectId),
-      ownerId,
     },
     take: 2,
   });
