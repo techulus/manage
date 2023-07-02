@@ -4,9 +4,12 @@ import { Webhook, WebhookRequiredHeaders } from "svix";
 const webhookSecret = process.env.AUTH_WEBHOOK_SECRET;
 
 enum MessageTypes {
+  // User
   "user.created" = "user.created",
   "user.updated" = "user.updated",
-  "user.deleted" = "user.deleted",
+  // Organization
+  "organization.created" = "organization.created",
+  "organization.updated" = "organization.updated",
 }
 
 type Message = {
@@ -57,6 +60,40 @@ export async function POST(request: Request) {
           },
         });
         break;
+
+      case "organization.created":
+        await prisma.organization.create({
+          data: {
+            id: data.id,
+            name: data.name,
+            image_url: data.image_url,
+            logo_url: data.logo_url,
+            rawData: data,
+            createdBy: {
+              connect: {
+                id: data.created_by,
+              },
+            },
+          },
+        });
+        break;
+      case "organization.updated":
+        await prisma.organization.update({
+          where: {
+            id: data.id,
+          },
+          data: {
+            name: data.name,
+            image_url: data.image_url,
+            logo_url: data.logo_url,
+            rawData: data,
+            createdBy: {
+              connect: {
+                id: data.created_by,
+              },
+            },
+          },
+        });
       default:
         throw new Error("Invalid message type");
     }
