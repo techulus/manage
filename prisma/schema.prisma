@@ -25,6 +25,10 @@ model User {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   organizations Organization[]
+  TaskList      TaskList[]
+  Task          Task[]
+  Document      Document[]
+  Project       Project[]
 }
 
 model Organization {
@@ -45,47 +49,55 @@ model Project {
   name           String
   description    String?
   status         String
-  deadline       DateTime?
+  dueDate        DateTime?
   taskLists      TaskList[]
   documents      Document[]
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String?
+  createdByUser  String
+  createdBy      User          @relation(fields: [createdByUser], references: [id], onDelete: Cascade)
 }
 
 model TaskList {
-  id          Int       @id @default(autoincrement())
-  projectId   Int
-  name        String
-  description String?
-  status      String
-  deadline    DateTime?
-  tasks       Task[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  id            Int       @id @default(autoincrement())
+  projectId     Int
+  name          String
+  description   String?
+  status        String
+  dueDate       DateTime?
+  tasks         Task[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdByUser String
+  createdBy     User      @relation(fields: [createdByUser], references: [id], onDelete: Cascade)
 }
 
 model Task {
-  id          Int       @id @default(autoincrement())
-  taskListId  Int
-  name        String
-  description String?
-  status      String
-  deadline    DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  taskList    TaskList  @relation(fields: [taskListId], references: [id], onDelete: Cascade)
+  id            Int       @id @default(autoincrement())
+  taskListId    Int
+  name          String
+  description   String?
+  status        String
+  dueDate       DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  taskList      TaskList  @relation(fields: [taskListId], references: [id], onDelete: Cascade)
+  createdByUser String
+  createdBy     User      @relation(fields: [createdByUser], references: [id], onDelete: Cascade)
 }
 
 model Document {
-  id          Int      @id @default(autoincrement())
-  projectId   Int
-  name        String
-  description String?
-  status      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  id            Int      @id @default(autoincrement())
+  projectId     Int
+  name          String
+  description   String?
+  status        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdByUser String
+  createdBy     User     @relation(fields: [createdByUser], references: [id], onDelete: Cascade)
 }

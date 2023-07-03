@@ -17,7 +17,7 @@ interface Props {
 export const dynamic = "force-dynamic";
 
 export default async function Projects({ searchParams }: Props) {
-  const ownerId = getOwner();
+  const { ownerId } = getOwner();
 
   const currentPage = searchParams.page ? parseInt(searchParams.page) : 1;
 

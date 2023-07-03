@@ -48,6 +48,7 @@ export default function SharedForm({ project }: { project?: Project | null }) {
       </div>
 
       <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 py-2">
+        <input type="hidden" name="dueDate" value={date?.toISOString()} />
         <label
           htmlFor="description"
           className="block lg:text-right text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5"

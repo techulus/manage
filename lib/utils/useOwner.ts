@@ -1,6 +1,12 @@
 import { auth } from "@clerk/nextjs";
 
-export function getOwner() {
+type Result = {
+  ownerId: string;
+  userId: string;
+  orgId: string;
+};
+
+export function getOwner(): Result {
   const { userId, orgId } = auth();
-  return orgId ?? userId ?? "";
+  return { ownerId: orgId ?? userId ?? "", userId, orgId } as Result;
 }

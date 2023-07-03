@@ -9,67 +9,38 @@ import { TaskItem } from "./task-item";
 
 export const TaskListItem = ({
   tasks,
+  userId,
   taskListId,
   projectId,
 }: {
   tasks: Task[];
+  userId: string;
   taskListId: number;
   projectId: number;
 }) => {
-  const [optimisticTasks, updateOptimisticTasks] = useOptimistic(
-    tasks,
-    (tasks: Task[], action: { type: "insert" | "update"; task: Task }) => {
-      if (action.type === "insert") {
-        return [...tasks, action.task];
-      } else {
-        return tasks.map((task) =>
-          task.id === action.task.id ? action.task : task
-        );
-      }
-    }
-  );
-
   const todoItems = useMemo(
-    () => optimisticTasks.filter((task) => task.status === "todo"),
-    [optimisticTasks]
+    () => tasks.filter((task) => task.status === "todo"),
+    [tasks]
   );
   const doneItems = useMemo(
-    () => optimisticTasks.filter((task) => task.status === "done"),
-    [optimisticTasks]
+    () => tasks.filter((task) => task.status === "done"),
+    [tasks]
   );
 
   return (
     <div className="p-4">
       <div className="space-y-2">
         {todoItems.map((task) => (
-          <TaskItem
-            key={task.id}
-            task={task}
-            projectId={Number(projectId)}
-            updateOptimisticTasks={updateOptimisticTasks}
-          />
+          <TaskItem key={task.id} task={task} projectId={Number(projectId)} />
         ))}
 
         <form
           action={async (formData: FormData) => {
             const name = formData.get("name") as string;
 
-            updateOptimisticTasks({
-              type: "insert",
-              task: {
-                id: 99,
-                name,
-                status: "todo",
-                deadline: null,
-                description: null,
-                taskListId,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-              },
-            });
-
             await createTask({
               name,
+              userId,
               taskListId,
               projectId,
             });
@@ -79,12 +50,7 @@ export const TaskListItem = ({
         </form>
 
         {doneItems.map((task) => (
-          <TaskItem
-            key={task.id}
-            task={task}
-            projectId={Number(projectId)}
-            updateOptimisticTasks={updateOptimisticTasks}
-          />
+          <TaskItem key={task.id} task={task} projectId={Number(projectId)} />
         ))}
       </div>
     </div>

@@ -77,10 +77,6 @@
   }
 }
 
-html {
-  background-color: black !important;
-}
-
 .prose p,
 .prose pre {
   margin: 12px 0;

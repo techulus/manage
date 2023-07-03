@@ -10,14 +10,9 @@ import { experimental_useOptimistic as useOptimistic } from "react";
 export const TaskItem = ({
   task,
   projectId,
-  updateOptimisticTasks,
 }: {
   task: Task;
   projectId: number;
-  updateOptimisticTasks: (action: {
-    type: "insert" | "update";
-    task: Task;
-  }) => void;
 }) => {
   const [optimisticTask, updateOptimisticTask] = useOptimistic(
     task,
@@ -35,10 +30,6 @@ export const TaskItem = ({
         onCheckedChange={async (checked) => {
           const status = checked ? "done" : "todo";
           updateOptimisticTask(status);
-          updateOptimisticTasks({
-            type: "update",
-            task: { ...optimisticTask, status },
-          });
           await updateTask({
             id,
             status,

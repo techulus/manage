@@ -32,7 +32,7 @@ async function TaskListDetails({
 }
 
 export default async function ProjectDetails({ params }: Props) {
-  const ownerId = getOwner();
+  const { ownerId } = getOwner();
   const { projectId } = params;
 
   const project = await prisma.project.findFirst({
