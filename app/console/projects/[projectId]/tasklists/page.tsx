@@ -16,6 +16,7 @@ async function TaskListDetails({
   projectId: number;
   taskListId: number;
 }) {
+  const { userId } = getOwner();
   const tasks = await prisma.task.findMany({
     where: {
       taskListId: Number(taskListId),
@@ -27,7 +28,12 @@ async function TaskListDetails({
   }
 
   return (
-    <TaskListItem taskListId={taskListId} tasks={tasks} projectId={projectId} />
+    <TaskListItem
+      taskListId={taskListId}
+      tasks={tasks}
+      projectId={projectId}
+      userId={userId}
+    />
   );
 }
 
