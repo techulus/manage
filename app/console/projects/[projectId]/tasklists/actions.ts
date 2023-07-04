@@ -49,7 +49,6 @@ export async function createTaskList(payload: FormData) {
     dueDate,
     status: "active",
   });
-  console.log("data", data);
 
   await prisma.taskList.create({
     data: {
@@ -71,13 +70,38 @@ export async function createTaskList(payload: FormData) {
   redirect(`/console/projects/${projectId}/tasklists`);
 }
 
+export async function updateTaskList(payload: FormData) {
+  const id = payload.get("id") as string;
+  const name = payload.get("name") as string;
+  const description = payload.get("description") as string;
+  const dueDate = payload.get("dueDate") as string;
+  const projectId = payload.get("projectId") as string;
+
+  const data = taskListSchema.parse({
+    name,
+    description,
+    dueDate,
+    status: "active",
+  });
+
+  await prisma.taskList.update({
+    where: {
+      id: Number(id),
+    },
+    data,
+  });
+
+  revalidatePath(`/console/projects/${projectId}/tasklists`);
+  redirect(`/console/projects/${projectId}/tasklists`);
+}
+
 export async function createTask({
   userId,
   taskListId,
   projectId,
   name,
   description = "",
-  dueDate,
+  dueDate = "",
 }: {
   userId: string;
   taskListId: number;

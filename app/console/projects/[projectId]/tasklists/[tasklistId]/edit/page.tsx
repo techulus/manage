@@ -5,24 +5,34 @@ import PageTitle from "@/components/layout/page-title";
 import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import Link from "next/link";
-import { createTaskList } from "../actions";
+import { updateTaskList } from "../../actions";
+import { prisma } from "@/lib/utils/db";
 
 type Props = {
   params: {
     projectId: string;
+    tasklistId: string;
   };
 };
 
-export default async function CreateTaskList({ params }: Props) {
+export default async function EditTaskList({ params }: Props) {
+  const tasklist = await prisma.taskList.findUnique({
+    where: {
+      id: Number(params.tasklistId),
+    },
+  });
+
   const backUrl = `/console/projects/${params.projectId}/tasklists`;
+
   return (
     <>
-      <PageTitle title="Create Task list" backUrl={backUrl} />
-      <form action={createTaskList}>
+      <PageTitle title="Update Task list" backUrl={backUrl} />
+      <form action={updateTaskList}>
+        <input type="hidden" name="id" defaultValue={params.tasklistId} />
         <input type="hidden" name="projectId" defaultValue={params.projectId} />
         <ContentBlock>
           <CardContent>
-            <SharedForm />
+            <SharedForm item={tasklist} />
           </CardContent>
           <CardFooter>
             <div className="flex ml-auto items-center justify-end gap-x-6">

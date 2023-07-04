@@ -11,7 +11,9 @@ export default function InlineTaskForm() {
   const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
-    setIsCreating(false);
+    if (!pending) {
+      setIsCreating(false);
+    }
   }, [pending]);
 
   if (!isCreating) {

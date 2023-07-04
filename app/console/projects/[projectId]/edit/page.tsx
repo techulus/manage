@@ -35,7 +35,7 @@ export default async function EditProject({ params }: Props) {
         <ContentBlock>
           <CardContent>
             <input type="hidden" name="id" defaultValue={projectId} />
-            <SharedForm project={project} />
+            <SharedForm item={project} />
           </CardContent>
           <CardFooter>
             <div className="flex items-center justify-end gap-x-6">

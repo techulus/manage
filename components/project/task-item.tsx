@@ -6,6 +6,7 @@ import { Checkbox } from "../ui/checkbox";
 
 import { cn } from "@/lib/utils";
 import { experimental_useOptimistic as useOptimistic } from "react";
+import toast from "react-hot-toast";
 
 export const TaskItem = ({
   task,
@@ -30,11 +31,19 @@ export const TaskItem = ({
         onCheckedChange={async (checked) => {
           const status = checked ? "done" : "todo";
           updateOptimisticTask(status);
-          await updateTask({
-            id,
-            status,
-            projectId,
-          });
+
+          toast.promise(
+            updateTask({
+              id,
+              status,
+              projectId,
+            }),
+            {
+              loading: "Saving...",
+              success: "Done!",
+              error: "Error while saving, please try again.",
+            }
+          );
         }}
       />
       <label

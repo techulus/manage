@@ -7,6 +7,7 @@ import { prisma } from "@/lib/utils/db";
 import { getOwner } from "@/lib/utils/useOwner";
 import Link from "next/link";
 import { archiveProject } from "../actions";
+import { MarkdownView } from "@/components/core/markdown-view";
 
 type Props = {
   params: {
@@ -69,6 +70,14 @@ export default async function ProjectDetails({ params }: Props) {
         actionLabel="Edit"
         actionLink={`/console/projects/${projectId}/edit`}
       />
+
+      {project.description ? (
+        <ContentBlock className="border-none">
+          <div className="p-6 border-b border-gray-900/5">
+            <MarkdownView content={project.description ?? ""} />
+          </div>
+        </ContentBlock>
+      ) : null}
 
       <ContentBlock>
         <CardHeader>

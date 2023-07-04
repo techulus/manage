@@ -10,40 +10,41 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "@heroicons/react/20/solid";
-import { Project } from "@prisma/client";
+import { Project, TaskList } from "@prisma/client";
 import { format } from "date-fns";
 import { useState } from "react";
-import { Textarea } from "../ui/textarea";
+import MarkdownEditor from "../editor";
 
-export default function SharedForm({ project }: { project?: Project | null }) {
+export default function SharedForm({
+  item,
+}: {
+  item?: Project | TaskList | null;
+}) {
   const [date, setDate] = useState<Date>();
 
   return (
-    <div className="pt-4 space-y-2 sm:space-y-3">
+    <div className="mt-10 space-y-8 border-b border-gray-900/10 pb-12 sm:space-y-0 sm:divide-y sm:divide-gray-900/10 sm:border-t sm:pb-0">
       <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 py-2">
         <label
           htmlFor="name"
-          className="block lg:text-right text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5"
+          className="block lg:text-left text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5"
         >
           Name
         </label>
         <div className="mt-2 sm:col-span-2 sm:mt-0">
-          <Input type="text" name="name" defaultValue={project?.name ?? ""} />
+          <Input type="text" name="name" defaultValue={item?.name ?? ""} />
         </div>
       </div>
 
       <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 py-2">
         <label
           htmlFor="description"
-          className="block lg:text-right text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5"
+          className="block lg:text-left text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5"
         >
           Notes
         </label>
         <div className="mt-2 sm:col-span-2 sm:mt-0">
-          <Textarea
-            name="description"
-            defaultValue={project?.description ?? ""}
-          />
+          <MarkdownEditor defaultValue={item?.description ?? ""} />
         </div>
       </div>
 
@@ -51,7 +52,7 @@ export default function SharedForm({ project }: { project?: Project | null }) {
         <input type="hidden" name="dueDate" value={date?.toISOString()} />
         <label
           htmlFor="description"
-          className="block lg:text-right text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5"
+          className="block lg:text-left text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5"
         >
           Due on
         </label>
