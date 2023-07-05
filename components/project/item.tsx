@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { convertMarkdownToPlainText } from "@/lib/utils/useMarkdown";
 import { Project } from "@prisma/client";
 
 export const ProjecItem = ({ id, name, description }: Project) => {
@@ -16,8 +17,8 @@ export const ProjecItem = ({ id, name, description }: Project) => {
             {name}
           </a>
         </h3>
-        <p className="mt-2 text-sm text-gray-500 dark:text-gray-200">
-          {description}
+        <p className="mt-2 text-sm text-gray-500 dark:text-gray-200 line-clamp-2">
+          {convertMarkdownToPlainText(description)}
         </p>
       </div>
       <span

@@ -8,6 +8,10 @@ import { getOwner } from "@/lib/utils/useOwner";
 import Link from "next/link";
 import { archiveProject } from "../actions";
 import { MarkdownView } from "@/components/core/markdown-view";
+import {
+  TaskListHeader,
+  TaskListWithCount,
+} from "@/components/project/tasklist-header";
 
 type Props = {
   params: {
@@ -44,6 +48,7 @@ export default async function ProjectDetails({ params }: Props) {
           status: "active",
         },
       },
+      projectId: true,
     },
     where: {
       projectId: Number(projectId),
@@ -72,8 +77,8 @@ export default async function ProjectDetails({ params }: Props) {
       />
 
       {project.description ? (
-        <ContentBlock className="border-none">
-          <div className="p-6 border-b border-gray-900/5">
+        <ContentBlock className="border-none shadow-none">
+          <div className="p-6">
             <MarkdownView content={project.description ?? ""} />
           </div>
         </ContentBlock>
@@ -108,17 +113,12 @@ export default async function ProjectDetails({ params }: Props) {
             className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-2 xl:gap-x-8"
           >
             {taskLists.map((taskList) => (
-              <Link
+              <div
                 key={taskList.id}
-                href={`/console/projects/${projectId}/tasklists`}
                 className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
               >
-                <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 dark:bg-gray-900 p-6">
-                  <div className="text-md font-medium leading-6">
-                    {taskList.name}
-                  </div>
-                </div>
-              </Link>
+                <TaskListHeader taskList={taskList as TaskListWithCount} />
+              </div>
             ))}
           </ul>
         </CardContent>
@@ -152,7 +152,7 @@ export default async function ProjectDetails({ params }: Props) {
             role="list"
             className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-2 xl:gap-x-8"
           >
-            {documents.map(({ id, name }) => (
+            {taskLists.map(({ id, name }) => (
               <Link
                 key={id}
                 href={`/console/projects/${projectId}/documents`}

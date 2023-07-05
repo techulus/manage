@@ -1,9 +1,12 @@
 import { MarkdownView } from "@/components/core/markdown-view";
 import PageTitle from "@/components/layout/page-title";
 import { TaskListItem } from "@/components/project/tasklist";
+import {
+  TaskListHeader,
+  TaskListWithCount,
+} from "@/components/project/tasklist-header";
 import { prisma } from "@/lib/utils/db";
 import { getOwner } from "@/lib/utils/useOwner";
-import { PencilSquareIcon } from "@heroicons/react/20/solid";
 
 type Props = {
   params: {
@@ -80,20 +83,7 @@ export default async function ProjectDetails({ params }: Props) {
                 key={taskList.id}
                 className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
               >
-                <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 dark:bg-gray-900 p-6">
-                  <div className="font-medium text-xl leading-6">
-                    {taskList.name}
-                  </div>
-
-                  <div className="flex-1 flex justify-end">
-                    <a
-                      href={`/console/projects/${projectId}/tasklists/${taskList.id}/edit`}
-                      className="text-sm font-medium text-gray-500 hover:text-gray-700 dark:hover:text-gray-400"
-                    >
-                      <PencilSquareIcon className="w-5 h-5" />
-                    </a>
-                  </div>
-                </div>
+                <TaskListHeader taskList={taskList as TaskListWithCount} />
                 {taskList.description ? (
                   <div className="p-6 border-b border-gray-900/5">
                     <MarkdownView content={taskList.description ?? ""} />
