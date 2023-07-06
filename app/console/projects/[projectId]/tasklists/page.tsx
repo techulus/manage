@@ -42,7 +42,7 @@ async function TaskListDetails({
   );
 }
 
-export default async function ProjectDetails({ params }: Props) {
+export default async function TaskLists({ params }: Props) {
   const { ownerId } = getOwner();
   const { projectId } = params;
 

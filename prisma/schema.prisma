@@ -90,14 +90,14 @@ model Task {
 }
 
 model Document {
-  id            Int      @id @default(autoincrement())
-  projectId     Int
-  name          String
-  description   String?
-  status        String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  createdByUser String
-  createdBy     User     @relation(fields: [createdByUser], references: [id], onDelete: Cascade)
+  id              Int      @id @default(autoincrement())
+  projectId       Int
+  name            String
+  markdownContent String
+  status          String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdByUser   String
+  createdBy       User     @relation(fields: [createdByUser], references: [id], onDelete: Cascade)
 }

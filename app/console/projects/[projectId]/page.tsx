@@ -12,6 +12,7 @@ import {
   TaskListHeader,
   TaskListWithCount,
 } from "@/components/project/tasklist-header";
+import { DocumentHeader } from "@/components/project/document-header";
 
 type Props = {
   params: {
@@ -131,7 +132,7 @@ export default async function ProjectDetails({ params }: Props) {
 
             <div>
               <a
-                href={`/console/projects/${projectId}/tasklists/new`}
+                href={`/console/projects/${projectId}/document/new`}
                 className={buttonVariants({ variant: "link" })}
               >
                 Create<span className="sr-only">, document</span>
@@ -152,15 +153,13 @@ export default async function ProjectDetails({ params }: Props) {
             role="list"
             className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-2 xl:gap-x-8"
           >
-            {taskLists.map(({ id, name }) => (
+            {documents.map((document) => (
               <Link
-                key={id}
+                key={document.id}
                 href={`/console/projects/${projectId}/documents`}
                 className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
               >
-                <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6">
-                  <div className="text-md font-medium leading-6">{name}</div>
-                </div>
+                <DocumentHeader document={document} />
               </Link>
             ))}
           </ul>
