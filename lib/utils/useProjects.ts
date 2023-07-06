@@ -1,8 +1,6 @@
 import { Prisma, Project } from "@prisma/client";
 import { prisma } from "./db";
 
-export const LIMIT = 15;
-
 export async function getProjectById(id: number): Promise<Project | null> {
   return prisma.project.findUnique({
     where: {
@@ -14,14 +12,11 @@ export async function getProjectById(id: number): Promise<Project | null> {
 export async function getProjectsForOwner({
   ownerId,
   search,
-  page = 1,
 }: {
   ownerId: string;
   search?: string;
-  page?: number;
 }): Promise<{
   projects: Project[];
-  count: number;
 }> {
   const dbQuery: Prisma.ProjectFindManyArgs = {
     where: {
@@ -32,8 +27,6 @@ export async function getProjectsForOwner({
     orderBy: {
       createdAt: "desc",
     },
-    take: LIMIT,
-    skip: (page - 1) * LIMIT,
   };
 
   if (search) {
@@ -42,16 +35,7 @@ export async function getProjectsForOwner({
     };
   }
 
-  const [projects, count]: [Project[], number] = await prisma.$transaction([
-    prisma.project.findMany(dbQuery),
-    prisma.project.count({
-      where: {
-        organizationId: {
-          equals: ownerId,
-        },
-      },
-    }),
-  ]);
+  const projects: Project[] = await prisma.project.findMany(dbQuery);
 
-  return { projects, count };
+  return { projects };
 }

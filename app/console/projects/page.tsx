@@ -4,7 +4,7 @@ import { ProjecItem } from "@/components/project/item";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getOwner } from "@/lib/utils/useOwner";
-import { LIMIT, getProjectsForOwner } from "@/lib/utils/useProjects";
+import { getProjectsForOwner } from "@/lib/utils/useProjects";
 import Link from "next/link";
 
 interface Props {
@@ -21,10 +21,9 @@ export default async function Projects({ searchParams }: Props) {
 
   const currentPage = searchParams.page ? parseInt(searchParams.page) : 1;
 
-  const { projects, count } = await getProjectsForOwner({
+  const { projects } = await getProjectsForOwner({
     ownerId,
     search: searchParams.search,
-    page: currentPage,
   });
 
   return (
@@ -102,52 +101,6 @@ export default async function Projects({ searchParams }: Props) {
             ))}
           </div>
         </ul>
-
-        {projects.length > 0 && !searchParams.search ? (
-          <nav className="flex items-center justify-between border-t border-gray-200 dark:border-gray-800 px-4 py-3 sm:px-6">
-            <div className="hidden sm:block">
-              <p className="text-sm text-gray-700 dark:text-gray-400">
-                Showing{" "}
-                <span className="font-medium">
-                  {(currentPage - 1) * LIMIT + 1}
-                </span>{" "}
-                to{" "}
-                <span className="font-medium">
-                  {Math.min(currentPage * LIMIT, count)}
-                </span>{" "}
-                of <span className="font-medium">{count}</span> projects
-              </p>
-            </div>
-
-            <div className="flex flex-1 justify-between sm:justify-end">
-              {currentPage > 1 ? (
-                <form action="/console/projects">
-                  <input
-                    type="hidden"
-                    name="page"
-                    defaultValue={currentPage - 1}
-                  />
-                  <Button type="submit" variant="ghost">
-                    Previous
-                  </Button>
-                </form>
-              ) : null}
-
-              {(currentPage - 1) * LIMIT + projects.length < count ? (
-                <form action="/console/projects">
-                  <input
-                    type="hidden"
-                    name="page"
-                    defaultValue={currentPage + 1}
-                  />
-                  <Button type="submit" variant="ghost">
-                    Next
-                  </Button>
-                </form>
-              ) : null}
-            </div>
-          </nav>
-        ) : null}
       </ContentBlock>
     </>
   );
