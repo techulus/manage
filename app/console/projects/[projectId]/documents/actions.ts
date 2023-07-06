@@ -45,3 +45,26 @@ export async function createDocument(payload: FormData) {
   revalidatePath(`/console/projects/${projectId}/documents`);
   redirect(`/console/projects/${projectId}/documents`);
 }
+
+export async function updateDocument(payload: FormData) {
+  const name = payload.get("name") as string;
+  const markdownContent = payload.get("markdownContent") as string;
+  const id = payload.get("id") as string;
+  const projectId = payload.get("projectId") as string;
+
+  const data = documentSchema.parse({
+    name,
+    markdownContent,
+    status: "active",
+  });
+
+  await prisma.document.update({
+    where: {
+      id: Number(id),
+    },
+    data,
+  });
+
+  revalidatePath(`/console/projects/${projectId}/documents`);
+  redirect(`/console/projects/${projectId}/documents`);
+}
