@@ -3,7 +3,7 @@ import PageTitle from "@/components/layout/page-title";
 import { TaskListItem } from "@/components/project/tasklist";
 import { TaskListHeader } from "@/components/project/tasklist-header";
 import { db } from "@/drizzle/db";
-import { task, taskList } from "@/drizzle/schema";
+import { taskList } from "@/drizzle/schema";
 import { getOwner } from "@/lib/utils/useOwner";
 import { getProjectById } from "@/lib/utils/useProjects";
 import { eq } from "drizzle-orm";
@@ -14,44 +14,20 @@ type Props = {
   };
 };
 
-async function TaskListDetails({
-  projectId,
-  taskListId,
-}: {
-  projectId: number;
-  taskListId: number;
-}) {
-  const { userId } = getOwner();
-  const allTasks = await db
-    .select()
-    .from(task)
-    .where(eq(task.taskListId, Number(taskListId)))
-    .all();
-
-  if (!taskListId) {
-    return <div>Tasklist not found</div>;
-  }
-
-  return (
-    <TaskListItem
-      taskListId={taskListId}
-      tasks={allTasks}
-      projectId={projectId}
-      userId={userId}
-    />
-  );
-}
-
 export default async function TaskLists({ params }: Props) {
+  const { userId } = getOwner();
   const { projectId } = params;
 
   const project = await getProjectById(projectId);
 
-  const taskLists = await db
-    .select()
-    .from(taskList)
-    .where(eq(taskList.projectId, Number(projectId)))
-    .all();
+  const taskLists = await db.query.taskList
+    .findMany({
+      where: eq(taskList.projectId, Number(projectId)),
+      with: {
+        tasks: true,
+      },
+    })
+    .execute();
 
   return (
     <>
@@ -78,9 +54,11 @@ export default async function TaskLists({ params }: Props) {
                   </div>
                 ) : null}
                 {/* @ts-ignore React server component */}
-                <TaskListDetails
-                  projectId={Number(projectId)}
+                <TaskListItem
                   taskListId={taskList.id}
+                  tasks={taskList.tasks}
+                  projectId={Number(projectId)}
+                  userId={userId}
                 />
               </div>
             ))}
