@@ -6,10 +6,7 @@ import { DocumentHeader } from "@/components/project/document-header";
 import { TaskListHeader } from "@/components/project/tasklist-header";
 import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardHeader } from "@/components/ui/card";
-import { db } from "@/drizzle/db";
-import { document, taskList } from "@/drizzle/schema";
 import { getProjectById } from "@/lib/utils/useProjects";
-import { eq } from "drizzle-orm";
 import { archiveProject } from "../actions";
 
 type Props = {
@@ -21,17 +18,7 @@ type Props = {
 export default async function ProjectDetails({ params }: Props) {
   const { projectId } = params;
 
-  const project = await getProjectById(projectId);
-  const taskLists = await db
-    .select()
-    .from(taskList)
-    .where(eq(taskList.projectId, Number(projectId)))
-    .all();
-  const documents = await db
-    .select()
-    .from(document)
-    .where(eq(document.projectId, Number(projectId)))
-    .all();
+  const project = await getProjectById(projectId, true);
 
   return (
     <>
@@ -78,7 +65,7 @@ export default async function ProjectDetails({ params }: Props) {
             role="list"
             className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2"
           >
-            {taskLists.map((taskList) => (
+            {project.taskLists.map((taskList) => (
               <div
                 key={taskList.id}
                 className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
@@ -118,7 +105,7 @@ export default async function ProjectDetails({ params }: Props) {
             role="list"
             className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2"
           >
-            {documents.map((document) => (
+            {project.documents.map((document) => (
               <div
                 key={document.id}
                 className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"

@@ -92,7 +92,7 @@ export default function NavBar({ appearance }: Props) {
       <div
         className={cn(
           "flex px-4 lg:px-8 min-w-full bg-background border-b border-gray-200 dark:border-gray-800 -mb-px self-start sticky -top-[1px] z-10",
-          isSticky ? "pt-[1px] bg-red shadow-md" : ""
+          isSticky ? "pt-[1px] shadow-md" : ""
         )}
         ref={ref}
         aria-label="Tabs"

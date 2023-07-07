@@ -6,8 +6,8 @@ import MarkdownEditor from "../editor";
 
 export default function DocumentForm({ item }: { item?: Document | null }) {
   return (
-    <div className="mt-10 space-y-8 border-b border-gray-900/10 pb-12 sm:space-y-0 sm:divide-y sm:divide-gray-900/10 sm:border-t sm:pb-0">
-      <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 py-2">
+    <div className="my-2 space-y-4">
+      <div className="space-y-2">
         <label
           htmlFor="name"
           className="block lg:text-left text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5"
@@ -19,9 +19,9 @@ export default function DocumentForm({ item }: { item?: Document | null }) {
         </div>
       </div>
 
-      <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 py-2">
+      <div className="space-y-2">
         <label
-          htmlFor="description"
+          htmlFor="markdownContent"
           className="block lg:text-left text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5"
         >
           Content

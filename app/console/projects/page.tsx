@@ -2,7 +2,6 @@ import { ContentBlock } from "@/components/core/content-block";
 import PageTitle from "@/components/layout/page-title";
 import { ProjecItem } from "@/components/project/item";
 import { Input } from "@/components/ui/input";
-import { getOwner } from "@/lib/utils/useOwner";
 import { getProjectsForOwner } from "@/lib/utils/useProjects";
 import Link from "next/link";
 
@@ -16,10 +15,7 @@ interface Props {
 export const dynamic = "force-dynamic";
 
 export default async function Projects({ searchParams }: Props) {
-  const { ownerId } = getOwner();
-
   const { projects } = await getProjectsForOwner({
-    ownerId,
     search: searchParams.search,
   });
 

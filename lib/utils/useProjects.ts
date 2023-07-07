@@ -1,71 +1,89 @@
 import { db } from "@/drizzle/db";
 import { document, project, taskList } from "@/drizzle/schema";
-import { Document, Project } from "@/drizzle/types";
-import { eq, like } from "drizzle-orm";
+import { Document, Project, TaskList } from "@/drizzle/types";
+import { and, eq, like } from "drizzle-orm";
+import { getOwner } from "./useOwner";
+
+type ProjectWithData = Project & {
+  taskLists: TaskList[];
+  documents: Document[];
+};
 
 export async function getProjectsForOwner({
-  ownerId,
   search,
 }: {
-  ownerId: string;
   search?: string;
 }): Promise<{
   projects: Project[];
 }> {
-  const query = db
-    .select()
-    .from(project)
-    .where(eq(project.organizationId, ownerId));
+  const { ownerId } = getOwner();
 
-  if (search) {
-    query.where(like(project.name, `%${search}%`));
-  }
-
-  const projects: Project[] = await query.all();
+  const projects = await db.query.project
+    .findMany({
+      where: search
+        ? and(
+            eq(project.organizationId, ownerId),
+            like(project.name, `%${search}%`)
+          )
+        : eq(project.organizationId, ownerId),
+    })
+    .execute();
 
   return { projects };
 }
 
 export async function getProjectById(
-  projectId: string | number
-): Promise<Project> {
-  const projects: Project[] = await db
-    .select()
-    .from(project)
-    .where(eq(project.id, Number(projectId)))
-    .all();
+  projectId: string | number,
+  withTasksAndDocs = false
+): Promise<ProjectWithData> {
+  const { ownerId } = getOwner();
 
-  if (!projects.length) {
+  const data = await db.query.project
+    .findFirst({
+      where: and(
+        eq(project.id, Number(projectId)),
+        eq(project.organizationId, ownerId)
+      ),
+      with: withTasksAndDocs
+        ? {
+            taskLists: true,
+            documents: true,
+          }
+        : {},
+    })
+    .execute();
+
+  if (!data) {
     throw new Error(`Project with id ${projectId} not found`);
   }
 
-  return projects[0];
+  return data as ProjectWithData;
 }
 
 export async function getTaskListById(taskListId: string | number) {
-  const taskLists = await db
-    .select()
-    .from(taskList)
-    .where(eq(taskList.id, Number(taskListId)))
-    .all();
+  const data = await db.query.taskList
+    .findFirst({
+      where: eq(taskList.id, Number(taskListId)),
+    })
+    .execute();
 
-  if (!taskLists.length) {
+  if (!data) {
     throw new Error(`TaskList with id ${taskListId} not found`);
   }
 
-  return taskLists[0];
+  return data;
 }
 
 export async function getDocumentById(documentId: string | number) {
-  const documents: Document[] = await db
-    .select()
-    .from(document)
-    .where(eq(document.id, Number(documentId)))
-    .all();
+  const data = await db.query.document
+    .findFirst({
+      where: eq(document.id, Number(documentId)),
+    })
+    .execute();
 
-  if (!documents.length) {
+  if (!data) {
     throw new Error(`Document with id ${documentId} not found`);
   }
 
-  return documents[0];
+  return data;
 }
