@@ -1,7 +1,9 @@
 "use server";
 
-import { prisma } from "@/lib/utils/db";
+import { db } from "@/drizzle/db";
+import { document } from "@/drizzle/schema";
 import { getOwner } from "@/lib/utils/useOwner";
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
@@ -26,21 +28,16 @@ export async function createDocument(payload: FormData) {
     status: "active",
   });
 
-  await prisma.document.create({
-    data: {
+  await db
+    .insert(document)
+    .values({
       ...data,
-      createdBy: {
-        connect: {
-          id: userId,
-        },
-      },
-      project: {
-        connect: {
-          id: Number(projectId),
-        },
-      },
-    },
-  });
+      projectId: Number(projectId),
+      createdByUser: userId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .run();
 
   revalidatePath(`/console/projects/${projectId}/documents`);
   redirect(`/console/projects/${projectId}/documents`);
@@ -58,12 +55,14 @@ export async function updateDocument(payload: FormData) {
     status: "active",
   });
 
-  await prisma.document.update({
-    where: {
-      id: Number(id),
-    },
-    data,
-  });
+  await db
+    .update(document)
+    .set({
+      ...data,
+      updatedAt: new Date(),
+    })
+    .where(eq(document.id, Number(id)))
+    .run();
 
   revalidatePath(`/console/projects/${projectId}/documents`);
   redirect(`/console/projects/${projectId}/documents`);

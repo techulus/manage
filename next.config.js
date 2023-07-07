@@ -5,6 +5,7 @@ const nextConfig = {
   },
   experimental: {
     serverActions: true,
+    serverComponentsExternalPackages: ["@libsql"],
   },
 };
 

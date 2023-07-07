@@ -1,8 +1,8 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
+import { Document } from "@/drizzle/types";
 import MarkdownEditor from "../editor";
-import { Document } from "@prisma/client";
 
 export default function DocumentForm({ item }: { item?: Document | null }) {
   return (

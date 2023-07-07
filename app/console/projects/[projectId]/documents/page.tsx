@@ -1,8 +1,11 @@
 import { MarkdownView } from "@/components/core/markdown-view";
 import PageTitle from "@/components/layout/page-title";
 import { DocumentHeader } from "@/components/project/document-header";
-import { prisma } from "@/lib/utils/db";
+import { db } from "@/drizzle/db";
+import { document } from "@/drizzle/schema";
 import { getOwner } from "@/lib/utils/useOwner";
+import { getProjectById } from "@/lib/utils/useProjects";
+import { eq } from "drizzle-orm";
 
 type Props = {
   params: {
@@ -14,21 +17,13 @@ export default async function DocumentsList({ params }: Props) {
   const { ownerId } = getOwner();
   const { projectId } = params;
 
-  const project = await prisma.project.findFirst({
-    where: {
-      id: Number(projectId),
-      organizationId: ownerId,
-    },
-  });
+  const project = await getProjectById(projectId);
 
-  const documents = await prisma.document.findMany({
-    where: {
-      projectId: Number(projectId),
-      project: {
-        organizationId: ownerId,
-      },
-    },
-  });
+  const documents = await db
+    .select()
+    .from(document)
+    .where(eq(document.projectId, Number(projectId)))
+    .all();
 
   if (!project) {
     return <div>Project not found</div>;
@@ -37,7 +32,8 @@ export default async function DocumentsList({ params }: Props) {
   return (
     <>
       <PageTitle
-        title={`${project.name} / Documents`}
+        title="Documents"
+        subTitle={project.name}
         backUrl={`/console/projects/${projectId}`}
         actionLabel="New Document"
         actionLink={`/console/projects/${projectId}/documents/new`}

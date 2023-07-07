@@ -4,9 +4,9 @@ import SharedForm from "@/components/form/shared";
 import PageTitle from "@/components/layout/page-title";
 import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
+import { getTaskListById } from "@/lib/utils/useProjects";
 import Link from "next/link";
 import { updateTaskList } from "../../actions";
-import { prisma } from "@/lib/utils/db";
 
 type Props = {
   params: {
@@ -16,11 +16,7 @@ type Props = {
 };
 
 export default async function EditTaskList({ params }: Props) {
-  const tasklist = await prisma.taskList.findUnique({
-    where: {
-      id: Number(params.tasklistId),
-    },
-  });
+  const tasklist = await getTaskListById(params.tasklistId);
 
   const backUrl = `/console/projects/${params.projectId}/tasklists`;
 

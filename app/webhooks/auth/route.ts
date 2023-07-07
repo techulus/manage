@@ -1,4 +1,6 @@
-import { prisma } from "@/lib/utils/db";
+import { db } from "@/drizzle/db";
+import { organization, user } from "@/drizzle/schema";
+import { eq } from "drizzle-orm";
 import { Webhook, WebhookRequiredHeaders } from "svix";
 
 const webhookSecret = process.env.AUTH_WEBHOOK_SECRET;
@@ -37,80 +39,74 @@ export async function POST(request: Request) {
 
     switch (msg.type) {
       case "user.created":
-        await prisma.$transaction([
-          prisma.user.create({
-            data: {
-              id: data.id,
-              email: data.email_addresses[0].email_address,
-              first_name: data.first_name,
-              last_name: data.last_name,
-              rawData: data,
-            },
-          }),
-          // Create a personal organization for the user
-          prisma.organization.create({
-            data: {
-              id: data.id,
-              name: "Personal",
-              image_url: data.image_url,
-              logo_url: data.image_url,
-              rawData: data,
-              createdBy: {
-                connect: {
-                  id: data.id,
-                },
-              },
-            },
-          }),
-        ]);
+        await db
+          .insert(user)
+          .values({
+            id: data.id,
+            email: data.emailAddresses[0].emailAddress,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            rawData: data,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .run();
+
+        await db
+          .insert(organization)
+          .values({
+            id: data.id,
+            name: "Personal",
+            imageUrl: data.imageUrl,
+            logoUrl: data.imageUrl,
+            rawData: data,
+            createdByUser: data.id,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .run();
         break;
       case "user.updated":
-        await prisma.user.update({
-          where: {
-            id: data.id,
-          },
-          data: {
+        await db
+          .update(user)
+          .set({
             email: data.email_addresses[0].email_address,
-            first_name: data.first_name,
-            last_name: data.last_name,
+            firstName: data.first_name,
+            lastName: data.last_name,
             rawData: data,
-          },
-        });
+            updatedAt: new Date(),
+          })
+          .where(eq(user.id, data.id))
+          .run();
         break;
 
       case "organization.created":
-        await prisma.organization.create({
-          data: {
+        await db
+          .insert(organization)
+          .values({
             id: data.id,
             name: data.name,
-            image_url: data.image_url,
-            logo_url: data.logo_url,
+            imageUrl: data.imageUrl,
+            logoUrl: data.logoUrl,
             rawData: data,
-            createdBy: {
-              connect: {
-                id: data.created_by,
-              },
-            },
-          },
-        });
+            createdByUser: data.createdBy,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .run();
         break;
       case "organization.updated":
-        await prisma.organization.update({
-          where: {
-            id: data.id,
-          },
-          data: {
+        await db
+          .update(organization)
+          .set({
             name: data.name,
-            image_url: data.image_url,
-            logo_url: data.logo_url,
+            imageUrl: data.image_url,
+            logoUrl: data.logo_url,
             rawData: data,
-            createdBy: {
-              connect: {
-                id: data.created_by,
-              },
-            },
-          },
-        });
+            updatedAt: new Date(),
+          })
+          .where(eq(user.id, data.id))
+          .run();
       default:
         console.log("POST /webhooks/auth Unknown message type:", msg.type);
     }

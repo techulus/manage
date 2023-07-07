@@ -4,7 +4,7 @@ import SharedForm from "@/components/form/shared";
 import PageTitle from "@/components/layout/page-title";
 import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
-import { prisma } from "@/lib/utils/db";
+import { getProjectById } from "@/lib/utils/useProjects";
 import Link from "next/link";
 import { updateProject } from "../../actions";
 
@@ -17,15 +17,7 @@ interface Props {
 export default async function EditProject({ params }: Props) {
   const { projectId } = params;
 
-  const project = await prisma.project.findUnique({
-    where: {
-      id: Number(projectId),
-    },
-  });
-
-  if (!project) {
-    return <div>Project not found</div>;
-  }
+  const project = await getProjectById(projectId);
 
   return (
     <>

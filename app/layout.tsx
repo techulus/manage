@@ -4,7 +4,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SITE_METADATA } from "@/data/marketing";
 import { cn } from "@/lib/utils";
 import { cookies } from "next/headers";
-import "./globals.css";
+import "./globals.scss";
 
 export const metadata = {
   title: SITE_METADATA.TITLE,

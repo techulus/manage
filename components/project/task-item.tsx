@@ -1,9 +1,9 @@
 "use client";
 
 import { updateTask } from "@/app/console/projects/[projectId]/tasklists/actions";
-import { Task } from "@prisma/client";
 import { Checkbox } from "../ui/checkbox";
 
+import { Task } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { experimental_useOptimistic as useOptimistic } from "react";
 import toast from "react-hot-toast";

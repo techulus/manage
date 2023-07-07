@@ -8,9 +8,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Project, TaskList } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "@heroicons/react/20/solid";
-import { Project, TaskList } from "@prisma/client";
 import { format } from "date-fns";
 import { useState } from "react";
 import MarkdownEditor from "../editor";

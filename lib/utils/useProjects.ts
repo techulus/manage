@@ -1,13 +1,7 @@
-import { Prisma, Project } from "@prisma/client";
-import { prisma } from "./db";
-
-export async function getProjectById(id: number): Promise<Project | null> {
-  return prisma.project.findUnique({
-    where: {
-      id,
-    },
-  });
-}
+import { db } from "@/drizzle/db";
+import { document, project, taskList } from "@/drizzle/schema";
+import { Document, Project } from "@/drizzle/types";
+import { eq, like } from "drizzle-orm";
 
 export async function getProjectsForOwner({
   ownerId,
@@ -18,24 +12,60 @@ export async function getProjectsForOwner({
 }): Promise<{
   projects: Project[];
 }> {
-  const dbQuery: Prisma.ProjectFindManyArgs = {
-    where: {
-      organizationId: {
-        equals: ownerId,
-      },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  };
+  const query = db
+    .select()
+    .from(project)
+    .where(eq(project.organizationId, ownerId));
 
   if (search) {
-    dbQuery.where!["name"] = {
-      search,
-    };
+    query.where(like(project.name, `%${search}%`));
   }
 
-  const projects: Project[] = await prisma.project.findMany(dbQuery);
+  const projects: Project[] = await query.all();
 
   return { projects };
+}
+
+export async function getProjectById(
+  projectId: string | number
+): Promise<Project> {
+  const projects: Project[] = await db
+    .select()
+    .from(project)
+    .where(eq(project.id, Number(projectId)))
+    .all();
+
+  if (!projects.length) {
+    throw new Error(`Project with id ${projectId} not found`);
+  }
+
+  return projects[0];
+}
+
+export async function getTaskListById(taskListId: string | number) {
+  const taskLists = await db
+    .select()
+    .from(taskList)
+    .where(eq(taskList.id, Number(taskListId)))
+    .all();
+
+  if (!taskLists.length) {
+    throw new Error(`TaskList with id ${taskListId} not found`);
+  }
+
+  return taskLists[0];
+}
+
+export async function getDocumentById(documentId: string | number) {
+  const documents: Document[] = await db
+    .select()
+    .from(document)
+    .where(eq(document.id, Number(documentId)))
+    .all();
+
+  if (!documents.length) {
+    throw new Error(`Document with id ${documentId} not found`);
+  }
+
+  return documents[0];
 }

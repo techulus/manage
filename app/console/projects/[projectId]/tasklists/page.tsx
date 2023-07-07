@@ -1,12 +1,12 @@
 import { MarkdownView } from "@/components/core/markdown-view";
 import PageTitle from "@/components/layout/page-title";
 import { TaskListItem } from "@/components/project/tasklist";
-import {
-  TaskListHeader,
-  TaskListWithCount,
-} from "@/components/project/tasklist-header";
-import { prisma } from "@/lib/utils/db";
+import { TaskListHeader } from "@/components/project/tasklist-header";
+import { db } from "@/drizzle/db";
+import { task, taskList } from "@/drizzle/schema";
 import { getOwner } from "@/lib/utils/useOwner";
+import { getProjectById } from "@/lib/utils/useProjects";
+import { eq } from "drizzle-orm";
 
 type Props = {
   params: {
@@ -22,11 +22,11 @@ async function TaskListDetails({
   taskListId: number;
 }) {
   const { userId } = getOwner();
-  const tasks = await prisma.task.findMany({
-    where: {
-      taskListId: Number(taskListId),
-    },
-  });
+  const allTasks = await db
+    .select()
+    .from(task)
+    .where(eq(task.taskListId, Number(taskListId)))
+    .all();
 
   if (!taskListId) {
     return <div>Tasklist not found</div>;
@@ -35,7 +35,7 @@ async function TaskListDetails({
   return (
     <TaskListItem
       taskListId={taskListId}
-      tasks={tasks}
+      tasks={allTasks}
       projectId={projectId}
       userId={userId}
     />
@@ -43,33 +43,21 @@ async function TaskListDetails({
 }
 
 export default async function TaskLists({ params }: Props) {
-  const { ownerId } = getOwner();
   const { projectId } = params;
 
-  const project = await prisma.project.findFirst({
-    where: {
-      id: Number(projectId),
-      organizationId: ownerId,
-    },
-  });
+  const project = await getProjectById(projectId);
 
-  const taskLists = await prisma.taskList.findMany({
-    where: {
-      projectId: Number(projectId),
-      project: {
-        organizationId: ownerId,
-      },
-    },
-  });
-
-  if (!project) {
-    return <div>Project not found</div>;
-  }
+  const taskLists = await db
+    .select()
+    .from(taskList)
+    .where(eq(taskList.projectId, Number(projectId)))
+    .all();
 
   return (
     <>
       <PageTitle
-        title={`${project.name} / Tasklists`}
+        title="Task lists"
+        subTitle={project.name}
         backUrl={`/console/projects/${projectId}`}
         actionLabel="New list"
         actionLink={`/console/projects/${projectId}/tasklists/new`}
@@ -83,7 +71,7 @@ export default async function TaskLists({ params }: Props) {
                 key={taskList.id}
                 className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
               >
-                <TaskListHeader taskList={taskList as TaskListWithCount} />
+                <TaskListHeader taskList={taskList} />
                 {taskList.description ? (
                   <div className="p-6 border-b border-gray-900/5">
                     <MarkdownView content={taskList.description ?? ""} />

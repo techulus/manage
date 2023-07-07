@@ -1,6 +1,6 @@
+import { Project } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { convertMarkdownToPlainText } from "@/lib/utils/useMarkdown";
-import { Project } from "@prisma/client";
 
 export const ProjecItem = ({ id, name, description }: Project) => {
   return (

@@ -1,18 +1,16 @@
 import { ContentBlock } from "@/components/core/content-block";
+import { MarkdownView } from "@/components/core/markdown-view";
 import { DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
+import { DocumentHeader } from "@/components/project/document-header";
+import { TaskListHeader } from "@/components/project/tasklist-header";
 import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardHeader } from "@/components/ui/card";
-import { prisma } from "@/lib/utils/db";
-import { getOwner } from "@/lib/utils/useOwner";
-import Link from "next/link";
+import { db } from "@/drizzle/db";
+import { document, taskList } from "@/drizzle/schema";
+import { getProjectById } from "@/lib/utils/useProjects";
+import { eq } from "drizzle-orm";
 import { archiveProject } from "../actions";
-import { MarkdownView } from "@/components/core/markdown-view";
-import {
-  TaskListHeader,
-  TaskListWithCount,
-} from "@/components/project/tasklist-header";
-import { DocumentHeader } from "@/components/project/document-header";
 
 type Props = {
   params: {
@@ -21,52 +19,19 @@ type Props = {
 };
 
 export default async function ProjectDetails({ params }: Props) {
-  const { ownerId } = getOwner();
   const { projectId } = params;
 
-  const project = await prisma.project.findFirstOrThrow({
-    where: {
-      id: Number(projectId),
-      organizationId: ownerId,
-    },
-  });
-
-  const taskLists = await prisma.taskList.findMany({
-    select: {
-      id: true,
-      name: true,
-      _count: {
-        select: {
-          tasks: true,
-        },
-      },
-      // count of active tasks
-      tasks: {
-        select: {
-          id: true,
-        },
-        where: {
-          status: "active",
-        },
-      },
-      projectId: true,
-    },
-    where: {
-      projectId: Number(projectId),
-    },
-    take: 5,
-  });
-
-  const documents = await prisma.document.findMany({
-    where: {
-      projectId: Number(projectId),
-    },
-    take: 5,
-  });
-
-  if (!project) {
-    return <div>Project not found</div>;
-  }
+  const project = await getProjectById(projectId);
+  const taskLists = await db
+    .select()
+    .from(taskList)
+    .where(eq(taskList.projectId, Number(projectId)))
+    .all();
+  const documents = await db
+    .select()
+    .from(document)
+    .where(eq(document.projectId, Number(projectId)))
+    .all();
 
   return (
     <>
@@ -111,14 +76,14 @@ export default async function ProjectDetails({ params }: Props) {
         <CardContent>
           <ul
             role="list"
-            className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-2 xl:gap-x-8"
+            className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2"
           >
             {taskLists.map((taskList) => (
               <div
                 key={taskList.id}
                 className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
               >
-                <TaskListHeader taskList={taskList as TaskListWithCount} />
+                <TaskListHeader taskList={taskList} />
               </div>
             ))}
           </ul>
@@ -132,7 +97,7 @@ export default async function ProjectDetails({ params }: Props) {
 
             <div>
               <a
-                href={`/console/projects/${projectId}/document/new`}
+                href={`/console/projects/${projectId}/documents/new`}
                 className={buttonVariants({ variant: "link" })}
               >
                 Create<span className="sr-only">, document</span>
@@ -151,16 +116,15 @@ export default async function ProjectDetails({ params }: Props) {
         <CardContent>
           <ul
             role="list"
-            className="grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-2 xl:gap-x-8"
+            className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2"
           >
             {documents.map((document) => (
-              <Link
+              <div
                 key={document.id}
-                href={`/console/projects/${projectId}/documents`}
                 className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
               >
                 <DocumentHeader document={document} />
-              </Link>
+              </div>
             ))}
           </ul>
         </CardContent>

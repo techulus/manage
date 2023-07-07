@@ -1,5 +1,5 @@
+import { Document } from "@/drizzle/types";
 import { PencilSquareIcon } from "@heroicons/react/20/solid";
-import { Document } from "@prisma/client";
 import Link from "next/link";
 
 export const DocumentHeader = ({ document }: { document: Document }) => {

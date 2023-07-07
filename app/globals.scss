@@ -103,3 +103,44 @@ select:focus,
 textarea {
   font-size: 16px !important;
 }
+
+.dark {
+  .editor-preview-full,
+  .editor-preview-side {
+    @apply prose-invert;
+    max-width: unset !important;
+    background-color: rgb(38, 38, 38) !important;
+    border-color: rgba(245, 245, 245, 0.1) !important;
+  }
+
+  .CodeMirror,
+  .editor-toolbar,
+  .editor-preview-full {
+    background-color: rgb(38, 38, 38) !important;
+    color: white !important;
+  }
+
+  .CodeMirror div.CodeMirror-cursor {
+    border-left: 1px solid white !important;
+  }
+
+  .editor-toolbar {
+    color: #959694 !important;
+
+    button {
+      &:hover {
+        background-color: rgb(38, 38, 38) !important;
+      }
+    }
+
+    button.active {
+      background-color: rgb(38, 38, 38) !important;
+    }
+  }
+
+  .EasyMDEContainer .CodeMirror,
+  .editor-toolbar i.separator,
+  .editor-toolbar {
+    border-color: rgba(245, 245, 245, 0.1) !important;
+  }
+}

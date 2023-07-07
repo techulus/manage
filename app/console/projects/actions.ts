@@ -1,7 +1,9 @@
 "use server";
 
-import { prisma } from "@/lib/utils/db";
+import { db } from "@/drizzle/db";
+import { project } from "@/drizzle/schema";
 import { getOwner } from "@/lib/utils/useOwner";
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
@@ -17,7 +19,7 @@ const projectSchema = z.object({
   dueDate: z
     .string()
     .nullable()
-    .transform((val) => (val?.trim()?.length ? val : null)),
+    .transform((val) => (val?.trim()?.length ? new Date(val) : null)),
   status: z.enum(["active", "archived"]),
 });
 
@@ -34,16 +36,20 @@ export async function createProject(payload: FormData) {
     status: "active",
   });
 
-  await prisma.project.create({
-    data: {
+  const newProject = await db
+    .insert(project)
+    .values({
       ...data,
-      organization: { connect: { id: ownerId } },
-      createdBy: { connect: { id: userId } },
-    },
-  });
+      organizationId: String(ownerId),
+      createdByUser: userId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .returning()
+    .get();
 
-  revalidatePath("/console/projects");
-  redirect("/console/projects");
+  revalidatePath(`/console/projects/${newProject.id}`);
+  redirect(`/console/projects/${newProject.id}`);
 }
 
 export async function updateProject(payload: FormData) {
@@ -59,28 +65,30 @@ export async function updateProject(payload: FormData) {
     status: "active",
   });
 
-  await prisma.project.update({
-    where: {
-      id,
-    },
-    data,
-  });
+  await db
+    .update(project)
+    .set({
+      ...data,
+      updatedAt: new Date(),
+    })
+    .where(eq(project.id, id))
+    .run();
 
-  revalidatePath("/console/projects");
-  redirect("/console/projects");
+  revalidatePath(`/console/projects/${id}`);
+  redirect(`/console/projects/${id}`);
 }
 
 export async function archiveProject(payload: FormData) {
   const id = Number(payload.get("id"));
 
-  await prisma.project.update({
-    where: {
-      id,
-    },
-    data: {
+  await db
+    .update(project)
+    .set({
       status: "archived",
-    },
-  });
+      updatedAt: new Date(),
+    })
+    .where(eq(project.id, id))
+    .run();
 
   revalidatePath("/console/projects");
   redirect("/console/projects");

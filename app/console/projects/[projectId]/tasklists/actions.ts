@@ -1,7 +1,9 @@
 "use server";
 
-import { prisma } from "@/lib/utils/db";
+import { db } from "@/drizzle/db";
+import { task, taskList } from "@/drizzle/schema";
 import { getOwner } from "@/lib/utils/useOwner";
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
@@ -17,7 +19,7 @@ const taskListSchema = z.object({
   dueDate: z
     .string()
     .nullable()
-    .transform((val) => (val?.trim()?.length ? val : null)),
+    .transform((val) => (val?.trim()?.length ? new Date(val) : null)),
   status: z.enum(["active", "archived"]),
 });
 
@@ -32,7 +34,7 @@ const taskSchema = z.object({
   dueDate: z
     .string()
     .nullable()
-    .transform((val) => (val?.trim()?.length ? val : null)),
+    .transform((val) => (val?.trim()?.length ? new Date(val) : null)),
   status: z.enum(["todo", "done"]),
 });
 
@@ -50,21 +52,24 @@ export async function createTaskList(payload: FormData) {
     status: "active",
   });
 
-  await prisma.taskList.create({
-    data: {
-      ...data,
-      createdBy: {
-        connect: {
-          id: userId,
-        },
-      },
-      project: {
-        connect: {
-          id: Number(projectId),
-        },
-      },
-    },
+  console.log("data", {
+    ...data,
+    projectId: Number(projectId),
+    createdByUser: userId,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   });
+
+  await db
+    .insert(taskList)
+    .values({
+      ...data,
+      projectId: Number(projectId),
+      createdByUser: userId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .run();
 
   revalidatePath(`/console/projects/${projectId}/tasklists`);
   redirect(`/console/projects/${projectId}/tasklists`);
@@ -84,12 +89,14 @@ export async function updateTaskList(payload: FormData) {
     status: "active",
   });
 
-  await prisma.taskList.update({
-    where: {
-      id: Number(id),
-    },
-    data,
-  });
+  await db
+    .update(taskList)
+    .set({
+      ...data,
+      updatedAt: new Date(),
+    })
+    .where(eq(taskList.id, Number(id)))
+    .run();
 
   revalidatePath(`/console/projects/${projectId}/tasklists`);
   redirect(`/console/projects/${projectId}/tasklists`);
@@ -117,21 +124,16 @@ export async function createTask({
     status: "todo",
   });
 
-  await prisma.task.create({
-    data: {
+  await db
+    .insert(task)
+    .values({
       ...data,
-      createdBy: {
-        connect: {
-          id: userId,
-        },
-      },
-      taskList: {
-        connect: {
-          id: taskListId,
-        },
-      },
-    },
-  });
+      taskListId: Number(taskListId),
+      createdByUser: userId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .run();
 
   revalidatePath(`/console/projects/${projectId}/tasklists`);
 }
@@ -145,14 +147,14 @@ export async function updateTask({
   status: string;
   projectId: number;
 }) {
-  await prisma.task.update({
-    where: {
-      id: Number(id),
-    },
-    data: {
+  await db
+    .update(task)
+    .set({
       status,
-    },
-  });
+      updatedAt: new Date(),
+    })
+    .where(eq(task.id, Number(id)))
+    .run();
 
   revalidatePath(`/console/projects/${projectId}/tasklists`);
 }

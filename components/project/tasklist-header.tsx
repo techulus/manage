@@ -1,21 +1,8 @@
+import { TaskList } from "@/drizzle/types";
 import { PencilSquareIcon } from "@heroicons/react/20/solid";
-import { TaskList } from "@prisma/client";
 import Link from "next/link";
 
-export type TaskListWithCount = TaskList & {
-  tasks: {
-    id: number;
-  }[];
-  _count: {
-    tasks: number;
-  };
-};
-
-export const TaskListHeader = ({
-  taskList,
-}: {
-  taskList: TaskListWithCount;
-}) => {
+export const TaskListHeader = ({ taskList }: { taskList: TaskList }) => {
   return (
     <div className="flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 dark:bg-gray-900 p-6">
       <Link

@@ -1,9 +1,8 @@
 "use client";
 
-import { Task } from "@prisma/client";
-
 import { createTask } from "@/app/console/projects/[projectId]/tasklists/actions";
-import { useMemo, experimental_useOptimistic as useOptimistic } from "react";
+import { Task } from "@/drizzle/types";
+import { useMemo } from "react";
 import InlineTaskForm from "../form/task";
 import { TaskItem } from "./task-item";
 
