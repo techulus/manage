@@ -1,9 +1,9 @@
 import { ContentBlock } from "@/components/core/content-block";
+import EmptyState from "@/components/core/empty-state";
 import PageTitle from "@/components/layout/page-title";
 import { ProjecItem } from "@/components/project/item";
 import { Input } from "@/components/ui/input";
 import { ProjectWithUser, getProjectsForOwner } from "@/lib/utils/useProjects";
-import Link from "next/link";
 
 interface Props {
   searchParams: {
@@ -55,38 +55,11 @@ export default async function Projects({ searchParams }: Props) {
           role="list"
           className="divide-y divide-gray-200 dark:divide-gray-800 border-gray-200 dark:border-gray-800"
         >
-          {projects.length === 0 ? (
-            <div className="p-6">
-              <Link
-                href="/console/projects/new"
-                className="relative block w-full rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 p-12 text-center hover:border-gray-400 dark:hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
-              >
-                <svg
-                  className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
-                  stroke="currentColor"
-                  fill="none"
-                  viewBox="0 0 48 48"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 14v20c0 4.418 7.163 8 16 8 1.381 0 2.721-.087 4-.252M8 14c0 4.418 7.163 8 16 8s16-3.582 16-8M8 14c0-4.418 7.163-8 16-8s16 3.582 16 8m0 0v14m0-4c0 4.418-7.163 8-16 8S8 28.418 8 24m32 10v6m0 0v6m0-6h6m-6 0h-6"
-                  />
-                </svg>
-                {searchParams.search ? (
-                  <span className="mt-4 block text-sm font-semibold text-gray-900 dark:text-gray-300">
-                    We couldn&apos;t find any projects matching{" "}
-                    {`"${searchParams.search}"`}
-                  </span>
-                ) : null}
-                <span className="mt-2 block text-sm font-semibold text-gray-900 dark:text-gray-300">
-                  Create new project
-                </span>
-              </Link>
-            </div>
-          ) : null}
+          <EmptyState
+            show={!projects.length}
+            isSearchResult={!!searchParams?.search}
+            label="projects"
+          />
 
           <div className="divide-y divide-gray-200 dark:divide-gray-800 overflow-hidden rounded-sm bg-gray-200 dark:bg-gray-900 shadow sm:grid sm:grid-cols-2 sm:gap-px sm:divide-y-0">
             {projects.map((project: ProjectWithUser) => (

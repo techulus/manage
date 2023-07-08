@@ -3,10 +3,12 @@
 import { db } from "@/drizzle/db";
 import { task, taskList } from "@/drizzle/schema";
 import { getOwner } from "@/lib/utils/useOwner";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
+
+const POSITION_INCREMENT = 1000;
 
 const taskListSchema = z.object({
   name: z.string().min(2, {
@@ -124,10 +126,22 @@ export async function createTask({
     status: "todo",
   });
 
+  const lastPosition = await db.query.task
+    .findFirst({
+      where: eq(task.taskListId, Number(taskListId)),
+      orderBy: [desc(task.position)],
+    })
+    .execute();
+
+  const position = lastPosition?.position
+    ? lastPosition?.position + POSITION_INCREMENT
+    : 1;
+
   await db
     .insert(task)
     .values({
       ...data,
+      position,
       taskListId: Number(taskListId),
       createdByUser: userId,
       createdAt: new Date(),

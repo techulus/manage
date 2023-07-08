@@ -1,4 +1,5 @@
 import { ContentBlock } from "@/components/core/content-block";
+import EmptyState from "@/components/core/empty-state";
 import { MarkdownView } from "@/components/core/markdown-view";
 import { DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
@@ -7,6 +8,7 @@ import { TaskListHeader } from "@/components/project/tasklist-header";
 import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardHeader } from "@/components/ui/card";
 import { getProjectById } from "@/lib/utils/useProjects";
+import Link from "next/link";
 import { archiveProject } from "../actions";
 
 type Props = {
@@ -43,37 +45,43 @@ export default async function ProjectDetails({ params }: Props) {
             <h2 className="text-2xl font-semibold leading-7">Tasklists</h2>
 
             <div>
-              <a
+              <Link
                 href={`/console/projects/${projectId}/tasklists/new`}
                 className={buttonVariants({ variant: "link" })}
               >
                 Create<span className="sr-only">, tasklist</span>
-              </a>
+              </Link>
 
-              <a
-                href={`/console/projects/${projectId}/tasklists`}
-                className={buttonVariants({ variant: "link" })}
-              >
-                View all<span className="sr-only">, tasklists</span>
-              </a>
+              {project.taskLists.length ? (
+                <Link
+                  href={`/console/projects/${projectId}/tasklists`}
+                  className={buttonVariants({ variant: "link" })}
+                >
+                  View all<span className="sr-only">, tasklists</span>
+                </Link>
+              ) : null}
             </div>
           </div>
         </CardHeader>
 
         <CardContent>
-          <ul
-            role="list"
-            className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2"
-          >
-            {project.taskLists.map((taskList) => (
-              <div
-                key={taskList.id}
-                className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
-              >
-                <TaskListHeader taskList={taskList} />
-              </div>
-            ))}
-          </ul>
+          {project.taskLists.length ? (
+            <ul
+              role="list"
+              className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2"
+            >
+              {project.taskLists.map((taskList) => (
+                <div
+                  key={taskList.id}
+                  className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
+                >
+                  <TaskListHeader taskList={taskList} />
+                </div>
+              ))}
+            </ul>
+          ) : null}
+
+          <EmptyState show={!project.taskLists.length} label="tasklist" />
         </CardContent>
       </ContentBlock>
 
@@ -83,37 +91,43 @@ export default async function ProjectDetails({ params }: Props) {
             <h2 className="text-2xl font-semibold leading-7">Documents</h2>
 
             <div>
-              <a
+              <Link
                 href={`/console/projects/${projectId}/documents/new`}
                 className={buttonVariants({ variant: "link" })}
               >
                 Create<span className="sr-only">, document</span>
-              </a>
+              </Link>
 
-              <a
-                href={`/console/projects/${projectId}/documents`}
-                className={buttonVariants({ variant: "link" })}
-              >
-                View all<span className="sr-only">, documents</span>
-              </a>
+              {project.documents.length ? (
+                <Link
+                  href={`/console/projects/${projectId}/documents`}
+                  className={buttonVariants({ variant: "link" })}
+                >
+                  View all<span className="sr-only">, documents</span>
+                </Link>
+              ) : null}
             </div>
           </div>
         </CardHeader>
 
         <CardContent>
-          <ul
-            role="list"
-            className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2"
-          >
-            {project.documents.map((document) => (
-              <div
-                key={document.id}
-                className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
-              >
-                <DocumentHeader document={document} />
-              </div>
-            ))}
-          </ul>
+          {project.documents.length ? (
+            <ul
+              role="list"
+              className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2"
+            >
+              {project.documents.map((document) => (
+                <div
+                  key={document.id}
+                  className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
+                >
+                  <DocumentHeader document={document} />
+                </div>
+              ))}
+            </ul>
+          ) : null}
+
+          <EmptyState show={!project.documents.length} label="document" />
         </CardContent>
       </ContentBlock>
 

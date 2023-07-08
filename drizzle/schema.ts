@@ -3,6 +3,7 @@ import { relations } from "drizzle-orm";
 import {
   customType,
   integer,
+  real,
   sqliteTable,
   text,
   uniqueIndex,
@@ -42,6 +43,7 @@ export const userRelations = relations(user, ({ many }) => ({
   projects: many(project),
   documents: many(document),
   taskLists: many(taskList),
+  tasks: many(task),
 }));
 
 export const organization = sqliteTable("Organization", {
@@ -138,16 +140,25 @@ export const task = sqliteTable("Task", {
   description: text("description"),
   status: text("status").notNull(),
   dueDate: integer("dueDate", { mode: "timestamp" }),
+  position: real("position").notNull(),
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+  assignedToUser: text("assignedToUser").references(() => user.id, {
+    onDelete: "cascade",
+    onUpdate: "cascade",
+  }),
   createdByUser: text("createdByUser")
     .notNull()
     .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
 });
 
 export const taskRelations = relations(task, ({ one }) => ({
-  user: one(user, {
+  creator: one(user, {
     fields: [task.createdByUser],
+    references: [user.id],
+  }),
+  assignee: one(user, {
+    fields: [task.assignedToUser],
     references: [user.id],
   }),
   taskList: one(taskList, {

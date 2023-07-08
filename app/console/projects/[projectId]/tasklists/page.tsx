@@ -3,10 +3,10 @@ import PageTitle from "@/components/layout/page-title";
 import { TaskListItem } from "@/components/project/tasklist";
 import { TaskListHeader } from "@/components/project/tasklist-header";
 import { db } from "@/drizzle/db";
-import { taskList } from "@/drizzle/schema";
+import { task, taskList } from "@/drizzle/schema";
 import { getOwner } from "@/lib/utils/useOwner";
 import { getProjectById } from "@/lib/utils/useProjects";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 type Props = {
   params: {
@@ -24,7 +24,9 @@ export default async function TaskLists({ params }: Props) {
     .findMany({
       where: eq(taskList.projectId, Number(projectId)),
       with: {
-        tasks: true,
+        tasks: {
+          orderBy: [desc(task.position)],
+        },
       },
     })
     .execute();
@@ -49,7 +51,7 @@ export default async function TaskLists({ params }: Props) {
               >
                 <TaskListHeader taskList={taskList} />
                 {taskList.description ? (
-                  <div className="p-6 border-b border-gray-900/5">
+                  <div className="py-2 px-6 border-b border-gray-900/5">
                     <MarkdownView content={taskList.description ?? ""} />
                   </div>
                 ) : null}

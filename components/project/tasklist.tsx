@@ -27,13 +27,14 @@ export const TaskListItem = ({
   );
 
   return (
-    <div className="p-4">
-      <div className="space-y-2">
+    <div className="py-4 px-6">
+      <div className="flex flex-col justify-center divide-y">
         {todoItems.map((task) => (
           <TaskItem key={task.id} task={task} projectId={Number(projectId)} />
         ))}
 
         <form
+          className="pt-4"
           action={async (formData: FormData) => {
             const name = formData.get("name") as string;
 
