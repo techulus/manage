@@ -14,3 +14,14 @@ export type Project = InferModel<typeof project>;
 export type TaskList = InferModel<typeof taskList>;
 export type Task = InferModel<typeof task>;
 export type Document = InferModel<typeof document>;
+
+export type ProjectWithUser = Project & { user: User };
+
+export type ProjectWithData = Project & {
+  taskLists: TaskList[];
+  documents: Document[];
+};
+
+export type TaskListWithTasks = TaskList & {
+  tasks: Task[];
+};

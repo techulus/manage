@@ -60,7 +60,7 @@ export const TaskItem = ({
       <label
         className={cn(
           "text-md font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-          status === "done" ? "line-through" : ""
+          status === "done" ? "line-through text-muted-foreground" : ""
         )}
       >
         {name}

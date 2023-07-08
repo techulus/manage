@@ -58,7 +58,7 @@ export default function PageTitle({
 
           <div className="flex flex-col relative">
             {subTitle && (
-              <p className="lg:absolute lg:-top-4 lg:left-0 text-sm text-gray-500 dark:text-gray-400">
+              <p className="lg:absolute lg:-top-4 lg:left-0 text-sm text-muted-foreground">
                 {subTitle}
               </p>
             )}

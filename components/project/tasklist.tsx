@@ -1,57 +1,70 @@
 "use client";
 
 import { createTask } from "@/app/console/projects/[projectId]/tasklists/actions";
-import { Task } from "@/drizzle/types";
+import { TaskListWithTasks } from "@/drizzle/types";
 import { useMemo } from "react";
 import InlineTaskForm from "../form/task";
 import { TaskItem } from "./task-item";
+import { TaskListHeader } from "./tasklist-header";
+import { MarkdownView } from "../core/markdown-view";
 
 export const TaskListItem = ({
-  tasks,
+  taskList,
   userId,
-  taskListId,
   projectId,
 }: {
-  tasks: Task[];
+  taskList: TaskListWithTasks;
   userId: string;
-  taskListId: number;
   projectId: number;
 }) => {
   const todoItems = useMemo(
-    () => tasks.filter((task) => task.status === "todo"),
-    [tasks]
+    () => taskList.tasks.filter((task) => task.status === "todo"),
+    [taskList.tasks]
   );
   const doneItems = useMemo(
-    () => tasks.filter((task) => task.status === "done"),
-    [tasks]
+    () => taskList.tasks.filter((task) => task.status === "done"),
+    [taskList.tasks]
   );
 
   return (
-    <div className="py-4 px-6">
-      <div className="flex flex-col justify-center divide-y">
-        {todoItems.map((task) => (
-          <TaskItem key={task.id} task={task} projectId={Number(projectId)} />
-        ))}
+    <div
+      className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
+    >
+      <TaskListHeader taskList={taskList}
+        totalCount={taskList.tasks.length}
+        doneCount={doneItems.length}
+      />
+      {taskList.description ? (
+        <div className="py-2 px-6 border-b border-gray-900/5">
+          <MarkdownView content={taskList.description ?? ""} />
+        </div>
+      ) : null}
+      <div className="py-4 px-6">
+        <div className="flex flex-col justify-center divide-y">
+          {todoItems.map((task) => (
+            <TaskItem key={task.id} task={task} projectId={Number(projectId)} />
+          ))}
 
-        <form
-          className="pt-4"
-          action={async (formData: FormData) => {
-            const name = formData.get("name") as string;
+          <form
+            className="py-4"
+            action={async (formData: FormData) => {
+              const name = formData.get("name") as string;
 
-            await createTask({
-              name,
-              userId,
-              taskListId,
-              projectId,
-            });
-          }}
-        >
-          <InlineTaskForm />
-        </form>
+              await createTask({
+                name,
+                userId,
+                taskListId: taskList.id,
+                projectId,
+              });
+            }}
+          >
+            <InlineTaskForm />
+          </form>
 
-        {doneItems.map((task) => (
-          <TaskItem key={task.id} task={task} projectId={Number(projectId)} />
-        ))}
+          {doneItems.map((task) => (
+            <TaskItem key={task.id} task={task} projectId={Number(projectId)} />
+          ))}
+        </div>
       </div>
     </div>
   );
