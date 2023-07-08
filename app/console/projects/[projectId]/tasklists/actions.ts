@@ -172,3 +172,18 @@ export async function updateTask({
 
   revalidatePath(`/console/projects/${projectId}/tasklists`);
 }
+
+export async function deleteTask({
+  id,
+  projectId,
+}: {
+  id: number;
+  projectId: number;
+}) {
+  await db
+    .delete(task)
+    .where(eq(task.id, Number(id)))
+    .run();
+
+  revalidatePath(`/console/projects/${projectId}/tasklists`);
+}
