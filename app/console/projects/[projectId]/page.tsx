@@ -42,7 +42,7 @@ export default async function ProjectDetails({ params }: Props) {
       <ContentBlock>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold leading-7">Tasklists</h2>
+            <h2 className="text-2xl font-semibold leading-7">Task Lists</h2>
 
             <div>
               <Link
@@ -70,14 +70,20 @@ export default async function ProjectDetails({ params }: Props) {
               role="list"
               className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2"
             >
-              {project.taskLists.map((taskList) => (
-                <div
-                  key={taskList.id}
-                  className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
-                >
-                  <TaskListHeader taskList={taskList} />
-                </div>
-              ))}
+              {project.taskLists.map((taskList) => {
+                return (
+                  <div
+                    key={taskList.id}
+                    className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
+                  >
+                    <TaskListHeader
+                      taskList={taskList}
+                      totalCount={taskList.tasks.length}
+                      doneCount={taskList.tasks.filter((task) => task.status === "done").length}
+                    />
+                  </div>
+                )
+              })}
             </ul>
           ) : null}
 

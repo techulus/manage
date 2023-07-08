@@ -18,7 +18,7 @@ export type Document = InferModel<typeof document>;
 export type ProjectWithUser = Project & { user: User };
 
 export type ProjectWithData = Project & {
-  taskLists: TaskList[];
+  taskLists: TaskListWithTasks[];
   documents: Document[];
 };
 

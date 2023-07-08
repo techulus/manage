@@ -45,7 +45,11 @@ export async function getProjectById(
       ),
       with: withTasksAndDocs
         ? {
-          taskLists: true,
+          taskLists: {
+            with: {
+              tasks: true,
+            },
+          },
           documents: true,
         }
         : {},

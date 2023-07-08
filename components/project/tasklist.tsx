@@ -39,32 +39,30 @@ export const TaskListItem = ({
           <MarkdownView content={taskList.description ?? ""} />
         </div>
       ) : null}
-      <div className="py-4 px-6">
-        <div className="flex flex-col justify-center divide-y">
-          {todoItems.map((task) => (
-            <TaskItem key={task.id} task={task} projectId={Number(projectId)} />
-          ))}
+      <div className="flex flex-col justify-center divide-y">
+        {todoItems.map((task) => (
+          <TaskItem key={task.id} task={task} projectId={Number(projectId)} />
+        ))}
 
-          <form
-            className="py-4"
-            action={async (formData: FormData) => {
-              const name = formData.get("name") as string;
+        <form
+          className="py-4"
+          action={async (formData: FormData) => {
+            const name = formData.get("name") as string;
 
-              await createTask({
-                name,
-                userId,
-                taskListId: taskList.id,
-                projectId,
-              });
-            }}
-          >
-            <InlineTaskForm />
-          </form>
+            await createTask({
+              name,
+              userId,
+              taskListId: taskList.id,
+              projectId,
+            });
+          }}
+        >
+          <InlineTaskForm />
+        </form>
 
-          {doneItems.map((task) => (
-            <TaskItem key={task.id} task={task} projectId={Number(projectId)} />
-          ))}
-        </div>
+        {doneItems.map((task) => (
+          <TaskItem key={task.id} task={task} projectId={Number(projectId)} />
+        ))}
       </div>
     </div>
   );
