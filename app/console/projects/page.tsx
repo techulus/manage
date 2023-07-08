@@ -3,7 +3,8 @@ import EmptyState from "@/components/core/empty-state";
 import PageTitle from "@/components/layout/page-title";
 import { ProjecItem } from "@/components/project/item";
 import { Input } from "@/components/ui/input";
-import { ProjectWithUser, getProjectsForOwner } from "@/lib/utils/useProjects";
+import { ProjectWithUser } from "@/drizzle/types";
+import { getProjectsForOwner } from "@/lib/utils/useProjects";
 
 interface Props {
   searchParams: {

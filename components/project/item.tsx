@@ -1,6 +1,6 @@
+import { ProjectWithUser } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { convertMarkdownToPlainText } from "@/lib/utils/useMarkdown";
-import { ProjectWithUser } from "@/lib/utils/useProjects";
 import Image from "next/image";
 
 export const ProjecItem = ({
