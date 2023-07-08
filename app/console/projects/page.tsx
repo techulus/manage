@@ -2,7 +2,7 @@ import { ContentBlock } from "@/components/core/content-block";
 import PageTitle from "@/components/layout/page-title";
 import { ProjecItem } from "@/components/project/item";
 import { Input } from "@/components/ui/input";
-import { getProjectsForOwner } from "@/lib/utils/useProjects";
+import { ProjectWithUser, getProjectsForOwner } from "@/lib/utils/useProjects";
 import Link from "next/link";
 
 interface Props {
@@ -89,8 +89,8 @@ export default async function Projects({ searchParams }: Props) {
           ) : null}
 
           <div className="divide-y divide-gray-200 dark:divide-gray-800 overflow-hidden rounded-sm bg-gray-200 dark:bg-gray-900 shadow sm:grid sm:grid-cols-2 sm:gap-px sm:divide-y-0">
-            {projects.map((project) => (
-              <ProjecItem key={project.id} {...project} />
+            {projects.map((project: ProjectWithUser) => (
+              <ProjecItem key={project.id} project={project} />
             ))}
           </div>
         </ul>

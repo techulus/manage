@@ -12,7 +12,7 @@ export default async function CreateProject() {
     <>
       <PageTitle title="Create Project" backUrl="/console/projects" />
       <form action={createProject}>
-        <ContentBlock className="max-w-3xl">
+        <ContentBlock>
           <CardContent>
             <SharedForm />
           </CardContent>

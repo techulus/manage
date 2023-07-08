@@ -3,7 +3,7 @@ import { organization, user } from "@/drizzle/schema";
 import { clerkClient } from "@clerk/nextjs";
 
 export async function GET() {
-  console.log("Running route");
+  console.log("Running migrate");
 
   const allUsers = await clerkClient.users.getUserList();
   for (const data of allUsers) {
@@ -45,6 +45,7 @@ export async function GET() {
   const orgs = await clerkClient.organizations.getOrganizationList();
   for (const data of orgs) {
     try {
+      console.log("Trying to insert org", data.id);
       await db
         .insert(organization)
         .values({

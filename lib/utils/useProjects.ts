@@ -1,10 +1,12 @@
 import { db } from "@/drizzle/db";
 import { document, project, taskList } from "@/drizzle/schema";
-import { Document, Project, TaskList } from "@/drizzle/types";
+import { Document, Project, TaskList, User } from "@/drizzle/types";
 import { and, eq, like } from "drizzle-orm";
 import { getOwner } from "./useOwner";
 
-type ProjectWithData = Project & {
+export type ProjectWithUser = Project & { user: User };
+
+export type ProjectWithData = Project & {
   taskLists: TaskList[];
   documents: Document[];
 };
@@ -14,7 +16,7 @@ export async function getProjectsForOwner({
 }: {
   search?: string;
 }): Promise<{
-  projects: Project[];
+  projects: ProjectWithUser[];
 }> {
   const { ownerId } = getOwner();
 
@@ -26,6 +28,9 @@ export async function getProjectsForOwner({
             like(project.name, `%${search}%`)
           )
         : eq(project.organizationId, ownerId),
+      with: {
+        user: true,
+      },
     })
     .execute();
 
