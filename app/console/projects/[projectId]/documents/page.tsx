@@ -3,7 +3,6 @@ import PageTitle from "@/components/layout/page-title";
 import { DocumentHeader } from "@/components/project/document-header";
 import { db } from "@/drizzle/db";
 import { document } from "@/drizzle/schema";
-import { getOwner } from "@/lib/utils/useOwner";
 import { getProjectById } from "@/lib/utils/useProjects";
 import { eq } from "drizzle-orm";
 
@@ -14,7 +13,6 @@ type Props = {
 };
 
 export default async function DocumentsList({ params }: Props) {
-  const { ownerId } = getOwner();
   const { projectId } = params;
 
   const project = await getProjectById(projectId);

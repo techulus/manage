@@ -1,3 +1,4 @@
+import { Organization, User } from "@clerk/nextjs/dist/types/server";
 import { relations } from "drizzle-orm";
 import {
   blob,
@@ -7,6 +8,16 @@ import {
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 
+// const dbJson = customType({
+//   dataType: () => "text", // must be text for sqlite3 json operators to work
+//   toDriver: (value: any) => {
+//     return JSON.stringify(value);
+//   },
+//   fromDriver: (value: any) => {
+//     return JSON.parse(value);
+//   },
+// });
+
 export const user = sqliteTable(
   "User",
   {
@@ -14,7 +25,8 @@ export const user = sqliteTable(
     email: text("email").notNull(),
     firstName: text("firstName"),
     lastName: text("lastName"),
-    rawData: blob("rawData", { mode: "json" }).notNull(),
+    imageUrl: text("imageUrl"),
+    rawData: blob("rawData", { mode: "json" }).notNull().$type<User>(),
     createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
     updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
   },
@@ -37,7 +49,9 @@ export const organization = sqliteTable("Organization", {
   name: text("name").notNull(),
   imageUrl: text("imageUrl"),
   logoUrl: text("logoUrl"),
-  rawData: blob("rawData", { mode: "json" }).notNull(),
+  rawData: blob("rawData", { mode: "json" })
+    .notNull()
+    .$type<Organization | User>(),
   createdByUser: text("createdByUser")
     .notNull()
     .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
