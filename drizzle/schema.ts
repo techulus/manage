@@ -43,7 +43,6 @@ export const userRelations = relations(user, ({ many }) => ({
   projects: many(project),
   documents: many(document),
   taskLists: many(taskList),
-  tasks: many(task),
 }));
 
 export const organization = sqliteTable("Organization", {
