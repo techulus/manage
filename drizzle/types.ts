@@ -22,6 +22,17 @@ export type ProjectWithData = Project & {
   documents: Document[];
 };
 
+export type TaskWithDetails = Task & {
+  creator: {
+    firstName: string | null;
+    imageUrl: string | null;
+  };
+  assignee: {
+    firstName: string | null;
+    imageUrl: string | null;
+  } | null;
+};
+
 export type TaskListWithTasks = TaskList & {
-  tasks: Task[];
+  tasks: TaskWithDetails[];
 };

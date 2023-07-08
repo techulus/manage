@@ -183,7 +183,7 @@ export const taskList = sqliteTable("TaskList", {
 });
 
 export const taskListRelations = relations(taskList, ({ many, one }) => ({
-  user: one(user, {
+  creator: one(user, {
     fields: [taskList.createdByUser],
     references: [user.id],
   }),

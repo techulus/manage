@@ -24,6 +24,20 @@ export default async function TaskLists({ params }: Props) {
       with: {
         tasks: {
           orderBy: [desc(task.position)],
+          with: {
+            creator: {
+              columns: {
+                firstName: true,
+                imageUrl: true,
+              }
+            },
+            assignee: {
+              columns: {
+                firstName: true,
+                imageUrl: true,
+              }
+            },
+          }
         },
       },
     })

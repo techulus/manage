@@ -54,14 +54,6 @@ export async function createTaskList(payload: FormData) {
     status: "active",
   });
 
-  console.log("data", {
-    ...data,
-    projectId: Number(projectId),
-    createdByUser: userId,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  });
-
   await db
     .insert(taskList)
     .values({
