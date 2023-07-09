@@ -4,7 +4,7 @@ import { db } from "@/drizzle/db";
 import { task, taskList } from "@/drizzle/schema";
 import { getOwner } from "@/lib/utils/useOwner";
 import { getProjectById } from "@/lib/utils/useProjects";
-import { desc, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 
 type Props = {
   params: {
@@ -20,10 +20,10 @@ export default async function TaskLists({ params }: Props) {
 
   const taskLists = await db.query.taskList
     .findMany({
-      where: eq(taskList.projectId, Number(projectId)),
+      where: and(eq(taskList.projectId, Number(projectId)), eq(taskList.status, "active")),
       with: {
         tasks: {
-          orderBy: [desc(task.position)],
+          orderBy: [asc(task.position)],
           with: {
             creator: {
               columns: {
@@ -43,6 +43,12 @@ export default async function TaskLists({ params }: Props) {
     })
     .execute();
 
+  const archivedTaskLists = await db.query.taskList
+    .findMany({
+      where: and(eq(taskList.projectId, Number(projectId)), eq(taskList.status, "archived")),
+    })
+    .execute();
+
   return (
     <>
       <PageTitle
@@ -54,18 +60,20 @@ export default async function TaskLists({ params }: Props) {
       />
 
       <div className="mx-auto max-w-5xl px-4 lg:px-0 my-12">
-        <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-none">
-          <ul role="list" className="mt-6 space-y-6">
-            {taskLists.map((taskList) => (
-              <TaskListItem
-                key={taskList.id}
-                taskList={taskList}
-                projectId={Number(projectId)}
-                userId={userId}
-              />
-            ))}
-          </ul>
-        </div>
+        <ul role="list" className="mt-6 space-y-6">
+          {taskLists.map((taskList) => (
+            <TaskListItem
+              key={taskList.id}
+              taskList={taskList}
+              projectId={Number(projectId)}
+              userId={userId}
+            />
+          ))}
+        </ul>
+
+        {archivedTaskLists.length > 0 && (
+          <p className="mt-12 pt-4 border-t border-muted text-sm text-muted-foreground">{archivedTaskLists.length} archived task list(s)</p>
+        )}
       </div>
     </>
   );

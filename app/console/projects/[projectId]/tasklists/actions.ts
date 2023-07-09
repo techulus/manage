@@ -96,6 +96,19 @@ export async function updateTaskList(payload: FormData) {
   redirect(`/console/projects/${projectId}/tasklists`);
 }
 
+export async function archiveTaskList(id: number, projectId: string | number) {
+  await db
+    .update(taskList)
+    .set({
+      status: "archived",
+      updatedAt: new Date(),
+    })
+    .where(eq(taskList.id, Number(id)))
+    .run();
+
+  revalidatePath(`/console/projects/${projectId}/tasklists`);
+}
+
 export async function createTask({
   userId,
   taskListId,

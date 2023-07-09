@@ -32,8 +32,8 @@ export default function InlineTaskForm() {
   }
 
   return (
-    <div className="py-4 space-y-2 sm:space-y-3">
-      <div className="mt-2 sm:col-span-2 sm:mt-0">
+    <div className="flex space-x-3">
+      <div className="sm:col-span-2 sm:mt-0">
         <Input type="text" name="name" defaultValue="" disabled={pending} />
       </div>
       <SaveButton />

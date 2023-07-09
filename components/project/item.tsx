@@ -2,6 +2,7 @@ import { ProjectWithUser } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { convertMarkdownToPlainText } from "@/lib/utils/useMarkdown";
 import Image from "next/image";
+import Link from "next/link";
 
 export const ProjecItem = ({
   project: { id, name, description, user },
@@ -17,10 +18,10 @@ export const ProjecItem = ({
     >
       <div>
         <h3 className="text-base font-semibold leading-6 text-gray-900 dark:text-gray-50">
-          <a href={`/console/projects/${id}`} className="focus:outline-none">
+          <Link href={`/console/projects/${id}`} className="focus:outline-none">
             <span className="absolute inset-0" aria-hidden="true" />
             {name}
-          </a>
+          </Link>
         </h3>
         <p className="mt-2 text-sm text-gray-500 dark:text-gray-200 line-clamp-3">
           {convertMarkdownToPlainText(description)}
