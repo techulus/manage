@@ -1,7 +1,7 @@
 import { ContentBlock } from "@/components/core/content-block";
 import EmptyState from "@/components/core/empty-state";
 import PageTitle from "@/components/layout/page-title";
-import { ProjecItem } from "@/components/project/item";
+import { ProjecItem } from "@/components/project/project-item";
 import { Input } from "@/components/ui/input";
 import { ProjectWithUser } from "@/drizzle/types";
 import { getProjectsForOwner } from "@/lib/utils/useProjects";
@@ -60,6 +60,7 @@ export default async function Projects({ searchParams }: Props) {
             show={!projects.length}
             isSearchResult={!!searchParams?.search}
             label="projects"
+            createLink="/console/projects/new"
           />
 
           <div className="divide-y divide-gray-200 dark:divide-gray-800 overflow-hidden rounded-sm bg-gray-200 dark:bg-gray-900 shadow sm:grid sm:grid-cols-2 sm:gap-px sm:divide-y-0">

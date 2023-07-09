@@ -1,6 +1,6 @@
 import { MarkdownView } from "@/components/core/markdown-view";
 import PageTitle from "@/components/layout/page-title";
-import { DocumentHeader } from "@/components/project/document-header";
+import { DocumentHeader } from "@/components/project/document/document-header";
 import { db } from "@/drizzle/db";
 import { document } from "@/drizzle/schema";
 import { getProjectById } from "@/lib/utils/useProjects";

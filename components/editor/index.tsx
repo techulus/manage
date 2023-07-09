@@ -10,9 +10,11 @@ const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
 export default function MarkdownEditor({
   defaultValue,
   name = "description",
+  setValue = () => {},
 }: {
   defaultValue?: string;
   name?: string;
+  setValue?: (value: string) => void;
 }) {
   const [value, onChange] = useState(defaultValue ?? "");
 
@@ -26,7 +28,14 @@ export default function MarkdownEditor({
   return (
     <>
       <input type="hidden" name={name} defaultValue={value} />
-      <SimpleMDE options={options} value={value} onChange={onChange} />
+      <SimpleMDE
+        options={options}
+        value={value}
+        onChange={(value) => {
+          onChange(value);
+          setValue(value);
+        }}
+      />
     </>
   );
 }

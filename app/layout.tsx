@@ -203,7 +203,7 @@ export default function RootLayout({
         <body
           className={cn(
             "flex-1 min-h-full min-w-full",
-            "rounded-tl-xl rounded-tr-xl md:rounded-none"
+            "rounded-tl-xl rounded-tr-xl md:rounded-none",
           )}
         >
           {children}

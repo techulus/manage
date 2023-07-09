@@ -3,16 +3,18 @@ import Link from "next/link";
 export default function EmptyState({
   label,
   show,
+  createLink,
   isSearchResult = false,
 }: {
   label: string;
-  isSearchResult?: boolean;
   show: boolean;
+  createLink: string;
+  isSearchResult?: boolean;
 }) {
   return show ? (
     <div className="p-1">
       <Link
-        href="/console/projects/new"
+        href={createLink}
         className="relative block w-full rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 p-12 text-center hover:border-gray-400 dark:hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
       >
         <svg

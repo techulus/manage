@@ -96,17 +96,21 @@ export async function updateTaskList(payload: FormData) {
   redirect(`/console/projects/${projectId}/tasklists`);
 }
 
-export async function archiveTaskList(id: number, projectId: string | number) {
-  await db
+export async function partialUpdateTaskList(
+  id: number,
+  data: { description: string } | { status: string }
+) {
+  const updated = await db
     .update(taskList)
     .set({
-      status: "archived",
+      ...data,
       updatedAt: new Date(),
     })
     .where(eq(taskList.id, Number(id)))
-    .run();
+    .returning()
+    .get();
 
-  revalidatePath(`/console/projects/${projectId}/tasklists`);
+  revalidatePath(`/console/projects/${updated.projectId}/tasklists`);
 }
 
 export async function createTask({
@@ -157,19 +161,15 @@ export async function createTask({
   revalidatePath(`/console/projects/${projectId}/tasklists`);
 }
 
-export async function updateTask({
-  id,
-  status,
-  projectId,
-}: {
-  id: number;
-  status: string;
-  projectId: number;
-}) {
+export async function updateTask(
+  id: number,
+  projectId: number,
+  data: { description: string } | { status: string }
+) {
   await db
     .update(task)
     .set({
-      status,
+      ...data,
       updatedAt: new Date(),
     })
     .where(eq(task.id, Number(id)))

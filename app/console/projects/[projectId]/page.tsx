@@ -3,8 +3,8 @@ import EmptyState from "@/components/core/empty-state";
 import { MarkdownView } from "@/components/core/markdown-view";
 import { DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
-import { DocumentHeader } from "@/components/project/document-header";
-import { TaskListHeader } from "@/components/project/tasklist-header";
+import { DocumentHeader } from "@/components/project/document/document-header";
+import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
 import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardHeader } from "@/components/ui/card";
 import { getProjectById } from "@/lib/utils/useProjects";
@@ -79,15 +79,22 @@ export default async function ProjectDetails({ params }: Props) {
                     <TaskListHeader
                       taskList={taskList}
                       totalCount={taskList.tasks.length}
-                      doneCount={taskList.tasks.filter((task) => task.status === "done").length}
+                      doneCount={
+                        taskList.tasks.filter((task) => task.status === "done")
+                          .length
+                      }
                     />
                   </div>
-                )
+                );
               })}
             </ul>
           ) : null}
 
-          <EmptyState show={!project.taskLists.length} label="tasklist" />
+          <EmptyState
+            show={!project.taskLists.length}
+            label="tasklist"
+            createLink={`/console/projects/${projectId}/tasklists/new`}
+          />
         </CardContent>
       </ContentBlock>
 
@@ -133,7 +140,11 @@ export default async function ProjectDetails({ params }: Props) {
             </ul>
           ) : null}
 
-          <EmptyState show={!project.documents.length} label="document" />
+          <EmptyState
+            show={!project.documents.length}
+            label="document"
+            createLink={`/console/projects/${projectId}/documents/new`}
+          />
         </CardContent>
       </ContentBlock>
 

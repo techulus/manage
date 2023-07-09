@@ -1,5 +1,5 @@
 import PageTitle from "@/components/layout/page-title";
-import { TaskListItem } from "@/components/project/tasklist";
+import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { db } from "@/drizzle/db";
 import { task, taskList } from "@/drizzle/schema";
 import { getOwner } from "@/lib/utils/useOwner";
@@ -20,7 +20,10 @@ export default async function TaskLists({ params }: Props) {
 
   const taskLists = await db.query.taskList
     .findMany({
-      where: and(eq(taskList.projectId, Number(projectId)), eq(taskList.status, "active")),
+      where: and(
+        eq(taskList.projectId, Number(projectId)),
+        eq(taskList.status, "active")
+      ),
       with: {
         tasks: {
           orderBy: [asc(task.position)],
@@ -29,15 +32,15 @@ export default async function TaskLists({ params }: Props) {
               columns: {
                 firstName: true,
                 imageUrl: true,
-              }
+              },
             },
             assignee: {
               columns: {
                 firstName: true,
                 imageUrl: true,
-              }
+              },
             },
-          }
+          },
         },
       },
     })
@@ -45,7 +48,10 @@ export default async function TaskLists({ params }: Props) {
 
   const archivedTaskLists = await db.query.taskList
     .findMany({
-      where: and(eq(taskList.projectId, Number(projectId)), eq(taskList.status, "archived")),
+      where: and(
+        eq(taskList.projectId, Number(projectId)),
+        eq(taskList.status, "archived")
+      ),
     })
     .execute();
 
@@ -72,7 +78,9 @@ export default async function TaskLists({ params }: Props) {
         </ul>
 
         {archivedTaskLists.length > 0 && (
-          <p className="mt-12 pt-4 border-t border-muted text-sm text-muted-foreground">{archivedTaskLists.length} archived task list(s)</p>
+          <p className="mt-12 pt-4 border-t border-muted text-sm text-muted-foreground">
+            {archivedTaskLists.length} archived task list(s)
+          </p>
         )}
       </div>
     </>

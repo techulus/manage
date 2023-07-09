@@ -1,15 +1,18 @@
 "use client";
 
-import { archiveTaskList, createTask } from "@/app/console/projects/[projectId]/tasklists/actions";
-import { TaskListWithTasks, TaskWithDetails } from "@/drizzle/types";
-import { useMemo } from "react";
-import InlineTaskForm from "../form/task";
-import { TaskItem } from "./task-item";
-import { TaskListHeader } from "./tasklist-header";
-import { MarkdownView } from "../core/markdown-view";
+import {
+  createTask,
+  partialUpdateTaskList,
+} from "@/app/console/projects/[projectId]/tasklists/actions";
+import { TaskListWithTasks } from "@/drizzle/types";
 import Link from "next/link";
-import { Button, buttonVariants } from "../ui/button";
+import { useMemo } from "react";
 import { toast } from "react-hot-toast";
+import { MarkdownView } from "../../core/markdown-view";
+import InlineTaskForm from "../../form/task";
+import { Button, buttonVariants } from "../../ui/button";
+import { TaskItem } from "./task/task-item";
+import { TaskListHeader } from "./tasklist-header";
 
 export const TaskListItem = ({
   taskList,
@@ -30,10 +33,9 @@ export const TaskListItem = ({
   );
 
   return (
-    <div
-      className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
-    >
-      <TaskListHeader taskList={taskList}
+    <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800">
+      <TaskListHeader
+        taskList={taskList}
         totalCount={taskList.tasks.length}
         doneCount={doneItems.length}
       />
@@ -87,10 +89,9 @@ export const TaskListItem = ({
                   variant="ghost"
                   onClick={async () => {
                     toast.promise(
-                      archiveTaskList(
-                        taskList.id,
-                        projectId,
-                      ),
+                      partialUpdateTaskList(taskList.id, {
+                        status: "archived",
+                      }),
                       {
                         loading: "Archiving task list...",
                         success: "Task list archived.",
