@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { experimental_useFormStatus as useFormStatus } from "react-dom";
 import { Button } from "../ui/button";
 import { SaveButton } from "./button";
+import { XMarkIcon } from "@heroicons/react/20/solid";
 
 export default function InlineTaskForm() {
   const { pending } = useFormStatus();
@@ -33,10 +34,18 @@ export default function InlineTaskForm() {
 
   return (
     <div className="flex space-x-3">
-      <div className="sm:col-span-2 sm:mt-0">
+      <div className="flex-grow max-w-xl">
         <Input type="text" name="name" defaultValue="" disabled={pending} />
       </div>
       <SaveButton />
+      <Button
+        type="button"
+        variant="ghost"
+        className="px-1 lg:px-2"
+        onClick={() => setIsCreating(false)}
+      >
+        <XMarkIcon className="w-5 h-5" />
+      </Button>
     </div>
   );
 }

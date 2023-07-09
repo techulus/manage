@@ -1,5 +1,4 @@
 import { Document } from "@/drizzle/types";
-import { PencilSquareIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 
 export const DocumentHeader = ({ document }: { document: Document }) => {
@@ -9,17 +8,9 @@ export const DocumentHeader = ({ document }: { document: Document }) => {
         href={`/console/projects/${document.projectId}/documents`}
         className="text-sm font-medium"
       >
+        <span className="absolute inset-0" aria-hidden="true" />
         <div className="font-medium text-xl leading-6">{document.name}</div>
       </Link>
-
-      <div className="flex-1 flex justify-end">
-        <Link
-          href={`/console/projects/${document.projectId}/documents/${document.id}/edit`}
-          className="text-sm font-medium"
-        >
-          <PencilSquareIcon className="w-5 h-5" />
-        </Link>
-      </div>
     </div>
   );
 };

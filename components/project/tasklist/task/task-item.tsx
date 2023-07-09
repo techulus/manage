@@ -39,7 +39,7 @@ export const TaskItem = ({
           <div className="flex items-center space-x-2">
             <Checkbox
               checked={status === "done"}
-              className={cn(status === "done" ? "opacity-50" : "", "mr-1 my-4")}
+              className={cn(status === "done" ? "opacity-50" : "", "mr-1 my-4 scale-125")}
               onCheckedChange={async (checked) => {
                 const status = checked ? "done" : "todo";
                 updateOptimisticTask({ status });
@@ -153,7 +153,7 @@ export const TaskItem = ({
     <div className="flex items-center space-x-2">
       <Checkbox
         checked={status === "done"}
-        className={cn(status === "done" ? "opacity-50" : "", "ml-6 mr-1 my-4")}
+        className={cn(status === "done" ? "opacity-50" : "", "ml-6 mr-1 my-4 scale-125")}
         onCheckedChange={async (checked) => {
           const status = checked ? "done" : "todo";
           updateOptimisticTask({ status });
