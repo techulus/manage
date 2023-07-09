@@ -48,6 +48,9 @@ export default async function TaskLists({ params }: Props) {
 
   const archivedTaskLists = await db.query.taskList
     .findMany({
+      columns: {
+        id: true,
+      },
       where: and(
         eq(taskList.projectId, Number(projectId)),
         eq(taskList.status, "archived")

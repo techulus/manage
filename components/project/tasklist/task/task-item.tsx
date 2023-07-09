@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { Card, CardContent, CardHeader } from "../../../ui/card";
 import { Checkbox } from "../../../ui/checkbox";
 import TaskNotesForm from "./notes-form";
+import { Input } from "@/components/ui/input";
 
 export const TaskItem = ({
   task,
@@ -20,41 +21,55 @@ export const TaskItem = ({
   projectId: number;
 }) => {
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [optimisticTask, updateOptimisticTask] = useOptimistic(
     task,
-    (task: Task, status: string) => ({ ...task, status })
+    (task: Task, data: { status: string } | { name: string }) => ({
+      ...task,
+      ...data,
+    })
   );
 
   const { id, name, status } = optimisticTask;
 
   if (detailsOpen) {
     return (
-      <Card className="flex w-full flex-col rounded-none">
-        <CardHeader className="pt-4">
+      <Card className="flex w-full flex-col rounded-none bg-gray-50 dark:bg-gray-900">
+        <CardHeader className="pt-0">
           <div className="flex items-center space-x-2">
             <Checkbox
               checked={status === "done"}
-              className={cn(status === "done" ? "opacity-50" : "")}
+              className={cn(status === "done" ? "opacity-50" : "", "mr-1 my-4")}
               onCheckedChange={async (checked) => {
                 const status = checked ? "done" : "todo";
-                updateOptimisticTask(status);
+                updateOptimisticTask({ status });
 
                 toast.promise(updateTask(id, projectId, { status }), {
                   loading: "Saving...",
-                  success: "Done!",
+                  success: "Updated!",
                   error: "Error while saving, please try again.",
                 });
               }}
+              disabled={isEditing}
             />
-            <button
-              onClick={() => setDetailsOpen(false)}
-              className={cn(
-                "text-md font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-                status === "done" ? "text-muted-foreground line-through" : ""
-              )}
-            >
-              {name}
-            </button>
+            {isEditing ? (
+              <Input
+                type="text"
+                value={name}
+                onChange={(e) => updateOptimisticTask({ name: e.target.value })}
+                className="text-md w-full text-left font-medium leading-none"
+              />
+            ) : (
+              <button
+                onClick={() => setDetailsOpen(false)}
+                className={cn(
+                  "text-md w-full text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 py-4",
+                  status === "done" ? "text-muted-foreground line-through" : ""
+                )}
+              >
+                {name}
+              </button>
+            )}
           </div>
         </CardHeader>
         <CardContent className="pb-3">
@@ -65,6 +80,22 @@ export const TaskItem = ({
                 <dd className="mt-1 flex text-sm leading-6 sm:col-span-2 sm:mt-0">
                   <span className="flex-grow">{task.creator?.firstName}</span>
                   <button
+                    className="mr-4 text-teal-600"
+                    onClick={async () => {
+                      setIsEditing((val) => !val);
+
+                      if (!isEditing) return;
+
+                      await toast.promise(updateTask(id, projectId, { name }), {
+                        loading: "Saving...",
+                        success: "Done!",
+                        error: "Error while saving, please try again.",
+                      });
+                    }}
+                  >
+                    {isEditing ? "Save" : "Edit"}
+                  </button>
+                  <button
                     className="text-teal-600 hover:text-red-500"
                     onClick={() => {
                       toast.promise(
@@ -74,7 +105,7 @@ export const TaskItem = ({
                         }),
                         {
                           loading: "Deleting...",
-                          success: "Done!",
+                          success: "Deleted!",
                           error: "Error while deleting, please try again.",
                         }
                       );
@@ -119,13 +150,13 @@ export const TaskItem = ({
   }
 
   return (
-    <div className="flex items-center space-x-2 px-6 py-4">
+    <div className="flex items-center space-x-2">
       <Checkbox
         checked={status === "done"}
-        className={cn(status === "done" ? "opacity-50" : "")}
+        className={cn(status === "done" ? "opacity-50" : "", "ml-6 mr-1 my-4")}
         onCheckedChange={async (checked) => {
           const status = checked ? "done" : "todo";
-          updateOptimisticTask(status);
+          updateOptimisticTask({ status });
 
           toast.promise(updateTask(id, projectId, { status }), {
             loading: "Saving...",
@@ -136,7 +167,7 @@ export const TaskItem = ({
       />
       <button
         className={cn(
-          "text-md w-full text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+          "text-md w-full py-4 text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
           status === "done" ? "text-muted-foreground line-through" : ""
         )}
         onClick={() => setDetailsOpen(true)}

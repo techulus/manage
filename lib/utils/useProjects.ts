@@ -4,7 +4,6 @@ import { and, eq, like } from "drizzle-orm";
 import { getOwner } from "./useOwner";
 import { ProjectWithData, ProjectWithUser } from "@/drizzle/types";
 
-
 export async function getProjectsForOwner({
   search,
 }: {
@@ -46,6 +45,7 @@ export async function getProjectById(
       with: withTasksAndDocs
         ? {
           taskLists: {
+            where: eq(taskList.status, "active"),
             with: {
               tasks: true,
             },

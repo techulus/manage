@@ -164,7 +164,11 @@ export async function createTask({
 export async function updateTask(
   id: number,
   projectId: number,
-  data: { description: string } | { status: string }
+  data:
+    | { description: string }
+    | { status: string }
+    | { position: number }
+    | { name: string }
 ) {
   await db
     .update(task)
