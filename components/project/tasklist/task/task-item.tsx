@@ -6,10 +6,6 @@ import {
 } from "@/app/console/projects/[projectId]/tasklists/actions";
 import { Task, TaskWithDetails } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import {
-  ChevronUpIcon,
-  EllipsisHorizontalIcon,
-} from "@heroicons/react/20/solid";
 import { experimental_useOptimistic as useOptimistic, useState } from "react";
 import toast from "react-hot-toast";
 import { Card, CardContent, CardHeader } from "../../../ui/card";
@@ -33,8 +29,8 @@ export const TaskItem = ({
 
   if (detailsOpen) {
     return (
-      <Card className="flex flex-col w-full rounded-none">
-        <CardHeader className="pt-3">
+      <Card className="flex w-full flex-col rounded-none">
+        <CardHeader className="pt-4">
           <div className="flex items-center space-x-2">
             <Checkbox
               checked={status === "done"}
@@ -50,25 +46,19 @@ export const TaskItem = ({
                 });
               }}
             />
-            <label
+            <button
+              onClick={() => setDetailsOpen(false)}
               className={cn(
                 "text-md font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-                status === "done" ? "line-through text-muted-foreground" : ""
+                status === "done" ? "text-muted-foreground line-through" : ""
               )}
             >
               {name}
-            </label>
-
-            <button
-              className="text-teal-500"
-              onClick={() => setDetailsOpen(false)}
-            >
-              <ChevronUpIcon className="w-6 h-6" />
             </button>
           </div>
         </CardHeader>
         <CardContent className="pb-3">
-          <div className="border-t border-gray-100 dark:border-gray-800 text-primary">
+          <div className="border-t border-gray-100 text-primary dark:border-gray-800">
             <dl>
               <div className="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                 <dt className="text-sm font-medium leading-6">Created By</dt>
@@ -106,7 +96,7 @@ export const TaskItem = ({
                   ) : (
                     <button
                       type="button"
-                      className="rounded-md bg-white font-medium text-teal-600 hover:text-teal-500"
+                      className="rounded-md font-medium text-teal-600 hover:text-teal-500"
                     >
                       Assign
                     </button>
@@ -117,7 +107,7 @@ export const TaskItem = ({
             <dl>
               <div className="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                 <dt className="text-sm font-medium leading-6">Notes</dt>
-                <dd className="mt-1 flex text-sm leading-6 sm:col-span-2 sm:mt-0">
+                <dd className="mt-1 flex items-start text-sm leading-6 sm:col-span-2 sm:mt-0">
                   <TaskNotesForm task={task} />
                 </dd>
               </div>
@@ -129,7 +119,7 @@ export const TaskItem = ({
   }
 
   return (
-    <div className="flex items-center space-x-2 py-4 px-6">
+    <div className="flex items-center space-x-2 px-6 py-4">
       <Checkbox
         checked={status === "done"}
         className={cn(status === "done" ? "opacity-50" : "")}
@@ -144,20 +134,15 @@ export const TaskItem = ({
           });
         }}
       />
-      <label
+      <button
         className={cn(
-          "text-md font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-          status === "done" ? "line-through text-muted-foreground" : ""
+          "text-md w-full text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+          status === "done" ? "text-muted-foreground line-through" : ""
         )}
+        onClick={() => setDetailsOpen(true)}
       >
         {name}
-      </label>
-
-      {task.status === "todo" ? (
-        <button onClick={() => setDetailsOpen(true)}>
-          <EllipsisHorizontalIcon className="w-4 h-4" />
-        </button>
-      ) : null}
+      </button>
     </div>
   );
 };

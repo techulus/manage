@@ -22,7 +22,7 @@ export function Header() {
           <Link href="/" className="-m-1.5 p-1.5">
             <p className="hero relative">
               Manage
-              <sup className="absolute top-0 left-[calc(100%+.1rem)] text-xs">
+              <sup className="absolute left-[calc(100%+.1rem)] top-0 text-xs">
                 [beta]
               </sup>
             </p>
@@ -30,20 +30,20 @@ export function Header() {
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
           <SignedIn>
-            <a
+            <Link
               href="/console/projects"
               className="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200"
             >
               Console <span aria-hidden="true">&rarr;</span>
-            </a>
+            </Link>
           </SignedIn>
           <SignedOut>
-            <a
+            <Link
               href="/console/projects"
               className="text-sm font-semibold leading-6 text-gray-900"
             >
               Log in <span aria-hidden="true">&rarr;</span>
-            </a>
+            </Link>
           </SignedOut>
         </div>
       </nav>

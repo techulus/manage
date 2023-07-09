@@ -42,17 +42,19 @@ export default function TaskNotesForm({ task }: { task: TaskWithDetails }) {
     );
 
   return (
-    <>
-      <span className="flex-grow">
-        <MarkdownView content={task.description ?? ""} />
-      </span>
-      <button
-        type="button"
-        className="rounded-md bg-white font-medium text-teal-600 hover:text-teal-500"
+    <div className="flex flex-grow flex-col items-start">
+      {task.description ? (
+        <span className="w-full rounded-md border border-muted p-2">
+          <MarkdownView content={task.description ?? ""} />
+        </span>
+      ) : null}
+      <Button
+        variant="secondary"
+        className="mt-2"
         onClick={() => setIsEditing(true)}
       >
         Update notes
-      </button>
-    </>
+      </Button>
+    </div>
   );
 }

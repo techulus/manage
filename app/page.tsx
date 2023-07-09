@@ -1,6 +1,7 @@
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SITE_METADATA } from "@/data/marketing";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -22,30 +23,30 @@ export default function Home() {
         </div>
         <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
           <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl hero text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-yellow-700">
+            <h1 className="hero bg-gradient-to-r from-teal-500 to-yellow-700 bg-clip-text text-4xl font-bold tracking-tight text-gray-900 text-transparent sm:text-6xl">
               {SITE_METADATA.TAGLINE}
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
               {SITE_METADATA.DESCRIPTION}
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
-              <a
+              <Link
                 href="/console/projects"
-                className="rounded-full bg-teal-600 px-8 py-2.5 text-sm font-semibold text-white hover:bg-teal-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 hover:shadow"
+                className="rounded-full bg-teal-600 px-8 py-2.5 text-sm font-semibold text-white hover:bg-teal-500 hover:shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
               >
                 Get started
-              </a>
-              <a
+              </Link>
+              <Link
                 href="https://github.com/techulus/manage"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-300 rounded-full border border-gray-300 dark:border-gray-700 px-4 py-2.5 hover:shadow"
+                className="rounded-full border border-gray-300 px-4 py-2.5 text-sm font-semibold leading-6 text-gray-900 hover:shadow dark:border-gray-700 dark:text-gray-300"
               >
                 Star on GitHub{" "}
                 <svg
                   fill="currentColor"
                   viewBox="0 0 24 24"
-                  className="inline-block w-5 h-5 ml-1 -mt-1"
+                  className="-mt-1 ml-1 inline-block h-5 w-5"
                 >
                   <path
                     fillRule="evenodd"
@@ -53,7 +54,7 @@ export default function Home() {
                     clipRule="evenodd"
                   />
                 </svg>
-              </a>
+              </Link>
             </div>
           </div>
         </div>

@@ -19,7 +19,7 @@ export function Footer() {
             <div key={item.name} className="pb-6">
               <Link
                 href={item.href}
-                className="text-sm leading-6 font-semibold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                className="text-sm font-semibold leading-6 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
               >
                 {item.name}
               </Link>
@@ -27,15 +27,7 @@ export function Footer() {
           ))}
         </nav>
 
-        <a
-          className="text-gray-500 text-sm leading-6 mt-10 block sm:text-center"
-          href="https://www.flaticon.com/free-icons/bot"
-          title="bot icons"
-        >
-          Bot icons created by Smashicons - Flaticon
-        </a>
-
-        <p className="mt-4 sm:text-center text-sm leading-5 text-gray-500">
+        <p className="mt-4 text-sm leading-5 text-gray-500 sm:text-center">
           &copy; 2023 Techulus. All rights reserved.
         </p>
       </div>

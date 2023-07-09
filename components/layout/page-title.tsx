@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { SignedIn } from "@clerk/nextjs";
 import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { buttonVariants } from "../ui/button";
@@ -20,7 +19,7 @@ export default function PageTitle({
   actionLabel,
 }: Props) {
   return (
-    <div className="relative flex justify-center border-b border-gray-200 dark:border-gray-800 pb-4 pl-4 pr-6 pt-4 sm:pl-6 lg:pl-8 xl:border-t-0 xl:px-8 xl:py-12 dark:text-white">
+    <div className="relative flex justify-center border-b border-gray-200 pb-4 pl-4 pr-6 pt-4 dark:border-gray-800 dark:text-white sm:pl-6 lg:pl-8 xl:border-t-0 xl:px-8 xl:py-12">
       <div
         className="absolute inset-0 -z-10 overflow-hidden dark:opacity-50"
         aria-hidden="true"
@@ -37,28 +36,26 @@ export default function PageTitle({
         <div className="absolute inset-x-0 bottom-0 h-px bg-gray-900/5" />
       </div>
 
-      <div className="flex w-full justify-between max-w-5xl">
+      <div className="flex w-full max-w-5xl justify-between">
         <div className="flex items-center">
           {backUrl && (
-            <SignedIn>
-              <Link
-                href={backUrl}
-                className="flex items-center text-md font-medium text-gray-600 hover:text-gray-900 mr-2"
-              >
-                <ArrowLeftIcon
-                  className={cn(
-                    "flex-shrink-0 h-6 w-6 text-gray-600 hover:text-gray-900",
-                    "dark:text-gray-400 dark:hover:text-gray-300"
-                  )}
-                  aria-hidden="true"
-                />
-              </Link>
-            </SignedIn>
+            <Link
+              href={backUrl}
+              className="text-md mr-2 flex items-center font-medium text-gray-600 hover:text-gray-900"
+            >
+              <ArrowLeftIcon
+                className={cn(
+                  "h-6 w-6 flex-shrink-0 text-gray-600 hover:text-gray-900",
+                  "dark:text-gray-400 dark:hover:text-gray-300"
+                )}
+                aria-hidden="true"
+              />
+            </Link>
           )}
 
-          <div className="flex flex-col relative">
+          <div className="relative flex flex-col">
             {subTitle && (
-              <p className="lg:absolute lg:-top-4 lg:left-0 text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground lg:absolute lg:-top-4 lg:left-0">
                 {subTitle}
               </p>
             )}
