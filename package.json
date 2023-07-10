@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "npx drizzle-kit@latest push:sqlite",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
