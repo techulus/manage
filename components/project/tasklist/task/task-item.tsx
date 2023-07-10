@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader } from "../../../ui/card";
 import { Checkbox } from "../../../ui/checkbox";
 import TaskNotesForm from "./notes-form";
 import { Input } from "@/components/ui/input";
+import { DocumentIcon } from "@heroicons/react/20/solid";
 
 export const TaskItem = ({
   task,
@@ -172,7 +173,10 @@ export const TaskItem = ({
         )}
         onClick={() => setDetailsOpen(true)}
       >
-        {name}
+        <div className="flex">
+          {name}
+          {task.description ? <DocumentIcon className="ml-2 w-4 h-4 text-teal-600 dark:text-teal-700" /> : null}
+        </div>
       </button>
     </div>
   );
