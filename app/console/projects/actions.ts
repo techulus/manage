@@ -23,12 +23,17 @@ const projectSchema = z.object({
   status: z.enum(["active", "archived"]),
 });
 
-export async function createProject(payload: z.infer<typeof projectSchema>) {
+export async function createProject(payload: FormData) {
   const { ownerId, userId } = getOwner();
+  const name = payload.get("name") as string;
+  const description = payload.get("description") as string;
+  const dueDate = payload.get("dueDate") as string;
 
   try {
     const data = projectSchema.parse({
-      ...payload,
+      name,
+      description,
+      dueDate,
       status: "active",
     });
 
@@ -49,7 +54,6 @@ export async function createProject(payload: z.infer<typeof projectSchema>) {
   } catch (error) {
     console.log(error);
     // TODO: Handle error, hook for handling this is not yet available
-    return JSON.stringify(error);
   }
 }
 
