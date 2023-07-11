@@ -1,7 +1,7 @@
-"use client";
-
 import dynamic from "next/dynamic";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { notifyError } from "../core/toast";
+import { BlobUploadResult } from "@/app/api/blob/route";
 
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
@@ -10,7 +10,7 @@ const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
 export default function MarkdownEditor({
   defaultValue,
   name = "description",
-  setValue = () => {},
+  setValue = () => { },
 }: {
   defaultValue?: string;
   name?: string;
@@ -18,12 +18,30 @@ export default function MarkdownEditor({
 }) {
   const [value, onChange] = useState(defaultValue ?? "");
 
+  const onUploadImage = useCallback(
+    async (
+      file: File,
+      onSuccess: (url: string) => void,
+    ) => {
+      try {
+        const result: BlobUploadResult = await fetch("/api/blob", { method: "PUT", body: file }).then((res) => res.json());
+        return onSuccess(result.url);
+      } catch (e) {
+        console.error(e);
+        notifyError("Failed to upload image");
+      }
+    },
+    []
+  );
+
   const options = useMemo(() => {
     return {
-      spellChecker: false,
+      spellChecker: true,
+      uploadImage: true,
+      imageUploadFunction: onUploadImage,
       placeholder: "### Notes",
     };
-  }, []);
+  }, [onUploadImage]);
 
   return (
     <>

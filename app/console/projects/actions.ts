@@ -23,33 +23,34 @@ const projectSchema = z.object({
   status: z.enum(["active", "archived"]),
 });
 
-export async function createProject(payload: FormData) {
+export async function createProject(payload: z.infer<typeof projectSchema>) {
   const { ownerId, userId } = getOwner();
-  const name = payload.get("name") as string;
-  const description = payload.get("description") as string;
-  const dueDate = (payload.get("dueDate") as string).trim() ?? null;
 
-  const data = projectSchema.parse({
-    name,
-    description,
-    dueDate,
-    status: "active",
-  });
+  try {
+    const data = projectSchema.parse({
+      ...payload,
+      status: "active",
+    });
 
-  const newProject = await db
-    .insert(project)
-    .values({
-      ...data,
-      organizationId: String(ownerId),
-      createdByUser: userId,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })
-    .returning()
-    .get();
+    const newProject = await db
+      .insert(project)
+      .values({
+        ...data,
+        organizationId: String(ownerId),
+        createdByUser: userId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning()
+      .get();
 
-  revalidatePath(`/console/projects/${newProject.id}`);
-  redirect(`/console/projects/${newProject.id}`);
+    revalidatePath(`/console/projects/${newProject.id}`);
+    redirect(`/console/projects/${newProject.id}`);
+  } catch (error) {
+    console.log(error);
+    // TODO: Handle error, hook for handling this is not yet available
+    return JSON.stringify(error);
+  }
 }
 
 export async function updateProject(payload: FormData) {

@@ -43,6 +43,7 @@ export const userRelations = relations(user, ({ many }) => ({
   projects: many(project),
   documents: many(document),
   taskLists: many(taskList),
+  // tasks: many(task),
 }));
 
 export const organization = sqliteTable("Organization", {
@@ -155,10 +156,12 @@ export const taskRelations = relations(task, ({ one }) => ({
   creator: one(user, {
     fields: [task.createdByUser],
     references: [user.id],
+    relationName: "creator",
   }),
   assignee: one(user, {
     fields: [task.assignedToUser],
     references: [user.id],
+    relationName: "assignee",
   }),
   taskList: one(taskList, {
     fields: [task.taskListId],
@@ -192,4 +195,26 @@ export const taskListRelations = relations(taskList, ({ many, one }) => ({
     references: [project.id],
   }),
   tasks: many(task),
+}));
+
+export const blobs = sqliteTable("Blob", {
+  id: text("id").primaryKey().notNull(),
+  key: text("key").notNull(),
+  contentType: text("contentType").notNull(),
+  contentSize: integer("contentSize").notNull(),
+  organizationId: text("organizationId")
+    .notNull()
+    .references(() => organization.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+});
+
+export const blobsRelations = relations(blobs, ({ one }) => ({
+  organization: one(organization, {
+    fields: [blobs.organizationId],
+    references: [organization.id],
+  }),
 }));
