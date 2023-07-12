@@ -2,7 +2,7 @@ import { Header } from "@/components/layout/header";
 
 export default function TermsAndConditions() {
   return (
-    <div className="dark:text-gray-100 h-full">
+    <div className="h-full dark:text-gray-100">
       <Header />
 
       <div className="relative isolate px-6 pt-14 lg:px-8">
@@ -19,10 +19,10 @@ export default function TermsAndConditions() {
           />
         </div>
         <div className="mx-auto max-w-2xl py-32">
-          <h1 className="text-2xl font-bold mb-4">Terms and Conditions</h1>
+          <h1 className="mb-4 text-2xl font-bold">Terms and Conditions</h1>
 
           <div className="mb-8">
-            <h2 className="text-xl font-bold mb-2">1. Introduction</h2>
+            <h2 className="mb-2 text-xl font-bold">1. Introduction</h2>
             <p className="mb-4">
               Welcome to Manage! These terms and conditions outline the rules
               and regulations for the use of our Open Source SaaS product.
@@ -30,7 +30,7 @@ export default function TermsAndConditions() {
           </div>
 
           <div className="mb-8">
-            <h2 className="text-xl font-bold mb-2">2. No Liability</h2>
+            <h2 className="mb-2 text-xl font-bold">2. No Liability</h2>
             <p className="mb-4">
               As the developer and provider of Manage, I hereby declare that I
               bear no liability for any damages, losses, or legal issues that
@@ -40,7 +40,7 @@ export default function TermsAndConditions() {
           </div>
 
           <div className="mb-8">
-            <h2 className="text-xl font-bold mb-2">3. Intellectual Property</h2>
+            <h2 className="mb-2 text-xl font-bold">3. Intellectual Property</h2>
             <p className="mb-4">
               Manage is an Open Source SaaS product released under the terms of
               the GNU General Public License (GPL). All intellectual property
@@ -50,7 +50,7 @@ export default function TermsAndConditions() {
           </div>
 
           <div className="mb-8">
-            <h2 className="text-xl font-bold mb-2">4. Limitations</h2>
+            <h2 className="mb-2 text-xl font-bold">4. Limitations</h2>
             <p className="mb-4">
               Manage is provided &quot;as is&quot; and without any warranty,
               whether express or implied. I do not guarantee the accuracy,
@@ -61,7 +61,7 @@ export default function TermsAndConditions() {
           </div>
 
           <div className="mb-8">
-            <h2 className="text-xl font-bold mb-2">5. Modifications</h2>
+            <h2 className="mb-2 text-xl font-bold">5. Modifications</h2>
             <p className="mb-4">
               I reserve the right to modify or replace these terms and
               conditions at any time without prior notice. It is your

@@ -150,8 +150,8 @@ export default async function ProjectDetails({ params }: Props) {
 
       {/* Toolbar*/}
       <ContentBlock>
-        <div className="hidden md:flex h-12 flex-col justify-center border-b border-gray-200 dark:border-gray-800">
-          <div className="px-4 sm:px-6 lg:px-8 lg:-mx-4">
+        <div className="hidden h-12 flex-col justify-center border-b border-gray-200 dark:border-gray-800 md:flex">
+          <div className="px-4 sm:px-6 lg:-mx-4 lg:px-8">
             <div className="flex justify-between py-3">
               {/* Left buttons */}
               <div className="isolate inline-flex sm:space-x-3">

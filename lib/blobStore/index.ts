@@ -1,4 +1,9 @@
-import { S3Client } from "@aws-sdk/client-s3";
+import {
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const blobStorage = new S3Client({
   region: "auto",
@@ -9,4 +14,38 @@ const blobStorage = new S3Client({
   },
 });
 
-export { blobStorage };
+const upload = async (
+  key: string,
+  {
+    content,
+    type,
+  }: {
+    content: string | Buffer | ArrayBuffer;
+    type: string;
+  }
+) => {
+  const input = {
+    Body: content as unknown as Blob, // supress type error :(
+    Bucket: process.env.R2_BUCKET_NAME!,
+    Key: key,
+    Type: type,
+  };
+
+  const command = new PutObjectCommand(input);
+  await blobStorage.send(command);
+};
+
+const getUrl = async (key: string): Promise<string> => {
+  const command = new GetObjectCommand({
+    Bucket: process.env.R2_BUCKET_NAME!,
+    Key: key,
+  });
+
+  const signedUrl = await getSignedUrl(blobStorage, command, {
+    expiresIn: 3600,
+  });
+
+  return signedUrl;
+};
+
+export { getUrl, upload };

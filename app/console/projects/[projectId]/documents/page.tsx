@@ -37,7 +37,7 @@ export default async function DocumentsList({ params }: Props) {
         actionLink={`/console/projects/${projectId}/documents/new`}
       />
 
-      <div className="mx-auto max-w-5xl px-4 lg:px-0 my-12">
+      <div className="mx-auto my-12 max-w-5xl px-4 lg:px-0">
         <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-none">
           <ul role="list" className="mt-6 space-y-6">
             {documents.map((document) => (

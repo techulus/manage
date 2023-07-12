@@ -68,7 +68,7 @@ export default async function TaskLists({ params }: Props) {
         actionLink={`/console/projects/${projectId}/tasklists/new`}
       />
 
-      <div className="mx-auto max-w-5xl px-4 lg:px-0 my-12">
+      <div className="mx-auto my-12 max-w-5xl px-4 lg:px-0">
         <ul role="list" className="mt-6 space-y-6">
           {taskLists.map((taskList) => (
             <TaskListItem
@@ -81,7 +81,7 @@ export default async function TaskLists({ params }: Props) {
         </ul>
 
         {archivedTaskLists.length > 0 && (
-          <p className="mt-12 pt-4 border-t border-muted text-sm text-muted-foreground">
+          <p className="mt-12 border-t border-muted pt-4 text-sm text-muted-foreground">
             {archivedTaskLists.length} archived task list(s)
           </p>
         )}

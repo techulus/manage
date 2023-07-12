@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "migrate": "drizzle-kit push:sqlite"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.367.0",
@@ -29,7 +30,7 @@
     "class-variance-authority": "^0.6.1",
     "clsx": "^1.2.1",
     "date-fns": "^2.30.0",
-    "drizzle-orm": "^0.27.0",
+    "drizzle-orm": "^0.27.2",
     "easymde": "^2.18.0",
     "eslint": "8.40.0",
     "eslint-config-next": "^13.4.1",

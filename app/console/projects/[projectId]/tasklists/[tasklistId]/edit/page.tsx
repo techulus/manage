@@ -31,7 +31,7 @@ export default async function EditTaskList({ params }: Props) {
             <SharedForm item={tasklist} />
           </CardContent>
           <CardFooter>
-            <div className="flex ml-auto items-center justify-end gap-x-6">
+            <div className="ml-auto flex items-center justify-end gap-x-6">
               <Link
                 href={backUrl}
                 className={buttonVariants({ variant: "secondary" })}

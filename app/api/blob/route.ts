@@ -1,11 +1,10 @@
 import { db } from "@/drizzle/db";
-import { blobs } from "@/drizzle/schema";
-import { blobStorage } from "@/lib/blobStore";
+import { blob } from "@/drizzle/schema";
+import { upload } from "@/lib/blobStore";
 import { getAppBaseUrl } from "@/lib/utils/url";
 import { getOwner } from "@/lib/utils/useOwner";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { NextResponse } from "next/server";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 export type BlobUploadResult = {
   message: string;
@@ -18,22 +17,17 @@ export async function PUT(request: Request) {
 
   try {
     const fileKey = uuidv4();
-    const input = {
-      "Body": await body.arrayBuffer(),
-      "Bucket": process.env.R2_BUCKET_NAME!,
-      "Key": `${ownerId}/${fileKey}`,
-      "Type": body.type,
-    };
+    const key = `${ownerId}/${fileKey}`;
 
-    // @ts-ignore I don't know why this is not working
-    const command = new PutObjectCommand(input);
-    await blobStorage.send(command);
+    await upload(key, {
+      content: await body.arrayBuffer(),
+      type: body.type,
+    });
 
     await db
-      .insert(blobs)
+      .insert(blob)
       .values({
-        id: uuidv4(),
-        key: input.Key,
+        key: key,
         contentType: body.type,
         contentSize: body.size,
         organizationId: ownerId,

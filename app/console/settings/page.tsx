@@ -28,7 +28,7 @@ export default async function Settings() {
                 Manage your account settings.
               </p>
 
-              <dl className="mt-6 space-y-6 divide-y divide-gray-100 dark:divide-gray-800 border-t border-gray-200 dark:border-gray-800 text-sm leading-6">
+              <dl className="mt-6 space-y-6 divide-y divide-gray-100 border-t border-gray-200 text-sm leading-6 dark:divide-gray-800 dark:border-gray-800">
                 <div className="pt-6 sm:flex">
                   <dt className="font-medium text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
                     Theme
@@ -41,13 +41,13 @@ export default async function Settings() {
             </div>
           </div>
 
-          <div className="mt-16 mx-auto max-w-2xl space-y-16 sm:space-y-20 lg:mx-0 lg:max-w-none">
+          <div className="mx-auto mt-16 max-w-2xl space-y-16 sm:space-y-20 lg:mx-0 lg:max-w-none">
             <div>
               <h2 className="text-base font-semibold leading-7 text-gray-900 dark:text-gray-200">
                 Profile
               </h2>
 
-              <dl className="mt-6 space-y-6 divide-y divide-gray-100 dark:divide-gray-800 border-t border-gray-200 dark:border-gray-800 text-sm leading-6">
+              <dl className="mt-6 space-y-6 divide-y divide-gray-100 border-t border-gray-200 text-sm leading-6 dark:divide-gray-800 dark:border-gray-800">
                 <div className="pt-6 sm:flex">
                   <dt className="font-medium text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
                     Full name

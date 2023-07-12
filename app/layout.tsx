@@ -19,7 +19,7 @@ export default function RootLayout({
   const theme = cookies().get("theme")?.value ?? "light";
 
   return (
-    <html lang="en" className={cn("flex min-w-full min-h-full", theme)}>
+    <html lang="en" className={cn("flex min-h-full min-w-full", theme)}>
       <head>
         <meta
           name="viewport"
@@ -202,8 +202,8 @@ export default function RootLayout({
       <ClerkProvider>
         <body
           className={cn(
-            "flex-1 min-h-full min-w-full",
-            "rounded-tl-xl rounded-tr-xl md:rounded-none",
+            "min-h-full min-w-full flex-1",
+            "rounded-tl-xl rounded-tr-xl md:rounded-none"
           )}
         >
           {children}

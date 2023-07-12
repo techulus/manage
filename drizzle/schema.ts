@@ -197,9 +197,8 @@ export const taskListRelations = relations(taskList, ({ many, one }) => ({
   tasks: many(task),
 }));
 
-export const blobs = sqliteTable("Blob", {
-  id: text("id").primaryKey().notNull(),
-  key: text("key").notNull(),
+export const blob = sqliteTable("Blob", {
+  key: text("key").primaryKey().notNull(),
   contentType: text("contentType").notNull(),
   contentSize: integer("contentSize").notNull(),
   organizationId: text("organizationId")
@@ -212,9 +211,9 @@ export const blobs = sqliteTable("Blob", {
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
 });
 
-export const blobsRelations = relations(blobs, ({ one }) => ({
+export const blobsRelations = relations(blob, ({ one }) => ({
   organization: one(organization, {
-    fields: [blobs.organizationId],
+    fields: [blob.organizationId],
     references: [organization.id],
   }),
 }));

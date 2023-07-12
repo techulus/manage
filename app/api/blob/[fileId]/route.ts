@@ -1,8 +1,9 @@
-import { blobStorage } from "@/lib/blobStore";
+import { db } from "@/drizzle/db";
+import { blob } from "@/drizzle/schema";
+import { getUrl } from "@/lib/blobStore";
 import { getOwner } from "@/lib/utils/useOwner";
-import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { and, eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 export async function GET(
   _: NextRequest,
@@ -10,20 +11,22 @@ export async function GET(
 ) {
   const { ownerId } = getOwner();
   const { fileId } = params;
+  const key = `${ownerId}/${fileId}`;
 
-  const command = new GetObjectCommand({
-    Bucket: process.env.R2_BUCKET_NAME!,
-    Key: `${ownerId}/${fileId}`
+  const fileDetails = await db.query.blob.findFirst({
+    where: and(eq(blob.organizationId, ownerId), eq(blob.key, key)),
   });
-  const signedUrl = await getSignedUrl(blobStorage, command, {
-    expiresIn: 3600,
-  });
+  if (!fileDetails) {
+    return new Response("Not found", { status: 404 });
+  }
+
+  const signedUrl = await getUrl(key);
   const file = await fetch(signedUrl);
 
   const headers = new Headers();
-  headers.set("Content-Type", "image/png");
+  headers.set("Content-Type", fileDetails.contentType);
 
   return new Response(await file.blob(), {
-    headers
+    headers,
   });
 }

@@ -2,7 +2,7 @@ import { SignUp } from "@clerk/nextjs/app-beta";
 
 export default function SignUpPage() {
   return (
-    <div className="flex h-full justify-center items-center relative overflow-hidden">
+    <div className="relative flex h-full items-center justify-center overflow-hidden">
       <div
         className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
         aria-hidden="true"

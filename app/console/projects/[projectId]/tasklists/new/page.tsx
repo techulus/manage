@@ -25,7 +25,7 @@ export default async function CreateTaskList({ params }: Props) {
             <SharedForm />
           </CardContent>
           <CardFooter>
-            <div className="flex ml-auto items-center justify-end gap-x-6">
+            <div className="ml-auto flex items-center justify-end gap-x-6">
               <Link
                 href={backUrl}
                 className={buttonVariants({ variant: "secondary" })}
