@@ -48,4 +48,8 @@ const getUrl = async (key: string): Promise<string> => {
   return signedUrl;
 };
 
-export { getUrl, upload };
+const bytesToMegabytes = (bytes: number): number => {
+  return Math.round(bytes / 1024 / 1024);
+};
+
+export { getUrl, upload, bytesToMegabytes };

@@ -7,7 +7,7 @@ import { NextRequest } from "next/server";
 
 export async function GET(
   _: NextRequest,
-  { params }: { params: { fileId: string } }
+  { params }: { params: { fileId: string; fileName: string } }
 ) {
   const { ownerId } = getOwner();
   const { fileId } = params;
@@ -16,17 +16,22 @@ export async function GET(
   const fileDetails = await db.query.blob.findFirst({
     where: and(eq(blob.organizationId, ownerId), eq(blob.key, key)),
   });
+
   if (!fileDetails) {
     return new Response("Not found", { status: 404 });
   }
 
-  const signedUrl = await getUrl(key);
-  const file = await fetch(signedUrl);
+  try {
+    const signedUrl = await getUrl(key);
+    const file = await fetch(signedUrl);
 
-  const headers = new Headers();
-  headers.set("Content-Type", fileDetails.contentType);
+    const headers = new Headers();
+    headers.set("Content-Type", fileDetails.contentType);
 
-  return new Response(await file.blob(), {
-    headers,
-  });
+    return new Response(await file.blob(), {
+      headers,
+    });
+  } catch (e) {
+    return new Response("Not found", { status: 404 });
+  }
 }
