@@ -1,28 +1,35 @@
 import PageTitle from "@/components/layout/page-title";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
+import { buttonVariants } from "@/components/ui/button";
 import { db } from "@/drizzle/db";
 import { task, taskList } from "@/drizzle/schema";
 import { getOwner } from "@/lib/utils/useOwner";
 import { getProjectById } from "@/lib/utils/useProjects";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, or } from "drizzle-orm";
+import Link from "next/link";
 
 type Props = {
   params: {
     projectId: string;
   };
+  searchParams: {
+    status?: string;
+  };
 };
 
-export default async function TaskLists({ params }: Props) {
+export default async function TaskLists({ params, searchParams }: Props) {
   const { userId } = getOwner();
   const { projectId } = params;
 
   const project = await getProjectById(projectId);
 
+  const filterByStatuses = searchParams.status?.split(",") ?? ["active"];
+  const statusFilter = filterByStatuses.map((status) => eq(taskList.status, status));
   const taskLists = await db.query.taskList
     .findMany({
       where: and(
         eq(taskList.projectId, Number(projectId)),
-        eq(taskList.status, "active")
+        or(...statusFilter)
       ),
       with: {
         tasks: {
@@ -81,9 +88,19 @@ export default async function TaskLists({ params }: Props) {
         </ul>
 
         {archivedTaskLists.length > 0 && (
-          <p className="mt-12 border-t border-muted pt-4 text-sm text-muted-foreground">
-            {archivedTaskLists.length} archived task list(s)
-          </p>
+          <div className="flex flex-grow w-full mt-12 border-t border-muted items-center py-4">
+            <p className="text-sm text-muted-foreground">
+              {archivedTaskLists.length} archived task list(s)
+            </p>
+
+            {filterByStatuses.includes("archived") ?
+              <Link href={`/console/projects/${projectId}/tasklists`} className={buttonVariants({ variant: "link" })}>
+                Hide
+              </Link>
+              : <Link href={`/console/projects/${projectId}/tasklists?status=active,archived`} className={buttonVariants({ variant: "link" })}>
+                Show
+              </Link>}
+          </div>
         )}
       </div>
     </>

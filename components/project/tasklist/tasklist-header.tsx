@@ -26,7 +26,9 @@ export const TaskListHeader = ({
         className="text-sm font-medium"
       >
         <span className="absolute inset-0" aria-hidden="true" />
-        <div className="text-xl font-medium leading-6">{taskList.name}</div>
+        <div className="text-xl font-medium leading-6">{taskList.name}
+          {taskList.status === "archived" ? " (Archived)" : null}
+        </div>
         {totalCount != null && doneCount != null ? (
           <div className="mt-1 text-sm text-muted-foreground">
             {doneCount}/{totalCount} completed
