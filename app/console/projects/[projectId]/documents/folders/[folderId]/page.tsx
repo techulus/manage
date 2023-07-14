@@ -62,7 +62,7 @@ export default async function FolderDetails({ params }: Props) {
                 href={`/console/projects/${projectId}/documents/folders/${folderId}/new`}
                 className={buttonVariants({ variant: "link" })}
               >
-                Create <DocumentPlusIcon className="ml-1 h-5 w-5" />
+                <DocumentPlusIcon className="mr-1 h-5 w-5" /> File
                 <span className="sr-only">, document</span>
               </Link>
             </div>
