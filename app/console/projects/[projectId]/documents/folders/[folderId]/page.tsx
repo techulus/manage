@@ -38,6 +38,7 @@ export default async function FolderDetails({ params }: Props) {
     <>
       <PageTitle
         title={folder?.name}
+        subTitle="Documents"
         backUrl="/console/projects"
         actionLabel="Edit"
         actionLink={`/console/projects/${projectId}/edit`}

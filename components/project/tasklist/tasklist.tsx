@@ -40,7 +40,7 @@ export const TaskListItem = ({
         doneCount={doneItems.length}
       />
       {taskList.description ? (
-        <div className="py-2 px-6 border-b border-gray-900/5">
+        <div className="border-b border-gray-900/5 px-6 py-2">
           <MarkdownView content={taskList.description ?? ""} />
         </div>
       ) : null}
@@ -69,8 +69,8 @@ export const TaskListItem = ({
         ))}
       </div>
 
-      <div className="flex h-12 flex-col justify-center mt-2 border-t border-gray-200 dark:border-gray-800">
-        <div className="px-4 sm:px-6 lg:px-8 lg:-mx-4">
+      <div className="mt-2 flex h-12 flex-col justify-center border-t border-gray-200 dark:border-gray-800">
+        <div className="px-4 sm:px-6 lg:-mx-4 lg:px-8">
           <div className="flex justify-between py-3">
             <div className="isolate inline-flex sm:space-x-3">
               <span className="inline-flex space-x-1">
@@ -85,23 +85,43 @@ export const TaskListItem = ({
 
             <nav aria-label="Pagination">
               <span className="isolate inline-flex">
-                <Button
-                  variant="ghost"
-                  onClick={async () => {
-                    toast.promise(
-                      partialUpdateTaskList(taskList.id, {
-                        status: "archived",
-                      }),
-                      {
-                        loading: "Archiving task list...",
-                        success: "Task list archived.",
-                        error: "Failed to archive task list.",
-                      }
-                    );
-                  }}
-                >
-                  Archive
-                </Button>
+                {taskList.status === "active" ? (
+                  <Button
+                    variant="ghost"
+                    onClick={async () => {
+                      toast.promise(
+                        partialUpdateTaskList(taskList.id, {
+                          status: "archived",
+                        }),
+                        {
+                          loading: "Archiving task list...",
+                          success: "Task list archived.",
+                          error: "Failed to archive task list.",
+                        }
+                      );
+                    }}
+                  >
+                    Archive
+                  </Button>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    onClick={async () => {
+                      toast.promise(
+                        partialUpdateTaskList(taskList.id, {
+                          status: "active",
+                        }),
+                        {
+                          loading: "Unarchiving task list...",
+                          success: "Task list activated.",
+                          error: "Failed to activate task list.",
+                        }
+                      );
+                    }}
+                  >
+                    Unarchive
+                  </Button>
+                )}
               </span>
             </nav>
           </div>

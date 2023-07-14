@@ -40,7 +40,10 @@ export const TaskItem = ({
           <div className="flex items-center space-x-2">
             <Checkbox
               checked={status === "done"}
-              className={cn(status === "done" ? "opacity-50" : "", "mr-1 my-4 scale-125")}
+              className={cn(
+                status === "done" ? "opacity-50" : "",
+                "my-4 mr-1 scale-125"
+              )}
               onCheckedChange={async (checked) => {
                 const status = checked ? "done" : "todo";
                 updateOptimisticTask({ status });
@@ -64,7 +67,7 @@ export const TaskItem = ({
               <button
                 onClick={() => setDetailsOpen(false)}
                 className={cn(
-                  "text-md w-full text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 py-4",
+                  "text-md w-full py-4 text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
                   status === "done" ? "text-muted-foreground line-through" : ""
                 )}
               >
@@ -154,7 +157,10 @@ export const TaskItem = ({
     <div className="flex items-center space-x-2">
       <Checkbox
         checked={status === "done"}
-        className={cn(status === "done" ? "opacity-50" : "", "ml-6 mr-1 my-4 scale-125")}
+        className={cn(
+          status === "done" ? "opacity-50" : "",
+          "my-4 ml-6 mr-1 scale-125"
+        )}
         onCheckedChange={async (checked) => {
           const status = checked ? "done" : "todo";
           updateOptimisticTask({ status });
@@ -175,7 +181,9 @@ export const TaskItem = ({
       >
         <div className="flex">
           {name}
-          {task.description ? <DocumentIcon className="ml-2 w-4 h-4 text-teal-600 dark:text-teal-700" /> : null}
+          {task.description ? (
+            <DocumentIcon className="ml-2 h-4 w-4 text-teal-600 dark:text-teal-700" />
+          ) : null}
         </div>
       </button>
     </div>

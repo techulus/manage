@@ -4,7 +4,7 @@ import { DocumentHeader } from "@/components/project/document/document-header";
 import { db } from "@/drizzle/db";
 import { document, documentFolder } from "@/drizzle/schema";
 import { getProjectById } from "@/lib/utils/useProjects";
-import { eq } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 
 type Props = {
   params: {
@@ -20,7 +20,9 @@ export default async function DocumentsList({ params }: Props) {
   const documents = await db
     .select()
     .from(document)
-    .where(eq(document.projectId, Number(projectId)))
+    .where(
+      and(eq(document.projectId, Number(projectId)), isNull(document.folderId))
+    )
     .all();
 
   const documentFolders = await db
@@ -44,10 +46,10 @@ export default async function DocumentsList({ params }: Props) {
       />
 
       <div className="mx-auto my-12 max-w-5xl px-4 lg:px-0">
-        <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-none space-y-12">
+        <div className="mx-auto max-w-2xl space-y-12 lg:mx-0 lg:max-w-none">
           {documentFolders.length ? (
             <div>
-              <h2 className="text-2xl font-bold mb-4">Folders</h2>
+              <h2 className="mb-4 text-2xl font-bold">Folders</h2>
               <ul
                 role="list"
                 className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2"
@@ -66,7 +68,7 @@ export default async function DocumentsList({ params }: Props) {
 
           {documents.length ? (
             <div>
-              <h2 className="text-2xl font-bold mb-4">Documents</h2>
+              <h2 className="mb-4 text-2xl font-bold">Documents</h2>
               <ul
                 role="list"
                 className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2"

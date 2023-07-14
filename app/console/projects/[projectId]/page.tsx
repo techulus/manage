@@ -44,7 +44,9 @@ export default async function ProjectDetails({ params }: Props) {
       <ContentBlock>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold leading-7">Task Lists</h2>
+            <Link href={`/console/projects/${projectId}/tasklists`}>
+              <h2 className="text-2xl font-semibold leading-7">Task Lists</h2>
+            </Link>
 
             <div>
               <Link
@@ -53,15 +55,6 @@ export default async function ProjectDetails({ params }: Props) {
               >
                 Create<span className="sr-only">, tasklist</span>
               </Link>
-
-              {project.taskLists.length ? (
-                <Link
-                  href={`/console/projects/${projectId}/tasklists`}
-                  className={buttonVariants({ variant: "link" })}
-                >
-                  View all<span className="sr-only">, tasklists</span>
-                </Link>
-              ) : null}
             </div>
           </div>
         </CardHeader>
@@ -102,34 +95,29 @@ export default async function ProjectDetails({ params }: Props) {
 
       <ContentBlock>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold leading-7">Documents</h2>
+          <div className="flex flex-col justify-between lg:flex-row lg:items-center">
+            <Link href={`/console/projects/${projectId}/documents`}>
+              <h2 className="text-2xl font-semibold leading-7">
+                Docs &amp; Files
+              </h2>
+            </Link>
 
-            <div>
+            <div className="mt-4 flex space-x-4 lg:mt-0">
               <Link
+                className="flex"
                 href={`/console/projects/${projectId}/documents/new`}
-                className={buttonVariants({ variant: "link" })}
               >
-                Create <DocumentPlusIcon className="ml-1 h-5 w-5" />
+                <DocumentPlusIcon className="mr-1 h-5 w-5" /> Document
                 <span className="sr-only">, document</span>
               </Link>
 
               <Link
+                className="flex"
                 href={`/console/projects/${projectId}/documents/folders/new`}
-                className={buttonVariants({ variant: "link" })}
               >
-                Create <FolderPlusIcon className="ml-1 h-5 w-5" />
+                <FolderPlusIcon className="mr-1 h-5 w-5" /> Folder
                 <span className="sr-only">, folder</span>
               </Link>
-
-              {project.documents.length ? (
-                <Link
-                  href={`/console/projects/${projectId}/documents`}
-                  className={buttonVariants({ variant: "link" })}
-                >
-                  View all<span className="sr-only">, documents</span>
-                </Link>
-              ) : null}
             </div>
           </div>
         </CardHeader>

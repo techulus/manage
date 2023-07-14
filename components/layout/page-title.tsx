@@ -37,7 +37,7 @@ export default function PageTitle({
       </div>
 
       <div className="flex w-full max-w-5xl justify-between">
-        <div className="flex items-center">
+        <div className="flex w-full items-center">
           {backUrl && (
             <Link
               href={backUrl}

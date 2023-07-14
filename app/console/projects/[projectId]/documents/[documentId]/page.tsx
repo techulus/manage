@@ -2,7 +2,6 @@ import { MarkdownView } from "@/components/core/markdown-view";
 import PageTitle from "@/components/layout/page-title";
 import { db } from "@/drizzle/db";
 import { document } from "@/drizzle/schema";
-import { Document } from "@/drizzle/types";
 import { eq } from "drizzle-orm";
 
 type Props = {
@@ -15,8 +14,11 @@ type Props = {
 export default async function DocumentDetails({ params }: Props) {
   const { projectId, documentId } = params;
 
-  const documentDetails: Document | undefined = await db.query.document.findFirst({
+  const documentDetails = await db.query.document.findFirst({
     where: eq(document.id, Number(documentId)),
+    with: {
+      folder: true,
+    },
   });
 
   if (!documentDetails) {
@@ -27,8 +29,16 @@ export default async function DocumentDetails({ params }: Props) {
     <>
       <PageTitle
         title={documentDetails.name}
-        subTitle="Documents"
-        backUrl={`/console/projects/${projectId}/documents`}
+        subTitle={
+          documentDetails.folder
+            ? `Docs / ${documentDetails.folder?.name}`
+            : "Docs"
+        }
+        backUrl={
+          documentDetails.folderId
+            ? `/console/projects/${projectId}/documents/folders/${documentDetails.folderId}`
+            : `/console/projects/${projectId}/documents`
+        }
         actionLabel="Edit"
         actionLink={`/console/projects/${projectId}/documents/${documentId}/edit`}
       />
