@@ -5,13 +5,13 @@ import { DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
 import { DocumentHeader } from "@/components/project/document/document-header";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
-import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardHeader } from "@/components/ui/card";
 import { getProjectById } from "@/lib/utils/useProjects";
 import Link from "next/link";
 import { archiveProject } from "../actions";
 import { DocumentPlusIcon, FolderPlusIcon } from "@heroicons/react/20/solid";
 import { DocumentFolderHeader } from "@/components/project/document/document-folder-header";
+import { ListPlusIcon } from "lucide-react";
 
 type Props = {
   params: {
@@ -51,9 +51,10 @@ export default async function ProjectDetails({ params }: Props) {
             <div>
               <Link
                 href={`/console/projects/${projectId}/tasklists/new`}
-                className={buttonVariants({ variant: "link" })}
+                className="flex items-center"
               >
-                Create<span className="sr-only">, tasklist</span>
+                <ListPlusIcon className="mr-1 h-5 w-5" />
+                List<span className="sr-only">, tasklist</span>
               </Link>
             </div>
           </div>
@@ -104,7 +105,7 @@ export default async function ProjectDetails({ params }: Props) {
 
             <div className="mt-4 flex space-x-4 lg:mt-0">
               <Link
-                className="flex"
+                className="flex items-center"
                 href={`/console/projects/${projectId}/documents/new`}
               >
                 <DocumentPlusIcon className="mr-1 h-5 w-5" /> Document
@@ -112,7 +113,7 @@ export default async function ProjectDetails({ params }: Props) {
               </Link>
 
               <Link
-                className="flex"
+                className="flex items-center"
                 href={`/console/projects/${projectId}/documents/folders/new`}
               >
                 <FolderPlusIcon className="mr-1 h-5 w-5" /> Folder
@@ -133,6 +134,7 @@ export default async function ProjectDetails({ params }: Props) {
                   key={document.id}
                   className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
                 >
+                  {/* @ts-ignore */}
                   <DocumentHeader document={document} />
                 </div>
               ))}
