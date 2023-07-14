@@ -78,6 +78,7 @@ export default async function DocumentsList({ params }: Props) {
                     key={document.id}
                     className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
                   >
+                    {/* @ts-ignore */}
                     <DocumentHeader document={document} />
                   </div>
                 ))}
