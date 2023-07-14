@@ -30,12 +30,12 @@ export default function Home() {
               {SITE_METADATA.DESCRIPTION}
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
-              <Link
-                href="/console/projects"
-                className="rounded-full bg-teal-600 px-8 py-2.5 text-sm font-semibold text-white hover:bg-teal-500 hover:shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
-              >
-                Get started
-              </Link>
+              {/* <Link */}
+              {/*   href="/console/projects" */}
+              {/*   className="rounded-full bg-teal-600 px-8 py-2.5 text-sm font-semibold text-white hover:bg-teal-500 hover:shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600" */}
+              {/* > */}
+              {/*   Get started */}
+              {/* </Link> */}
               <Link
                 href="https://github.com/techulus/manage"
                 target="_blank"
