@@ -100,6 +100,8 @@ export const projectRelations = relations(project, ({ many, one }) => ({
   }),
   taskLists: many(taskList),
   documents: many(document),
+  documentFolders: many(documentFolder),
+  blobs: many(blob),
 }));
 
 export const document = sqliteTable("Document", {
@@ -112,6 +114,10 @@ export const document = sqliteTable("Document", {
   projectId: integer("projectId")
     .notNull()
     .references(() => project.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  folderId: integer("folderId").references(() => documentFolder.id, {
+    onDelete: "cascade",
+    onUpdate: "cascade",
+  }),
   createdByUser: text("createdByUser")
     .notNull()
     .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
@@ -126,6 +132,37 @@ export const documentRelations = relations(document, ({ one }) => ({
     fields: [document.projectId],
     references: [project.id],
   }),
+  folder: one(documentFolder, {
+    fields: [document.folderId],
+    references: [documentFolder.id],
+  }),
+}));
+
+export const documentFolder = sqliteTable("DocumentFolder", {
+  id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  description: text("description"),
+  projectId: integer("projectId")
+    .notNull()
+    .references(() => project.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  createdByUser: text("createdByUser")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+});
+
+export const documentFolderRelations = relations(documentFolder, ({ one, many }) => ({
+  user: one(user, {
+    fields: [documentFolder.createdByUser],
+    references: [user.id],
+  }),
+  project: one(project, {
+    fields: [documentFolder.projectId],
+    references: [project.id],
+  }),
+  documents: many(document),
+  files: many(blob),
 }));
 
 export const task = sqliteTable("Task", {
@@ -207,6 +244,10 @@ export const blob = sqliteTable("Blob", {
       onDelete: "cascade",
       onUpdate: "cascade",
     }),
+  documentFolderId: integer("documentFolderId").references(() => documentFolder.id, {
+    onDelete: "cascade",
+    onUpdate: "cascade",
+  }),
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
 });
@@ -215,5 +256,9 @@ export const blobsRelations = relations(blob, ({ one }) => ({
   organization: one(organization, {
     fields: [blob.organizationId],
     references: [organization.id],
+  }),
+  folder: one(documentFolder, {
+    fields: [blob.documentFolderId],
+    references: [documentFolder.id],
   }),
 }));

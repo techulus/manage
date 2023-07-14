@@ -17,8 +17,10 @@ import MarkdownEditor from "../editor";
 
 export default function SharedForm({
   item,
+  showDueDate = true,
 }: {
   item?: Project | TaskList | null;
+  showDueDate?: boolean;
 }) {
   const [date, setDate] = useState<Date>();
 
@@ -48,7 +50,7 @@ export default function SharedForm({
         </div>
       </div>
 
-      <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 py-2">
+      {showDueDate ? <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 py-2">
         <input type="hidden" name="dueDate" value={date?.toISOString()} />
         <label
           htmlFor="description"
@@ -80,7 +82,7 @@ export default function SharedForm({
             </PopoverContent>
           </Popover>
         </div>
-      </div>
+      </div> : null}
     </div>
   );
 }

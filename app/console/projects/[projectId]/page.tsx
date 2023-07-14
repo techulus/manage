@@ -10,6 +10,8 @@ import { CardContent, CardHeader } from "@/components/ui/card";
 import { getProjectById } from "@/lib/utils/useProjects";
 import Link from "next/link";
 import { archiveProject } from "../actions";
+import { DocumentPlusIcon, FolderPlusIcon } from "@heroicons/react/20/solid";
+import { DocumentFolderHeader } from "@/components/project/document/document-folder-header";
 
 type Props = {
   params: {
@@ -108,7 +110,16 @@ export default async function ProjectDetails({ params }: Props) {
                 href={`/console/projects/${projectId}/documents/new`}
                 className={buttonVariants({ variant: "link" })}
               >
-                Create<span className="sr-only">, document</span>
+                Create <DocumentPlusIcon className="ml-1 h-5 w-5" />
+                <span className="sr-only">, document</span>
+              </Link>
+
+              <Link
+                href={`/console/projects/${projectId}/documents/folders/new`}
+                className={buttonVariants({ variant: "link" })}
+              >
+                Create <FolderPlusIcon className="ml-1 h-5 w-5" />
+                <span className="sr-only">, folder</span>
               </Link>
 
               {project.documents.length ? (
@@ -124,7 +135,7 @@ export default async function ProjectDetails({ params }: Props) {
         </CardHeader>
 
         <CardContent>
-          {project.documents.length ? (
+          {project.documents.length || project.documentFolders.length ? (
             <ul
               role="list"
               className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2"
@@ -135,6 +146,14 @@ export default async function ProjectDetails({ params }: Props) {
                   className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
                 >
                   <DocumentHeader document={document} />
+                </div>
+              ))}
+              {project.documentFolders.map((folder) => (
+                <div
+                  key={folder.id}
+                  className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
+                >
+                  <DocumentFolderHeader documentFolder={folder} />
                 </div>
               ))}
             </ul>

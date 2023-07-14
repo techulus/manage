@@ -1,6 +1,6 @@
 import { db } from "@/drizzle/db";
 import { document, project, taskList } from "@/drizzle/schema";
-import { and, eq, like } from "drizzle-orm";
+import { and, eq, like, isNull } from "drizzle-orm";
 import { getOwner } from "./useOwner";
 import { ProjectWithData, ProjectWithUser } from "@/drizzle/types";
 
@@ -17,9 +17,9 @@ export async function getProjectsForOwner({
     .findMany({
       where: search
         ? and(
-          eq(project.organizationId, ownerId),
-          like(project.name, `%${search}%`)
-        )
+            eq(project.organizationId, ownerId),
+            like(project.name, `%${search}%`)
+          )
         : eq(project.organizationId, ownerId),
       with: {
         user: true,
@@ -44,14 +44,17 @@ export async function getProjectById(
       ),
       with: withTasksAndDocs
         ? {
-          taskLists: {
-            where: eq(taskList.status, "active"),
-            with: {
-              tasks: true,
+            taskLists: {
+              where: eq(taskList.status, "active"),
+              with: {
+                tasks: true,
+              },
             },
-          },
-          documents: true,
-        }
+            documents: {
+              where: isNull(document.folderId),
+            },
+            documentFolders: true,
+          }
         : {},
     })
     .execute();
