@@ -68,10 +68,6 @@ export default async function TaskLists({ params, searchParams }: Props) {
     .execute();
 
   const users = await db.query.user.findMany({
-    columns: {
-      id: true,
-      firstName: true,
-    },
     orderBy: asc(user.firstName),
   });
 
