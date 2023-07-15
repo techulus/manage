@@ -27,7 +27,7 @@ export default async function Projects({ searchParams }: Props) {
           searchParams.search ? `Search '${searchParams.search}'` : "Projects"
         }
         backUrl={searchParams.search ? "/console/projects" : undefined}
-        actionLabel="New Project"
+        actionLabel="New"
         actionLink="/console/projects/new"
       />
 
