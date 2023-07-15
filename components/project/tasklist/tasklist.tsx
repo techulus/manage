@@ -4,7 +4,7 @@ import {
   createTask,
   partialUpdateTaskList,
 } from "@/app/console/projects/[projectId]/tasklists/actions";
-import { TaskListWithTasks } from "@/drizzle/types";
+import { TaskListWithTasks, User } from "@/drizzle/types";
 import Link from "next/link";
 import { useMemo } from "react";
 import { toast } from "react-hot-toast";
@@ -18,10 +18,12 @@ export const TaskListItem = ({
   taskList,
   userId,
   projectId,
+  users,
 }: {
   taskList: TaskListWithTasks;
   userId: string;
   projectId: number;
+  users: User[];
 }) => {
   const todoItems = useMemo(
     () => taskList.tasks.filter((task) => task.status === "todo"),
@@ -46,7 +48,12 @@ export const TaskListItem = ({
       ) : null}
       <div className="flex flex-col justify-center divide-y">
         {todoItems.map((task) => (
-          <TaskItem key={task.id} task={task} projectId={Number(projectId)} />
+          <TaskItem
+            key={task.id}
+            task={task}
+            projectId={Number(projectId)}
+            users={users}
+          />
         ))}
 
         <form
@@ -65,7 +72,12 @@ export const TaskListItem = ({
         </form>
 
         {doneItems.map((task) => (
-          <TaskItem key={task.id} task={task} projectId={Number(projectId)} />
+          <TaskItem
+            key={task.id}
+            task={task}
+            projectId={Number(projectId)}
+            users={users}
+          />
         ))}
       </div>
 

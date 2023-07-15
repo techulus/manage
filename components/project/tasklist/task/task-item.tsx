@@ -4,7 +4,7 @@ import {
   deleteTask,
   updateTask,
 } from "@/app/console/projects/[projectId]/tasklists/actions";
-import { Task, TaskWithDetails } from "@/drizzle/types";
+import { Task, TaskWithDetails, User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { experimental_useOptimistic as useOptimistic, useState } from "react";
 import toast from "react-hot-toast";
@@ -13,13 +13,16 @@ import { Checkbox } from "../../../ui/checkbox";
 import TaskNotesForm from "./notes-form";
 import { Input } from "@/components/ui/input";
 import { DocumentIcon } from "@heroicons/react/20/solid";
+import { AssignToUser } from "../../shared/assign-to-user";
 
 export const TaskItem = ({
   task,
   projectId,
+  users,
 }: {
   task: TaskWithDetails;
   projectId: number;
+  users: User[];
 }) => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -129,12 +132,19 @@ export const TaskItem = ({
                       {task.assignee?.firstName}
                     </span>
                   ) : (
-                    <button
-                      type="button"
-                      className="rounded-md font-medium text-teal-600 hover:text-teal-500"
-                    >
-                      Assign
-                    </button>
+                    <AssignToUser
+                      users={users}
+                      onUpdate={(userId) => {
+                        toast.promise(
+                          updateTask(id, projectId, { assignedToUser: userId }),
+                          {
+                            loading: "Saving...",
+                            success: "Done!",
+                            error: "Error while saving, please try again.",
+                          }
+                        );
+                      }}
+                    />
                   )}
                 </dd>
               </div>

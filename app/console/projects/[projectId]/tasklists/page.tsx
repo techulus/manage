@@ -2,7 +2,7 @@ import PageTitle from "@/components/layout/page-title";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { buttonVariants } from "@/components/ui/button";
 import { db } from "@/drizzle/db";
-import { task, taskList } from "@/drizzle/schema";
+import { task, taskList, user } from "@/drizzle/schema";
 import { getOwner } from "@/lib/utils/useOwner";
 import { getProjectById } from "@/lib/utils/useProjects";
 import { and, asc, eq, or } from "drizzle-orm";
@@ -24,7 +24,9 @@ export default async function TaskLists({ params, searchParams }: Props) {
   const project = await getProjectById(projectId);
 
   const filterByStatuses = searchParams.status?.split(",") ?? ["active"];
-  const statusFilter = filterByStatuses.map((status) => eq(taskList.status, status));
+  const statusFilter = filterByStatuses.map((status) =>
+    eq(taskList.status, status)
+  );
   const taskLists = await db.query.taskList
     .findMany({
       where: and(
@@ -65,6 +67,14 @@ export default async function TaskLists({ params, searchParams }: Props) {
     })
     .execute();
 
+  const users = await db.query.user.findMany({
+    columns: {
+      id: true,
+      firstName: true,
+    },
+    orderBy: asc(user.firstName),
+  });
+
   return (
     <>
       <PageTitle
@@ -83,23 +93,32 @@ export default async function TaskLists({ params, searchParams }: Props) {
               taskList={taskList}
               projectId={Number(projectId)}
               userId={userId}
+              users={users}
             />
           ))}
         </ul>
 
         {archivedTaskLists.length > 0 && (
-          <div className="flex flex-grow w-full mt-12 border-t border-muted items-center py-4">
+          <div className="mt-12 flex w-full flex-grow items-center border-t border-muted py-4">
             <p className="text-sm text-muted-foreground">
               {archivedTaskLists.length} archived task list(s)
             </p>
 
-            {filterByStatuses.includes("archived") ?
-              <Link href={`/console/projects/${projectId}/tasklists`} className={buttonVariants({ variant: "link" })}>
+            {filterByStatuses.includes("archived") ? (
+              <Link
+                href={`/console/projects/${projectId}/tasklists`}
+                className={buttonVariants({ variant: "link" })}
+              >
                 Hide
               </Link>
-              : <Link href={`/console/projects/${projectId}/tasklists?status=active,archived`} className={buttonVariants({ variant: "link" })}>
+            ) : (
+              <Link
+                href={`/console/projects/${projectId}/tasklists?status=active,archived`}
+                className={buttonVariants({ variant: "link" })}
+              >
                 Show
-              </Link>}
+              </Link>
+            )}
           </div>
         )}
       </div>
