@@ -14,6 +14,7 @@ import TaskNotesForm from "./notes-form";
 import { Input } from "@/components/ui/input";
 import { DocumentIcon } from "@heroicons/react/20/solid";
 import { AssignToUser } from "../../shared/assign-to-user";
+import { Assignee } from "../../shared/assigee";
 
 export const TaskItem = ({
   task,
@@ -129,7 +130,7 @@ export const TaskItem = ({
                 <dd className="mt-1 flex text-sm leading-6 sm:col-span-2 sm:mt-0">
                   {task.assignee ? (
                     <span className="flex-grow">
-                      {task.assignee?.firstName}
+                      <Assignee user={task.assignee} />
                     </span>
                   ) : (
                     <AssignToUser
@@ -189,7 +190,10 @@ export const TaskItem = ({
         )}
         onClick={() => setDetailsOpen(true)}
       >
-        <div className="flex">
+        <div className="flex items-center">
+          {task.assignee ? (
+            <Assignee className="mr-2" user={task.assignee} imageOnly />
+          ) : null}
           {name}
           {task.description ? (
             <DocumentIcon className="ml-2 h-4 w-4 text-teal-600 dark:text-teal-700" />
