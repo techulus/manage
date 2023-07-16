@@ -21,8 +21,8 @@ export type ProjectWithUser = Project & { user: User };
 
 export type ProjectWithData = Project & {
   taskLists: TaskListWithTasks[];
-  documents: Document[];
-  documentFolders: DocumentFolder[];
+  documents: DocumentWithUser[];
+  documentFolders: DocumentFolderWithDocuments[];
 };
 
 export type TaskWithDetails = Task & {

@@ -63,15 +63,16 @@ export async function getProjectById(
             },
             documentFolders: {
               with: {
-                documents: {
-                  columns: {
-                    id: true,
-                  },
-                },
                 user: {
                   columns: {
                     firstName: true,
                     imageUrl: true,
+                  },
+                },
+                // I can't get count query to work, so I'm just selecting the id :(
+                documents: {
+                  columns: {
+                    id: true,
                   },
                 },
               },
