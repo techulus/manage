@@ -1,21 +1,34 @@
-import { DocumentFolder } from "@/drizzle/types";
+import { DocumentFolderWithDocuments } from "@/drizzle/types";
 import Link from "next/link";
+import { CreatorDetails } from "../shared/creator-details";
 
 export const DocumentFolderHeader = ({
   documentFolder,
 }: {
-  documentFolder: DocumentFolder;
+  documentFolder: DocumentFolderWithDocuments;
 }) => {
   return (
-    <div className="relative flex h-[140px] gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6 dark:bg-gray-900">
+    <div className="relative flex h-[180px] gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6 dark:bg-gray-900">
       <Link
         href={`/console/projects/${documentFolder.projectId}/documents/folders/${documentFolder.id}`}
-        className="flex text-sm font-medium"
+        className="flex flex-col text-sm font-medium"
       >
         <span className="absolute inset-0" aria-hidden="true" />
         <div className="text-xl font-medium leading-6">
           {documentFolder.name}
         </div>
+
+        <p>
+          <span className="sr-only">, </span>
+          <span className="text-sm text-muted-foreground">
+            {documentFolder.documents.length} document(s)
+          </span>
+        </p>
+
+        <CreatorDetails
+          user={documentFolder.user}
+          updatedAt={documentFolder.updatedAt}
+        />
       </Link>
     </div>
   );

@@ -17,19 +17,38 @@ export default async function DocumentsList({ params }: Props) {
 
   const project = await getProjectById(projectId);
 
-  const documents = await db
-    .select()
-    .from(document)
-    .where(
-      and(eq(document.projectId, Number(projectId)), isNull(document.folderId))
-    )
-    .all();
+  const documents = await db.query.document.findMany({
+    with: {
+      user: {
+        columns: {
+          firstName: true,
+          imageUrl: true,
+        },
+      },
+    },
+    where: and(
+      eq(document.projectId, Number(projectId)),
+      isNull(document.folderId)
+    ),
+  });
 
-  const documentFolders = await db
-    .select()
-    .from(documentFolder)
-    .where(eq(documentFolder.projectId, Number(projectId)))
-    .all();
+  const documentFolders = await db.query.documentFolder.findMany({
+    with: {
+      user: {
+        columns: {
+          firstName: true,
+          imageUrl: true,
+        },
+      },
+      // I can't get count query to work, so I'm just selecting the id :(
+      documents: {
+        columns: {
+          id: true,
+        },
+      },
+    },
+    where: eq(documentFolder.projectId, Number(projectId)),
+  });
 
   if (!project) {
     return <div>Project not found</div>;
@@ -41,7 +60,7 @@ export default async function DocumentsList({ params }: Props) {
         title="Documents"
         subTitle={project.name}
         backUrl={`/console/projects/${projectId}`}
-        actionLabel="New Document"
+        actionLabel="New"
         actionLink={`/console/projects/${projectId}/documents/new`}
       />
 

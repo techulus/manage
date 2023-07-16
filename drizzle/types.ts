@@ -41,5 +41,14 @@ export type TaskListWithTasks = TaskList & {
 };
 
 export type FolderWithDocuments = DocumentFolder & {
-  documents: Document[];
+  documents: DocumentWithUser[];
+};
+
+export type DocumentWithUser = Document & {
+  user: Pick<User, "firstName" | "imageUrl">;
+};
+
+export type DocumentFolderWithDocuments = DocumentFolder & {
+  user: Pick<User, "firstName" | "imageUrl">;
+  documents: Pick<Document, "id">[];
 };

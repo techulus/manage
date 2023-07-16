@@ -52,8 +52,30 @@ export async function getProjectById(
             },
             documents: {
               where: isNull(document.folderId),
+              with: {
+                user: {
+                  columns: {
+                    firstName: true,
+                    imageUrl: true,
+                  },
+                },
+              },
             },
-            documentFolders: true,
+            documentFolders: {
+              with: {
+                documents: {
+                  columns: {
+                    id: true,
+                  },
+                },
+                user: {
+                  columns: {
+                    firstName: true,
+                    imageUrl: true,
+                  },
+                },
+              },
+            },
           }
         : {},
     })

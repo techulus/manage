@@ -6,7 +6,7 @@ import { DocumentHeader } from "@/components/project/document/document-header";
 import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardHeader } from "@/components/ui/card";
 import Link from "next/link";
-import { DocumentPlusIcon, FolderPlusIcon } from "@heroicons/react/20/solid";
+import { DocumentPlusIcon } from "@heroicons/react/20/solid";
 import { eq } from "drizzle-orm";
 import { documentFolder } from "@/drizzle/schema";
 import { db } from "@/drizzle/db";
@@ -26,7 +26,16 @@ export default async function FolderDetails({ params }: Props) {
     await db.query.documentFolder.findFirst({
       where: eq(documentFolder.id, Number(folderId)),
       with: {
-        documents: true,
+        documents: {
+          with: {
+            user: {
+              columns: {
+                firstName: true,
+                imageUrl: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -39,9 +48,9 @@ export default async function FolderDetails({ params }: Props) {
       <PageTitle
         title={folder?.name}
         subTitle="Documents"
-        backUrl="/console/projects"
+        backUrl={`/console/projects/${projectId}/documents`}
         actionLabel="Edit"
-        actionLink={`/console/projects/${projectId}/edit`}
+        actionLink={`/console/projects/${projectId}/documents/folders/${folderId}/edit`}
       />
 
       {folder.description ? (
