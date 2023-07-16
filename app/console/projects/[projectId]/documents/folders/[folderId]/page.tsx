@@ -4,13 +4,13 @@ import { MarkdownView } from "@/components/core/markdown-view";
 import PageTitle from "@/components/layout/page-title";
 import { DocumentHeader } from "@/components/project/document/document-header";
 import { buttonVariants } from "@/components/ui/button";
-import { CardContent, CardHeader } from "@/components/ui/card";
 import Link from "next/link";
 import { DocumentPlusIcon } from "@heroicons/react/20/solid";
 import { eq } from "drizzle-orm";
 import { documentFolder } from "@/drizzle/schema";
 import { db } from "@/drizzle/db";
-import { FolderWithDocuments } from "@/drizzle/types";
+import { Blob, FolderWithContents } from "@/drizzle/types";
+import { FileUploader } from "@/components/project/file/uploader";
 
 type Props = {
   params: {
@@ -22,7 +22,7 @@ type Props = {
 export default async function FolderDetails({ params }: Props) {
   const { projectId, folderId } = params;
 
-  const folder: FolderWithDocuments | undefined =
+  const folder: FolderWithContents | undefined =
     await db.query.documentFolder.findFirst({
       where: eq(documentFolder.id, Number(folderId)),
       with: {
@@ -36,6 +36,7 @@ export default async function FolderDetails({ params }: Props) {
             },
           },
         },
+        files: true,
       },
     });
 
@@ -66,7 +67,9 @@ export default async function FolderDetails({ params }: Props) {
               <div className="flex justify-between py-3">
                 {/* Left buttons */}
                 <div className="isolate inline-flex sm:space-x-3">
-                  <span className="inline-flex space-x-1"></span>
+                  <span className="inline-flex space-x-1">
+                    <FileUploader folderId={Number(folderId)} />
+                  </span>
                 </div>
 
                 {/* Right buttons */}
@@ -101,6 +104,17 @@ export default async function FolderDetails({ params }: Props) {
                   <DocumentHeader document={document} />
                 </div>
               ))}
+
+              {folder.files.length
+                ? folder.files.map((file: Blob) => (
+                    <div
+                      key={file.key}
+                      className="text-sm font-medium text-gray-900 dark:text-gray-100"
+                    >
+                      {file.key}
+                    </div>
+                  ))
+                : null}
             </ul>
           ) : null}
 

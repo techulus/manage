@@ -1,5 +1,6 @@
 import { InferModel } from "drizzle-orm";
 import {
+  blob,
   document,
   documentFolder,
   organization,
@@ -16,6 +17,7 @@ export type TaskList = InferModel<typeof taskList>;
 export type Task = InferModel<typeof task>;
 export type Document = InferModel<typeof document>;
 export type DocumentFolder = InferModel<typeof documentFolder>;
+export type Blob = InferModel<typeof blob>;
 
 export type ProjectWithUser = Project & { user: User };
 
@@ -40,8 +42,9 @@ export type TaskListWithTasks = TaskList & {
   tasks: TaskWithDetails[];
 };
 
-export type FolderWithDocuments = DocumentFolder & {
+export type FolderWithContents = DocumentFolder & {
   documents: DocumentWithUser[];
+  files: Blob[];
 };
 
 export type DocumentWithUser = Document & {

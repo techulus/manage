@@ -43,6 +43,7 @@
     "react": "experimental",
     "react-day-picker": "^8.8.0",
     "react-dom": "experimental",
+    "react-dropzone": "^14.2.3",
     "react-hot-toast": "^2.4.1",
     "react-markdown": "^8.0.7",
     "react-simplemde-editor": "^5.2.0",

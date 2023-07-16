@@ -101,7 +101,6 @@ export const projectRelations = relations(project, ({ many, one }) => ({
   taskLists: many(taskList),
   documents: many(document),
   documentFolders: many(documentFolder),
-  blobs: many(blob),
 }));
 
 export const document = sqliteTable("Document", {
@@ -241,6 +240,9 @@ export const blob = sqliteTable("Blob", {
   key: text("key").primaryKey().notNull(),
   contentType: text("contentType").notNull(),
   contentSize: integer("contentSize").notNull(),
+  createdByUser: text("createdByUser")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
   organizationId: text("organizationId")
     .notNull()
     .references(() => organization.id, {
@@ -262,6 +264,10 @@ export const blobsRelations = relations(blob, ({ one }) => ({
   organization: one(organization, {
     fields: [blob.organizationId],
     references: [organization.id],
+  }),
+  creator: one(user, {
+    fields: [blob.createdByUser],
+    references: [user.id],
   }),
   folder: one(documentFolder, {
     fields: [blob.documentFolderId],
