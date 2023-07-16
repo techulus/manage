@@ -74,6 +74,7 @@ export async function POST(request: Request) {
             email: data.email_addresses[0].email_address,
             firstName: data.first_name,
             lastName: data.last_name,
+            imageUrl: data.image_url,
             rawData: data,
             updatedAt: new Date(),
           })
