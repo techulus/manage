@@ -6,7 +6,6 @@ import {
   real,
   sqliteTable,
   text,
-  uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 
 const dbJson = customType({
@@ -19,24 +18,16 @@ const dbJson = customType({
   },
 });
 
-export const user = sqliteTable(
-  "User",
-  {
-    id: text("id").primaryKey().notNull(),
-    email: text("email").notNull(),
-    firstName: text("firstName"),
-    lastName: text("lastName"),
-    imageUrl: text("imageUrl"),
-    rawData: dbJson("rawData").notNull().$type<User>(),
-    createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-    updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
-  },
-  (table) => {
-    return {
-      emailKey: uniqueIndex("User_email_key").on(table.email),
-    };
-  }
-);
+export const user = sqliteTable("User", {
+  id: text("id").primaryKey().notNull(),
+  email: text("email").notNull().unique(),
+  firstName: text("firstName"),
+  lastName: text("lastName"),
+  imageUrl: text("imageUrl"),
+  rawData: dbJson("rawData").notNull().$type<User>(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+});
 
 export const userRelations = relations(user, ({ many }) => ({
   organizations: many(organization),
@@ -237,7 +228,8 @@ export const taskListRelations = relations(taskList, ({ many, one }) => ({
 }));
 
 export const blob = sqliteTable("Blob", {
-  key: text("key").primaryKey().notNull(),
+  id: text("id").notNull().primaryKey(),
+  key: text("key").unique().notNull(),
   name: text("name").notNull(),
   contentType: text("contentType").notNull(),
   contentSize: integer("contentSize").notNull(),

@@ -1,3 +1,4 @@
+import { Blob } from "@/drizzle/types";
 import {
   GetObjectCommand,
   PutObjectCommand,
@@ -52,4 +53,8 @@ const bytesToMegabytes = (bytes: number): number => {
   return Math.round(bytes / 1024 / 1024);
 };
 
-export { getUrl, upload, bytesToMegabytes };
+const getFileUrl = (file: Blob): string => {
+  return `/api/blob/${file.id}/${file.name}`;
+};
+
+export { getUrl, upload, bytesToMegabytes, getFileUrl };

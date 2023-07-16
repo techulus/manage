@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 import mime from "mime-types";
 import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 export type BlobUploadResult = {
   message: string;
@@ -41,8 +42,8 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    const fileKey = uuidv4();
-    const key = `${ownerId}/${fileKey}`;
+    const fileId = uuidv4();
+    const key = `${ownerId}/${fileId}`;
 
     await upload(key, {
       content: await body.arrayBuffer(),
@@ -52,6 +53,7 @@ export async function PUT(request: NextRequest) {
     await db
       .insert(blob)
       .values({
+        id: fileId,
         key,
         name,
         contentType: body.type,
@@ -65,9 +67,10 @@ export async function PUT(request: NextRequest) {
       .returning()
       .get();
 
+    // TODO: relvalidate path?
     return NextResponse.json<BlobUploadResult>({
       message: "ok",
-      url: `${getAppBaseUrl()}/api/blob/${fileKey}/file.${extension}`,
+      url: `${getAppBaseUrl()}/api/blob/${fileId}/file.${extension}`,
     });
   } catch (error) {
     console.log("Error uploading file", error);
