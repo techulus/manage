@@ -37,7 +37,7 @@ export default async function DocumentDetails({ params }: Props) {
         backUrl={
           documentDetails.folderId
             ? `/console/projects/${projectId}/documents/folders/${documentDetails.folderId}`
-            : `/console/projects/${projectId}/documents`
+            : `/console/projects/${projectId}`
         }
         actionLabel="Edit"
         actionLink={`/console/projects/${projectId}/documents/${documentId}/edit`}

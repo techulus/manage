@@ -14,16 +14,18 @@ export const DocumentFolderHeader = ({
         className="flex flex-col text-sm font-medium"
       >
         <span className="absolute inset-0" aria-hidden="true" />
-        <div className="text-xl font-medium leading-6">
-          {documentFolder.name}
-        </div>
+        <div className="flex-shrink space-y-2">
+          <div className="text-xl font-medium leading-6">
+            {documentFolder.name}
+          </div>
 
-        <p>
-          <span className="sr-only">, </span>
-          <span className="text-sm text-muted-foreground">
-            {documentFolder.documents.length} document(s)
-          </span>
-        </p>
+          <p>
+            <span className="sr-only">, </span>
+            <span className="text-sm text-muted-foreground">
+              {documentFolder.documents.length} document(s)
+            </span>
+          </p>
+        </div>
 
         <CreatorDetails
           user={documentFolder.user}

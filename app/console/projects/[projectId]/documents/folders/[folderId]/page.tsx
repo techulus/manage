@@ -48,37 +48,45 @@ export default async function FolderDetails({ params }: Props) {
       <PageTitle
         title={folder?.name}
         subTitle="Documents"
-        backUrl={`/console/projects/${projectId}/documents`}
+        backUrl={`/console/projects/${projectId}`}
         actionLabel="Edit"
         actionLink={`/console/projects/${projectId}/documents/folders/${folderId}/edit`}
       />
 
-      {folder.description ? (
-        <ContentBlock className="border-none shadow-none">
-          <div className="p-6">
+      <div className="space-y-16">
+        {folder.description ? (
+          <div className="mx-auto flex max-w-5xl flex-col space-y-4">
             <MarkdownView content={folder.description ?? ""} />
           </div>
-        </ContentBlock>
-      ) : null}
+        ) : null}
 
-      <ContentBlock>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold leading-7">Documents</h2>
+        <ContentBlock>
+          <div className="hidden h-12 flex-col justify-center border-b border-gray-200 dark:border-gray-800 md:flex">
+            <div className="px-4 sm:px-6 lg:-mx-4 lg:px-8">
+              <div className="flex justify-between py-3">
+                {/* Left buttons */}
+                <div className="isolate inline-flex sm:space-x-3">
+                  <span className="inline-flex space-x-1"></span>
+                </div>
 
-            <div>
-              <Link
-                href={`/console/projects/${projectId}/documents/folders/${folderId}/new`}
-                className={buttonVariants({ variant: "link" })}
-              >
-                <DocumentPlusIcon className="mr-1 h-5 w-5" /> File
-                <span className="sr-only">, document</span>
-              </Link>
+                {/* Right buttons */}
+                <nav aria-label="Pagination">
+                  <span className="isolate inline-flex">
+                    <Link
+                      href={`/console/projects/${projectId}/documents/folders/${folderId}/new`}
+                      className={buttonVariants({ variant: "link" })}
+                    >
+                      <DocumentPlusIcon className="mr-1 h-5 w-5" /> File
+                      <span className="sr-only">, document</span>
+                    </Link>
+                  </span>
+                </nav>
+              </div>
             </div>
           </div>
-        </CardHeader>
+        </ContentBlock>
 
-        <CardContent>
+        <div className="mx-auto flex max-w-5xl flex-col space-y-4">
           {folder.documents.length ? (
             <ul
               role="list"
@@ -101,8 +109,8 @@ export default async function FolderDetails({ params }: Props) {
             label="document"
             createLink={`/console/projects/${projectId}/documents/new`}
           />
-        </CardContent>
-      </ContentBlock>
+        </div>
+      </div>
     </>
   );
 }

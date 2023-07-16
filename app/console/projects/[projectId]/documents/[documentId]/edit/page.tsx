@@ -17,9 +17,7 @@ type Props = {
 
 export default async function EditTaskList({ params }: Props) {
   const document = await getDocumentById(params.documentId);
-
-  const backUrl = `/console/projects/${params.projectId}/documents`;
-
+  const backUrl = `/console/projects/${params.projectId}`;
   return (
     <>
       <PageTitle title="Update Document" backUrl={backUrl} />
@@ -27,7 +25,11 @@ export default async function EditTaskList({ params }: Props) {
         <input type="hidden" name="id" defaultValue={params.documentId} />
         <input type="hidden" name="projectId" defaultValue={params.projectId} />
         {document.folderId && (
-          <input type="hidden" name="folderId" defaultValue={document.folderId} />
+          <input
+            type="hidden"
+            name="folderId"
+            defaultValue={document.folderId}
+          />
         )}
         <ContentBlock>
           <CardContent>

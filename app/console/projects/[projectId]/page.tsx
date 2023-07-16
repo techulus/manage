@@ -28,21 +28,22 @@ export default async function ProjectDetails({ params }: Props) {
     <>
       <PageTitle
         title={project.name}
+        subTitle={
+          project.dueDate ? `Due ${project.dueDate.toDateString()}` : ""
+        }
         backUrl="/console/projects"
         actionLabel="Edit"
         actionLink={`/console/projects/${projectId}/edit`}
       />
 
-      {project.description ? (
-        <ContentBlock className="border-none shadow-none">
-          <div className="p-6">
+      <div className="space-y-16">
+        {project.description ? (
+          <div className="mx-auto flex max-w-5xl flex-col space-y-4">
             <MarkdownView content={project.description ?? ""} />
           </div>
-        </ContentBlock>
-      ) : null}
+        ) : null}
 
-      <ContentBlock>
-        <CardHeader>
+        <div className="mx-auto flex max-w-5xl flex-col space-y-4">
           <div className="flex items-center justify-between">
             <Link href={`/console/projects/${projectId}/tasklists`}>
               <h2 className="text-2xl font-semibold leading-7">Task Lists</h2>
@@ -58,9 +59,7 @@ export default async function ProjectDetails({ params }: Props) {
               </Link>
             </div>
           </div>
-        </CardHeader>
 
-        <CardContent>
           {project.taskLists.length ? (
             <ul
               role="list"
@@ -91,17 +90,13 @@ export default async function ProjectDetails({ params }: Props) {
             label="tasklist"
             createLink={`/console/projects/${projectId}/tasklists/new`}
           />
-        </CardContent>
-      </ContentBlock>
+        </div>
 
-      <ContentBlock>
-        <CardHeader>
+        <div className="mx-auto flex max-w-5xl flex-col space-y-4">
           <div className="flex flex-col justify-between lg:flex-row lg:items-center">
-            <Link href={`/console/projects/${projectId}/documents`}>
-              <h2 className="text-2xl font-semibold leading-7">
-                Docs &amp; Files
-              </h2>
-            </Link>
+            <h2 className="text-2xl font-semibold leading-7">
+              Docs &amp; Files
+            </h2>
 
             <div className="mt-4 flex space-x-4 lg:mt-0">
               <Link
@@ -121,9 +116,7 @@ export default async function ProjectDetails({ params }: Props) {
               </Link>
             </div>
           </div>
-        </CardHeader>
 
-        <CardContent>
           {project.documents.length || project.documentFolders.length ? (
             <ul
               role="list"
@@ -154,36 +147,35 @@ export default async function ProjectDetails({ params }: Props) {
             label="document"
             createLink={`/console/projects/${projectId}/documents/new`}
           />
-        </CardContent>
-      </ContentBlock>
+        </div>
 
-      {/* Toolbar*/}
-      <ContentBlock>
-        <div className="hidden h-12 flex-col justify-center border-b border-gray-200 dark:border-gray-800 md:flex">
-          <div className="px-4 sm:px-6 lg:-mx-4 lg:px-8">
-            <div className="flex justify-between py-3">
-              {/* Left buttons */}
-              <div className="isolate inline-flex sm:space-x-3">
-                <span className="inline-flex space-x-1"></span>
+        <ContentBlock>
+          <div className="hidden h-12 flex-col justify-center border-b border-gray-200 dark:border-gray-800 md:flex">
+            <div className="px-4 sm:px-6 lg:-mx-4 lg:px-8">
+              <div className="flex justify-between py-3">
+                {/* Left buttons */}
+                <div className="isolate inline-flex sm:space-x-3">
+                  <span className="inline-flex space-x-1"></span>
+                </div>
+
+                {/* Right buttons */}
+                <nav aria-label="Pagination">
+                  <span className="isolate inline-flex">
+                    <form action={archiveProject}>
+                      <input
+                        className="hidden"
+                        name="id"
+                        defaultValue={project.id}
+                      />
+                      <DeleteButton action="Archive" />
+                    </form>
+                  </span>
+                </nav>
               </div>
-
-              {/* Right buttons */}
-              <nav aria-label="Pagination">
-                <span className="isolate inline-flex">
-                  <form action={archiveProject}>
-                    <input
-                      className="hidden"
-                      name="id"
-                      defaultValue={project.id}
-                    />
-                    <DeleteButton action="Archive" />
-                  </form>
-                </span>
-              </nav>
             </div>
           </div>
-        </div>
-      </ContentBlock>
+        </ContentBlock>
+      </div>
     </>
   );
 }

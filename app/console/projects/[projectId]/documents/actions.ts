@@ -48,15 +48,13 @@ export async function createDocument(payload: FormData) {
     })
     .run();
 
+  revalidatePath(`/console/projects/${projectId}`);
+
   if (folderId) {
-    revalidatePath(`/console/projects/${projectId}/documents`);
     revalidatePath(
       `/console/projects/${projectId}/documents/folders/${folderId}`
     );
     redirect(`/console/projects/${projectId}/documents/folders/${folderId}`);
-  } else {
-    revalidatePath(`/console/projects/${projectId}/documents`);
-    redirect(`/console/projects/${projectId}/documents`);
   }
 }
 
@@ -65,6 +63,7 @@ export async function updateDocument(payload: FormData) {
   const markdownContent = payload.get("markdownContent") as string;
   const id = payload.get("id") as string;
   const projectId = payload.get("projectId") as string;
+  const folderId = (payload.get("folderId") as string) ?? null;
 
   const data = documentSchema.parse({
     name,
@@ -81,8 +80,14 @@ export async function updateDocument(payload: FormData) {
     .where(eq(document.id, Number(id)))
     .run();
 
-  revalidatePath(`/console/projects/${projectId}/documents`);
-  redirect(`/console/projects/${projectId}/documents`);
+  revalidatePath(`/console/projects/${projectId}`);
+
+  if (folderId) {
+    revalidatePath(
+      `/console/projects/${projectId}/documents/folders/${folderId}`
+    );
+    redirect(`/console/projects/${projectId}/documents/folders/${folderId}`);
+  }
 }
 
 export async function createDocumentFolder(payload: FormData) {
@@ -107,7 +112,6 @@ export async function createDocumentFolder(payload: FormData) {
     })
     .run();
 
-  revalidatePath(`/console/projects/${projectId}/documents`);
   revalidatePath(`/console/projects/${projectId}`);
   redirect(`/console/projects/${projectId}`);
 }
