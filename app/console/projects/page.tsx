@@ -3,7 +3,6 @@ import EmptyState from "@/components/core/empty-state";
 import PageTitle from "@/components/layout/page-title";
 import { ProjecItem } from "@/components/project/project-item";
 import { Input } from "@/components/ui/input";
-import { ProjectWithUser } from "@/drizzle/types";
 import { getProjectsForOwner } from "@/lib/utils/useProjects";
 
 interface Props {
@@ -64,7 +63,7 @@ export default async function Projects({ searchParams }: Props) {
           />
 
           <div className="divide-y divide-gray-200 overflow-hidden rounded-sm bg-gray-200 shadow dark:divide-gray-800 dark:bg-gray-900 sm:grid sm:grid-cols-2 sm:gap-px sm:divide-y-0">
-            {projects.map((project: ProjectWithUser) => (
+            {projects.map((project) => (
               <ProjecItem key={project.id} project={project} />
             ))}
           </div>

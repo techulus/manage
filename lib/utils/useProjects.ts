@@ -2,14 +2,14 @@ import { db } from "@/drizzle/db";
 import { document, project, taskList } from "@/drizzle/schema";
 import { and, eq, like, isNull } from "drizzle-orm";
 import { getOwner } from "./useOwner";
-import { ProjectWithData, ProjectWithUser } from "@/drizzle/types";
+import { ProjectWithCreator, ProjectWithData } from "@/drizzle/types";
 
 export async function getProjectsForOwner({
   search,
 }: {
   search?: string;
 }): Promise<{
-  projects: ProjectWithUser[];
+  projects: ProjectWithCreator[];
 }> {
   const { ownerId } = getOwner();
 
@@ -22,7 +22,7 @@ export async function getProjectsForOwner({
           )
         : eq(project.organizationId, ownerId),
       with: {
-        user: true,
+        creator: true,
       },
     })
     .execute();
@@ -53,7 +53,7 @@ export async function getProjectById(
             documents: {
               where: isNull(document.folderId),
               with: {
-                user: {
+                creator: {
                   columns: {
                     firstName: true,
                     imageUrl: true,
@@ -63,7 +63,7 @@ export async function getProjectById(
             },
             documentFolders: {
               with: {
-                user: {
+                creator: {
                   columns: {
                     firstName: true,
                     imageUrl: true,

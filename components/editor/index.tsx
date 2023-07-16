@@ -25,10 +25,13 @@ export default function MarkdownEditor({
       onError: (error: string) => void
     ) => {
       try {
-        const result: BlobUploadResult = await fetch("/api/blob", {
-          method: "PUT",
-          body: file,
-        }).then((res) => res.json());
+        const result: BlobUploadResult = await fetch(
+          `/api/blob?name=${file.name}`,
+          {
+            method: "PUT",
+            body: file,
+          }
+        ).then((res) => res.json());
         return onSuccess(result.url);
       } catch (e) {
         console.error(e);

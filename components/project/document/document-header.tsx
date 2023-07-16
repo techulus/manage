@@ -1,4 +1,4 @@
-import { DocumentWithUser } from "@/drizzle/types";
+import { DocumentWithCreator } from "@/drizzle/types";
 import { convertMarkdownToPlainText } from "@/lib/utils/useMarkdown";
 import Link from "next/link";
 import { CreatorDetails } from "../shared/creator-details";
@@ -8,7 +8,7 @@ const MAX_LENGTH = 140;
 export async function DocumentHeader({
   document,
 }: {
-  document: DocumentWithUser;
+  document: DocumentWithCreator;
 }) {
   const plainText = await convertMarkdownToPlainText(document.markdownContent);
 
@@ -31,7 +31,10 @@ export async function DocumentHeader({
           </p>
         </div>
 
-        <CreatorDetails user={document.user} updatedAt={document.updatedAt} />
+        <CreatorDetails
+          user={document.creator}
+          updatedAt={document.updatedAt}
+        />
       </Link>
     </div>
   );

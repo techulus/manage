@@ -19,11 +19,11 @@ export type Document = InferModel<typeof document>;
 export type DocumentFolder = InferModel<typeof documentFolder>;
 export type Blob = InferModel<typeof blob>;
 
-export type ProjectWithUser = Project & { user: User };
+export type ProjectWithCreator = Project & { creator: User };
 
 export type ProjectWithData = Project & {
   taskLists: TaskListWithTasks[];
-  documents: DocumentWithUser[];
+  documents: DocumentWithCreator[];
   documentFolders: DocumentFolderWithDocuments[];
 };
 
@@ -43,15 +43,19 @@ export type TaskListWithTasks = TaskList & {
 };
 
 export type FolderWithContents = DocumentFolder & {
-  documents: DocumentWithUser[];
-  files: Blob[];
+  documents: DocumentWithCreator[];
+  files: BlobWithCreater[];
 };
 
-export type DocumentWithUser = Document & {
-  user: Pick<User, "firstName" | "imageUrl">;
+export type DocumentWithCreator = Document & {
+  creator: Pick<User, "firstName" | "imageUrl">;
 };
 
 export type DocumentFolderWithDocuments = DocumentFolder & {
-  user: Pick<User, "firstName" | "imageUrl">;
+  creator: Pick<User, "firstName" | "imageUrl">;
   documents: Pick<Document, "id">[];
+};
+
+export type BlobWithCreater = Blob & {
+  creator: Pick<User, "firstName" | "imageUrl">;
 };

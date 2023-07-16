@@ -18,6 +18,7 @@ export async function PUT(request: NextRequest) {
   const body = await request.blob();
   const extension = mime.extension(body.type);
   const folder = request.nextUrl.searchParams.get("folder") ?? null;
+  const name = request.nextUrl.searchParams.get("name") ?? uuidv4();
 
   try {
     if (folder) {
@@ -51,7 +52,8 @@ export async function PUT(request: NextRequest) {
     await db
       .insert(blob)
       .values({
-        key: key,
+        key,
+        name,
         contentType: body.type,
         contentSize: body.size,
         organizationId: ownerId,

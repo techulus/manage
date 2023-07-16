@@ -13,7 +13,7 @@ export function FileUploader({ folderId }: { folderId: number }) {
 
       const uploaders = acceptedFiles.map((file) => {
         try {
-          return fetch(`/api/blob?folder=${folderId}`, {
+          return fetch(`/api/blob?folder=${folderId}&name=${file.name}`, {
             method: "PUT",
             body: file,
           }).then((res) => res.json());
@@ -40,7 +40,7 @@ export function FileUploader({ folderId }: { folderId: number }) {
     <div {...getRootProps()} className="flex items-center">
       <input {...getInputProps()} disabled={loading} />
       <p className="text-sm">Drop files here!</p>
-      {loading && <Spinner />}
+      {loading && <Spinner className="ml-2" />}
     </div>
   );
 }

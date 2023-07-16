@@ -62,7 +62,7 @@ export const organization = sqliteTable("Organization", {
 export const organizationRelations = relations(
   organization,
   ({ many, one }) => ({
-    user: one(user, {
+    creator: one(user, {
       fields: [organization.createdByUser],
       references: [user.id],
     }),
@@ -90,7 +90,7 @@ export const project = sqliteTable("Project", {
 });
 
 export const projectRelations = relations(project, ({ many, one }) => ({
-  user: one(user, {
+  creator: one(user, {
     fields: [project.createdByUser],
     references: [user.id],
   }),
@@ -123,7 +123,7 @@ export const document = sqliteTable("Document", {
 });
 
 export const documentRelations = relations(document, ({ one }) => ({
-  user: one(user, {
+  creator: one(user, {
     fields: [document.createdByUser],
     references: [user.id],
   }),
@@ -154,7 +154,7 @@ export const documentFolder = sqliteTable("DocumentFolder", {
 export const documentFolderRelations = relations(
   documentFolder,
   ({ one, many }) => ({
-    user: one(user, {
+    creator: one(user, {
       fields: [documentFolder.createdByUser],
       references: [user.id],
     }),
@@ -238,6 +238,7 @@ export const taskListRelations = relations(taskList, ({ many, one }) => ({
 
 export const blob = sqliteTable("Blob", {
   key: text("key").primaryKey().notNull(),
+  name: text("name").notNull(),
   contentType: text("contentType").notNull(),
   contentSize: integer("contentSize").notNull(),
   createdByUser: text("createdByUser")

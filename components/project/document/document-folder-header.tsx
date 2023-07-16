@@ -28,7 +28,7 @@ export const DocumentFolderHeader = ({
         </div>
 
         <CreatorDetails
-          user={documentFolder.user}
+          user={documentFolder.creator}
           updatedAt={documentFolder.updatedAt}
         />
       </Link>

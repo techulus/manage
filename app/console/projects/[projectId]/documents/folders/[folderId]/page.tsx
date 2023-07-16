@@ -2,6 +2,7 @@ import EmptyState from "@/components/core/empty-state";
 import { MarkdownView } from "@/components/core/markdown-view";
 import PageTitle from "@/components/layout/page-title";
 import { DocumentHeader } from "@/components/project/document/document-header";
+import { FileInfo } from "@/components/project/file/info";
 import { FileUploader } from "@/components/project/file/uploader";
 import { buttonVariants } from "@/components/ui/button";
 import { db } from "@/drizzle/db";
@@ -27,7 +28,7 @@ export default async function FolderDetails({ params }: Props) {
       with: {
         documents: {
           with: {
-            user: {
+            creator: {
               columns: {
                 firstName: true,
                 imageUrl: true,
@@ -35,7 +36,16 @@ export default async function FolderDetails({ params }: Props) {
             },
           },
         },
-        files: true,
+        files: {
+          with: {
+            creator: {
+              columns: {
+                firstName: true,
+                imageUrl: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -103,12 +113,12 @@ export default async function FolderDetails({ params }: Props) {
               ))}
 
               {folder.files.length
-                ? folder.files.map((file: Blob) => (
+                ? folder.files.map((file) => (
                     <div
                       key={file.key}
-                      className="text-sm font-medium text-gray-900 dark:text-gray-100"
+                      className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
                     >
-                      {file.key}
+                      <FileInfo file={file} />
                     </div>
                   ))
                 : null}
