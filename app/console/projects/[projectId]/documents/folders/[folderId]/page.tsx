@@ -1,16 +1,15 @@
-import { ContentBlock } from "@/components/core/content-block";
 import EmptyState from "@/components/core/empty-state";
 import { MarkdownView } from "@/components/core/markdown-view";
 import PageTitle from "@/components/layout/page-title";
 import { DocumentHeader } from "@/components/project/document/document-header";
+import { FileUploader } from "@/components/project/file/uploader";
 import { buttonVariants } from "@/components/ui/button";
-import Link from "next/link";
+import { db } from "@/drizzle/db";
+import { documentFolder } from "@/drizzle/schema";
+import { Blob, FolderWithContents } from "@/drizzle/types";
 import { DocumentPlusIcon } from "@heroicons/react/20/solid";
 import { eq } from "drizzle-orm";
-import { documentFolder } from "@/drizzle/schema";
-import { db } from "@/drizzle/db";
-import { Blob, FolderWithContents } from "@/drizzle/types";
-import { FileUploader } from "@/components/project/file/uploader";
+import Link from "next/link";
 
 type Props = {
   params: {
@@ -54,42 +53,40 @@ export default async function FolderDetails({ params }: Props) {
         actionLink={`/console/projects/${projectId}/documents/folders/${folderId}/edit`}
       />
 
-      <div className="space-y-16">
+      <div className="mx-auto max-w-5xl space-y-16 px-4 lg:px-0">
         {folder.description ? (
-          <div className="mx-auto flex max-w-5xl flex-col space-y-4">
+          <div className="flex flex-col">
             <MarkdownView content={folder.description ?? ""} />
           </div>
         ) : null}
 
-        <ContentBlock>
-          <div className="hidden h-12 flex-col justify-center border-b border-gray-200 dark:border-gray-800 md:flex">
-            <div className="px-4 sm:px-6 lg:-mx-4 lg:px-8">
-              <div className="flex justify-between py-3">
-                {/* Left buttons */}
-                <div className="isolate inline-flex sm:space-x-3">
-                  <span className="inline-flex space-x-1">
-                    <FileUploader folderId={Number(folderId)} />
-                  </span>
-                </div>
-
-                {/* Right buttons */}
-                <nav aria-label="Pagination">
-                  <span className="isolate inline-flex">
-                    <Link
-                      href={`/console/projects/${projectId}/documents/folders/${folderId}/new`}
-                      className={buttonVariants({ variant: "link" })}
-                    >
-                      <DocumentPlusIcon className="mr-1 h-5 w-5" /> File
-                      <span className="sr-only">, document</span>
-                    </Link>
-                  </span>
-                </nav>
+        <div className="flex h-12 flex-col justify-center border-b border-gray-200 dark:border-gray-800">
+          <div className="px-4 sm:px-6 lg:-mx-4 lg:px-8">
+            <div className="flex justify-between py-3">
+              {/* Left buttons */}
+              <div className="isolate inline-flex sm:space-x-3">
+                <span className="inline-flex space-x-1">
+                  <FileUploader folderId={Number(folderId)} />
+                </span>
               </div>
+
+              {/* Right buttons */}
+              <nav aria-label="Pagination">
+                <span className="isolate inline-flex">
+                  <Link
+                    href={`/console/projects/${projectId}/documents/folders/${folderId}/new`}
+                    className={buttonVariants({ variant: "link" })}
+                  >
+                    <DocumentPlusIcon className="mr-1 h-5 w-5" /> File
+                    <span className="sr-only">, document</span>
+                  </Link>
+                </span>
+              </nav>
             </div>
           </div>
-        </ContentBlock>
+        </div>
 
-        <div className="mx-auto flex max-w-5xl flex-col space-y-4">
+        <div className="flex flex-col space-y-4">
           {folder.documents.length ? (
             <ul
               role="list"

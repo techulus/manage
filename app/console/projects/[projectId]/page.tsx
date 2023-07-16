@@ -1,17 +1,15 @@
-import { ContentBlock } from "@/components/core/content-block";
 import EmptyState from "@/components/core/empty-state";
 import { MarkdownView } from "@/components/core/markdown-view";
 import { DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
+import { DocumentFolderHeader } from "@/components/project/document/document-folder-header";
 import { DocumentHeader } from "@/components/project/document/document-header";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
-import { CardContent, CardHeader } from "@/components/ui/card";
 import { getProjectById } from "@/lib/utils/useProjects";
+import { DocumentPlusIcon, FolderPlusIcon } from "@heroicons/react/20/solid";
+import { ListPlusIcon } from "lucide-react";
 import Link from "next/link";
 import { archiveProject } from "../actions";
-import { DocumentPlusIcon, FolderPlusIcon } from "@heroicons/react/20/solid";
-import { DocumentFolderHeader } from "@/components/project/document/document-folder-header";
-import { ListPlusIcon } from "lucide-react";
 
 type Props = {
   params: {
@@ -36,14 +34,39 @@ export default async function ProjectDetails({ params }: Props) {
         actionLink={`/console/projects/${projectId}/edit`}
       />
 
-      <div className="space-y-16">
+      <div className="mx-auto max-w-5xl space-y-16 px-4 lg:px-0">
         {project.description ? (
-          <div className="mx-auto flex max-w-5xl flex-col space-y-4">
+          <div className="flex flex-col">
             <MarkdownView content={project.description ?? ""} />
           </div>
         ) : null}
 
-        <div className="mx-auto flex max-w-5xl flex-col space-y-4">
+        <div className="flex h-12 flex-col justify-center border-b border-gray-200 dark:border-gray-800">
+          <div className="px-4 sm:px-6 lg:-mx-4 lg:px-8">
+            <div className="flex justify-between py-3">
+              {/* Left buttons */}
+              <div className="isolate inline-flex sm:space-x-3">
+                <span className="inline-flex space-x-1"></span>
+              </div>
+
+              {/* Right buttons */}
+              <nav aria-label="Pagination">
+                <span className="isolate inline-flex">
+                  <form action={archiveProject}>
+                    <input
+                      className="hidden"
+                      name="id"
+                      defaultValue={project.id}
+                    />
+                    <DeleteButton action="Archive" />
+                  </form>
+                </span>
+              </nav>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between">
             <Link href={`/console/projects/${projectId}/tasklists`}>
               <h2 className="text-2xl font-semibold leading-7">Task Lists</h2>
@@ -92,7 +115,7 @@ export default async function ProjectDetails({ params }: Props) {
           />
         </div>
 
-        <div className="mx-auto flex max-w-5xl flex-col space-y-4">
+        <div className="flex flex-col space-y-4">
           <div className="flex flex-col justify-between lg:flex-row lg:items-center">
             <h2 className="text-2xl font-semibold leading-7">
               Docs &amp; Files
@@ -148,33 +171,6 @@ export default async function ProjectDetails({ params }: Props) {
             createLink={`/console/projects/${projectId}/documents/new`}
           />
         </div>
-
-        <ContentBlock>
-          <div className="hidden h-12 flex-col justify-center border-b border-gray-200 dark:border-gray-800 md:flex">
-            <div className="px-4 sm:px-6 lg:-mx-4 lg:px-8">
-              <div className="flex justify-between py-3">
-                {/* Left buttons */}
-                <div className="isolate inline-flex sm:space-x-3">
-                  <span className="inline-flex space-x-1"></span>
-                </div>
-
-                {/* Right buttons */}
-                <nav aria-label="Pagination">
-                  <span className="isolate inline-flex">
-                    <form action={archiveProject}>
-                      <input
-                        className="hidden"
-                        name="id"
-                        defaultValue={project.id}
-                      />
-                      <DeleteButton action="Archive" />
-                    </form>
-                  </span>
-                </nav>
-              </div>
-            </div>
-          </div>
-        </ContentBlock>
       </div>
     </>
   );
