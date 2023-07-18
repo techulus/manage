@@ -11,8 +11,8 @@ Manage is an open-source alternative to Basecamp, offering a streamlined project
 ## V1 Roadmap
 
 - [x] Users / teams management
-- [x] Basic Project management - Create, update, delete projects, set due date
-- [ ] Task lists and tasks
+- [x] Basic Project management
+- [x] Task lists and tasks
 - [ ] Documents - Creating and sharing markdown documents
 - [ ] Files - Uploading and sharing files
 - [ ] Discussions / Comments
