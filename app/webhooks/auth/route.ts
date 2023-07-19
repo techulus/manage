@@ -43,10 +43,10 @@ export async function POST(request: Request) {
           .insert(user)
           .values({
             id: data.id,
-            email: data.emailAddresses[0].emailAddress,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            imageUrl: data.imageUrl,
+            email: data.email_addresses[0].email_address,
+            firstName: data.first_name,
+            lastName: data.last_name,
+            imageUrl: data.image_url,
             rawData: data,
             createdAt: new Date(),
             updatedAt: new Date(),
@@ -58,8 +58,8 @@ export async function POST(request: Request) {
           .values({
             id: data.id,
             name: "Personal",
-            imageUrl: data.imageUrl,
-            logoUrl: data.imageUrl,
+            imageUrl: data.image_url,
+            logoUrl: data.logo_url,
             rawData: data,
             createdByUser: data.id,
             createdAt: new Date(),
@@ -88,10 +88,10 @@ export async function POST(request: Request) {
           .values({
             id: data.id,
             name: data.name,
-            imageUrl: data.imageUrl,
-            logoUrl: data.logoUrl,
+            imageUrl: data.image_url,
+            logoUrl: data.logo_url,
             rawData: data,
-            createdByUser: data.createdBy,
+            createdByUser: data.created_by,
             createdAt: new Date(),
             updatedAt: new Date(),
           })
