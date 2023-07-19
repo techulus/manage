@@ -29,32 +29,26 @@ export async function createProject(payload: FormData) {
   const description = payload.get("description") as string;
   const dueDate = payload.get("dueDate") as string;
 
-  try {
-    const data = projectSchema.parse({
-      name,
-      description,
-      dueDate,
-      status: "active",
-    });
+  const data = projectSchema.parse({
+    name,
+    description,
+    dueDate,
+    status: "active",
+  });
 
-    const newProject = await db
-      .insert(project)
-      .values({
-        ...data,
-        organizationId: String(ownerId),
-        createdByUser: userId,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .returning()
-      .get();
+  await db
+    .insert(project)
+    .values({
+      ...data,
+      organizationId: String(ownerId),
+      createdByUser: userId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .run();
 
-    revalidatePath(`/console/projects/${newProject.id}`);
-    redirect(`/console/projects/${newProject.id}`);
-  } catch (error) {
-    console.log(error);
-    // TODO: Handle error, hook for handling this is not yet available
-  }
+  revalidatePath(`/console/projects`);
+  redirect(`/console/projects`);
 }
 
 export async function updateProject(payload: FormData) {
@@ -94,6 +88,15 @@ export async function archiveProject(payload: FormData) {
     })
     .where(eq(project.id, id))
     .run();
+
+  revalidatePath("/console/projects");
+  redirect("/console/projects");
+}
+
+export async function deleteProject(payload: FormData) {
+  const id = Number(payload.get("id"));
+
+  await db.delete(project).where(eq(project.id, id)).run();
 
   revalidatePath("/console/projects");
   redirect("/console/projects");

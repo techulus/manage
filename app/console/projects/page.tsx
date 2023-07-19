@@ -2,21 +2,26 @@ import { ContentBlock } from "@/components/core/content-block";
 import EmptyState from "@/components/core/empty-state";
 import PageTitle from "@/components/layout/page-title";
 import { ProjecItem } from "@/components/project/project-item";
+import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getProjectsForOwner } from "@/lib/utils/useProjects";
+import Link from "next/link";
 
 interface Props {
   searchParams: {
     search: string;
-    page: string;
+    status?: string;
   };
 }
 
 export const dynamic = "force-dynamic";
 
 export default async function Projects({ searchParams }: Props) {
-  const { projects } = await getProjectsForOwner({
+  const statuses = searchParams?.status?.split(",") ?? ["active"];
+
+  const { projects, archivedProjects } = await getProjectsForOwner({
     search: searchParams.search,
+    statuses,
   });
 
   return (
@@ -69,6 +74,29 @@ export default async function Projects({ searchParams }: Props) {
           </div>
         </ul>
       </ContentBlock>
+
+      {archivedProjects.length > 0 && (
+        <div className="mt-12 flex w-full flex-grow items-center border-t border-muted py-4 max-w-5xl mx-auto">
+          <p className="text-sm text-muted-foreground">
+            {archivedProjects.length} archived project(s)
+          </p>
+          {statuses.includes("archived") ? (
+            <Link
+              href={`/console/projects/projects`}
+              className={buttonVariants({ variant: "link" })}
+            >
+              Hide
+            </Link>
+          ) : (
+            <Link
+              href={`/console/projects?status=active,archived`}
+              className={buttonVariants({ variant: "link" })}
+            >
+              Show
+            </Link>
+          )}
+        </div>
+      )}
     </>
   );
 }

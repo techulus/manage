@@ -9,7 +9,7 @@ import { getProjectById } from "@/lib/utils/useProjects";
 import { DocumentPlusIcon, FolderPlusIcon } from "@heroicons/react/20/solid";
 import { ListPlusIcon } from "lucide-react";
 import Link from "next/link";
-import { archiveProject } from "../actions";
+import { archiveProject, deleteProject } from "../actions";
 
 type Props = {
   params: {
@@ -36,7 +36,7 @@ export default async function ProjectDetails({ params }: Props) {
 
       <div className="mx-auto max-w-5xl space-y-16 px-4 lg:px-0">
         {project.description ? (
-          <div className="flex flex-col">
+          <div className="flex flex-col pt-4">
             <MarkdownView content={project.description ?? ""} />
           </div>
         ) : null}
@@ -52,14 +52,25 @@ export default async function ProjectDetails({ params }: Props) {
               {/* Right buttons */}
               <nav aria-label="Pagination">
                 <span className="isolate inline-flex">
-                  <form action={archiveProject}>
-                    <input
-                      className="hidden"
-                      name="id"
-                      defaultValue={project.id}
-                    />
-                    <DeleteButton action="Archive" />
-                  </form>
+                  {project.status == "archived" ? (
+                    <form action={deleteProject}>
+                      <input
+                        className="hidden"
+                        name="id"
+                        defaultValue={project.id}
+                      />
+                      <DeleteButton action="Delete" />
+                    </form>
+                  ) : (
+                    <form action={archiveProject}>
+                      <input
+                        className="hidden"
+                        name="id"
+                        defaultValue={project.id}
+                      />
+                      <DeleteButton action="Archive" />
+                    </form>
+                  )}
                 </span>
               </nav>
             </div>

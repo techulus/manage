@@ -15,7 +15,7 @@ export const DeleteButton = ({ action = "Delete" }: { action?: string }) => {
     return (
       <Button type="submit" variant="destructive">
         {pending ? (
-          <Spinner message="Deleting..." />
+          <Spinner message="Processing..." />
         ) : (
           <>
             <CheckIcon className="mr-2 h-5 w-5" aria-hidden="true" />
