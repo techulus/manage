@@ -169,7 +169,7 @@ export async function updateTask(
     | { status: string }
     | { position: number }
     | { name: string }
-    | { assignedToUser: string }
+    | { assignedToUser: string | null }
 ) {
   await db
     .update(task)

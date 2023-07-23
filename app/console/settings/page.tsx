@@ -67,13 +67,14 @@ export default async function Settings() {
                   </dt>
                   <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
                     <div className="text-gray-900 dark:text-gray-200">
-                      {bytesToMegabytes(storage.usage)} MB <p className="font-bold inline">/ 5 GB</p> ({storage.count} files)
+                      {bytesToMegabytes(storage?.usage)} MB{" "}
+                      <p className="inline font-bold">/ 5 GB</p> (
+                      {storage?.count} files)
                     </div>
                   </dd>
                 </div>
               </dl>
             </div>
-
           </div>
           <div className="mx-auto mt-16 max-w-2xl space-y-16 sm:space-y-20 lg:mx-0 lg:max-w-none">
             <div>

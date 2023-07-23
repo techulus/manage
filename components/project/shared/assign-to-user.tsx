@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/popover";
 import { User } from "@/drizzle/types";
 import { useState, useMemo } from "react";
+import { Assignee } from "./assigee";
 
 export function AssignToUser({
   users,
@@ -86,7 +87,7 @@ export function AssignToUser({
                     value === user.id ? "opacity-100" : "opacity-0"
                   )}
                 />
-                {user.firstName}
+                <Assignee user={user} />
               </CommandItem>
             ))}
           </CommandGroup>

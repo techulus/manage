@@ -129,9 +129,26 @@ export const TaskItem = ({
                 <dt className="text-sm font-medium leading-6">Assigned to</dt>
                 <dd className="mt-1 flex text-sm leading-6 sm:col-span-2 sm:mt-0">
                   {task.assignee ? (
-                    <span className="flex-grow">
-                      <Assignee user={task.assignee} />
-                    </span>
+                    <>
+                      <span className="flex-grow">
+                        <Assignee user={task.assignee} />
+                      </span>
+                      <button
+                        className="text-teal-600 hover:text-red-500"
+                        onClick={() => {
+                          toast.promise(
+                            updateTask(id, projectId, { assignedToUser: null }),
+                            {
+                              loading: "Saving...",
+                              success: "Done!",
+                              error: "Error while saving, please try again.",
+                            }
+                          );
+                        }}
+                      >
+                        Unassign
+                      </button>
+                    </>
                   ) : (
                     <AssignToUser
                       users={users}
