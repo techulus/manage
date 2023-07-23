@@ -87,6 +87,8 @@ export async function updateDocument(payload: FormData) {
       `/console/projects/${projectId}/documents/folders/${folderId}`
     );
     redirect(`/console/projects/${projectId}/documents/folders/${folderId}`);
+  } else {
+    redirect(`/console/projects/${projectId}`);
   }
 }
 

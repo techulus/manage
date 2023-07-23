@@ -10,6 +10,7 @@ import { DocumentPlusIcon, FolderPlusIcon } from "@heroicons/react/20/solid";
 import { ListPlusIcon } from "lucide-react";
 import Link from "next/link";
 import { archiveProject, deleteProject } from "../actions";
+import { Badge } from "@/components/ui/badge";
 
 type Props = {
   params: {
@@ -26,13 +27,21 @@ export default async function ProjectDetails({ params }: Props) {
     <>
       <PageTitle
         title={project.name}
-        subTitle={
-          project.dueDate ? `Due ${project.dueDate.toDateString()}` : ""
-        }
         backUrl="/console/projects"
         actionLabel="Edit"
         actionLink={`/console/projects/${projectId}/edit`}
-      />
+      >
+        {project.dueDate ? (
+          <Badge variant="outline">
+            Due {project.dueDate.toLocaleDateString()}
+          </Badge>
+        ) : null}
+        {project.status == "archived" ? (
+          <Badge variant="outline" className="ml-2 text-red-500">
+            Archived
+          </Badge>
+        ) : null}
+      </PageTitle>
 
       <div className="mx-auto max-w-5xl space-y-16 px-4 lg:px-0">
         {project.description ? (
@@ -177,7 +186,7 @@ export default async function ProjectDetails({ params }: Props) {
           ) : null}
 
           <EmptyState
-            show={!project.documents.length}
+            show={!project.documents.length && !project.documentFolders.length}
             label="document"
             createLink={`/console/projects/${projectId}/documents/new`}
           />

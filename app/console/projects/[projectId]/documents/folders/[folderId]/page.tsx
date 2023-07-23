@@ -7,7 +7,7 @@ import { FileUploader } from "@/components/project/file/uploader";
 import { buttonVariants } from "@/components/ui/button";
 import { db } from "@/drizzle/db";
 import { documentFolder } from "@/drizzle/schema";
-import { Blob, FolderWithContents } from "@/drizzle/types";
+import { FolderWithContents } from "@/drizzle/types";
 import { DocumentPlusIcon } from "@heroicons/react/20/solid";
 import { eq } from "drizzle-orm";
 import Link from "next/link";
@@ -76,7 +76,10 @@ export default async function FolderDetails({ params }: Props) {
               {/* Left buttons */}
               <div className="isolate inline-flex sm:space-x-3">
                 <span className="inline-flex space-x-1">
-                  <FileUploader folderId={Number(folderId)} />
+                  <FileUploader
+                    folderId={Number(folderId)}
+                    projectId={Number(projectId)}
+                  />
                 </span>
               </div>
 

@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import { TaskList } from "@/drizzle/types";
 import Link from "next/link";
 
@@ -26,16 +27,22 @@ export const TaskListHeader = ({
         className="text-sm font-medium"
       >
         <span className="absolute inset-0" aria-hidden="true" />
-        <div className="flex">
+        <div className="mb-2 flex">
           <div className="text-xl font-medium leading-6">
             {taskList.name}
             {taskList.status === "archived" ? " (Archived)" : null}
           </div>
         </div>
+
         {totalCount != null && doneCount != null ? (
-          <div className="mt-1 text-sm text-muted-foreground">
+          <Badge variant="outline">
             {doneCount}/{totalCount} completed
-          </div>
+          </Badge>
+        ) : null}
+        {taskList.dueDate ? (
+          <Badge variant="outline" className="ml-2">
+            Due {taskList.dueDate.toLocaleDateString()}
+          </Badge>
         ) : null}
       </Link>
     </div>

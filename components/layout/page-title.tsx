@@ -17,7 +17,8 @@ export default function PageTitle({
   backUrl,
   actionLink,
   actionLabel,
-}: Props) {
+  children,
+}: React.PropsWithChildren<Props>) {
   return (
     <div className="relative flex justify-center border-b border-gray-200 pb-4 pl-4 pr-6 pt-4 dark:border-gray-800 dark:text-white sm:pl-6 lg:pl-8 xl:border-t-0 xl:px-8 xl:py-12">
       <div
@@ -60,6 +61,8 @@ export default function PageTitle({
               </p>
             )}
             <h1 className="flex-1 text-2xl font-semibold">{title}</h1>
+
+            <div className="mt-2 flex">{children}</div>
           </div>
         </div>
 
