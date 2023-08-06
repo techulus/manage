@@ -55,6 +55,8 @@ export async function createDocument(payload: FormData) {
       `/console/projects/${projectId}/documents/folders/${folderId}`
     );
     redirect(`/console/projects/${projectId}/documents/folders/${folderId}`);
+  } else {
+    redirect(`/console/projects/${projectId}`);
   }
 }
 
@@ -116,4 +118,29 @@ export async function createDocumentFolder(payload: FormData) {
 
   revalidatePath(`/console/projects/${projectId}`);
   redirect(`/console/projects/${projectId}`);
+}
+
+export async function updateDocumentFolder(payload: FormData) {
+  const name = payload.get("name") as string;
+  const description = payload.get("description") as string;
+  const id = payload.get("id") as string;
+  const projectId = payload.get("projectId") as string;
+
+  const data = documentFolderSchema.parse({
+    name,
+    description,
+  });
+
+  await db
+    .update(documentFolder)
+    .set({
+      ...data,
+      updatedAt: new Date(),
+    })
+    .where(eq(documentFolder.id, Number(id)))
+    .run();
+
+  revalidatePath(`/console/projects/${projectId}`);
+  revalidatePath(`/console/projects/${projectId}/documents/folders/${id}`);
+  redirect(`/console/projects/${projectId}/documents/folders/${id}`);
 }
