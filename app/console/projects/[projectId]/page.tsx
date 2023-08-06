@@ -43,48 +43,12 @@ export default async function ProjectDetails({ params }: Props) {
         ) : null}
       </PageTitle>
 
-      <div className="mx-auto max-w-5xl space-y-16 px-4 lg:px-0">
+      <div className="mx-auto max-w-5xl space-y-12 px-4 lg:px-0">
         {project.description ? (
           <div className="flex flex-col pt-4">
             <MarkdownView content={project.description ?? ""} />
           </div>
         ) : null}
-
-        <div className="flex h-12 flex-col justify-center border-b border-gray-200 dark:border-gray-800">
-          <div className="px-4 sm:px-6 lg:-mx-4 lg:px-8">
-            <div className="flex justify-between py-3">
-              {/* Left buttons */}
-              <div className="isolate inline-flex sm:space-x-3">
-                <span className="inline-flex space-x-1"></span>
-              </div>
-
-              {/* Right buttons */}
-              <nav aria-label="Pagination">
-                <span className="isolate inline-flex">
-                  {project.status == "archived" ? (
-                    <form action={deleteProject}>
-                      <input
-                        className="hidden"
-                        name="id"
-                        defaultValue={project.id}
-                      />
-                      <DeleteButton action="Delete" />
-                    </form>
-                  ) : (
-                    <form action={archiveProject}>
-                      <input
-                        className="hidden"
-                        name="id"
-                        defaultValue={project.id}
-                      />
-                      <DeleteButton action="Archive" />
-                    </form>
-                  )}
-                </span>
-              </nav>
-            </div>
-          </div>
-        </div>
 
         <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between">
@@ -190,6 +154,42 @@ export default async function ProjectDetails({ params }: Props) {
             label="document"
             createLink={`/console/projects/${projectId}/documents/new`}
           />
+        </div>
+
+        <div className="flex h-12 flex-col justify-center border-t border-gray-200 dark:border-gray-800">
+          <div className="px-4 sm:px-6 lg:-mx-4 lg:px-8">
+            <div className="flex justify-between py-3">
+              {/* Left buttons */}
+              <div className="isolate inline-flex sm:space-x-3">
+                <span className="inline-flex space-x-1"></span>
+              </div>
+
+              {/* Right buttons */}
+              <nav aria-label="Pagination">
+                <span className="isolate inline-flex">
+                  {project.status == "archived" ? (
+                    <form action={deleteProject}>
+                      <input
+                        className="hidden"
+                        name="id"
+                        defaultValue={project.id}
+                      />
+                      <DeleteButton action="Delete" />
+                    </form>
+                  ) : (
+                    <form action={archiveProject}>
+                      <input
+                        className="hidden"
+                        name="id"
+                        defaultValue={project.id}
+                      />
+                      <DeleteButton action="Archive" />
+                    </form>
+                  )}
+                </span>
+              </nav>
+            </div>
+          </div>
         </div>
       </div>
     </>

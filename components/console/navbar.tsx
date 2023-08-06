@@ -24,11 +24,6 @@ export default function NavBar({ appearance }: Props) {
   const tabs = useMemo(
     () => [
       {
-        name: "Today",
-        href: "/console/today",
-        current: path === "/console/today",
-      },
-      {
         name: "Projects",
         href: "/console/projects",
         current: path.startsWith("/console/projects"),
@@ -71,7 +66,7 @@ export default function NavBar({ appearance }: Props) {
                   strokeWidth="1"
                   viewBox="0 0 24 24"
                   width="32"
-                  className="text-gray-300 dark:text-gray-700 xl:block mr-2"
+                  className="mr-2 text-gray-300 dark:text-gray-700 xl:block"
                 >
                   <path d="M16.88 3.549L7.12 20.451"></path>
                 </svg>
@@ -81,7 +76,7 @@ export default function NavBar({ appearance }: Props) {
             </div>
 
             <SignedIn>
-              <div className="flex ml-2 justify-center">
+              <div className="ml-2 flex justify-center">
                 <ThemedUserButton appearance={appearance} />
               </div>
             </SignedIn>
@@ -91,7 +86,7 @@ export default function NavBar({ appearance }: Props) {
 
       <div
         className={cn(
-          "flex px-4 lg:px-8 min-w-full bg-background border-b border-gray-200 dark:border-gray-800 -mb-px self-start sticky -top-[1px] z-10",
+          "sticky -top-[1px] z-10 -mb-px flex min-w-full self-start border-b border-gray-200 bg-background px-4 dark:border-gray-800 lg:px-8",
           isSticky ? "pt-[1px] shadow-md" : ""
         )}
         ref={ref}
@@ -121,7 +116,7 @@ export default function NavBar({ appearance }: Props) {
         <div
           className={cn(
             "flex space-x-1 overflow-y-scroll",
-            "transition ease-in-out duration-300",
+            "transition duration-300 ease-in-out",
             isSticky ? "translate-x-[40px]" : "translate-x-0"
           )}
         >
@@ -137,7 +132,7 @@ export default function NavBar({ appearance }: Props) {
               )}
               aria-current={tab.current ? "page" : undefined}
             >
-              <span className="transition ease-in-out duration-300 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-white hover:text-black py-2 px-4 rounded-md">
+              <span className="rounded-md px-4 py-2 transition duration-300 ease-in-out hover:bg-gray-100 hover:text-black dark:hover:bg-gray-800 dark:hover:text-white">
                 {tab.name}
               </span>
             </Link>
