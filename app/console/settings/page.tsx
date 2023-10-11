@@ -1,13 +1,13 @@
 import { ContentBlock } from "@/components/core/content-block";
-import PageTitle from "@/components/layout/page-title";
-import { clerkClient } from "@clerk/nextjs/app-beta";
 import { ThemePicker } from "@/components/core/theme-picker";
-import { cookies } from "next/headers";
+import PageTitle from "@/components/layout/page-title";
 import { db } from "@/drizzle/db";
-import { eq, sql } from "drizzle-orm";
-import { getOwner } from "@/lib/utils/useOwner";
 import { blob } from "@/drizzle/schema";
 import { bytesToMegabytes } from "@/lib/blobStore";
+import { getOwner } from "@/lib/utils/useOwner";
+import { clerkClient } from "@clerk/nextjs/app-beta";
+import { eq, sql } from "drizzle-orm";
+import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
@@ -37,10 +37,6 @@ export default async function Settings() {
               <h2 className="text-base font-semibold leading-7 text-gray-900 dark:text-gray-200">
                 General
               </h2>
-              <p className="mt-1 text-sm leading-6 text-gray-500">
-                Manage your account settings.
-              </p>
-
               <dl className="mt-6 space-y-6 divide-y divide-gray-100 border-t border-gray-200 text-sm leading-6 dark:divide-gray-800 dark:border-gray-800">
                 <div className="pt-6 sm:flex">
                   <dt className="font-medium text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
