@@ -4,7 +4,6 @@ const nextConfig = {
     domains: ["images.clerk.dev", "img.clerk.com"],
   },
   experimental: {
-    serverActions: true,
     serverComponentsExternalPackages: ["@libsql"],
   },
 };
