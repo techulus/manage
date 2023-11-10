@@ -2,7 +2,8 @@
 
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-import { experimental_useFormStatus as useFormStatus } from "react-dom";
+// @ts-ignore
+import { useFormStatus } from "react-dom";
 import { Button } from "../ui/button";
 import { SaveButton } from "./button";
 import { XMarkIcon } from "@heroicons/react/20/solid";
