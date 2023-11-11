@@ -7,6 +7,7 @@ import { getOwner } from "@/lib/utils/useOwner";
 import { getProjectById } from "@/lib/utils/useProjects";
 import { and, asc, eq, or } from "drizzle-orm";
 import Link from "next/link";
+import { createTask, partialUpdateTaskList } from "./actions";
 
 type Props = {
   params: {
@@ -90,6 +91,8 @@ export default async function TaskLists({ params, searchParams }: Props) {
               projectId={Number(projectId)}
               userId={userId}
               users={users}
+              createTask={createTask}
+              partialUpdateTaskList={partialUpdateTaskList}
             />
           ))}
         </ul>
