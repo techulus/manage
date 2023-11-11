@@ -1,5 +1,6 @@
 import { ClerkProvider } from "@clerk/nextjs/app-beta";
 import { Analytics } from "@vercel/analytics/react";
+import { GeistSans } from "geist/font/sans";
 
 import { SITE_METADATA } from "@/data/marketing";
 import { cn } from "@/lib/utils";
@@ -20,7 +21,7 @@ export default function RootLayout({
   const theme = cookies().get("theme")?.value ?? "light";
 
   return (
-    <html lang="en" className={cn("flex min-h-full min-w-full", theme)}>
+    <html lang="en" className={cn("flex min-h-full min-w-full", theme, GeistSans.className)}>
       <head>
         <meta
           name="viewport"

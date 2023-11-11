@@ -1,10 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["images.clerk.dev", "img.clerk.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.clerk.dev",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "img.clerk.com",
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
   experimental: {
-    serverActions: true,
     serverComponentsExternalPackages: ["@libsql"],
   },
 };

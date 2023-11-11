@@ -2,7 +2,8 @@
 
 import { CheckIcon, TrashIcon } from "@heroicons/react/20/solid";
 import { useState } from "react";
-import { experimental_useFormStatus as useFormStatus } from "react-dom";
+// @ts-ignore
+import { useFormStatus } from "react-dom";
 import { Spinner } from "../core/loaders";
 import { Button } from "../ui/button";
 

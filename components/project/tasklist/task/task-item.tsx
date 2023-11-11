@@ -6,7 +6,8 @@ import {
 } from "@/app/console/projects/[projectId]/tasklists/actions";
 import { Task, TaskWithDetails, User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import { experimental_useOptimistic as useOptimistic, useState } from "react";
+// @ts-ignore
+import { useOptimistic, useState } from "react";
 import toast from "react-hot-toast";
 import { Card, CardContent, CardHeader } from "../../../ui/card";
 import { Checkbox } from "../../../ui/checkbox";

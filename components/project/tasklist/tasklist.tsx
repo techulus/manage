@@ -1,9 +1,5 @@
 "use client";
 
-import {
-  createTask,
-  partialUpdateTaskList,
-} from "@/app/console/projects/[projectId]/tasklists/actions";
 import { TaskListWithTasks, User } from "@/drizzle/types";
 import Link from "next/link";
 import { useMemo } from "react";
@@ -19,11 +15,15 @@ export const TaskListItem = ({
   userId,
   projectId,
   users,
+  createTask,
+  partialUpdateTaskList,
 }: {
   taskList: TaskListWithTasks;
   userId: string;
   projectId: number;
   users: User[];
+  createTask: any;
+  partialUpdateTaskList: any;
 }) => {
   const todoItems = useMemo(
     () => taskList.tasks.filter((task) => task.status === "todo"),
