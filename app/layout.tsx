@@ -21,7 +21,11 @@ export default function RootLayout({
   const theme = cookies().get("theme")?.value ?? "light";
 
   return (
-    <html lang="en" className={cn("flex min-h-full min-w-full", theme, GeistSans.className)}>
+    <html
+      lang="en"
+      className={cn("flex min-h-full min-w-full", theme, GeistSans.className)}
+      suppressHydrationWarning
+    >
       <head>
         <meta
           name="viewport"
