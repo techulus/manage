@@ -11,6 +11,7 @@ import { FolderWithContents } from "@/drizzle/types";
 import { DocumentPlusIcon } from "@heroicons/react/20/solid";
 import { eq } from "drizzle-orm";
 import Link from "next/link";
+import { reloadDocuments } from "../../actions";
 
 type Props = {
   params: {
@@ -79,6 +80,7 @@ export default async function FolderDetails({ params }: Props) {
                   <FileUploader
                     folderId={Number(folderId)}
                     projectId={Number(projectId)}
+                    reloadDocuments={reloadDocuments}
                   />
                 </span>
               </div>
