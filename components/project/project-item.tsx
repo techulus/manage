@@ -18,7 +18,7 @@ export const ProjecItem = ({
       )}
     >
       <div>
-        <h3 className="text-xl font-semibold leading-6 text-gray-900 dark:text-gray-50">
+        <h3 className="text-xl font-semibold leading-6 tracking-tight text-gray-900 dark:text-gray-50">
           <Link href={`/console/projects/${id}`} className="focus:outline-none">
             <span className="absolute inset-0" aria-hidden="true" />
             {name}

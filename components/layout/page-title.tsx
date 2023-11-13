@@ -60,7 +60,14 @@ export default function PageTitle({
                 {subTitle}
               </p>
             )}
-            <h1 className="flex-1 text-2xl font-semibold">{title}</h1>
+            <h1
+              className={cn(
+                "flex-1 text-2xl font-semibold tracking-tight",
+                subTitle ? "-mb-2 md:-mb-8" : "-mb-2"
+              )}
+            >
+              {title}
+            </h1>
 
             <div className="mt-2 flex">{children}</div>
           </div>

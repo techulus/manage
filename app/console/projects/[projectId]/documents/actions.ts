@@ -144,3 +144,15 @@ export async function updateDocumentFolder(payload: FormData) {
   revalidatePath(`/console/projects/${projectId}/documents/folders/${id}`);
   redirect(`/console/projects/${projectId}/documents/folders/${id}`);
 }
+
+export async function reloadDocuments(projectId: string, folderId: string) {
+  if (folderId) {
+    revalidatePath(
+      `/console/projects/${projectId}/documents/folders/${folderId}`
+    );
+    redirect(`/console/projects/${projectId}/documents/folders/${folderId}`);
+  }
+
+  revalidatePath(`/console/projects/${projectId}`);
+  redirect(`/console/projects/${projectId}`);
+}

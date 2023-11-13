@@ -1,16 +1,18 @@
 "use client";
 
 import { Spinner } from "@/components/core/loaders";
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import toast from "react-hot-toast";
 
 export function FileUploader({
   folderId,
   projectId,
+  reloadDocuments,
 }: {
-  folderId: number;
-  projectId: number;
+  folderId?: number;
+  projectId: number | string;
+  reloadDocuments: (projectId: string, folderId: string) => void;
 }) {
   const [loading, setLoading] = useState(false);
   const onDrop = useCallback(
@@ -20,12 +22,16 @@ export function FileUploader({
       const uploaders = acceptedFiles.map(async (file) => {
         try {
           return fetch(
-            `/api/blob?folder=${folderId}&name=${file.name}&projectId=${projectId}`,
+            folderId
+              ? `/api/blob?folder=${folderId}&name=${file.name}&projectId=${projectId}`
+              : `/api/blob?name=${file.name}&projectId=${projectId}`,
             {
               method: "put",
               body: file,
             }
-          ).then((res) => res.json());
+          )
+            .then((res) => res.json())
+            .then(() => reloadDocuments(String(projectId), String(folderId)));
         } catch (e) {
           console.error(e);
           return null;
@@ -40,13 +46,16 @@ export function FileUploader({
         })
         .finally(() => setLoading(false));
     },
-    [folderId, projectId]
+    [folderId, projectId, reloadDocuments]
   );
 
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
   return (
-    <div {...getRootProps()} className="flex items-center">
+    <div
+      {...getRootProps()}
+      className="flex items-center rounded-lg border border-gray-100 bg-gray-50 px-3 py-1.5 dark:border-gray-800 dark:bg-gray-900"
+    >
       <input {...getInputProps()} disabled={loading} />
       <p className="text-sm">Drop files here!</p>
       {loading && <Spinner className="ml-2" />}

@@ -28,7 +28,7 @@ export const TaskListHeader = ({
       >
         <span className="absolute inset-0" aria-hidden="true" />
         <div className="mb-2 flex">
-          <div className="text-xl font-medium leading-6">
+          <div className="text-xl font-bold leading-6 tracking-tight">
             {taskList.name}
             {taskList.status === "archived" ? " (Archived)" : null}
           </div>
