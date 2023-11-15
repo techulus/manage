@@ -1,6 +1,6 @@
 import { db } from "@/drizzle/db";
-import { organization, user } from "@/drizzle/schema";
-import { eq } from "drizzle-orm";
+import { organization, organizationToUser, user } from "@/drizzle/schema";
+import { and, eq } from "drizzle-orm";
 import { Webhook, WebhookRequiredHeaders } from "svix";
 
 const webhookSecret = process.env.AUTH_WEBHOOK_SECRET;
@@ -12,6 +12,8 @@ enum MessageTypes {
   // Organization
   "organization.created" = "organization.created",
   "organization.updated" = "organization.updated",
+  "organizationMembership.created" = "organizationMembership.created",
+  "organizationMembership.deleted" = "organizationMembership.deleted",
 }
 
 type Message = {
@@ -36,6 +38,8 @@ export async function POST(request: Request) {
     // console.log("POST /webhooks/auth Message:", msg);
 
     const data = msg.data;
+
+    console.log("POST /webhooks/auth Message:", msg);
 
     switch (msg.type) {
       case "user.created":
@@ -109,6 +113,29 @@ export async function POST(request: Request) {
           })
           .where(eq(user.id, data.id))
           .run();
+        break;
+      case "organizationMembership.created":
+        await db
+          .insert(organizationToUser)
+          .values({
+            userId: data.public_user_data.user_id,
+            organizationId: data.organization.id,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .run();
+        break;
+      case "organizationMembership.deleted":
+        await db
+          .delete(organizationToUser)
+          .where(
+            and(
+              eq(organizationToUser.organizationId, data.organization.id),
+              eq(organizationToUser.userId, data.public_user_data.user_id)
+            )
+          )
+          .run();
+        break;
       default:
         console.log("POST /webhooks/auth Unknown message type:", msg.type);
     }
