@@ -9,7 +9,8 @@ export const ThemedOrgSwitcher = ({ appearance }: Props) => {
   return (
     <OrganizationSwitcher
       appearance={appearance === "dark" ? { baseTheme: dark } : {}}
-      afterSwitchOrganizationUrl="/console/projects"
+      afterSelectOrganizationUrl="/console/projects"
+      afterSelectPersonalUrl="/console/projects"
     />
   );
 };

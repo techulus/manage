@@ -61,6 +61,34 @@ export const organizationRelations = relations(
   })
 );
 
+export const organizationToUser = sqliteTable("OrganizationToUser", {
+  organizationId: text("organizationId")
+    .notNull()
+    .references(() => organization.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+});
+
+export const organizationToUserRelations = relations(
+  organizationToUser,
+  ({ one }) => ({
+    organization: one(organization, {
+      fields: [organizationToUser.organizationId],
+      references: [organization.id],
+    }),
+    user: one(user, {
+      fields: [organizationToUser.userId],
+      references: [user.id],
+    }),
+  })
+);
+
 export const project = sqliteTable("Project", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),

@@ -2,7 +2,8 @@ import PageTitle from "@/components/layout/page-title";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { buttonVariants } from "@/components/ui/button";
 import { db } from "@/drizzle/db";
-import { task, taskList, user } from "@/drizzle/schema";
+import { organizationToUser, task, taskList, user } from "@/drizzle/schema";
+import { User } from "@/drizzle/types";
 import { getOwner } from "@/lib/utils/useOwner";
 import { getProjectById } from "@/lib/utils/useProjects";
 import { and, asc, eq, or } from "drizzle-orm";
@@ -19,7 +20,7 @@ type Props = {
 };
 
 export default async function TaskLists({ params, searchParams }: Props) {
-  const { userId } = getOwner();
+  const { userId, orgId } = getOwner();
   const { projectId } = params;
 
   const project = await getProjectById(projectId);
@@ -68,9 +69,25 @@ export default async function TaskLists({ params, searchParams }: Props) {
     })
     .execute();
 
-  const users = await db.query.user.findMany({
-    orderBy: asc(user.firstName),
+  const currentUser = await db.query.user.findFirst({
+    where: eq(user.id, userId),
   });
+
+  const orgUsers = orgId
+    ? await db.query.organizationToUser.findMany({
+        where: eq(organizationToUser.organizationId, orgId),
+        with: {
+          user: {},
+        },
+      })
+    : [];
+
+  const users: User[] = currentUser
+    ? [
+        currentUser,
+        ...(orgUsers ? orgUsers.map((orgUser) => orgUser.user) : []),
+      ]
+    : orgUsers.map((orgUser) => orgUser.user);
 
   return (
     <>
