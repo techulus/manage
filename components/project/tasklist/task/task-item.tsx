@@ -7,15 +7,15 @@ import {
 import { Task, TaskWithDetails, User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 // @ts-ignore
-import { useOptimistic, useState } from "react";
+import { Input } from "@/components/ui/input";
+import { DocumentIcon } from "@heroicons/react/20/solid";
+import { useReducer, useState } from "react";
 import toast from "react-hot-toast";
 import { Card, CardContent, CardHeader } from "../../../ui/card";
 import { Checkbox } from "../../../ui/checkbox";
-import TaskNotesForm from "./notes-form";
-import { Input } from "@/components/ui/input";
-import { DocumentIcon } from "@heroicons/react/20/solid";
-import { AssignToUser } from "../../shared/assign-to-user";
 import { Assignee } from "../../shared/assigee";
+import { AssignToUser } from "../../shared/assign-to-user";
+import TaskNotesForm from "./notes-form";
 
 export const TaskItem = ({
   task,
@@ -28,12 +28,12 @@ export const TaskItem = ({
 }) => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [optimisticTask, updateOptimisticTask] = useOptimistic(
-    task,
+  const [optimisticTask, updateOptimisticTask] = useReducer(
     (task: Task, data: { status: string } | { name: string }) => ({
       ...task,
       ...data,
-    })
+    }),
+    task
   );
 
   const { id, name, status } = optimisticTask;
