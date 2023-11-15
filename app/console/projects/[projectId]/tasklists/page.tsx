@@ -82,12 +82,9 @@ export default async function TaskLists({ params, searchParams }: Props) {
       })
     : [];
 
-  const users: User[] = currentUser
-    ? [
-        currentUser,
-        ...(orgUsers ? orgUsers.map((orgUser) => orgUser.user) : []),
-      ]
-    : orgUsers.map((orgUser) => orgUser.user);
+  const users: User[] = orgId
+    ? orgUsers.map((orgUser) => orgUser.user)
+    : [currentUser!];
 
   return (
     <>
