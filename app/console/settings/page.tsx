@@ -5,7 +5,7 @@ import { db } from "@/drizzle/db";
 import { blob } from "@/drizzle/schema";
 import { bytesToMegabytes } from "@/lib/blobStore";
 import { getOwner } from "@/lib/utils/useOwner";
-import { clerkClient } from "@clerk/nextjs/app-beta";
+import { clerkClient } from "@clerk/nextjs";
 import { eq, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
 
