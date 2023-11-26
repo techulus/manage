@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckIcon, TrashIcon } from "@heroicons/react/20/solid";
+import { CheckIcon, TrashIcon } from "lucide-react";
 import { useState } from "react";
 // @ts-ignore
 import { useFormStatus } from "react-dom";

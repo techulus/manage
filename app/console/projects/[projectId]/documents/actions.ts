@@ -145,6 +145,29 @@ export async function updateDocumentFolder(payload: FormData) {
   redirect(`/console/projects/${projectId}/documents/folders/${id}`);
 }
 
+export async function deleteDocument(
+  id: string,
+  projectId: string,
+  folderId: number | null
+) {
+  await db
+    .delete(document)
+    .where(eq(document.id, Number(id)))
+    .run();
+
+  if (folderId) {
+    revalidatePath(
+      `/console/projects/${projectId}/documents/folders/${folderId}`
+    );
+    revalidatePath(`/console/projects/${projectId}/documents/${id}`);
+    redirect(`/console/projects/${projectId}/documents/folders/${folderId}`);
+  }
+
+  revalidatePath(`/console/projects/${projectId}`);
+  revalidatePath(`/console/projects/${projectId}/documents/${id}`);
+  redirect(`/console/projects/${projectId}`);
+}
+
 export async function reloadDocuments(projectId: string, folderId: string) {
   if (folderId) {
     revalidatePath(
