@@ -22,7 +22,8 @@ export const DocumentFolderHeader = ({
           <p>
             <span className="sr-only">, </span>
             <span className="text-sm text-muted-foreground">
-              {documentFolder.documents.length} document(s)
+              {documentFolder.documents.length + documentFolder.files.length}{" "}
+              document(s)
             </span>
           </p>
         </div>

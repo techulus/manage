@@ -2,7 +2,7 @@ import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SITE_METADATA } from "@/data/marketing";
 import { cn } from "@/lib/utils";
-import { CheckIcon } from "@heroicons/react/20/solid";
+import { CheckIcon } from "lucide-react";
 import Link from "next/link";
 
 async function getGitHubStars(): Promise<string | null> {
@@ -115,7 +115,7 @@ export default async function Home() {
                 <div className="flex items-center">
                   <div className="h-4 w-4 border-y-8 border-l-0 border-r-8 border-solid border-muted border-y-transparent"></div>
                   <div className="flex h-10 items-center rounded-md border border-muted bg-muted px-4 font-medium">
-                    {stars} star(s) on GitHub
+                    {stars} stars on GitHub
                   </div>
                 </div>
               </Link>

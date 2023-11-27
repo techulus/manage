@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { ArrowLeftIcon } from "@heroicons/react/20/solid";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "../ui/button";
 
@@ -44,7 +44,7 @@ export default function PageTitle({
               href={backUrl}
               className="text-md mr-2 flex items-center font-medium text-gray-600 hover:text-gray-900"
             >
-              <ArrowLeftIcon
+              <ArrowLeft
                 className={cn(
                   "h-6 w-6 flex-shrink-0 text-gray-600 hover:text-gray-900",
                   "dark:text-gray-400 dark:hover:text-gray-300"

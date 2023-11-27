@@ -15,7 +15,6 @@
     "@clerk/nextjs": "^4.27.1",
     "@clerk/themes": "^1.7.2",
     "@headlessui/react": "^1.7.14",
-    "@heroicons/react": "^2.0.17",
     "@libsql/client": "^0.2.2",
     "@radix-ui/react-avatar": "^1.0.3",
     "@radix-ui/react-checkbox": "^1.0.4",
