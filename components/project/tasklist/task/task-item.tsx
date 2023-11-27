@@ -8,7 +8,7 @@ import { Task, TaskWithDetails, User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 // @ts-ignore
 import { Input } from "@/components/ui/input";
-import { DocumentIcon } from "@heroicons/react/20/solid";
+import { FileIcon } from "lucide-react";
 import { useReducer, useState } from "react";
 import toast from "react-hot-toast";
 import { Card, CardContent, CardHeader } from "../../../ui/card";
@@ -214,7 +214,7 @@ export const TaskItem = ({
           ) : null}
           {name}
           {task.description ? (
-            <DocumentIcon className="ml-2 h-4 w-4 text-teal-600 dark:text-teal-700" />
+            <FileIcon className="ml-2 h-4 w-4 text-teal-600 dark:text-teal-700" />
           ) : null}
         </div>
       </button>

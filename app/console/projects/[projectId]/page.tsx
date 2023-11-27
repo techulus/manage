@@ -7,8 +7,7 @@ import { DocumentHeader } from "@/components/project/document/document-header";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
 import { Badge } from "@/components/ui/badge";
 import { getProjectById } from "@/lib/utils/useProjects";
-import { DocumentPlusIcon, FolderPlusIcon } from "@heroicons/react/20/solid";
-import { ListPlusIcon } from "lucide-react";
+import { FilePlus2Icon, FolderPlusIcon, ListPlusIcon } from "lucide-react";
 import Link from "next/link";
 import { archiveProject, deleteProject } from "../actions";
 
@@ -110,7 +109,7 @@ export default async function ProjectDetails({ params }: Props) {
                 className="flex items-center"
                 href={`/console/projects/${projectId}/documents/new`}
               >
-                <DocumentPlusIcon className="mr-1 h-5 w-5" /> Document
+                <FilePlus2Icon className="mr-1 h-5 w-5" /> Document
                 <span className="sr-only">, document</span>
               </Link>
 

@@ -1,13 +1,13 @@
 import { db } from "@/drizzle/db";
-import { blob, documentFolder, document } from "@/drizzle/schema";
+import { blob, document, documentFolder } from "@/drizzle/schema";
 import { upload } from "@/lib/blobStore";
 import { getAppBaseUrl } from "@/lib/utils/url";
 import { getOwner } from "@/lib/utils/useOwner";
+import { eq } from "drizzle-orm";
+import mime from "mime-types";
+import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
-import mime from "mime-types";
-import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 
 export type BlobUploadResult = {
   message: string;
@@ -98,7 +98,12 @@ export async function PUT(request: NextRequest) {
       .returning()
       .get();
 
-    // TODO: relvalidate path?
+    if (folder) {
+      revalidatePath(
+        `/console/projects/${projectId}/documents/folders/${folder}`
+      );
+    }
+
     return NextResponse.json<BlobUploadResult>({
       message: "ok",
       url: `${getAppBaseUrl()}/api/blob/${fileId}/file.${extension}`,

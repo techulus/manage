@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/popover";
 import { DocumentFolder, Project, TaskList } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import { CalendarIcon } from "@heroicons/react/20/solid";
 import { format } from "date-fns";
+import { CalendarDaysIcon } from "lucide-react";
 import { useState } from "react";
 import MarkdownEditor from "../editor";
 
@@ -69,7 +69,7 @@ export default function SharedForm({
                     !date && "text-muted-foreground"
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  <CalendarDaysIcon className="mr-2 h-4 w-4" />
                   {date ? format(date, "PPP") : <span>Pick a due date</span>}
                 </Button>
               </PopoverTrigger>

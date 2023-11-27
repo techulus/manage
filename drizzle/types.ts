@@ -54,6 +54,7 @@ export type DocumentWithCreator = Document & {
 export type DocumentFolderWithDocuments = DocumentFolder & {
   creator: Pick<User, "firstName" | "imageUrl">;
   documents: Pick<Document, "id">[];
+  files: Pick<Blob, "id">[];
 };
 
 export type BlobWithCreater = Blob & {

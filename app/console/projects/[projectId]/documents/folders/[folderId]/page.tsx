@@ -8,8 +8,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { db } from "@/drizzle/db";
 import { documentFolder } from "@/drizzle/schema";
 import { FolderWithContents } from "@/drizzle/types";
-import { DocumentPlusIcon } from "@heroicons/react/20/solid";
 import { eq } from "drizzle-orm";
+import { FilePlus2 } from "lucide-react";
 import Link from "next/link";
 import { reloadDocuments } from "../../actions";
 
@@ -92,7 +92,7 @@ export default async function FolderDetails({ params }: Props) {
                     href={`/console/projects/${projectId}/documents/folders/${folderId}/new`}
                     className={buttonVariants({ variant: "link" })}
                   >
-                    <DocumentPlusIcon className="mr-1 h-5 w-5" /> File
+                    <FilePlus2 className="mr-1 h-5 w-5" /> Document
                     <span className="sr-only">, document</span>
                   </Link>
                 </span>
@@ -102,7 +102,7 @@ export default async function FolderDetails({ params }: Props) {
         </div>
 
         <div className="flex flex-col space-y-4">
-          {folder.documents.length ? (
+          {folder.documents.length || folder.files.length ? (
             <ul
               role="list"
               className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2"
@@ -131,7 +131,7 @@ export default async function FolderDetails({ params }: Props) {
           ) : null}
 
           <EmptyState
-            show={!folder.documents.length}
+            show={!folder.documents.length && !folder.files.length}
             label="document"
             createLink={`/console/projects/${projectId}/documents/new`}
           />
