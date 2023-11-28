@@ -55,28 +55,23 @@ export default async function Projects({ searchParams }: Props) {
         </form>
       ) : null}
 
-      <ContentBlock>
-        <ul
-          role="list"
-          className="divide-y divide-gray-200 border-gray-200 dark:divide-gray-800 dark:border-gray-800"
-        >
-          <EmptyState
-            show={!projects.length}
-            isSearchResult={!!searchParams?.search}
-            label="projects"
-            createLink="/console/projects/new"
-          />
+      <ContentBlock className="border-none">
+        <EmptyState
+          show={!projects.length}
+          isSearchResult={!!searchParams?.search}
+          label="projects"
+          createLink="/console/projects/new"
+        />
 
-          <div className="divide-y divide-gray-200 overflow-hidden rounded-sm bg-gray-200 shadow dark:divide-gray-800 dark:bg-gray-900 sm:grid sm:grid-cols-2 sm:gap-px sm:divide-y-0">
-            {projects.map((project) => (
-              <ProjecItem key={project.id} project={project} />
-            ))}
-          </div>
-        </ul>
+        <div className="grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:px-0">
+          {projects.map((project) => (
+            <ProjecItem key={project.id} project={project} />
+          ))}
+        </div>
       </ContentBlock>
 
       {archivedProjects.length > 0 && (
-        <div className="mt-12 flex w-full flex-grow items-center border-t border-muted py-4 max-w-5xl mx-auto">
+        <div className="mx-auto mt-12 flex w-full max-w-5xl flex-grow items-center border-t border-muted py-4">
           <p className="text-sm text-muted-foreground">
             {archivedProjects.length} archived project(s)
           </p>

@@ -14,7 +14,7 @@ export const ProjecItem = ({
     <div
       key={id}
       className={cn(
-        "group relative bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-teal-500 dark:bg-black"
+        "relative flex space-x-3 rounded-lg border border-gray-200 px-6 py-5 shadow-sm hover:border-gray-400 dark:border-gray-800 dark:hover:border-gray-700"
       )}
     >
       <div>
