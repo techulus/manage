@@ -1,7 +1,7 @@
-// "use client"; // not ideal, but the clerk components are reloading too many times, and this is a quick fix
+"use client";
 
 import NavBar from "@/components/console/navbar";
-import { cookies } from "next/headers";
+import { useTheme } from "@/lib/hooks/useTheme";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +10,7 @@ export default function ConsoleLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const theme = cookies().get("theme")?.value ?? "light";
+  const theme = useTheme();
 
   return (
     <div className="relative flex min-h-full flex-col">
