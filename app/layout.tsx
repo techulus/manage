@@ -4,7 +4,6 @@ import { GeistSans } from "geist/font/sans";
 
 import { SITE_METADATA } from "@/data/marketing";
 import { cn } from "@/lib/utils";
-import { cookies } from "next/headers";
 
 import "./globals.scss";
 
@@ -18,12 +17,10 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const theme = cookies().get("theme")?.value ?? "light";
-
   return (
     <html
       lang="en"
-      className={cn("flex min-h-full min-w-full", theme, GeistSans.className)}
+      className={cn("flex min-h-full min-w-full", GeistSans.className)}
       suppressHydrationWarning
     >
       <head>
