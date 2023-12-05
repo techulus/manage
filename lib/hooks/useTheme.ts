@@ -12,5 +12,5 @@ export const useTheme = () => {
     root.classList.add(colorScheme);
   }, [colorScheme]);
 
-  return colorScheme == "no-preference" ? "light" : colorScheme;
+  return colorScheme == "no-preference" ? "dark" : colorScheme;
 };
