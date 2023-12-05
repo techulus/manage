@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { BlobWithCreater } from "@/drizzle/types";
 import { getFileUrl } from "@/lib/blobStore";
 import Link from "next/link";

@@ -6,6 +6,7 @@ import { DocumentFolderHeader } from "@/components/project/document/document-fol
 import { DocumentHeader } from "@/components/project/document/document-header";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import { getProjectById } from "@/lib/utils/useProjects";
 import { FilePlus2Icon, FolderPlusIcon, ListPlusIcon } from "lucide-react";
 import Link from "next/link";
@@ -49,7 +50,12 @@ export default async function ProjectDetails({ params }: Props) {
           </div>
         ) : null}
 
-        <div className="flex flex-col space-y-4">
+        <div
+          className={cn(
+            "flex flex-col space-y-4",
+            project.description ? "" : "mt-6"
+          )}
+        >
           <div className="flex items-center justify-between">
             <Link href={`/console/projects/${projectId}/tasklists`}>
               <h2 className="text-lg font-semibold leading-7">Task Lists</h2>

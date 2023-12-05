@@ -22,7 +22,7 @@ export const useDetectSticky = (
     return () => {
       observer.unobserve(cachedRef);
     };
-  }, []);
+  }, [observerSettings, ref]);
 
   return [isSticky, ref, setIsSticky];
 };

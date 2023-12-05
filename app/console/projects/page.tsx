@@ -55,7 +55,7 @@ export default async function Projects({ searchParams }: Props) {
         </form>
       ) : null}
 
-      <ContentBlock className="border-none">
+      <ContentBlock className="border-none shadow-none">
         <EmptyState
           show={!projects.length}
           isSearchResult={!!searchParams?.search}
