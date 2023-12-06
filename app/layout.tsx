@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("flex min-h-full min-w-full", GeistSans.className)}
+      className={cn("dark flex min-h-full min-w-full", GeistSans.className)}
       suppressHydrationWarning
     >
       <head>
