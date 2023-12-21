@@ -28,7 +28,7 @@ export async function PUT(request: NextRequest) {
         columns: {
           id: true,
         },
-        where: eq(documentFolder.id, Number(folder)),
+        where: eq(documentFolder.id, +folder),
         with: {
           project: {
             columns: {
@@ -55,8 +55,8 @@ export async function PUT(request: NextRequest) {
           name,
           markdownContent: content,
           status: "active",
-          projectId: Number(projectId),
-          folderId: Number(folder),
+          projectId: +projectId,
+          folderId: +folder,
           createdByUser: userId,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -91,7 +91,7 @@ export async function PUT(request: NextRequest) {
         contentSize: body.size,
         organizationId: ownerId,
         createdByUser: userId,
-        documentFolderId: folder ? Number(folder) : null,
+        documentFolderId: folder ? +folder : null,
         createdAt: new Date(),
         updatedAt: new Date(),
       })

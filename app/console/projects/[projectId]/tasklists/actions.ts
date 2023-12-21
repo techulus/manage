@@ -58,7 +58,7 @@ export async function createTaskList(payload: FormData) {
     .insert(taskList)
     .values({
       ...data,
-      projectId: Number(projectId),
+      projectId: +projectId,
       createdByUser: userId,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -89,7 +89,7 @@ export async function updateTaskList(payload: FormData) {
       ...data,
       updatedAt: new Date(),
     })
-    .where(eq(taskList.id, Number(id)))
+    .where(eq(taskList.id, +id))
     .run();
 
   revalidatePath(`/console/projects/${projectId}/tasklists`);
@@ -106,7 +106,7 @@ export async function partialUpdateTaskList(
       ...data,
       updatedAt: new Date(),
     })
-    .where(eq(taskList.id, Number(id)))
+    .where(eq(taskList.id, +id))
     .returning()
     .get();
 
@@ -137,7 +137,7 @@ export async function createTask({
 
   const lastPosition = await db.query.task
     .findFirst({
-      where: eq(task.taskListId, Number(taskListId)),
+      where: eq(task.taskListId, +taskListId),
       orderBy: [desc(task.position)],
     })
     .execute();
@@ -151,7 +151,7 @@ export async function createTask({
     .values({
       ...data,
       position,
-      taskListId: Number(taskListId),
+      taskListId: +taskListId,
       createdByUser: userId,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -177,7 +177,7 @@ export async function updateTask(
       ...data,
       updatedAt: new Date(),
     })
-    .where(eq(task.id, Number(id)))
+    .where(eq(task.id, +id))
     .run();
 
   revalidatePath(`/console/projects/${projectId}/tasklists`);
@@ -190,10 +190,7 @@ export async function deleteTask({
   id: number;
   projectId: number;
 }) {
-  await db
-    .delete(task)
-    .where(eq(task.id, Number(id)))
-    .run();
+  await db.delete(task).where(eq(task.id, +id)).run();
 
   revalidatePath(`/console/projects/${projectId}/tasklists`);
 }

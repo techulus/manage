@@ -79,7 +79,7 @@ export default async function FolderDetails({ params }: Props) {
                 <span className="inline-flex space-x-1">
                   <FileUploader
                     folderId={Number(folderId)}
-                    projectId={Number(projectId)}
+                    projectId={+projectId}
                     reloadDocuments={reloadDocuments}
                   />
                 </span>

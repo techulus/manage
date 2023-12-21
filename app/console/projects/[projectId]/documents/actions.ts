@@ -40,8 +40,8 @@ export async function createDocument(payload: FormData) {
     .insert(document)
     .values({
       ...data,
-      projectId: Number(projectId),
-      folderId: folderId ? Number(folderId) : null,
+      projectId: +projectId,
+      folderId: folderId ? +folderId : null,
       createdByUser: userId,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -79,7 +79,7 @@ export async function updateDocument(payload: FormData) {
       ...data,
       updatedAt: new Date(),
     })
-    .where(eq(document.id, Number(id)))
+    .where(eq(document.id, +id))
     .run();
 
   revalidatePath(`/console/projects/${projectId}`);
@@ -109,7 +109,7 @@ export async function createDocumentFolder(payload: FormData) {
     .insert(documentFolder)
     .values({
       ...data,
-      projectId: Number(projectId),
+      projectId: +projectId,
       createdByUser: userId,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -137,7 +137,7 @@ export async function updateDocumentFolder(payload: FormData) {
       ...data,
       updatedAt: new Date(),
     })
-    .where(eq(documentFolder.id, Number(id)))
+    .where(eq(documentFolder.id, +id))
     .run();
 
   revalidatePath(`/console/projects/${projectId}`);
@@ -150,10 +150,7 @@ export async function deleteDocument(
   projectId: string,
   folderId: number | null
 ) {
-  await db
-    .delete(document)
-    .where(eq(document.id, Number(id)))
-    .run();
+  await db.delete(document).where(eq(document.id, +id)).run();
 
   if (folderId) {
     revalidatePath(

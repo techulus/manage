@@ -31,10 +31,7 @@ export default async function TaskLists({ params, searchParams }: Props) {
   );
   const taskLists = await db.query.taskList
     .findMany({
-      where: and(
-        eq(taskList.projectId, Number(projectId)),
-        or(...statusFilter)
-      ),
+      where: and(eq(taskList.projectId, +projectId), or(...statusFilter)),
       with: {
         tasks: {
           orderBy: [asc(task.position)],
@@ -63,7 +60,7 @@ export default async function TaskLists({ params, searchParams }: Props) {
         id: true,
       },
       where: and(
-        eq(taskList.projectId, Number(projectId)),
+        eq(taskList.projectId, +projectId),
         eq(taskList.status, "archived")
       ),
     })
@@ -102,7 +99,7 @@ export default async function TaskLists({ params, searchParams }: Props) {
             <TaskListItem
               key={taskList.id}
               taskList={taskList}
-              projectId={Number(projectId)}
+              projectId={+projectId}
               userId={userId}
               users={users}
               createTask={createTask}
