@@ -14,7 +14,7 @@ export const ProjecItem = ({
     <div
       key={id}
       className={cn(
-        "relative flex space-x-3 rounded-lg border border-gray-200 px-6 py-5 shadow-sm hover:border-gray-400 dark:border-gray-800 dark:hover:border-gray-700"
+        "relative flex space-x-3 rounded-lg border border-gray-200 px-3 py-2 shadow-sm hover:border-gray-400 dark:border-gray-800 dark:hover:border-gray-700"
       )}
     >
       <div>
