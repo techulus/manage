@@ -17,7 +17,7 @@ export default async function DocumentDetails({ params }: Props) {
   const { projectId, documentId } = params;
 
   const documentDetails = await db.query.document.findFirst({
-    where: eq(document.id, Number(documentId)),
+    where: eq(document.id, +documentId),
     with: {
       folder: true,
     },

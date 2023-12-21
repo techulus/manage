@@ -51,7 +51,7 @@ export const TaskListItem = ({
           <TaskItem
             key={task.id}
             task={task}
-            projectId={Number(projectId)}
+            projectId={+projectId}
             users={users}
           />
         ))}
@@ -75,7 +75,7 @@ export const TaskListItem = ({
           <TaskItem
             key={task.id}
             task={task}
-            projectId={Number(projectId)}
+            projectId={+projectId}
             users={users}
           />
         ))}

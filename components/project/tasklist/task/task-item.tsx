@@ -72,7 +72,7 @@ export const TaskItem = ({
               <button
                 onClick={() => setDetailsOpen(false)}
                 className={cn(
-                  "text-md w-full py-4 text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+                  "text-md w-full py-1 text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
                   status === "done" ? "text-muted-foreground line-through" : ""
                 )}
               >
@@ -203,7 +203,7 @@ export const TaskItem = ({
       />
       <button
         className={cn(
-          "text-md w-full py-4 text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+          "text-md w-full py-1 text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
           status === "done" ? "text-muted-foreground line-through" : ""
         )}
         onClick={() => setDetailsOpen(true)}

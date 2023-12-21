@@ -59,7 +59,7 @@ export async function getProjectById(
   const data = await db.query.project
     .findFirst({
       where: and(
-        eq(project.id, Number(projectId)),
+        eq(project.id, +projectId),
         eq(project.organizationId, ownerId)
       ),
       with: withTasksAndDocs
@@ -117,7 +117,7 @@ export async function getProjectById(
 export async function getTaskListById(taskListId: string | number) {
   const data = await db.query.taskList
     .findFirst({
-      where: eq(taskList.id, Number(taskListId)),
+      where: eq(taskList.id, +taskListId),
     })
     .execute();
 
@@ -131,7 +131,7 @@ export async function getTaskListById(taskListId: string | number) {
 export async function getDocumentById(documentId: string | number) {
   const data = await db.query.document
     .findFirst({
-      where: eq(document.id, Number(documentId)),
+      where: eq(document.id, +documentId),
     })
     .execute();
 
