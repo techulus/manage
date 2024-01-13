@@ -12,7 +12,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.367.0",
     "@aws-sdk/signature-v4-crt": "^3.369.0",
-    "@clerk/nextjs": "^4.27.1",
+    "@clerk/nextjs": "^4.29.3",
     "@clerk/themes": "^1.7.2",
     "@headlessui/react": "^1.7.14",
     "@libsql/client": "^0.2.2",
