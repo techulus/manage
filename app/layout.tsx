@@ -5,7 +5,7 @@ import { GeistSans } from "geist/font/sans";
 import { SITE_METADATA } from "@/data/marketing";
 import { cn } from "@/lib/utils";
 
-import "./globals.scss";
+import "./globals.css";
 
 export const metadata = {
   title: SITE_METADATA.TITLE,
