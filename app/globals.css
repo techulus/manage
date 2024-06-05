@@ -104,43 +104,33 @@ textarea {
   font-size: 16px !important;
 }
 
-.dark {
-  .editor-preview-full,
-  .editor-preview-side {
-    @apply prose-invert;
-    max-width: unset !important;
-    background-color: #09090b !important;
-    border-color: rgba(245, 245, 245, 0.1) !important;
-  }
-
-  .CodeMirror,
-  .editor-toolbar,
-  .editor-preview-full {
-    background-color: #09090b !important;
-    color: white !important;
-  }
-
-  .CodeMirror div.CodeMirror-cursor {
-    border-left: 1px solid white !important;
-  }
-
-  .editor-toolbar {
-    color: #959694 !important;
-
-    button {
-      &:hover {
-        background-color: #09090b !important;
-      }
-    }
-
-    button.active {
-      background-color: #09090b !important;
-    }
-  }
-
-  .EasyMDEContainer .CodeMirror,
-  .editor-toolbar i.separator,
-  .editor-toolbar {
-    border-color: rgba(245, 245, 245, 0.1) !important;
-  }
+.dark .editor-preview-full,
+.dark .editor-preview-side {
+  @apply prose-invert;
+  max-width: unset !important;
+  background-color: #09090b !important;
+  border-color: rgba(245, 245, 245, 0.1) !important;
+}
+.dark .CodeMirror,
+.dark .editor-toolbar,
+.dark .editor-preview-full {
+  background-color: #09090b !important;
+  color: white !important;
+}
+.dark .CodeMirror div.CodeMirror-cursor {
+  border-left: 1px solid white !important;
+}
+.dark .editor-toolbar {
+  color: #959694 !important;
+}
+.dark .editor-toolbar button:hover {
+  background-color: #09090b !important;
+}
+.dark .editor-toolbar button.active {
+  background-color: #09090b !important;
+}
+.dark .EasyMDEContainer .CodeMirror,
+.dark .editor-toolbar i.separator,
+.dark .editor-toolbar {
+  border-color: rgba(245, 245, 245, 0.1) !important;
 }
