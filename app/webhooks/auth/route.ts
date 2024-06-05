@@ -143,6 +143,6 @@ export async function POST(request: Request) {
     return new Response("OK");
   } catch (err) {
     console.log("POST /webhooks/auth Error:", err);
-    new Response("Invalid signature", { status: 401 });
+    return new Response("Invalid signature", { status: 401 });
   }
 }
