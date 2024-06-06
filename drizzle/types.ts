@@ -1,23 +1,21 @@
-import { InferModel } from "drizzle-orm";
+import { InferSelectModel } from "drizzle-orm";
 import {
   blob,
   document,
   documentFolder,
-  organization,
   project,
   task,
   taskList,
   user,
 } from "./schema";
 
-export type User = InferModel<typeof user>;
-export type Organization = InferModel<typeof organization>;
-export type Project = InferModel<typeof project>;
-export type TaskList = InferModel<typeof taskList>;
-export type Task = InferModel<typeof task>;
-export type Document = InferModel<typeof document>;
-export type DocumentFolder = InferModel<typeof documentFolder>;
-export type Blob = InferModel<typeof blob>;
+export type User = InferSelectModel<typeof user>;
+export type Project = InferSelectModel<typeof project>;
+export type TaskList = InferSelectModel<typeof taskList>;
+export type Task = InferSelectModel<typeof task>;
+export type Document = InferSelectModel<typeof document>;
+export type DocumentFolder = InferSelectModel<typeof documentFolder>;
+export type Blob = InferSelectModel<typeof blob>;
 
 export type ProjectWithCreator = Project & { creator: User };
 
