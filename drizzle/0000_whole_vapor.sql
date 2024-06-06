@@ -5,12 +5,10 @@ CREATE TABLE `Blob` (
 	`contentType` text NOT NULL,
 	`contentSize` integer NOT NULL,
 	`createdByUser` text NOT NULL,
-	`organizationId` text NOT NULL,
 	`documentFolderId` integer,
 	`createdAt` integer NOT NULL,
 	`updatedAt` integer NOT NULL,
 	FOREIGN KEY (`createdByUser`) REFERENCES `User`(`id`) ON UPDATE cascade ON DELETE cascade,
-	FOREIGN KEY (`organizationId`) REFERENCES `Organization`(`id`) ON UPDATE cascade ON DELETE cascade,
 	FOREIGN KEY (`documentFolderId`) REFERENCES `DocumentFolder`(`id`) ON UPDATE cascade ON DELETE cascade
 );
 --> statement-breakpoint
@@ -41,27 +39,6 @@ CREATE TABLE `DocumentFolder` (
 	FOREIGN KEY (`createdByUser`) REFERENCES `User`(`id`) ON UPDATE cascade ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `Organization` (
-	`id` text PRIMARY KEY NOT NULL,
-	`name` text NOT NULL,
-	`imageUrl` text,
-	`logoUrl` text,
-	`rawData` text NOT NULL,
-	`createdByUser` text NOT NULL,
-	`createdAt` integer NOT NULL,
-	`updatedAt` integer NOT NULL,
-	FOREIGN KEY (`createdByUser`) REFERENCES `User`(`id`) ON UPDATE cascade ON DELETE cascade
-);
---> statement-breakpoint
-CREATE TABLE `OrganizationToUser` (
-	`organizationId` text NOT NULL,
-	`userId` text NOT NULL,
-	`createdAt` integer NOT NULL,
-	`updatedAt` integer NOT NULL,
-	FOREIGN KEY (`organizationId`) REFERENCES `Organization`(`id`) ON UPDATE cascade ON DELETE cascade,
-	FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON UPDATE cascade ON DELETE cascade
-);
---> statement-breakpoint
 CREATE TABLE `Project` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
@@ -70,9 +47,7 @@ CREATE TABLE `Project` (
 	`dueDate` integer,
 	`createdAt` integer NOT NULL,
 	`updatedAt` integer NOT NULL,
-	`organizationId` text NOT NULL,
 	`createdByUser` text NOT NULL,
-	FOREIGN KEY (`organizationId`) REFERENCES `Organization`(`id`) ON UPDATE cascade ON DELETE cascade,
 	FOREIGN KEY (`createdByUser`) REFERENCES `User`(`id`) ON UPDATE cascade ON DELETE cascade
 );
 --> statement-breakpoint

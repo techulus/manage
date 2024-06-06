@@ -5,12 +5,12 @@ import { bytesToMegabytes } from "@/lib/blobStore";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { clerkClient } from "@clerk/nextjs";
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 
 export default async function Settings() {
-  const { ownerId, userId } = getOwner();
+  const { userId } = getOwner();
   const user = await clerkClient.users.getUser(userId ?? "");
 
   const storage = await database()
@@ -19,7 +19,6 @@ export default async function Settings() {
       usage: sql<number>`sum(${blob.contentSize})`,
     })
     .from(blob)
-    .where(eq(blob.organizationId, ownerId))
     .get();
 
   return (

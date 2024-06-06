@@ -31,16 +31,9 @@ export async function PUT(request: NextRequest) {
           id: true,
         },
         where: eq(documentFolder.id, +folder),
-        with: {
-          project: {
-            columns: {
-              organizationId: true,
-            },
-          },
-        },
       });
 
-      if (!verifyFolder || verifyFolder?.project?.organizationId !== ownerId) {
+      if (!verifyFolder) {
         return NextResponse.error();
       }
     }
@@ -91,7 +84,6 @@ export async function PUT(request: NextRequest) {
         name,
         contentType: body.type,
         contentSize: body.size,
-        organizationId: ownerId,
         createdByUser: userId,
         documentFolderId: folder ? +folder : null,
         createdAt: new Date(),

@@ -2,7 +2,6 @@ import { document, project, taskList } from "@/drizzle/schema";
 import { ProjectWithCreator, ProjectWithData } from "@/drizzle/types";
 import { and, eq, isNull, like, or } from "drizzle-orm";
 import { database } from "./useDatabase";
-import { getOwner } from "./useOwner";
 
 export async function getProjectsForOwner({
   search,
@@ -14,19 +13,14 @@ export async function getProjectsForOwner({
   projects: ProjectWithCreator[];
   archivedProjects: ProjectWithCreator[];
 }> {
-  const { ownerId } = getOwner();
   const db = database();
 
   const statusFilter = statuses?.map((status) => eq(project.status, status));
 
   const projects = await db.query.project.findMany({
     where: search
-      ? and(
-          eq(project.organizationId, ownerId),
-          like(project.name, `%${search}%`),
-          or(...statusFilter)
-        )
-      : and(eq(project.organizationId, ownerId), or(...statusFilter)),
+      ? and(like(project.name, `%${search}%`), or(...statusFilter))
+      : and(or(...statusFilter)),
     with: {
       creator: true,
     },
@@ -34,15 +28,8 @@ export async function getProjectsForOwner({
 
   const archivedProjects = await db.query.project.findMany({
     where: search
-      ? and(
-          eq(project.organizationId, ownerId),
-          eq(project.status, "archived"),
-          like(project.name, `%${search}%`)
-        )
-      : and(
-          eq(project.organizationId, ownerId),
-          eq(project.status, "archived")
-        ),
+      ? and(eq(project.status, "archived"), like(project.name, `%${search}%`))
+      : and(eq(project.status, "archived")),
     with: {
       creator: true,
     },
@@ -56,14 +43,10 @@ export async function getProjectById(
   withTasksAndDocs = false
 ): Promise<ProjectWithData> {
   const db = database();
-  const { ownerId } = getOwner();
 
   const data = await db.query.project
     .findFirst({
-      where: and(
-        eq(project.id, +projectId),
-        eq(project.organizationId, ownerId)
-      ),
+      where: and(eq(project.id, +projectId)),
       with: withTasksAndDocs
         ? {
             taskLists: {

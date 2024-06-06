@@ -1,9 +1,9 @@
-import { organization, organizationToUser, user } from "@/drizzle/schema";
+import { user } from "@/drizzle/schema";
 import {
   createDatabaseAndMigrate,
   getDatabaseForOwner,
 } from "@/lib/utils/useDatabase";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { Webhook, WebhookRequiredHeaders } from "svix";
 
 const webhookSecret = process.env.AUTH_WEBHOOK_SECRET;
@@ -48,7 +48,6 @@ export async function POST(request: Request) {
     switch (msg.type) {
       case "user.created":
         db = await createDatabaseAndMigrate(data.id);
-
         await db
           .insert(user)
           .values({
@@ -62,21 +61,8 @@ export async function POST(request: Request) {
             updatedAt: new Date(),
           })
           .run();
-
-        await db
-          .insert(organization)
-          .values({
-            id: data.id,
-            name: "Personal",
-            imageUrl: data.image_url,
-            logoUrl: data.logo_url,
-            rawData: data,
-            createdByUser: data.id,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          })
-          .run();
         break;
+
       case "user.updated":
         db = getDatabaseForOwner(data.id);
         await db
@@ -95,59 +81,8 @@ export async function POST(request: Request) {
 
       case "organization.created":
         db = await createDatabaseAndMigrate(data.id);
+        break;
 
-        await db
-          .insert(organization)
-          .values({
-            id: data.id,
-            name: data.name,
-            imageUrl: data.image_url,
-            logoUrl: data.logo_url,
-            rawData: data,
-            createdByUser: data.created_by,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          })
-          .run();
-        break;
-      case "organization.updated":
-        db = getDatabaseForOwner(data.id);
-        await db
-          .update(organization)
-          .set({
-            name: data.name,
-            imageUrl: data.image_url,
-            logoUrl: data.logo_url,
-            rawData: data,
-            updatedAt: new Date(),
-          })
-          .where(eq(user.id, data.id))
-          .run();
-        break;
-      case "organizationMembership.created":
-        db = getDatabaseForOwner(data.organization.id);
-        await db
-          .insert(organizationToUser)
-          .values({
-            userId: data.public_user_data.user_id,
-            organizationId: data.organization.id,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          })
-          .run();
-        break;
-      case "organizationMembership.deleted":
-        db = getDatabaseForOwner(data.organization.id);
-        await db
-          .delete(organizationToUser)
-          .where(
-            and(
-              eq(organizationToUser.organizationId, data.organization.id),
-              eq(organizationToUser.userId, data.public_user_data.user_id)
-            )
-          )
-          .run();
-        break;
       default:
         console.log("POST /webhooks/auth Unknown message type:", msg.type);
     }

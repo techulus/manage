@@ -1,7 +1,7 @@
 import PageTitle from "@/components/layout/page-title";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { buttonVariants } from "@/components/ui/button";
-import { organizationToUser, task, taskList, user } from "@/drizzle/schema";
+import { task, taskList, user } from "@/drizzle/schema";
 import { User } from "@/drizzle/types";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
@@ -70,18 +70,9 @@ export default async function TaskLists({ params, searchParams }: Props) {
     where: eq(user.id, userId),
   });
 
-  const orgUsers = orgId
-    ? await database().query.organizationToUser.findMany({
-        where: eq(organizationToUser.organizationId, orgId),
-        with: {
-          user: {},
-        },
-      })
-    : [];
+  const orgUsers = orgId ? await database().query.user.findMany() : [];
 
-  const users: User[] = orgId
-    ? orgUsers.map((orgUser) => orgUser.user)
-    : [currentUser!];
+  const users: User[] = orgId ? orgUsers : [currentUser!];
 
   return (
     <>

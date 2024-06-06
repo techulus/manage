@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "41bf6f6a-feb4-46ab-951c-24bffcf43bd8",
+  "id": "bbdae849-6d7a-45ef-965e-4e5ae9dfb36a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "Blob": {
@@ -49,13 +49,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "organizationId": {
-          "name": "organizationId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "documentFolderId": {
           "name": "documentFolderId",
           "type": "integer",
@@ -94,19 +87,6 @@
           "tableTo": "User",
           "columnsFrom": [
             "createdByUser"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        },
-        "Blob_organizationId_Organization_id_fk": {
-          "name": "Blob_organizationId_Organization_id_fk",
-          "tableFrom": "Blob",
-          "tableTo": "Organization",
-          "columnsFrom": [
-            "organizationId"
           ],
           "columnsTo": [
             "id"
@@ -328,149 +308,6 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "Organization": {
-      "name": "Organization",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "imageUrl": {
-          "name": "imageUrl",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "logoUrl": {
-          "name": "logoUrl",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "rawData": {
-          "name": "rawData",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "createdByUser": {
-          "name": "createdByUser",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "Organization_createdByUser_User_id_fk": {
-          "name": "Organization_createdByUser_User_id_fk",
-          "tableFrom": "Organization",
-          "tableTo": "User",
-          "columnsFrom": [
-            "createdByUser"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "OrganizationToUser": {
-      "name": "OrganizationToUser",
-      "columns": {
-        "organizationId": {
-          "name": "organizationId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "userId": {
-          "name": "userId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "OrganizationToUser_organizationId_Organization_id_fk": {
-          "name": "OrganizationToUser_organizationId_Organization_id_fk",
-          "tableFrom": "OrganizationToUser",
-          "tableTo": "Organization",
-          "columnsFrom": [
-            "organizationId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        },
-        "OrganizationToUser_userId_User_id_fk": {
-          "name": "OrganizationToUser_userId_User_id_fk",
-          "tableFrom": "OrganizationToUser",
-          "tableTo": "User",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
     "Project": {
       "name": "Project",
       "columns": {
@@ -523,13 +360,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "organizationId": {
-          "name": "organizationId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "createdByUser": {
           "name": "createdByUser",
           "type": "text",
@@ -540,19 +370,6 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "Project_organizationId_Organization_id_fk": {
-          "name": "Project_organizationId_Organization_id_fk",
-          "tableFrom": "Project",
-          "tableTo": "Organization",
-          "columnsFrom": [
-            "organizationId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        },
         "Project_createdByUser_User_id_fk": {
           "name": "Project_createdByUser_User_id_fk",
           "tableFrom": "Project",

@@ -24,7 +24,7 @@ const projectSchema = z.object({
 });
 
 export async function createProject(payload: FormData) {
-  const { ownerId, userId } = getOwner();
+  const { userId } = getOwner();
   const name = payload.get("name") as string;
   const description = payload.get("description") as string;
   const dueDate = payload.get("dueDate") as string;
@@ -40,7 +40,6 @@ export async function createProject(payload: FormData) {
     .insert(project)
     .values({
       ...data,
-      organizationId: String(ownerId),
       createdByUser: userId,
       createdAt: new Date(),
       updatedAt: new Date(),
