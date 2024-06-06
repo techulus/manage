@@ -2,7 +2,6 @@ import { organization, organizationToUser, user } from "@/drizzle/schema";
 import {
   createDatabaseAndMigrate,
   getDatabaseForOwner,
-  getDatabaseNameForOwner,
 } from "@/lib/utils/useDatabase";
 import { and, eq } from "drizzle-orm";
 import { Webhook, WebhookRequiredHeaders } from "svix";
@@ -42,14 +41,13 @@ export async function POST(request: Request) {
     // console.log("POST /webhooks/auth Message:", msg);
 
     const data = msg.data;
-    let db, databaseName;
+    let db;
 
     console.log("POST /webhooks/auth Message:", msg);
 
     switch (msg.type) {
       case "user.created":
-        databaseName = getDatabaseNameForOwner(data.id);
-        db = await createDatabaseAndMigrate(databaseName);
+        db = await createDatabaseAndMigrate(data.id);
 
         await db
           .insert(user)
@@ -96,8 +94,7 @@ export async function POST(request: Request) {
         break;
 
       case "organization.created":
-        databaseName = getDatabaseNameForOwner(data.id);
-        db = await createDatabaseAndMigrate(databaseName);
+        db = await createDatabaseAndMigrate(data.id);
 
         await db
           .insert(organization)

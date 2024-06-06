@@ -1,16 +1,18 @@
 import { createClient } from "@libsql/client";
 import { LibSQLDatabase, drizzle } from "drizzle-orm/libsql";
 import { migrate } from "drizzle-orm/libsql/migrator";
+import path from "path";
 import * as schema from "../../drizzle/schema";
 import { getOwner } from "./useOwner";
 
 const tursoOrganizationName = process.env.TURSO_ORGANIZATION_NAME;
 
-export function getDatabaseNameForOwner(ownerId: string) {
+function getDatabaseNameForOwner(ownerId: string) {
   return ownerId.replace(/_/g, "-").toLowerCase();
 }
 
-export async function createDatabaseAndMigrate(name: string) {
+export async function createDatabaseAndMigrate(ownerId: string) {
+  const name = getDatabaseNameForOwner(ownerId);
   const database = await fetch(
     `https://api.turso.tech/v1/organizations/${tursoOrganizationName}/databases`,
     {
@@ -25,7 +27,7 @@ export async function createDatabaseAndMigrate(name: string) {
       }),
     }
   ).then((res) => res.json());
-  console.log("Created database", database);
+  console.log("Created database", database, "for", name);
 
   const databaseUrl = `libsql://${name}-${tursoOrganizationName}.turso.io`;
 
@@ -36,7 +38,9 @@ export async function createDatabaseAndMigrate(name: string) {
 
   const db = drizzle(client, { schema });
 
-  await migrate(db, { migrationsFolder: "drizzle" });
+  const migrationsFolder = path.resolve(process.cwd(), "drizzle");
+  await migrate(db, { migrationsFolder: migrationsFolder });
+  console.log("Migrated database for", name);
 
   return db;
 }

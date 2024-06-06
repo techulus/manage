@@ -14,8 +14,8 @@ export async function getProjectsForOwner({
   projects: ProjectWithCreator[];
   archivedProjects: ProjectWithCreator[];
 }> {
-  const db = database();
   const { ownerId } = getOwner();
+  const db = database();
 
   const statusFilter = statuses?.map((status) => eq(project.status, status));
 
