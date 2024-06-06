@@ -1,7 +1,7 @@
-import { db } from "@/drizzle/db";
 import { blob, document, documentFolder } from "@/drizzle/schema";
 import { upload } from "@/lib/blobStore";
 import { getAppBaseUrl } from "@/lib/utils/url";
+import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { eq } from "drizzle-orm";
 import mime from "mime-types";
@@ -21,6 +21,8 @@ export async function PUT(request: NextRequest) {
   const folder = request.nextUrl.searchParams.get("folder") ?? null;
   const projectId = request.nextUrl.searchParams.get("projectId");
   const name = request.nextUrl.searchParams.get("name") ?? uuidv4();
+
+  const db = database();
 
   try {
     if (folder) {

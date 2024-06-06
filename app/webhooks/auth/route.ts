@@ -1,5 +1,9 @@
-import { db } from "@/drizzle/db";
 import { organization, organizationToUser, user } from "@/drizzle/schema";
+import {
+  createDatabaseAndMigrate,
+  getDatabaseForOwner,
+  getDatabaseNameForOwner,
+} from "@/lib/utils/useDatabase";
 import { and, eq } from "drizzle-orm";
 import { Webhook, WebhookRequiredHeaders } from "svix";
 
@@ -38,11 +42,15 @@ export async function POST(request: Request) {
     // console.log("POST /webhooks/auth Message:", msg);
 
     const data = msg.data;
+    let db, databaseName;
 
     console.log("POST /webhooks/auth Message:", msg);
 
     switch (msg.type) {
       case "user.created":
+        databaseName = getDatabaseNameForOwner(data.id);
+        db = await createDatabaseAndMigrate(databaseName);
+
         await db
           .insert(user)
           .values({
@@ -72,6 +80,7 @@ export async function POST(request: Request) {
           .run();
         break;
       case "user.updated":
+        db = getDatabaseForOwner(data.id);
         await db
           .update(user)
           .set({
@@ -87,6 +96,9 @@ export async function POST(request: Request) {
         break;
 
       case "organization.created":
+        databaseName = getDatabaseNameForOwner(data.id);
+        db = await createDatabaseAndMigrate(databaseName);
+
         await db
           .insert(organization)
           .values({
@@ -102,6 +114,7 @@ export async function POST(request: Request) {
           .run();
         break;
       case "organization.updated":
+        db = getDatabaseForOwner(data.id);
         await db
           .update(organization)
           .set({
@@ -115,6 +128,7 @@ export async function POST(request: Request) {
           .run();
         break;
       case "organizationMembership.created":
+        db = getDatabaseForOwner(data.organization.id);
         await db
           .insert(organizationToUser)
           .values({
@@ -126,6 +140,7 @@ export async function POST(request: Request) {
           .run();
         break;
       case "organizationMembership.deleted":
+        db = getDatabaseForOwner(data.organization.id);
         await db
           .delete(organizationToUser)
           .where(

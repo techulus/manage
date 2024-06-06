@@ -1,7 +1,7 @@
 "use server";
 
-import { db } from "@/drizzle/db";
 import { task, taskList } from "@/drizzle/schema";
+import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -54,7 +54,7 @@ export async function createTaskList(payload: FormData) {
     status: "active",
   });
 
-  await db
+  await database()
     .insert(taskList)
     .values({
       ...data,
@@ -83,7 +83,7 @@ export async function updateTaskList(payload: FormData) {
     status: "active",
   });
 
-  await db
+  await database()
     .update(taskList)
     .set({
       ...data,
@@ -100,7 +100,7 @@ export async function partialUpdateTaskList(
   id: number,
   data: { description: string } | { status: string }
 ) {
-  const updated = await db
+  const updated = await database()
     .update(taskList)
     .set({
       ...data,
@@ -135,8 +135,8 @@ export async function createTask({
     status: "todo",
   });
 
-  const lastPosition = await db.query.task
-    .findFirst({
+  const lastPosition = await database()
+    .query.task.findFirst({
       where: eq(task.taskListId, +taskListId),
       orderBy: [desc(task.position)],
     })
@@ -146,7 +146,7 @@ export async function createTask({
     ? lastPosition?.position + POSITION_INCREMENT
     : 1;
 
-  await db
+  await database()
     .insert(task)
     .values({
       ...data,
@@ -171,7 +171,7 @@ export async function updateTask(
     | { name: string }
     | { assignedToUser: string | null }
 ) {
-  await db
+  await database()
     .update(task)
     .set({
       ...data,
@@ -190,7 +190,7 @@ export async function deleteTask({
   id: number;
   projectId: number;
 }) {
-  await db.delete(task).where(eq(task.id, +id)).run();
+  await database().delete(task).where(eq(task.id, +id)).run();
 
   revalidatePath(`/console/projects/${projectId}/tasklists`);
 }

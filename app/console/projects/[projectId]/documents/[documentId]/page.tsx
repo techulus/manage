@@ -1,8 +1,8 @@
 import { MarkdownView } from "@/components/core/markdown-view";
 import { DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
-import { db } from "@/drizzle/db";
 import { document } from "@/drizzle/schema";
+import { database } from "@/lib/utils/useDatabase";
 import { eq } from "drizzle-orm";
 import { deleteDocument } from "../actions";
 
@@ -16,7 +16,7 @@ type Props = {
 export default async function DocumentDetails({ params }: Props) {
   const { projectId, documentId } = params;
 
-  const documentDetails = await db.query.document.findFirst({
+  const documentDetails = await database().query.document.findFirst({
     where: eq(document.id, +documentId),
     with: {
       folder: true,

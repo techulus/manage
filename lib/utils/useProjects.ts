@@ -1,7 +1,7 @@
-import { db } from "@/drizzle/db";
 import { document, project, taskList } from "@/drizzle/schema";
 import { ProjectWithCreator, ProjectWithData } from "@/drizzle/types";
 import { and, eq, isNull, like, or } from "drizzle-orm";
+import { database } from "./useDatabase";
 import { getOwner } from "./useOwner";
 
 export async function getProjectsForOwner({
@@ -14,6 +14,7 @@ export async function getProjectsForOwner({
   projects: ProjectWithCreator[];
   archivedProjects: ProjectWithCreator[];
 }> {
+  const db = database();
   const { ownerId } = getOwner();
 
   const statusFilter = statuses?.map((status) => eq(project.status, status));
@@ -54,6 +55,7 @@ export async function getProjectById(
   projectId: string | number,
   withTasksAndDocs = false
 ): Promise<ProjectWithData> {
+  const db = database();
   const { ownerId } = getOwner();
 
   const data = await db.query.project
@@ -115,6 +117,7 @@ export async function getProjectById(
 }
 
 export async function getTaskListById(taskListId: string | number) {
+  const db = database();
   const data = await db.query.taskList
     .findFirst({
       where: eq(taskList.id, +taskListId),
@@ -129,6 +132,7 @@ export async function getTaskListById(taskListId: string | number) {
 }
 
 export async function getDocumentById(documentId: string | number) {
+  const db = database();
   const data = await db.query.document
     .findFirst({
       where: eq(document.id, +documentId),
