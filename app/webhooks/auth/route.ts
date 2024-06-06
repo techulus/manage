@@ -3,7 +3,7 @@ import {
   createDatabaseAndMigrate,
   getDatabaseForOwner,
 } from "@/lib/utils/useDatabase";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { Webhook, WebhookRequiredHeaders } from "svix";
 
 const webhookSecret = process.env.AUTH_WEBHOOK_SECRET;
@@ -81,6 +81,31 @@ export async function POST(request: Request) {
 
       case "organization.created":
         db = await createDatabaseAndMigrate(data.id);
+        break;
+
+      case "organizationMembership.created":
+        db = getDatabaseForOwner(data.organization.id);
+        await db
+          .insert(user)
+          .values({
+            id: data.public_user_data.user_id,
+            email: data.public_user_data.identifier,
+            firstName: data.public_user_data.first_name,
+            lastName: data.public_user_data.last_name,
+            imageUrl: data.public_user_data.image_url,
+            rawData: data,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .run();
+        break;
+
+      case "organizationMembership.deleted":
+        db = getDatabaseForOwner(data.organization.id);
+        await db
+          .delete(user)
+          .where(and(eq(user.id, data.public_user_data.user_id)))
+          .run();
         break;
 
       default:
