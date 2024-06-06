@@ -29,6 +29,8 @@ export async function createDatabaseAndMigrate(ownerId: string) {
   ).then((res) => res.json());
   console.log("Created database", database, "for", name);
 
+  await new Promise((resolve) => setTimeout(resolve, 2500));
+
   const databaseUrl = `libsql://${name}-${tursoOrganizationName}.turso.io`;
 
   const client = createClient({
