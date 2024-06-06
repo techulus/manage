@@ -13,6 +13,7 @@ enum MessageTypes {
   // User
   "user.created" = "user.created",
   "user.updated" = "user.updated",
+  "user.deleted" = "user.deleted",
   // Organization
   "organization.created" = "organization.created",
   "organization.updated" = "organization.updated",
@@ -110,6 +111,7 @@ export async function POST(request: Request) {
           .run();
         break;
 
+      case "user.deleted":
       case "organization.deleted":
         await deleteDatabaseForOwner(data.id);
         break;
