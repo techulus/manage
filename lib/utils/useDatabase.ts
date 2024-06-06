@@ -77,6 +77,22 @@ export function getDatabaseForOwner(ownerId: string) {
   return drizzle(client, { schema });
 }
 
+export async function deleteDatabaseForOwner(ownerId: string) {
+  const databaseName = getDatabaseNameForOwner(ownerId);
+
+  await fetch(
+    `https://api.turso.tech/v1/organizations/${tursoOrganizationName}/databases/${databaseName}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${process.env.TURSO_API_TOKEN}`,
+      },
+    }
+  );
+
+  console.log("Deleted database for", databaseName);
+}
+
 export function database(): LibSQLDatabase<typeof schema> {
   const { ownerId } = getOwner();
 

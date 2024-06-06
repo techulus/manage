@@ -1,6 +1,7 @@
 import { user } from "@/drizzle/schema";
 import {
   createDatabaseAndMigrate,
+  deleteDatabaseForOwner,
   getDatabaseForOwner,
 } from "@/lib/utils/useDatabase";
 import { and, eq } from "drizzle-orm";
@@ -15,6 +16,7 @@ enum MessageTypes {
   // Organization
   "organization.created" = "organization.created",
   "organization.updated" = "organization.updated",
+  "organization.deleted" = "organization.deleted",
   "organizationMembership.created" = "organizationMembership.created",
   "organizationMembership.deleted" = "organizationMembership.deleted",
 }
@@ -106,6 +108,10 @@ export async function POST(request: Request) {
           .delete(user)
           .where(and(eq(user.id, data.public_user_data.user_id)))
           .run();
+        break;
+
+      case "organization.deleted":
+        await deleteDatabaseForOwner(data.id);
         break;
 
       default:
