@@ -36,7 +36,7 @@ export async function createDatabaseAndMigrate(name: string) {
 
   const db = drizzle(client, { schema });
 
-  await migrate(db, { migrationsFolder: "./drizzle" });
+  await migrate(db, { migrationsFolder: "drizzle" });
 
   return db;
 }
