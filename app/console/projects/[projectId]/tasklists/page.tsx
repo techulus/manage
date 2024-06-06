@@ -1,9 +1,9 @@
 import PageTitle from "@/components/layout/page-title";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { buttonVariants } from "@/components/ui/button";
-import { db } from "@/drizzle/db";
-import { organizationToUser, task, taskList, user } from "@/drizzle/schema";
+import { task, taskList, user } from "@/drizzle/schema";
 import { User } from "@/drizzle/types";
+import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { getProjectById } from "@/lib/utils/useProjects";
 import { and, asc, eq, or } from "drizzle-orm";
@@ -29,8 +29,8 @@ export default async function TaskLists({ params, searchParams }: Props) {
   const statusFilter = filterByStatuses.map((status) =>
     eq(taskList.status, status)
   );
-  const taskLists = await db.query.taskList
-    .findMany({
+  const taskLists = await database()
+    .query.taskList.findMany({
       where: and(eq(taskList.projectId, +projectId), or(...statusFilter)),
       with: {
         tasks: {
@@ -54,8 +54,8 @@ export default async function TaskLists({ params, searchParams }: Props) {
     })
     .execute();
 
-  const archivedTaskLists = await db.query.taskList
-    .findMany({
+  const archivedTaskLists = await database()
+    .query.taskList.findMany({
       columns: {
         id: true,
       },
@@ -66,22 +66,13 @@ export default async function TaskLists({ params, searchParams }: Props) {
     })
     .execute();
 
-  const currentUser = await db.query.user.findFirst({
+  const currentUser = await database().query.user.findFirst({
     where: eq(user.id, userId),
   });
 
-  const orgUsers = orgId
-    ? await db.query.organizationToUser.findMany({
-        where: eq(organizationToUser.organizationId, orgId),
-        with: {
-          user: {},
-        },
-      })
-    : [];
+  const orgUsers = orgId ? await database().query.user.findMany() : [];
 
-  const users: User[] = orgId
-    ? orgUsers.map((orgUser) => orgUser.user)
-    : [currentUser!];
+  const users: User[] = orgId ? orgUsers : [currentUser!];
 
   return (
     <>

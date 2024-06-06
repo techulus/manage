@@ -1,8 +1,8 @@
-import { db } from "@/drizzle/db";
 import { blob } from "@/drizzle/schema";
 import { getUrl } from "@/lib/blobStore";
+import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
 
 export async function GET(
@@ -10,11 +10,12 @@ export async function GET(
   { params }: { params: { fileId: string; fileName: string } }
 ) {
   const { ownerId } = getOwner();
+  const db = database();
   const { fileId } = params;
   const key = `${ownerId}/${fileId}`;
 
   const fileDetails = await db.query.blob.findFirst({
-    where: and(eq(blob.organizationId, ownerId), eq(blob.key, key)),
+    where: eq(blob.key, key),
   });
 
   if (!fileDetails) {

@@ -1,5 +1,9 @@
-import { db } from "@/drizzle/db";
-import { organization, organizationToUser, user } from "@/drizzle/schema";
+import { user } from "@/drizzle/schema";
+import {
+  createDatabaseAndMigrate,
+  deleteDatabaseForOwner,
+  getDatabaseForOwner,
+} from "@/lib/utils/useDatabase";
 import { and, eq } from "drizzle-orm";
 import { Webhook, WebhookRequiredHeaders } from "svix";
 
@@ -9,9 +13,11 @@ enum MessageTypes {
   // User
   "user.created" = "user.created",
   "user.updated" = "user.updated",
+  "user.deleted" = "user.deleted",
   // Organization
   "organization.created" = "organization.created",
   "organization.updated" = "organization.updated",
+  "organization.deleted" = "organization.deleted",
   "organizationMembership.created" = "organizationMembership.created",
   "organizationMembership.deleted" = "organizationMembership.deleted",
 }
@@ -38,11 +44,13 @@ export async function POST(request: Request) {
     // console.log("POST /webhooks/auth Message:", msg);
 
     const data = msg.data;
+    let db;
 
     console.log("POST /webhooks/auth Message:", msg);
 
     switch (msg.type) {
       case "user.created":
+        db = await createDatabaseAndMigrate(data.id);
         await db
           .insert(user)
           .values({
@@ -56,22 +64,10 @@ export async function POST(request: Request) {
             updatedAt: new Date(),
           })
           .run();
-
-        await db
-          .insert(organization)
-          .values({
-            id: data.id,
-            name: "Personal",
-            imageUrl: data.image_url,
-            logoUrl: data.logo_url,
-            rawData: data,
-            createdByUser: data.id,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          })
-          .run();
         break;
+
       case "user.updated":
+        db = getDatabaseForOwner(data.id);
         await db
           .update(user)
           .set({
@@ -87,55 +83,39 @@ export async function POST(request: Request) {
         break;
 
       case "organization.created":
-        await db
-          .insert(organization)
-          .values({
-            id: data.id,
-            name: data.name,
-            imageUrl: data.image_url,
-            logoUrl: data.logo_url,
-            rawData: data,
-            createdByUser: data.created_by,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          })
-          .run();
+        db = await createDatabaseAndMigrate(data.id);
         break;
-      case "organization.updated":
-        await db
-          .update(organization)
-          .set({
-            name: data.name,
-            imageUrl: data.image_url,
-            logoUrl: data.logo_url,
-            rawData: data,
-            updatedAt: new Date(),
-          })
-          .where(eq(user.id, data.id))
-          .run();
-        break;
+
       case "organizationMembership.created":
+        db = getDatabaseForOwner(data.organization.id);
         await db
-          .insert(organizationToUser)
+          .insert(user)
           .values({
-            userId: data.public_user_data.user_id,
-            organizationId: data.organization.id,
+            id: data.public_user_data.user_id,
+            email: data.public_user_data.identifier,
+            firstName: data.public_user_data.first_name,
+            lastName: data.public_user_data.last_name,
+            imageUrl: data.public_user_data.image_url,
+            rawData: data,
             createdAt: new Date(),
             updatedAt: new Date(),
           })
           .run();
         break;
+
       case "organizationMembership.deleted":
+        db = getDatabaseForOwner(data.organization.id);
         await db
-          .delete(organizationToUser)
-          .where(
-            and(
-              eq(organizationToUser.organizationId, data.organization.id),
-              eq(organizationToUser.userId, data.public_user_data.user_id)
-            )
-          )
+          .delete(user)
+          .where(and(eq(user.id, data.public_user_data.user_id)))
           .run();
         break;
+
+      case "user.deleted":
+      case "organization.deleted":
+        await deleteDatabaseForOwner(data.id);
+        break;
+
       default:
         console.log("POST /webhooks/auth Unknown message type:", msg.type);
     }

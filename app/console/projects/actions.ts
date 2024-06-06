@@ -1,7 +1,7 @@
 "use server";
 
-import { db } from "@/drizzle/db";
 import { project } from "@/drizzle/schema";
+import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -24,7 +24,7 @@ const projectSchema = z.object({
 });
 
 export async function createProject(payload: FormData) {
-  const { ownerId, userId } = getOwner();
+  const { userId } = getOwner();
   const name = payload.get("name") as string;
   const description = payload.get("description") as string;
   const dueDate = payload.get("dueDate") as string;
@@ -36,11 +36,10 @@ export async function createProject(payload: FormData) {
     status: "active",
   });
 
-  await db
+  await database()
     .insert(project)
     .values({
       ...data,
-      organizationId: String(ownerId),
       createdByUser: userId,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -64,7 +63,7 @@ export async function updateProject(payload: FormData) {
     status: "active",
   });
 
-  await db
+  await database()
     .update(project)
     .set({
       ...data,
@@ -80,7 +79,7 @@ export async function updateProject(payload: FormData) {
 export async function archiveProject(payload: FormData) {
   const id = Number(payload.get("id"));
 
-  await db
+  await database()
     .update(project)
     .set({
       status: "archived",
@@ -96,7 +95,7 @@ export async function archiveProject(payload: FormData) {
 export async function deleteProject(payload: FormData) {
   const id = Number(payload.get("id"));
 
-  await db.delete(project).where(eq(project.id, id)).run();
+  await database().delete(project).where(eq(project.id, id)).run();
 
   revalidatePath("/console/projects");
   redirect("/console/projects");

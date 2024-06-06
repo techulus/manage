@@ -35,7 +35,7 @@ const tiers = [
   {
     name: "Personal",
     id: "tier-personal",
-    href: "/console/projects",
+    href: "/console/start",
     priceMonthly: "$0",
     description: "The perfect plan if you're working solo or a small team.",
     features: [
@@ -51,7 +51,7 @@ const tiers = [
   {
     name: "Team",
     id: "tier-team",
-    href: "/console/projects",
+    href: "/console/start",
     priceMonthly: "$99",
     description: "A plan that scales with your rapidly growing business.",
     features: ["Unlimited users", "50 GB storage", "Priority support"],
@@ -90,7 +90,7 @@ export default async function Home() {
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-y-6 md:flex-row md:gap-x-6 md:gap-y-0">
               <Link
-                href="/console/projects"
+                href="/console/start"
                 className="rounded-full bg-teal-600 px-8 py-2.5 text-sm font-semibold text-white hover:bg-teal-500 hover:shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
               >
                 Get started

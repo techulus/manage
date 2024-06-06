@@ -5,9 +5,9 @@ import { DocumentHeader } from "@/components/project/document/document-header";
 import { FileInfo } from "@/components/project/file/info";
 import { FileUploader } from "@/components/project/file/uploader";
 import { buttonVariants } from "@/components/ui/button";
-import { db } from "@/drizzle/db";
 import { documentFolder } from "@/drizzle/schema";
 import { FolderWithContents } from "@/drizzle/types";
+import { database } from "@/lib/utils/useDatabase";
 import { eq } from "drizzle-orm";
 import { FilePlus2 } from "lucide-react";
 import Link from "next/link";
@@ -24,7 +24,7 @@ export default async function FolderDetails({ params }: Props) {
   const { projectId, folderId } = params;
 
   const folder: FolderWithContents | undefined =
-    await db.query.documentFolder.findFirst({
+    await database().query.documentFolder.findFirst({
       where: eq(documentFolder.id, Number(folderId)),
       with: {
         documents: {

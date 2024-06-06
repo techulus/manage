@@ -1,4 +1,4 @@
-import { Organization, User } from "@clerk/nextjs/dist/types/server";
+import { User } from "@clerk/nextjs/dist/types/server";
 import { relations } from "drizzle-orm";
 import {
   customType,
@@ -30,64 +30,11 @@ export const user = sqliteTable("User", {
 });
 
 export const userRelations = relations(user, ({ many }) => ({
-  organizations: many(organization),
   projects: many(project),
   documents: many(document),
   taskLists: many(taskList),
   // tasks: many(task),
 }));
-
-export const organization = sqliteTable("Organization", {
-  id: text("id").primaryKey().notNull(),
-  name: text("name").notNull(),
-  imageUrl: text("imageUrl"),
-  logoUrl: text("logoUrl"),
-  rawData: dbJson("rawData").notNull().$type<Organization | User>(),
-  createdByUser: text("createdByUser")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
-  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
-});
-
-export const organizationRelations = relations(
-  organization,
-  ({ many, one }) => ({
-    creator: one(user, {
-      fields: [organization.createdByUser],
-      references: [user.id],
-    }),
-    projects: many(project),
-  })
-);
-
-export const organizationToUser = sqliteTable("OrganizationToUser", {
-  organizationId: text("organizationId")
-    .notNull()
-    .references(() => organization.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-  userId: text("userId")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
-  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
-});
-
-export const organizationToUserRelations = relations(
-  organizationToUser,
-  ({ one }) => ({
-    organization: one(organization, {
-      fields: [organizationToUser.organizationId],
-      references: [organization.id],
-    }),
-    user: one(user, {
-      fields: [organizationToUser.userId],
-      references: [user.id],
-    }),
-  })
-);
 
 export const project = sqliteTable("Project", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
@@ -97,12 +44,6 @@ export const project = sqliteTable("Project", {
   dueDate: integer("dueDate", { mode: "timestamp" }),
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
-  organizationId: text("organizationId")
-    .notNull()
-    .references(() => organization.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
   createdByUser: text("createdByUser")
     .notNull()
     .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
@@ -112,10 +53,6 @@ export const projectRelations = relations(project, ({ many, one }) => ({
   creator: one(user, {
     fields: [project.createdByUser],
     references: [user.id],
-  }),
-  organization: one(organization, {
-    fields: [project.organizationId],
-    references: [organization.id],
   }),
   taskLists: many(taskList),
   documents: many(document),
@@ -264,12 +201,6 @@ export const blob = sqliteTable("Blob", {
   createdByUser: text("createdByUser")
     .notNull()
     .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
-  organizationId: text("organizationId")
-    .notNull()
-    .references(() => organization.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
   documentFolderId: integer("documentFolderId").references(
     () => documentFolder.id,
     {
@@ -282,10 +213,6 @@ export const blob = sqliteTable("Blob", {
 });
 
 export const blobsRelations = relations(blob, ({ one }) => ({
-  organization: one(organization, {
-    fields: [blob.organizationId],
-    references: [organization.id],
-  }),
   creator: one(user, {
     fields: [blob.createdByUser],
     references: [user.id],

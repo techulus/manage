@@ -1,7 +1,7 @@
-import { db } from "@/drizzle/db";
 import { blob, document, documentFolder } from "@/drizzle/schema";
 import { upload } from "@/lib/blobStore";
 import { getAppBaseUrl } from "@/lib/utils/url";
+import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { eq } from "drizzle-orm";
 import mime from "mime-types";
@@ -22,6 +22,8 @@ export async function PUT(request: NextRequest) {
   const projectId = request.nextUrl.searchParams.get("projectId");
   const name = request.nextUrl.searchParams.get("name") ?? uuidv4();
 
+  const db = database();
+
   try {
     if (folder) {
       const verifyFolder = await db.query.documentFolder.findFirst({
@@ -29,16 +31,9 @@ export async function PUT(request: NextRequest) {
           id: true,
         },
         where: eq(documentFolder.id, +folder),
-        with: {
-          project: {
-            columns: {
-              organizationId: true,
-            },
-          },
-        },
       });
 
-      if (!verifyFolder || verifyFolder?.project?.organizationId !== ownerId) {
+      if (!verifyFolder) {
         return NextResponse.error();
       }
     }
@@ -89,7 +84,6 @@ export async function PUT(request: NextRequest) {
         name,
         contentType: body.type,
         contentSize: body.size,
-        organizationId: ownerId,
         createdByUser: userId,
         documentFolderId: folder ? +folder : null,
         createdAt: new Date(),

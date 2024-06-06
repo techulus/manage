@@ -16,7 +16,7 @@ export default function SignUpPage() {
         />
       </div>
 
-      <SignUp redirectUrl="/console/projects" signInUrl="/sign-in" />
+      <SignUp redirectUrl="/console/start" signInUrl="/sign-in" />
 
       <div
         className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"

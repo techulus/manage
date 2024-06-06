@@ -5,7 +5,7 @@
   "background_color": "#000",
   "display": "standalone",
   "scope": "/",
-  "start_url": "/console/projects",
+  "start_url": "/console/start",
   "icons": [
     {
       "src": "images/icons/icon-72x72.png",

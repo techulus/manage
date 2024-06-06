@@ -1,7 +1,7 @@
 "use server";
 
-import { db } from "@/drizzle/db";
 import { document, documentFolder } from "@/drizzle/schema";
+import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -36,7 +36,7 @@ export async function createDocument(payload: FormData) {
     status: "active",
   });
 
-  await db
+  await database()
     .insert(document)
     .values({
       ...data,
@@ -73,7 +73,7 @@ export async function updateDocument(payload: FormData) {
     status: "active",
   });
 
-  await db
+  await database()
     .update(document)
     .set({
       ...data,
@@ -105,7 +105,7 @@ export async function createDocumentFolder(payload: FormData) {
     description,
   });
 
-  await db
+  await database()
     .insert(documentFolder)
     .values({
       ...data,
@@ -131,7 +131,7 @@ export async function updateDocumentFolder(payload: FormData) {
     description,
   });
 
-  await db
+  await database()
     .update(documentFolder)
     .set({
       ...data,
@@ -150,7 +150,7 @@ export async function deleteDocument(
   projectId: string,
   folderId: number | null
 ) {
-  await db.delete(document).where(eq(document.id, +id)).run();
+  await database().delete(document).where(eq(document.id, +id)).run();
 
   if (folderId) {
     revalidatePath(

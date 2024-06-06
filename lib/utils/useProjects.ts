@@ -1,8 +1,7 @@
-import { db } from "@/drizzle/db";
 import { document, project, taskList } from "@/drizzle/schema";
 import { ProjectWithCreator, ProjectWithData } from "@/drizzle/types";
 import { and, eq, isNull, like, or } from "drizzle-orm";
-import { getOwner } from "./useOwner";
+import { database } from "./useDatabase";
 
 export async function getProjectsForOwner({
   search,
@@ -14,18 +13,14 @@ export async function getProjectsForOwner({
   projects: ProjectWithCreator[];
   archivedProjects: ProjectWithCreator[];
 }> {
-  const { ownerId } = getOwner();
+  const db = database();
 
   const statusFilter = statuses?.map((status) => eq(project.status, status));
 
   const projects = await db.query.project.findMany({
     where: search
-      ? and(
-          eq(project.organizationId, ownerId),
-          like(project.name, `%${search}%`),
-          or(...statusFilter)
-        )
-      : and(eq(project.organizationId, ownerId), or(...statusFilter)),
+      ? and(like(project.name, `%${search}%`), or(...statusFilter))
+      : and(or(...statusFilter)),
     with: {
       creator: true,
     },
@@ -33,15 +28,8 @@ export async function getProjectsForOwner({
 
   const archivedProjects = await db.query.project.findMany({
     where: search
-      ? and(
-          eq(project.organizationId, ownerId),
-          eq(project.status, "archived"),
-          like(project.name, `%${search}%`)
-        )
-      : and(
-          eq(project.organizationId, ownerId),
-          eq(project.status, "archived")
-        ),
+      ? and(eq(project.status, "archived"), like(project.name, `%${search}%`))
+      : and(eq(project.status, "archived")),
     with: {
       creator: true,
     },
@@ -54,14 +42,11 @@ export async function getProjectById(
   projectId: string | number,
   withTasksAndDocs = false
 ): Promise<ProjectWithData> {
-  const { ownerId } = getOwner();
+  const db = database();
 
   const data = await db.query.project
     .findFirst({
-      where: and(
-        eq(project.id, +projectId),
-        eq(project.organizationId, ownerId)
-      ),
+      where: and(eq(project.id, +projectId)),
       with: withTasksAndDocs
         ? {
             taskLists: {
@@ -115,6 +100,7 @@ export async function getProjectById(
 }
 
 export async function getTaskListById(taskListId: string | number) {
+  const db = database();
   const data = await db.query.taskList
     .findFirst({
       where: eq(taskList.id, +taskListId),
@@ -129,6 +115,7 @@ export async function getTaskListById(taskListId: string | number) {
 }
 
 export async function getDocumentById(documentId: string | number) {
+  const db = database();
   const data = await db.query.document
     .findFirst({
       where: eq(document.id, +documentId),
