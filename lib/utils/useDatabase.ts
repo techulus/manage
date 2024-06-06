@@ -11,6 +11,24 @@ function getDatabaseNameForOwner(ownerId: string) {
   return ownerId.replace(/_/g, "-").toLowerCase();
 }
 
+export async function isDatabaseReady(ownerId: string) {
+  try {
+    await fetch(
+      `https://api.turso.tech/v1/organizations/${tursoOrganizationName}/databases/${getDatabaseNameForOwner(
+        ownerId
+      )}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.TURSO_API_TOKEN}`,
+        },
+      }
+    ).then((res) => res.json());
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 export async function createDatabaseAndMigrate(ownerId: string) {
   const name = getDatabaseNameForOwner(ownerId);
   const database = await fetch(
