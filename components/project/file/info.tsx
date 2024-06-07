@@ -7,7 +7,7 @@ import { CreatorDetails } from "../shared/creator-details";
 export const FileInfo = ({ file }: { file: BlobWithCreater }) => {
   const fileUrl = getFileUrl(file);
   return (
-    <div className="relative flex h-[180px] gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6 dark:bg-gray-900">
+    <div className="relative flex h-[240px] gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6 dark:bg-gray-900">
       <Link
         href={fileUrl}
         target="_blank"

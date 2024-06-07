@@ -1,5 +1,6 @@
 import { Blob as ManageBlob } from "@/drizzle/types";
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
@@ -57,4 +58,12 @@ const getFileUrl = (file: ManageBlob): string => {
   return `/api/blob/${file.id}/${file.name}`;
 };
 
-export { bytesToMegabytes, getFileUrl, getUrl, upload };
+const deleteFile = async (file: ManageBlob) => {
+  const command = new DeleteObjectCommand({
+    Bucket: process.env.R2_BUCKET_NAME!,
+    Key: file.key,
+  });
+  const result = await blobStorage.send(command);
+};
+
+export { bytesToMegabytes, deleteFile, getFileUrl, getUrl, upload };

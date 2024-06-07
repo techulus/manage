@@ -13,17 +13,6 @@ function getDatabaseNameForOwner(ownerId: string) {
 
 export async function isDatabaseReady(ownerId: string) {
   try {
-    await fetch(
-      `https://api.turso.tech/v1/organizations/${tursoOrganizationName}/databases/${getDatabaseNameForOwner(
-        ownerId
-      )}`,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.TURSO_API_TOKEN}`,
-        },
-      }
-    ).then((res) => res.json());
-
     const db = getDatabaseForOwner(ownerId);
     await db.query.project.findFirst();
     return true;
