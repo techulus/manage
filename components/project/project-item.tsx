@@ -14,7 +14,7 @@ export const ProjecItem = ({
     <div
       key={id}
       className={cn(
-        "relative flex space-x-3 rounded-lg border border-gray-200 px-3 py-2 shadow-sm hover:border-gray-400 dark:border-gray-800 dark:hover:border-gray-700"
+        "relative flex justify-between space-x-3 rounded-lg border border-gray-200 px-3 py-2 shadow-sm hover:border-gray-400 dark:border-gray-800 dark:hover:border-gray-700"
       )}
     >
       <div>
@@ -34,7 +34,7 @@ export const ProjecItem = ({
         ) : null}
       </div>
       <span
-        className="pointer-events-none absolute right-6 top-6 text-gray-300 group-hover:text-gray-400"
+        className="pointer-events-none text-gray-300 group-hover:text-gray-400"
         aria-hidden="true"
       >
         {creator.imageUrl ? (

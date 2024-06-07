@@ -63,6 +63,7 @@ export default async function DocumentDetails({ params }: Props) {
                       await deleteDocument(
                         documentId,
                         projectId,
+                        documentDetails?.markdownContent,
                         documentDetails?.folderId
                       );
                     }}

@@ -2,6 +2,7 @@
 
 import { document, documentFolder } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
+import { deleteFilesInMarkdown } from "@/lib/utils/useMarkdown";
 import { getOwner } from "@/lib/utils/useOwner";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -148,8 +149,13 @@ export async function updateDocumentFolder(payload: FormData) {
 export async function deleteDocument(
   id: string,
   projectId: string,
+  content: string | null,
   folderId: number | null
 ) {
+  if (content) {
+    await deleteFilesInMarkdown(content);
+  }
+
   await database().delete(document).where(eq(document.id, +id)).run();
 
   if (folderId) {
