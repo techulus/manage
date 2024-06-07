@@ -7,7 +7,7 @@ export default async function Start() {
   const ready = await isDatabaseReady(ownerId);
 
   if (!ready) {
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     redirect("/console/start");
   }
 
