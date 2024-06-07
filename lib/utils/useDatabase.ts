@@ -1,4 +1,4 @@
-import { createClient } from "@libsql/client";
+import { createClient } from "@libsql/client/web";
 import { LibSQLDatabase, drizzle } from "drizzle-orm/libsql";
 import { migrate } from "drizzle-orm/libsql/migrator";
 import path from "path";
@@ -23,6 +23,9 @@ export async function isDatabaseReady(ownerId: string) {
         },
       }
     ).then((res) => res.json());
+
+    const db = getDatabaseForOwner(ownerId);
+    await db.query.project.findFirst();
     return true;
   } catch (e) {
     return false;
@@ -47,7 +50,7 @@ export async function createDatabaseAndMigrate(ownerId: string) {
   ).then((res) => res.json());
   console.log("Created database", database, "for", name);
 
-  await new Promise((resolve) => setTimeout(resolve, 2500));
+  await new Promise((resolve) => setTimeout(resolve, 1500));
 
   const databaseUrl = `libsql://${name}-${tursoOrganizationName}.turso.io`;
 
