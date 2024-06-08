@@ -123,7 +123,11 @@ export default async function FolderDetails({ params }: Props) {
                       key={file.key}
                       className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
                     >
-                      <FileInfo file={file} />
+                      <FileInfo
+                        file={file}
+                        projectId={+projectId}
+                        folderId={folderId ? +folderId : null}
+                      />
                     </div>
                   ))
                 : null}

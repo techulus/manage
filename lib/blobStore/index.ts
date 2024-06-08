@@ -58,12 +58,12 @@ const getFileUrl = (file: ManageBlob): string => {
   return `/api/blob/${file.id}/${file.name}`;
 };
 
-const deleteFile = async (file: ManageBlob) => {
+const deleteFile = async (key: string) => {
   const command = new DeleteObjectCommand({
     Bucket: process.env.R2_BUCKET_NAME!,
-    Key: file.key,
+    Key: key,
   });
-  const result = await blobStorage.send(command);
+  await blobStorage.send(command);
 };
 
 export { bytesToMegabytes, deleteFile, getFileUrl, getUrl, upload };

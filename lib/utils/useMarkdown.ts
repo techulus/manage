@@ -63,7 +63,7 @@ export async function deleteFilesInMarkdown(content: string) {
         where: eq(blob.id, fileId),
       });
       if (file) {
-        await deleteFile(file);
+        await deleteFile(file.key);
       }
     } catch (error) {
       console.error("Error deleting file", error);
