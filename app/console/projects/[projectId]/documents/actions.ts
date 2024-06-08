@@ -1,6 +1,7 @@
 "use server";
 
-import { document, documentFolder } from "@/drizzle/schema";
+import { blob, document, documentFolder } from "@/drizzle/schema";
+import { deleteFile } from "@/lib/blobStore";
 import { database } from "@/lib/utils/useDatabase";
 import { deleteFilesInMarkdown } from "@/lib/utils/useMarkdown";
 import { getOwner } from "@/lib/utils/useOwner";
@@ -171,7 +172,10 @@ export async function deleteDocument(
   redirect(`/console/projects/${projectId}`);
 }
 
-export async function reloadDocuments(projectId: string, folderId: string) {
+export async function reloadDocuments(
+  projectId: string | number,
+  folderId: string | number | null
+) {
   if (folderId) {
     revalidatePath(
       `/console/projects/${projectId}/documents/folders/${folderId}`
@@ -181,4 +185,9 @@ export async function reloadDocuments(projectId: string, folderId: string) {
 
   revalidatePath(`/console/projects/${projectId}`);
   redirect(`/console/projects/${projectId}`);
+}
+
+export async function deleteBlob(file: { id: string; key: string }) {
+  await deleteFile(file.key);
+  await database().delete(blob).where(eq(blob.id, file.id)).run();
 }
