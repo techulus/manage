@@ -1,15 +1,14 @@
-import { isDatabaseReady } from "@/lib/utils/useDatabase";
-import { getOwner } from "@/lib/utils/useOwner";
+import { isDatabaseReady, migrateDatabase } from "@/lib/utils/useDatabase";
 import { redirect } from "next/navigation";
 
 export default async function Start() {
-  const { ownerId } = getOwner();
-  const ready = await isDatabaseReady(ownerId);
+  const ready = await isDatabaseReady();
 
   if (!ready) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     redirect("/console/start");
   }
 
+  await migrateDatabase();
   redirect("/console/projects");
 }

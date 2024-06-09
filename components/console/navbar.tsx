@@ -1,6 +1,7 @@
 "use client";
 
 import { useDetectSticky } from "@/lib/hooks/useDetectSticky";
+import { useTheme } from "@/lib/hooks/useTheme";
 import { cn } from "@/lib/utils";
 import { SignedIn } from "@clerk/nextjs";
 import { Transition } from "@headlessui/react";
@@ -12,11 +13,8 @@ import logo from "../../public/images/logo.png";
 import { ThemedOrgSwitcher, ThemedUserButton } from "../core/auth";
 import { createToastWrapper } from "../core/toast";
 
-type Props = {
-  appearance: string;
-};
-
-export default function NavBar({ appearance }: Props) {
+export default function NavBar() {
+  const appearance = useTheme();
   const path = usePathname();
 
   const [isSticky, ref] = useDetectSticky();

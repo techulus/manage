@@ -1,9 +1,8 @@
+import { SITE_METADATA } from "@/data/marketing";
+import { cn } from "@/lib/utils";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/react";
 import { GeistSans } from "geist/font/sans";
-
-import { SITE_METADATA } from "@/data/marketing";
-import { cn } from "@/lib/utils";
 
 import "./globals.css";
 

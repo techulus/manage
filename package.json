@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "migrate": "drizzle-kit push",
-    "generate": "drizzle-kit generate"
+    "generate:migrations": "drizzle-kit generate"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.367.0",
