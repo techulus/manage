@@ -15,7 +15,7 @@ export default function EmptyState({
     <div className="p-1">
       <Link
         href={createLink}
-        className="relative block w-full rounded-lg border-2 border-dashed border-gray-300 bg-white p-12 text-center hover:border-gray-400 dark:border-gray-700 dark:bg-secondary dark:hover:border-gray-600"
+        className="relative block w-full rounded-lg border-2 border-dashed border-gray-300 bg-white p-12 text-center hover:border-gray-400 dark:border-gray-700 dark:bg-black dark:hover:border-gray-600"
       >
         <svg
           className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"

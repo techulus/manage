@@ -8,7 +8,7 @@ export const DocumentFolderHeader = ({
   documentFolder: DocumentFolderWithDocuments;
 }) => {
   return (
-    <div className="relative flex h-[240px] gap-x-4 border-b border-gray-900/5 bg-white p-3 dark:bg-secondary">
+    <div className="relative flex h-[240px] gap-x-4 border-b border-gray-900/5 bg-white p-3 dark:bg-black">
       <Link
         href={`/console/projects/${documentFolder.projectId}/documents/folders/${documentFolder.id}`}
         className="flex flex-col text-sm font-medium"

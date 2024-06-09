@@ -11,7 +11,7 @@ export async function DocumentHeader({
   const plainText = await convertMarkdownToPlainText(document.markdownContent);
 
   return (
-    <div className="relative flex h-[240px] gap-x-4 overflow-hidden border-b border-gray-900/5 bg-white p-3 dark:bg-secondary">
+    <div className="relative flex h-[240px] gap-x-4 overflow-hidden border-b border-gray-900/5 bg-white p-3 dark:bg-black">
       <Link
         href={`/console/projects/${document.projectId}/documents/${document.id}`}
         className="flex flex-col text-sm font-medium"

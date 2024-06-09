@@ -135,6 +135,7 @@ textarea {
   border-color: rgba(245, 245, 245, 0.1) !important;
 }
 
-.simplemde-compact .editor-toolbar {
+.simplemde-compact .editor-toolbar,
+.simplemde-compact .editor-statusbar {
   display: none;
 }

@@ -51,6 +51,42 @@ export default async function ProjectDetails({ params }: Props) {
           </div>
         ) : null}
 
+        <div className="flex h-12 flex-col justify-center border-t border-gray-200 dark:border-gray-800">
+          <div className="px-4 sm:px-6 lg:-mx-4 lg:px-8">
+            <div className="flex justify-between py-3">
+              {/* Left buttons */}
+              <div className="isolate inline-flex sm:space-x-3">
+                <span className="inline-flex space-x-1"></span>
+              </div>
+
+              {/* Right buttons */}
+              <nav aria-label="Pagination">
+                <span className="isolate inline-flex">
+                  {project.status == "archived" ? (
+                    <form action={deleteProject}>
+                      <input
+                        className="hidden"
+                        name="id"
+                        defaultValue={project.id}
+                      />
+                      <DeleteButton action="Delete" />
+                    </form>
+                  ) : (
+                    <form action={archiveProject}>
+                      <input
+                        className="hidden"
+                        name="id"
+                        defaultValue={project.id}
+                      />
+                      <DeleteButton action="Archive" />
+                    </form>
+                  )}
+                </span>
+              </nav>
+            </div>
+          </div>
+        </div>
+
         <div
           className={cn(
             "flex flex-col space-y-4",
@@ -160,42 +196,6 @@ export default async function ProjectDetails({ params }: Props) {
             label="document"
             createLink={`/console/projects/${projectId}/documents/new`}
           />
-        </div>
-
-        <div className="flex h-12 flex-col justify-center border-t border-gray-200 dark:border-gray-800">
-          <div className="px-4 sm:px-6 lg:-mx-4 lg:px-8">
-            <div className="flex justify-between py-3">
-              {/* Left buttons */}
-              <div className="isolate inline-flex sm:space-x-3">
-                <span className="inline-flex space-x-1"></span>
-              </div>
-
-              {/* Right buttons */}
-              <nav aria-label="Pagination">
-                <span className="isolate inline-flex">
-                  {project.status == "archived" ? (
-                    <form action={deleteProject}>
-                      <input
-                        className="hidden"
-                        name="id"
-                        defaultValue={project.id}
-                      />
-                      <DeleteButton action="Delete" />
-                    </form>
-                  ) : (
-                    <form action={archiveProject}>
-                      <input
-                        className="hidden"
-                        name="id"
-                        defaultValue={project.id}
-                      />
-                      <DeleteButton action="Archive" />
-                    </form>
-                  )}
-                </span>
-              </nav>
-            </div>
-          </div>
         </div>
 
         <CommentsSection type="project" parentId={project.id} />
