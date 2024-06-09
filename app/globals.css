@@ -134,3 +134,7 @@ textarea {
 .dark .editor-toolbar {
   border-color: rgba(245, 245, 245, 0.1) !important;
 }
+
+.simplemde-compact .editor-toolbar {
+  display: none;
+}

@@ -1,4 +1,6 @@
+import EmptyState from "@/components/core/empty-state";
 import PageTitle from "@/components/layout/page-title";
+import { CommentsSection } from "@/components/project/comment/comments-section";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { buttonVariants } from "@/components/ui/button";
 import { task, taskList, user } from "@/drizzle/schema";
@@ -85,17 +87,26 @@ export default async function TaskLists({ params, searchParams }: Props) {
       />
 
       <div className="mx-auto my-12 max-w-5xl px-4 lg:px-0">
+        <EmptyState
+          show={!taskLists.length}
+          label="task list"
+          createLink={`/console/projects/${projectId}/tasklists/new`}
+        />
+
         <ul role="list" className="mt-6 space-y-6">
           {taskLists.map((taskList) => (
-            <TaskListItem
-              key={taskList.id}
-              taskList={taskList}
-              projectId={+projectId}
-              userId={userId}
-              users={users}
-              createTask={createTask}
-              partialUpdateTaskList={partialUpdateTaskList}
-            />
+            <>
+              <TaskListItem
+                key={taskList.id}
+                taskList={taskList}
+                projectId={+projectId}
+                userId={userId}
+                users={users}
+                createTask={createTask}
+                partialUpdateTaskList={partialUpdateTaskList}
+              />
+              <CommentsSection parentId={taskList.id} type="tasklist" />
+            </>
           ))}
         </ul>
 

@@ -222,3 +222,22 @@ export const blobsRelations = relations(blob, ({ one }) => ({
     references: [documentFolder.id],
   }),
 }));
+
+export const comment = sqliteTable("Comment", {
+  id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+  content: text("content").notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+  createdByUser: text("createdByUser")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  type: text("type").notNull(),
+  parentId: integer("parentId").notNull(),
+});
+
+export const commentRelations = relations(comment, ({ one }) => ({
+  creator: one(user, {
+    fields: [comment.createdByUser],
+    references: [user.id],
+  }),
+}));

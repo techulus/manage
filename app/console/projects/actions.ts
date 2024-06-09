@@ -1,6 +1,6 @@
 "use server";
 
-import { project } from "@/drizzle/schema";
+import { comment, project } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { eq } from "drizzle-orm";
@@ -99,4 +99,31 @@ export async function deleteProject(payload: FormData) {
 
   revalidatePath("/console/projects");
   redirect("/console/projects");
+}
+
+export async function addComment(payload: FormData) {
+  const parentId = Number(payload.get("parentId"));
+  const content = payload.get("content") as string;
+  const type = payload.get("type") as string;
+
+  await database().insert(comment).values({
+    type,
+    parentId,
+    content,
+    createdByUser: getOwner().userId,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  const currentPath = payload.get("currentPath") as string;
+  revalidatePath(currentPath);
+}
+
+export async function deleteComment(payload: FormData) {
+  const id = Number(payload.get("id"));
+
+  await database().delete(comment).where(eq(comment.id, id)).run();
+
+  const currentPath = payload.get("currentPath") as string;
+  revalidatePath(currentPath);
 }

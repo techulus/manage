@@ -1,6 +1,7 @@
 import { MarkdownView } from "@/components/core/markdown-view";
 import { DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
+import { CommentsSection } from "@/components/project/comment/comments-section";
 import { document } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
 import { eq } from "drizzle-orm";
@@ -81,6 +82,8 @@ export default async function DocumentDetails({ params }: Props) {
             <MarkdownView content={documentDetails.markdownContent} />
           </ul>
         </div>
+
+        <CommentsSection type="document" parentId={documentId} />
       </div>
     </>
   );

@@ -1,6 +1,7 @@
 import EmptyState from "@/components/core/empty-state";
 import { MarkdownView } from "@/components/core/markdown-view";
 import PageTitle from "@/components/layout/page-title";
+import { CommentsSection } from "@/components/project/comment/comments-section";
 import { DocumentHeader } from "@/components/project/document/document-header";
 import { FileInfo } from "@/components/project/file/info";
 import { FileUploader } from "@/components/project/file/uploader";
@@ -16,7 +17,7 @@ import { reloadDocuments } from "../../actions";
 type Props = {
   params: {
     projectId: string;
-    folderId?: string;
+    folderId: number;
   };
 };
 
@@ -140,6 +141,8 @@ export default async function FolderDetails({ params }: Props) {
             createLink={`/console/projects/${projectId}/documents/new`}
           />
         </div>
+
+        <CommentsSection type="folder" parentId={folderId} />
       </div>
     </>
   );

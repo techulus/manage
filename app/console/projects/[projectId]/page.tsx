@@ -2,6 +2,7 @@ import EmptyState from "@/components/core/empty-state";
 import { MarkdownView } from "@/components/core/markdown-view";
 import { DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
+import { CommentsSection } from "@/components/project/comment/comments-section";
 import { DocumentFolderHeader } from "@/components/project/document/document-folder-header";
 import { DocumentHeader } from "@/components/project/document/document-header";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
@@ -99,7 +100,7 @@ export default async function ProjectDetails({ params }: Props) {
 
           <EmptyState
             show={!project.taskLists.length}
-            label="tasklist"
+            label="task list"
             createLink={`/console/projects/${projectId}/tasklists/new`}
           />
         </div>
@@ -196,6 +197,8 @@ export default async function ProjectDetails({ params }: Props) {
             </div>
           </div>
         </div>
+
+        <CommentsSection type="project" parentId={project.id} />
       </div>
     </>
   );
