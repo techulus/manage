@@ -35,7 +35,7 @@ export const TaskListItem = ({
   );
 
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800">
+    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-black">
       <TaskListHeader
         taskList={taskList}
         totalCount={taskList.tasks.length}

@@ -71,7 +71,11 @@ export async function Comments({
                     <DropdownMenuLabel className="m-0 p-0">
                       <form action={deleteComment}>
                         <input type="hidden" name="id" value={comment.id} />
-                        <DeleteButton action="Delete" size="sm" />
+                        <DeleteButton
+                          action="Delete"
+                          size="sm"
+                          className="w-full"
+                        />
                       </form>
                     </DropdownMenuLabel>
                   </DropdownMenuContent>

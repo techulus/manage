@@ -1,18 +1,25 @@
 import EmptyState from "@/components/core/empty-state";
 import { MarkdownView } from "@/components/core/markdown-view";
+import { DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import { DocumentHeader } from "@/components/project/document/document-header";
 import { FileInfo } from "@/components/project/file/info";
 import { FileUploader } from "@/components/project/file/uploader";
 import { buttonVariants } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { documentFolder } from "@/drizzle/schema";
 import { FolderWithContents } from "@/drizzle/types";
 import { database } from "@/lib/utils/useDatabase";
 import { eq } from "drizzle-orm";
-import { FilePlus2 } from "lucide-react";
+import { CircleEllipsisIcon, FilePlus2 } from "lucide-react";
 import Link from "next/link";
-import { reloadDocuments } from "../../actions";
+import { deleteDocumentFolder, reloadDocuments } from "../../actions";
 
 type Props = {
   params: {
@@ -96,6 +103,29 @@ export default async function FolderDetails({ params }: Props) {
                     <FilePlus2 className="mr-1 h-5 w-5" /> Document
                     <span className="sr-only">, document</span>
                   </Link>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <CircleEllipsisIcon className="h-6 w-6" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel className="m-0 p-0">
+                        <form action={deleteDocumentFolder}>
+                          <input type="hidden" name="id" value={folderId} />
+                          <input
+                            type="hidden"
+                            name="projectId"
+                            value={projectId}
+                          />
+                          <DeleteButton
+                            action="Delete folder"
+                            size="sm"
+                            className="w-full"
+                          />
+                        </form>
+                      </DropdownMenuLabel>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </span>
               </nav>
             </div>

@@ -1,11 +1,11 @@
 "use server";
 
-import { blob, document, documentFolder } from "@/drizzle/schema";
+import { blob, comment, document, documentFolder } from "@/drizzle/schema";
 import { deleteFile } from "@/lib/blobStore";
 import { database } from "@/lib/utils/useDatabase";
 import { deleteFilesInMarkdown } from "@/lib/utils/useMarkdown";
 import { getOwner } from "@/lib/utils/useOwner";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
@@ -147,6 +147,23 @@ export async function updateDocumentFolder(payload: FormData) {
   redirect(`/console/projects/${projectId}/documents/folders/${id}`);
 }
 
+export async function deleteDocumentFolder(payload: FormData) {
+  const id = payload.get("id") as string;
+  const projectId = payload.get("projectId") as string;
+  const currentPath = payload.get("currentPath") as string;
+
+  await Promise.all([
+    database().delete(documentFolder).where(eq(documentFolder.id, +id)).run(),
+    database()
+      .delete(comment)
+      .where(and(eq(comment.type, "folder"), eq(comment.parentId, +id)))
+      .run(),
+  ]);
+
+  revalidatePath(currentPath);
+  redirect(`/console/projects/${projectId}`);
+}
+
 export async function deleteDocument(
   id: string,
   projectId: string,
@@ -157,7 +174,13 @@ export async function deleteDocument(
     await deleteFilesInMarkdown(content);
   }
 
-  await database().delete(document).where(eq(document.id, +id)).run();
+  await Promise.all([
+    database().delete(document).where(eq(document.id, +id)).run(),
+    database()
+      .delete(comment)
+      .where(and(eq(comment.type, "document"), eq(comment.parentId, +id)))
+      .run(),
+  ]);
 
   if (folderId) {
     revalidatePath(

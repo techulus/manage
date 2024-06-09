@@ -52,7 +52,7 @@ export default function MarkdownEditor({
       spellChecker: false,
       uploadImage: true,
       imageUploadFunction: onUploadImage,
-      maxHeight: compact ? "80px" : "480px",
+      maxHeight: compact ? "80px" : "240px",
       placeholder,
     };
   }, [onUploadImage, placeholder, compact]);
