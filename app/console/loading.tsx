@@ -1,3 +1,3 @@
-import { SpinnerWithSpacing } from "@/components/core/loaders";
+import { PageLoading } from "@/components/core/loaders";
 
-export default SpinnerWithSpacing;
+export default PageLoading;
