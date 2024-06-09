@@ -10,6 +10,7 @@ export function CommentsSection({
 }) {
   return (
     <div className="flex flex-col space-y-4">
+      {/* @ts-ignore */}
       <Comments type={type} parentId={parentId} />
       <CommentForm type={type} parentId={parentId} />
     </div>

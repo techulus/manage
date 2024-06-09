@@ -83,7 +83,8 @@ export default async function DocumentDetails({ params }: Props) {
           </ul>
         </div>
 
-        <CommentsSection type="document" parentId={documentId} />
+        {/* @ts-ignore */}
+        <CommentsSection type="document" parentId={+documentId} />
       </div>
     </>
   );
