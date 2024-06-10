@@ -48,7 +48,7 @@ export default function MarkdownEditor({
 
   const options = useMemo(() => {
     return {
-      autofocus: true,
+      autofocus: !compact,
       spellChecker: false,
       uploadImage: true,
       imageUploadFunction: onUploadImage,
