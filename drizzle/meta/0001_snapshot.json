@@ -74,9 +74,7 @@
       "indexes": {
         "Blob_key_unique": {
           "name": "Blob_key_unique",
-          "columns": [
-            "key"
-          ],
+          "columns": ["key"],
           "isUnique": true
         }
       },
@@ -85,12 +83,8 @@
           "name": "Blob_createdByUser_User_id_fk",
           "tableFrom": "Blob",
           "tableTo": "User",
-          "columnsFrom": [
-            "createdByUser"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["createdByUser"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -98,12 +92,8 @@
           "name": "Blob_documentFolderId_DocumentFolder_id_fk",
           "tableFrom": "Blob",
           "tableTo": "DocumentFolder",
-          "columnsFrom": [
-            "documentFolderId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["documentFolderId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -149,6 +139,13 @@
           "notNull": true,
           "autoincrement": false
         },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "parentId": {
           "name": "parentId",
           "type": "integer",
@@ -163,12 +160,8 @@
           "name": "Comment_createdByUser_User_id_fk",
           "tableFrom": "Comment",
           "tableTo": "User",
-          "columnsFrom": [
-            "createdByUser"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["createdByUser"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -249,12 +242,8 @@
           "name": "Document_projectId_Project_id_fk",
           "tableFrom": "Document",
           "tableTo": "Project",
-          "columnsFrom": [
-            "projectId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["projectId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -262,12 +251,8 @@
           "name": "Document_folderId_DocumentFolder_id_fk",
           "tableFrom": "Document",
           "tableTo": "DocumentFolder",
-          "columnsFrom": [
-            "folderId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["folderId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -275,12 +260,8 @@
           "name": "Document_createdByUser_User_id_fk",
           "tableFrom": "Document",
           "tableTo": "User",
-          "columnsFrom": [
-            "createdByUser"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["createdByUser"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -347,12 +328,8 @@
           "name": "DocumentFolder_projectId_Project_id_fk",
           "tableFrom": "DocumentFolder",
           "tableTo": "Project",
-          "columnsFrom": [
-            "projectId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["projectId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -360,12 +337,8 @@
           "name": "DocumentFolder_createdByUser_User_id_fk",
           "tableFrom": "DocumentFolder",
           "tableTo": "User",
-          "columnsFrom": [
-            "createdByUser"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["createdByUser"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -439,12 +412,8 @@
           "name": "Project_createdByUser_User_id_fk",
           "tableFrom": "Project",
           "tableTo": "User",
-          "columnsFrom": [
-            "createdByUser"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["createdByUser"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -539,12 +508,8 @@
           "name": "Task_taskListId_TaskList_id_fk",
           "tableFrom": "Task",
           "tableTo": "TaskList",
-          "columnsFrom": [
-            "taskListId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["taskListId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -552,12 +517,8 @@
           "name": "Task_assignedToUser_User_id_fk",
           "tableFrom": "Task",
           "tableTo": "User",
-          "columnsFrom": [
-            "assignedToUser"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["assignedToUser"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -565,12 +526,8 @@
           "name": "Task_createdByUser_User_id_fk",
           "tableFrom": "Task",
           "tableTo": "User",
-          "columnsFrom": [
-            "createdByUser"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["createdByUser"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -651,12 +608,8 @@
           "name": "TaskList_projectId_Project_id_fk",
           "tableFrom": "TaskList",
           "tableTo": "Project",
-          "columnsFrom": [
-            "projectId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["projectId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -664,12 +617,8 @@
           "name": "TaskList_createdByUser_User_id_fk",
           "tableFrom": "TaskList",
           "tableTo": "User",
-          "columnsFrom": [
-            "createdByUser"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["createdByUser"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -740,9 +689,7 @@
       "indexes": {
         "User_email_unique": {
           "name": "User_email_unique",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "isUnique": true
         }
       },

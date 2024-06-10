@@ -18,7 +18,7 @@ export default function CommentForm({
   const { user: creator } = useUser();
 
   return (
-    <form className="mt-8" action={addComment}>
+    <form className="pb-12" action={addComment}>
       <input value={pathname} type="hidden" name="currentPath" />
       <input value={parentId} type="hidden" name="parentId" />
       <input value={type} type="hidden" name="type" />
