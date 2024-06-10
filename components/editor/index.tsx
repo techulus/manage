@@ -10,10 +10,14 @@ const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
 export default function MarkdownEditor({
   defaultValue,
   name = "description",
+  compact = false,
+  placeholder = "Type here...",
   setValue = () => {},
 }: {
   defaultValue?: string;
   name?: string;
+  compact?: boolean;
+  placeholder?: string;
   setValue?: (value: string) => void;
 }) {
   const [value, onChange] = useState(defaultValue ?? "");
@@ -48,14 +52,16 @@ export default function MarkdownEditor({
       spellChecker: false,
       uploadImage: true,
       imageUploadFunction: onUploadImage,
-      placeholder: "Type here...",
+      maxHeight: compact ? "80px" : "240px",
+      placeholder,
     };
-  }, [onUploadImage]);
+  }, [onUploadImage, placeholder, compact]);
 
   return (
     <>
       <input type="hidden" name={name} defaultValue={value} />
       <SimpleMDE
+        className={compact ? "simplemde-compact" : ""}
         options={options}
         value={value}
         onChange={(value) => {

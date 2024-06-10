@@ -15,29 +15,31 @@ export default function TaskNotesForm({ task }: { task: TaskWithDetails }) {
   if (isEditing)
     return (
       <div className="flex-grow">
-        <MarkdownEditor defaultValue={notes} setValue={setNotes} />
-        <Button
-          className="mr-2"
-          variant="secondary"
-          onClick={() => {
-            setIsEditing(false);
-          }}
-        >
-          Cancel
-        </Button>
-        <Button
-          onClick={() => {
-            setIsEditing(false);
+        <MarkdownEditor defaultValue={notes} setValue={setNotes} compact />
+        <div className="mt-2">
+          <Button
+            className="mr-2"
+            variant="secondary"
+            onClick={() => {
+              setIsEditing(false);
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              setIsEditing(false);
 
-            toast.promise(updateTask(task.id, 1, { description: notes }), {
-              loading: "Saving...",
-              success: "Done!",
-              error: "Error while saving, please try again.",
-            });
-          }}
-        >
-          Save
-        </Button>
+              toast.promise(updateTask(task.id, 1, { description: notes }), {
+                loading: "Saving...",
+                success: "Done!",
+                error: "Error while saving, please try again.",
+              });
+            }}
+          >
+            Save
+          </Button>
+        </div>
       </div>
     );
 

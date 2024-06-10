@@ -17,7 +17,7 @@ export default async function CreateTaskList({ params }: Props) {
   const backUrl = `/console/projects/${params.projectId}/tasklists`;
   return (
     <>
-      <PageTitle title="Create Task list" backUrl={backUrl} />
+      <PageTitle title="Create task list" backUrl={backUrl} />
       <form action={createTaskList}>
         <input type="hidden" name="projectId" defaultValue={params.projectId} />
         <ContentBlock>

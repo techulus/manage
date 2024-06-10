@@ -24,7 +24,9 @@ export default async function ConsoleLayout({
 
       <div className="mx-auto w-full flex-grow lg:flex">
         <div className="min-w-0 flex-1 xl:flex">
-          <div className="pb-12 lg:min-w-0 lg:flex-1">{children}</div>
+          <div className="min-h-screen bg-gray-50 pb-12 dark:bg-card lg:min-w-0 lg:flex-1">
+            {children}
+          </div>
         </div>
       </div>
     </div>
