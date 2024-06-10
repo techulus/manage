@@ -37,7 +37,10 @@ export async function Comments({
   return (
     <div className={cn("flex flex-col divide-y-2 border-t", className)}>
       {comments.map((comment) => (
-        <div key={comment.id} className="relative flex pt-4">
+        <div
+          key={`${comment.type}-${comment.id}`}
+          className="relative flex pt-4"
+        >
           <div className="flex space-x-4">
             <div className="hidden w-[160px] text-xs text-gray-500 md:block">
               {new Date(comment.createdAt).toLocaleString()}
