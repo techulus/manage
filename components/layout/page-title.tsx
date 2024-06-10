@@ -47,7 +47,7 @@ export default function PageTitle({
             {subTitle ? (
               <p className="text-gray-500 dark:text-gray-400">{subTitle}</p>
             ) : null}
-            {children}
+            <div className="flex space-x-2">{children}</div>
           </div>
         </div>
 

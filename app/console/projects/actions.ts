@@ -3,7 +3,7 @@
 import { comment, project } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
@@ -92,10 +92,33 @@ export async function archiveProject(payload: FormData) {
   redirect("/console/projects");
 }
 
+export async function unarchiveProject(payload: FormData) {
+  const id = Number(payload.get("id"));
+
+  await database()
+    .update(project)
+    .set({
+      status: "active",
+      updatedAt: new Date(),
+    })
+    .where(eq(project.id, id))
+    .run();
+
+  revalidatePath("/console/projects");
+  revalidatePath(`/console/projects/${id}`);
+  redirect(`/console/projects/${id}`);
+}
+
 export async function deleteProject(payload: FormData) {
   const id = Number(payload.get("id"));
 
-  await database().delete(project).where(eq(project.id, id)).run();
+  await Promise.all([
+    database().delete(project).where(eq(project.id, id)).run(),
+    database()
+      .delete(comment)
+      .where(and(eq(comment.parentId, id), eq(comment.type, "project")))
+      .run(),
+  ]);
 
   revalidatePath("/console/projects");
   redirect("/console/projects");

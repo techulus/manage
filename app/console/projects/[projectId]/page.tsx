@@ -1,6 +1,6 @@
 import EmptyState from "@/components/core/empty-state";
 import { MarkdownView } from "@/components/core/markdown-view";
-import { DeleteButton } from "@/components/form/button";
+import { ActionButton, DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import { DocumentFolderHeader } from "@/components/project/document/document-folder-header";
@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { getProjectById } from "@/lib/utils/useProjects";
 import { FilePlus2Icon, FolderPlusIcon, ListPlusIcon } from "lucide-react";
 import Link from "next/link";
-import { archiveProject, deleteProject } from "../actions";
+import { archiveProject, deleteProject, unarchiveProject } from "../actions";
 
 type Props = {
   params: {
@@ -63,14 +63,24 @@ export default async function ProjectDetails({ params }: Props) {
               <nav aria-label="Pagination">
                 <span className="isolate inline-flex">
                   {project.status == "archived" ? (
-                    <form action={deleteProject}>
-                      <input
-                        className="hidden"
-                        name="id"
-                        defaultValue={project.id}
-                      />
-                      <DeleteButton action="Delete" />
-                    </form>
+                    <>
+                      <form action={unarchiveProject}>
+                        <input
+                          className="hidden"
+                          name="id"
+                          defaultValue={project.id}
+                        />
+                        <ActionButton label="Unarchive" variant="ghost" />
+                      </form>
+                      <form action={deleteProject}>
+                        <input
+                          className="hidden"
+                          name="id"
+                          defaultValue={project.id}
+                        />
+                        <DeleteButton action="Delete" />
+                      </form>
+                    </>
                   ) : (
                     <form action={archiveProject}>
                       <input
