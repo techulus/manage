@@ -31,5 +31,4 @@ Manage is an open-source alternative to Basecamp, offering a streamlined project
 
 ## License
 
-Licensed under the [GNU GENERAL PUBLIC LICENSE
-](https://github.com/techulus/manage/blob/main/LICENSE.md).
+Licensed under the [GNU AFFERO GENERAL PUBLIC LICENSE](https://github.com/techulus/manage/blob/main/LICENSE).
