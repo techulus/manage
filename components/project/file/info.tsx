@@ -2,7 +2,7 @@
 import {
   deleteBlob,
   reloadDocuments,
-} from "@/app/console/projects/[projectId]/documents/actions";
+} from "@/app/(dashboard)/console/projects/[projectId]/documents/actions";
 import { DeleteButton } from "@/components/form/button";
 import { BlobWithCreater } from "@/drizzle/types";
 import { getFileUrl } from "@/lib/blobStore";

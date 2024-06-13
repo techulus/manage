@@ -13,11 +13,9 @@ function getDatabaseNameForOwner(ownerId: string) {
 
 export async function isDatabaseReady(): Promise<boolean> {
   try {
-    console.time("isDatabaseReady");
     const { ownerId } = getOwner();
     const db = getDatabaseForOwner(ownerId);
     await db.query.project.findFirst();
-    console.timeEnd("isDatabaseReady");
     return true;
   } catch (e) {
     return false;
@@ -25,12 +23,10 @@ export async function isDatabaseReady(): Promise<boolean> {
 }
 
 export async function migrateDatabase(): Promise<void> {
-  console.time("migrateDatabase");
   const { ownerId } = getOwner();
   const db = getDatabaseForOwner(ownerId);
   const migrationsFolder = path.resolve(process.cwd(), "drizzle");
   await migrate(db, { migrationsFolder: migrationsFolder });
-  console.timeEnd("migrateDatabase");
 }
 
 export async function createDatabaseAndMigrate(ownerId: string) {

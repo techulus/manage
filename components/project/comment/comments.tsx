@@ -1,4 +1,4 @@
-import { deleteComment } from "@/app/console/projects/actions";
+import { deleteComment } from "@/app/(dashboard)/console/projects/actions";
 import { MarkdownView } from "@/components/core/markdown-view";
 import { DeleteButton } from "@/components/form/button";
 import {

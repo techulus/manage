@@ -1,4 +1,4 @@
-import { BlobUploadResult } from "@/app/api/blob/route";
+import { BlobUploadResult } from "@/app/(api)/api/blob/route";
 import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState } from "react";
 import { notifyError } from "../core/toast";

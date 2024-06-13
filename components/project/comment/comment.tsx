@@ -1,6 +1,6 @@
 "use client";
 
-import { addComment } from "@/app/console/projects/actions";
+import { addComment } from "@/app/(dashboard)/console/projects/actions";
 import MarkdownEditor from "@/components/editor";
 import { ActionButton } from "@/components/form/button";
 import { useUser } from "@clerk/nextjs";

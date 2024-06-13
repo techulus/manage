@@ -1,6 +1,6 @@
 "use client";
 
-import { updateTask } from "@/app/console/projects/[projectId]/tasklists/actions";
+import { updateTask } from "@/app/(dashboard)/console/projects/[projectId]/tasklists/actions";
 import { MarkdownView } from "@/components/core/markdown-view";
 import MarkdownEditor from "@/components/editor";
 import { Button } from "@/components/ui/button";
