@@ -15,7 +15,7 @@ export const TaskListHeader = ({
     totalCount != null && doneCount != null ? doneCount / totalCount : null;
 
   return (
-    <div className="group relative flex items-center gap-x-4 border-b border-gray-900/5 bg-gray-50 p-3 pt-4 dark:bg-gray-900">
+    <div className="group relative flex items-center gap-x-4 border-b border-gray-900/5 bg-white p-3 pt-4 dark:bg-black">
       {completedPercent != null ? (
         <div
           className="absolute left-0 top-0 z-0 h-2 w-full rounded-md bg-green-200 opacity-70 transition-all dark:bg-green-900"

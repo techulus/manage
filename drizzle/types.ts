@@ -1,6 +1,7 @@
 import { InferSelectModel } from "drizzle-orm";
 import {
   blob,
+  calendarEvent,
   document,
   documentFolder,
   project,
@@ -16,6 +17,7 @@ export type Task = InferSelectModel<typeof task>;
 export type Document = InferSelectModel<typeof document>;
 export type DocumentFolder = InferSelectModel<typeof documentFolder>;
 export type Blob = InferSelectModel<typeof blob>;
+export type CalendarEvent = InferSelectModel<typeof calendarEvent>;
 
 export type ProjectWithCreator = Project & { creator: User };
 
@@ -23,6 +25,7 @@ export type ProjectWithData = Project & {
   taskLists: TaskListWithTasks[];
   documents: DocumentWithCreator[];
   documentFolders: DocumentFolderWithDocuments[];
+  events: EventWithCreator[];
 };
 
 export type TaskWithDetails = Task & {
@@ -56,5 +59,9 @@ export type DocumentFolderWithDocuments = DocumentFolder & {
 };
 
 export type BlobWithCreater = Blob & {
+  creator: Pick<User, "firstName" | "imageUrl">;
+};
+
+export type EventWithCreator = CalendarEvent & {
   creator: Pick<User, "firstName" | "imageUrl">;
 };

@@ -3,15 +3,13 @@ import PageTitle from "@/components/layout/page-title";
 import { blob } from "@/drizzle/schema";
 import { bytesToMegabytes } from "@/lib/blobStore";
 import { database } from "@/lib/utils/useDatabase";
-import { getOwner } from "@/lib/utils/useOwner";
-import { clerkClient } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 import { sql } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 
 export default async function Settings() {
-  const { userId } = getOwner();
-  const user = await clerkClient.users.getUser(userId ?? "");
+  const user = await currentUser();
 
   const storage = await database()
     .select({

@@ -73,11 +73,11 @@ export default function NavBar() {
               </SignedIn>
             </div>
 
-            <SignedIn>
-              <div className="ml-2 flex justify-center">
+            <div className="ml-2 flex justify-center">
+              <SignedIn>
                 <ThemedUserButton appearance={appearance} />
-              </div>
-            </SignedIn>
+              </SignedIn>
+            </div>
           </div>
         </div>
       </nav>

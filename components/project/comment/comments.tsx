@@ -10,7 +10,7 @@ import {
 import { comment } from "@/drizzle/schema";
 import { cn } from "@/lib/utils";
 import { database } from "@/lib/utils/useDatabase";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { and, desc, eq } from "drizzle-orm";
 import { CircleEllipsisIcon } from "lucide-react";
 import Image from "next/image";

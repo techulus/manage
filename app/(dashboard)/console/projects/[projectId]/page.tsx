@@ -5,11 +5,17 @@ import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import { DocumentFolderHeader } from "@/components/project/document/document-folder-header";
 import { DocumentHeader } from "@/components/project/document/document-header";
+import EventsCalendar from "@/components/project/events/project-events";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { getProjectById } from "@/lib/utils/useProjects";
-import { FilePlus2Icon, FolderPlusIcon, ListPlusIcon } from "lucide-react";
+import {
+  CalendarPlusIcon,
+  FilePlus2Icon,
+  FolderPlusIcon,
+  ListPlusIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { archiveProject, deleteProject, unarchiveProject } from "../actions";
 
@@ -105,7 +111,7 @@ export default async function ProjectDetails({ params }: Props) {
         >
           <div className="flex items-center justify-between">
             <Link href={`/console/projects/${projectId}/tasklists`}>
-              <h2 className="text-lg font-semibold leading-7">Task Lists</h2>
+              <h2 className="text-2xl leading-7">Task Lists</h2>
             </Link>
 
             <div>
@@ -153,9 +159,7 @@ export default async function ProjectDetails({ params }: Props) {
 
         <div className="flex flex-col space-y-4">
           <div className="flex flex-col justify-between lg:flex-row lg:items-center">
-            <h2 className="text-lg font-semibold leading-7">
-              Docs &amp; Files
-            </h2>
+            <h2 className="text-2xl leading-7">Docs &amp; Files</h2>
 
             <div className="mt-4 flex space-x-4 lg:mt-0">
               <Link
@@ -206,6 +210,26 @@ export default async function ProjectDetails({ params }: Props) {
             label="document"
             createLink={`/console/projects/${projectId}/documents/new`}
           />
+        </div>
+
+        <div className="flex flex-col space-y-4">
+          <div className="flex flex-col justify-between lg:flex-row lg:items-center">
+            <h2 className="text-2xl leading-7">Events</h2>
+
+            <div className="mt-4 flex space-x-4 lg:mt-0">
+              <Link
+                className="flex items-center"
+                href={`/console/projects/${projectId}/events/new`}
+              >
+                <CalendarPlusIcon className="mr-1 h-5 w-5" /> Event
+                <span className="sr-only">, document</span>
+              </Link>
+            </div>
+          </div>
+
+          <div className="flex w-full rounded-md border bg-white dark:bg-black">
+            <EventsCalendar />
+          </div>
         </div>
 
         <CommentsSection type="project" parentId={project.id} />

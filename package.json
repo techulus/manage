@@ -14,8 +14,8 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.367.0",
     "@aws-sdk/signature-v4-crt": "^3.369.0",
-    "@clerk/nextjs": "^4.29.3",
-    "@clerk/themes": "^1.7.2",
+    "@clerk/nextjs": "^5.1.5",
+    "@clerk/themes": "^2.1.9",
     "@headlessui/react": "^1.7.14",
     "@libsql/client": "^0.6.2",
     "@radix-ui/react-avatar": "^1.0.3",
@@ -27,6 +27,7 @@
     "@radix-ui/react-select": "^1.2.2",
     "@radix-ui/react-separator": "^1.0.3",
     "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-switch": "^1.0.3",
     "@vercel/analytics": "^1.1.1",
     "autoprefixer": "10.4.14",
     "class-variance-authority": "^0.6.1",

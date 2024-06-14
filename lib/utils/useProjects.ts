@@ -1,6 +1,6 @@
-import { document, project, taskList } from "@/drizzle/schema";
+import { calendarEvent, document, project, taskList } from "@/drizzle/schema";
 import { ProjectWithCreator, ProjectWithData } from "@/drizzle/types";
-import { and, eq, isNull, like, or } from "drizzle-orm";
+import { and, eq, gte, isNull, like, or } from "drizzle-orm";
 import { database } from "./useDatabase";
 
 export async function getProjectsForOwner({
@@ -44,6 +44,9 @@ export async function getProjectById(
 ): Promise<ProjectWithData> {
   const db = database();
 
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
   const data = await db.query.project
     .findFirst({
       where: and(eq(project.id, +projectId)),
@@ -83,6 +86,17 @@ export async function getProjectById(
                 files: {
                   columns: {
                     id: true,
+                  },
+                },
+              },
+            },
+            events: {
+              where: gte(calendarEvent.start, startOfDay),
+              with: {
+                creator: {
+                  columns: {
+                    firstName: true,
+                    imageUrl: true,
                   },
                 },
               },

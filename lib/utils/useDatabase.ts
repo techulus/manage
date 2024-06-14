@@ -18,6 +18,7 @@ export async function isDatabaseReady(): Promise<boolean> {
     await db.query.project.findFirst();
     return true;
   } catch (e) {
+    console.error("Database not ready", e);
     return false;
   }
 }
