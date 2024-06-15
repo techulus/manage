@@ -1,7 +1,8 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { Document } from "@/drizzle/types";
+import { CalendarEvent } from "@/drizzle/types";
+import { RRule } from "rrule";
 import MarkdownEditor from "../editor";
 import { DateTimePicker } from "../project/events/date-time-picker";
 import { Label } from "../ui/label";
@@ -14,7 +15,13 @@ import {
 } from "../ui/select";
 import { Switch } from "../ui/switch";
 
-export default function EventForm({ item }: { item?: Document | null }) {
+export default function EventForm({ item }: { item?: CalendarEvent | null }) {
+  const start = item?.start
+    ? new Date(item.start)
+    : new Date(new Date().setHours(new Date().getHours() + 1));
+
+  const end = item?.end ? new Date(item.end) : undefined;
+
   return (
     <div className="my-2 space-y-4">
       <div className="space-y-2">
@@ -32,31 +39,32 @@ export default function EventForm({ item }: { item?: Document | null }) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col space-y-2">
           <Label>Start</Label>
-          <DateTimePicker />
+          <DateTimePicker name="start" defaultValue={start.toISOString()} />
         </div>
         <div className="flex flex-col space-y-2">
           <Label>End</Label>
-          <DateTimePicker />
+          <DateTimePicker name="end" defaultValue={end?.toISOString()} />
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col justify-center space-y-2">
           <Label htmlFor="all-day" className="flex items-center gap-2">
-            <Switch id="all-day" aria-label="All day event" /> All Day Event
+            <Switch name="allDay" id="all-day" aria-label="All day event" /> All
+            Day Event
           </Label>
         </div>
         <div className="flex flex-col space-y-2">
           <Label htmlFor="repeat">Repeat</Label>
-          <Select>
+          <Select name="repeat">
             <SelectTrigger id="repeat">
               <SelectValue placeholder="Select repeat option" />
             </SelectTrigger>
             <SelectContent position="popper">
-              <SelectItem value="daily">Daily</SelectItem>
-              <SelectItem value="weekly">Weekly</SelectItem>
-              <SelectItem value="monthly">Monthly</SelectItem>
-              <SelectItem value="yearly">Yearly</SelectItem>
+              <SelectItem value={String(RRule.DAILY)}>Daily</SelectItem>
+              <SelectItem value={String(RRule.WEEKLY)}>Weekly</SelectItem>
+              <SelectItem value={String(RRule.MONTHLY)}>Monthly</SelectItem>
+              <SelectItem value={String(RRule.YEARLY)}>Yearly</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -71,7 +79,7 @@ export default function EventForm({ item }: { item?: Document | null }) {
         </label>
         <div className="mt-2 sm:col-span-2 sm:mt-0">
           <MarkdownEditor
-            defaultValue={item?.markdownContent ?? ""}
+            defaultValue={item?.description ?? ""}
             name="description"
           />
         </div>

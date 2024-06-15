@@ -5,6 +5,7 @@ import PageTitle from "@/components/layout/page-title";
 import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import Link from "next/link";
+import { createEvent } from "../actions";
 
 type Props = {
   params: {
@@ -18,7 +19,7 @@ export default async function CreateEvent({ params }: Props) {
   return (
     <>
       <PageTitle title="Create Event" backUrl={backUrl} />
-      <form>
+      <form action={createEvent}>
         <input type="hidden" name="projectId" defaultValue={params.projectId} />
         <ContentBlock>
           <CardContent>

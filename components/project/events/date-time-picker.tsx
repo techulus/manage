@@ -25,10 +25,15 @@ export interface TimePickerInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   picker: TimePickerType;
   date: Date | undefined;
-  setDate: (date: Date | undefined) => void;
+  setDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
   period?: Period;
   onRightFocus?: () => void;
   onLeftFocus?: () => void;
+}
+
+interface TimePickerProps {
+  date: Date | undefined;
+  setDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
 }
 
 const TimePickerInput = React.forwardRef<
@@ -141,12 +146,7 @@ TimePickerInput.displayName = "TimePickerInput";
 
 export { TimePickerInput };
 
-interface TimePickerDemoProps {
-  date: Date | undefined;
-  setDate: (date: Date | undefined) => void;
-}
-
-export function TimePicker({ date, setDate }: TimePickerDemoProps) {
+export function TimePicker({ date, setDate }: TimePickerProps) {
   const minuteRef = React.useRef<HTMLInputElement>(null);
   const hourRef = React.useRef<HTMLInputElement>(null);
   const secondRef = React.useRef<HTMLInputElement>(null);
@@ -197,8 +197,16 @@ export function TimePicker({ date, setDate }: TimePickerDemoProps) {
   );
 }
 
-export function DateTimePicker() {
-  const [date, setDate] = React.useState<Date>();
+export function DateTimePicker({
+  name,
+  defaultValue,
+}: {
+  name: string;
+  defaultValue?: string | undefined;
+}) {
+  const [date, setDate] = React.useState<Date | undefined>(
+    defaultValue ? new Date(defaultValue) : undefined
+  );
 
   /**
    * carry over the current time when a user clicks a new day
@@ -217,30 +225,34 @@ export function DateTimePicker() {
   };
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant={"outline"}
-          className={cn(
-            "w-full justify-start text-left font-normal",
-            !date && "text-muted-foreground"
-          )}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP HH:mm:ss") : <span>Pick a date</span>}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={(d) => handleSelect(d)}
-          initialFocus
-        />
-        <div className="border-t border-border p-3">
-          <TimePicker setDate={setDate} date={date} />
-        </div>
-      </PopoverContent>
-    </Popover>
+    <>
+      <input type="hidden" name={name} defaultValue={date?.toISOString()} />
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant={"outline"}
+            className={cn(
+              "w-full justify-start text-left font-normal",
+              !date && "text-muted-foreground"
+            )}
+            suppressHydrationWarning
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {date ? format(date, "PPP HH:mm:ss") : <span>Pick a date</span>}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0">
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={(d) => handleSelect(d)}
+            initialFocus
+          />
+          <div className="border-t border-border p-3">
+            <TimePicker setDate={setDate} date={date} />
+          </div>
+        </PopoverContent>
+      </Popover>
+    </>
   );
 }

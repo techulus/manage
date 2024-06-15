@@ -3,7 +3,7 @@ CREATE TABLE `Event` (
 	`name` text NOT NULL,
 	`description` text,
 	`start` integer NOT NULL,
-	`end` integer NOT NULL,
+	`end` integer,
 	`allDay` integer DEFAULT false NOT NULL,
 	`repeatRule` text,
 	`createdAt` integer NOT NULL,

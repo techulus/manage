@@ -228,7 +228,7 @@ export default async function ProjectDetails({ params }: Props) {
           </div>
 
           <div className="flex w-full rounded-md border bg-white dark:bg-black">
-            <EventsCalendar />
+            <EventsCalendar events={project.events} />
           </div>
         </div>
 

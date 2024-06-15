@@ -228,7 +228,7 @@ export const calendarEvent = sqliteTable("Event", {
   name: text("name").notNull(),
   description: text("description"),
   start: integer("start", { mode: "timestamp" }).notNull(),
-  end: integer("end", { mode: "timestamp" }).notNull(),
+  end: integer("end", { mode: "timestamp" }),
   allDay: integer("allDay", { mode: "boolean" }).notNull().default(false),
   repeatRule: text("repeatRule"),
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
