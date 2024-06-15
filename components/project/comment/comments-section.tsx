@@ -5,8 +5,8 @@ export function CommentsSection({
   type,
   parentId,
 }: {
-  type: "document" | "folder" | "tasklist" | "project";
-  parentId: number;
+  type: "document" | "folder" | "tasklist" | "project" | "event";
+  parentId: string | number;
 }) {
   return (
     <div className="flex flex-col space-y-4">

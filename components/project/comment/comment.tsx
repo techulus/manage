@@ -12,7 +12,7 @@ export default function CommentForm({
   parentId,
 }: {
   type: string;
-  parentId: number;
+  parentId: string | number;
 }) {
   const pathname = usePathname();
   const { user: creator } = useUser();
