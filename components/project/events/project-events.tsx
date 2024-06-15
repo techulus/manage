@@ -17,8 +17,9 @@ export default function EventsCalendar({
   const router = useRouter();
 
   return (
-    <div className="flex w-full flex-row space-x-4">
+    <div className="flex w-full flex-col justify-center md:flex-row md:space-x-4">
       <Calendar
+        className="m-auto"
         mode="single"
         selected={date}
         onSelect={(date) => {
@@ -29,7 +30,7 @@ export default function EventsCalendar({
           );
         }}
       />
-      <EventsList events={events} />
+      <EventsList events={events} projectId={projectId} />
     </div>
   );
 }

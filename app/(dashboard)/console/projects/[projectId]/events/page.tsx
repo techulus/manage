@@ -1,9 +1,8 @@
-import EmptyState from "@/components/core/empty-state";
 import PageTitle from "@/components/layout/page-title";
 import EventsList from "@/components/project/events/events-list";
 import { calendarEvent } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
-import { and, eq, gte, lte } from "drizzle-orm";
+import { and, between, eq, gte, lte, or } from "drizzle-orm";
 
 type Props = {
   params: {
@@ -29,8 +28,14 @@ export default async function EventDetails({ params, searchParams }: Props) {
     .query.calendarEvent.findMany({
       where: and(
         eq(calendarEvent.projectId, +projectId),
-        gte(calendarEvent.start, startOfDay),
-        lte(calendarEvent.start, endOfDay)
+        or(
+          between(calendarEvent.start, startOfDay, endOfDay),
+          between(calendarEvent.end, startOfDay, endOfDay),
+          and(
+            lte(calendarEvent.start, startOfDay),
+            gte(calendarEvent.end, endOfDay)
+          )
+        )
       ),
       with: {
         creator: {
@@ -53,13 +58,7 @@ export default async function EventDetails({ params, searchParams }: Props) {
       />
 
       <div className="mx-auto my-12 max-w-5xl px-4 lg:px-0">
-        <EmptyState
-          show={!events.length}
-          label="event"
-          createLink={`/console/projects/${projectId}/events/new`}
-        />
-
-        <EventsList events={events} />
+        <EventsList events={events} projectId={projectId} />
       </div>
     </>
   );
