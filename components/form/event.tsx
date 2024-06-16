@@ -2,6 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import { CalendarEvent } from "@/drizzle/types";
+import { useState } from "react";
 import { RRule } from "rrule";
 import MarkdownEditor from "../editor";
 import { DateTimePicker } from "../project/events/date-time-picker";
@@ -16,6 +17,8 @@ import {
 import { Switch } from "../ui/switch";
 
 export default function EventForm({ item }: { item?: CalendarEvent | null }) {
+  const [allDay, setAllDay] = useState(item?.allDay ?? false);
+
   const start = item?.start
     ? new Date(item.start)
     : new Date(new Date().setHours(new Date().getHours() + 1));
@@ -39,19 +42,33 @@ export default function EventForm({ item }: { item?: CalendarEvent | null }) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col space-y-2">
           <Label>Start</Label>
-          <DateTimePicker name="start" defaultValue={start.toISOString()} />
+          <DateTimePicker
+            name="start"
+            defaultValue={start.toISOString()}
+            dateOnly={allDay}
+          />
         </div>
         <div className="flex flex-col space-y-2">
           <Label>End</Label>
-          <DateTimePicker name="end" defaultValue={end?.toISOString()} />
+          <DateTimePicker
+            name="end"
+            defaultValue={end?.toISOString()}
+            dateOnly={allDay}
+          />
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col justify-center space-y-2">
           <Label htmlFor="all-day" className="flex items-center gap-2">
-            <Switch name="allDay" id="all-day" aria-label="All day event" /> All
-            Day Event
+            <Switch
+              name="allDay"
+              id="all-day"
+              aria-label="All day event"
+              defaultChecked={item?.allDay ?? false}
+              onCheckedChange={(checked) => setAllDay(checked)}
+            />
+            All Day Event
           </Label>
         </div>
         <div className="flex flex-col space-y-2">

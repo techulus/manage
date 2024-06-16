@@ -28,7 +28,7 @@ export default async function CreateTaskList({ params }: Props) {
             <div className="ml-auto flex items-center justify-end gap-x-6">
               <Link
                 href={backUrl}
-                className={buttonVariants({ variant: "secondary" })}
+                className={buttonVariants({ variant: "ghost" })}
               >
                 Cancel
               </Link>

@@ -22,15 +22,14 @@ export default function EventsCalendar({
         className="m-auto"
         mode="single"
         selected={date}
-        onSelect={(date) => {
-          if (!date) return;
-          setDate(date);
+        onSelect={setDate}
+        onDayClick={(date) => {
           router.push(
             `/console/projects/${projectId}/events?date=${date.toISOString()}`
           );
         }}
       />
-      <EventsList events={events} projectId={projectId} />
+      <EventsList events={events} projectId={projectId} compact />
     </div>
   );
 }

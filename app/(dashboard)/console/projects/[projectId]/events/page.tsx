@@ -3,6 +3,7 @@ import EventsList from "@/components/project/events/events-list";
 import { calendarEvent } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
 import { and, between, eq, gte, lte, or } from "drizzle-orm";
+import { createHash } from "node:crypto";
 
 type Props = {
   params: {
@@ -18,6 +19,9 @@ export default async function EventDetails({ params, searchParams }: Props) {
   const { date } = searchParams;
 
   const selectedDate = date ? new Date(date) : new Date();
+  const commentsParentId = createHash("md5")
+    .update(selectedDate.toISOString())
+    .digest("hex");
 
   const startOfDay = new Date(selectedDate);
   startOfDay.setHours(0, 0, 0, 0);

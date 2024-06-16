@@ -4,7 +4,7 @@ import { DeleteButton } from "@/components/form/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuLabel,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { comment } from "@/drizzle/schema";
@@ -71,16 +71,16 @@ export async function Comments({
                     <CircleEllipsisIcon className="h-6 w-6" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuLabel className="m-0 p-0">
+                    <DropdownMenuItem className="m-0 p-0">
                       <form action={deleteComment}>
                         <input type="hidden" name="id" value={comment.id} />
                         <DeleteButton
                           action="Delete"
-                          size="sm"
                           className="w-full"
+                          compact
                         />
                       </form>
-                    </DropdownMenuLabel>
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : null}

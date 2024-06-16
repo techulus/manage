@@ -20,7 +20,7 @@ export default async function CreateProject() {
             <div className="ml-auto flex items-center justify-end gap-x-6">
               <Link
                 href="/console/projects"
-                className={buttonVariants({ variant: "secondary" })}
+                className={buttonVariants({ variant: "ghost" })}
               >
                 Cancel
               </Link>

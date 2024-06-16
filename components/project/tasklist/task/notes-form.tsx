@@ -19,7 +19,7 @@ export default function TaskNotesForm({ task }: { task: TaskWithDetails }) {
         <div className="mt-2">
           <Button
             className="mr-2"
-            variant="secondary"
+            variant="ghost"
             onClick={() => {
               setIsEditing(false);
             }}

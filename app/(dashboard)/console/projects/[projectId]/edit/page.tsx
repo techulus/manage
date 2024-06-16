@@ -33,7 +33,7 @@ export default async function EditProject({ params }: Props) {
             <div className="flex items-center justify-end gap-x-6">
               <Link
                 href="/console/projects"
-                className={buttonVariants({ variant: "secondary" })}
+                className={buttonVariants({ variant: "ghost" })}
               >
                 Cancel
               </Link>

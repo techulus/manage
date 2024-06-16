@@ -10,12 +10,12 @@ import { Button } from "../ui/button";
 
 export const DeleteButton = ({
   action = "Delete",
-  size = "default",
   className = "",
+  compact = false,
 }: {
   action?: string;
-  size?: "default" | "sm";
   className?: string;
+  compact?: boolean;
 }) => {
   const pathname = usePathname();
   const { pending } = useFormStatus();
@@ -29,14 +29,16 @@ export const DeleteButton = ({
         <Button
           type="submit"
           variant="destructive"
-          size={size}
+          size={compact ? "sm" : "default"}
           className={className}
         >
           {pending ? (
             <Spinner message="Processing..." />
           ) : (
             <>
-              <CheckIcon className="mr-2 h-5 w-5" aria-hidden="true" />
+              {!compact ? (
+                <CheckIcon className="mr-2 h-5 w-5" aria-hidden="true" />
+              ) : null}
               Confirm {action}
             </>
           )}
@@ -53,9 +55,12 @@ export const DeleteButton = ({
         setShowConfirmDelete(true);
       }}
       variant="ghost"
+      size={compact ? "sm" : "default"}
       className={className}
     >
-      <TrashIcon className="mr-2 h-5 w-5" aria-hidden="true" />
+      {!compact ? (
+        <TrashIcon className="mr-2 h-5 w-5" aria-hidden="true" />
+      ) : null}
       {action}
     </Button>
   );

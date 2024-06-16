@@ -200,9 +200,11 @@ export function TimePicker({ date, setDate }: TimePickerProps) {
 export function DateTimePicker({
   name,
   defaultValue,
+  dateOnly = false,
 }: {
   name: string;
   defaultValue?: string | undefined;
+  dateOnly?: boolean;
 }) {
   const [date, setDate] = React.useState<Date | undefined>(
     defaultValue ? new Date(defaultValue) : undefined
@@ -238,7 +240,11 @@ export function DateTimePicker({
             suppressHydrationWarning
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {date ? format(date, "PPP HH:mm:ss") : <span>Pick a date</span>}
+            {date ? (
+              format(date, dateOnly ? "PPP" : "PPP HH:mm:ss")
+            ) : (
+              <span>Pick a date</span>
+            )}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">
@@ -248,9 +254,11 @@ export function DateTimePicker({
             onSelect={(d) => handleSelect(d)}
             initialFocus
           />
-          <div className="border-t border-border p-3">
-            <TimePicker setDate={setDate} date={date} />
-          </div>
+          {!dateOnly ? (
+            <div className="border-t border-border p-3">
+              <TimePicker setDate={setDate} date={date} />
+            </div>
+          ) : null}
         </PopoverContent>
       </Popover>
     </>

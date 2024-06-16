@@ -10,7 +10,7 @@ import { buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuLabel,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { documentFolder } from "@/drizzle/schema";
@@ -109,7 +109,7 @@ export default async function FolderDetails({ params }: Props) {
                       <CircleEllipsisIcon className="h-6 w-6" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuLabel className="m-0 p-0">
+                      <DropdownMenuItem className="m-0 p-0">
                         <form action={deleteDocumentFolder}>
                           <input type="hidden" name="id" value={folderId} />
                           <input
@@ -119,11 +119,11 @@ export default async function FolderDetails({ params }: Props) {
                           />
                           <DeleteButton
                             action="Delete folder"
-                            size="sm"
                             className="w-full"
+                            compact
                           />
                         </form>
-                      </DropdownMenuLabel>
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </span>
