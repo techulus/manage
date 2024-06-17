@@ -19,6 +19,7 @@ Manage is an open-source alternative to Basecamp, offering a streamlined project
 - [ ] Events / Calendar
 - [ ] Notifications
 - [ ] Search
+- [ ] Activity logs
 - [ ] Permissions
 - [ ] Billing
 
