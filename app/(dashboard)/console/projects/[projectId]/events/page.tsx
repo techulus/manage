@@ -1,9 +1,9 @@
 import PageTitle from "@/components/layout/page-title";
 import EventsList from "@/components/project/events/events-list";
 import { calendarEvent } from "@/drizzle/schema";
+import { getEndOfDay, getStartOfDay } from "@/lib/utils/time";
 import { database } from "@/lib/utils/useDatabase";
-import { and, between, eq, gte, lte, or } from "drizzle-orm";
-import { createHash } from "node:crypto";
+import { and, between, eq, gte, isNotNull, lte, or } from "drizzle-orm";
 
 type Props = {
   params: {
@@ -19,14 +19,9 @@ export default async function EventDetails({ params, searchParams }: Props) {
   const { date } = searchParams;
 
   const selectedDate = date ? new Date(date) : new Date();
-  const commentsParentId = createHash("md5")
-    .update(selectedDate.toISOString())
-    .digest("hex");
 
-  const startOfDay = new Date(selectedDate);
-  startOfDay.setHours(0, 0, 0, 0);
-  const endOfDay = new Date(selectedDate);
-  endOfDay.setHours(23, 59, 59, 999);
+  const startOfDay = getStartOfDay(selectedDate);
+  const endOfDay = getEndOfDay(selectedDate);
 
   const events = await database()
     .query.calendarEvent.findMany({
@@ -38,7 +33,8 @@ export default async function EventDetails({ params, searchParams }: Props) {
           and(
             lte(calendarEvent.start, startOfDay),
             gte(calendarEvent.end, endOfDay)
-          )
+          ),
+          isNotNull(calendarEvent.repeatRule)
         )
       ),
       with: {
@@ -59,10 +55,18 @@ export default async function EventDetails({ params, searchParams }: Props) {
         backUrl={`/console/projects/${projectId}`}
         actionLabel="New"
         actionLink={`/console/projects/${projectId}/events/new`}
-      />
+      >
+        <div className="font-medium text-gray-500">
+          {selectedDate.toDateString()}
+        </div>
+      </PageTitle>
 
       <div className="mx-auto my-12 max-w-5xl px-4 lg:px-0">
-        <EventsList events={events} projectId={projectId} />
+        <EventsList
+          events={events}
+          projectId={projectId}
+          date={selectedDate.toISOString()}
+        />
       </div>
     </>
   );

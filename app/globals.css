@@ -139,3 +139,7 @@ textarea {
 .simplemde-compact .editor-statusbar {
   display: none;
 }
+
+.simplemde-compact .CodeMirror {
+  border-radius: var(--radius);
+}

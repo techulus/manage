@@ -1,6 +1,7 @@
 import { calendarEvent, document, project, taskList } from "@/drizzle/schema";
 import { ProjectWithCreator, ProjectWithData } from "@/drizzle/types";
-import { and, between, eq, isNull, like, or } from "drizzle-orm";
+import { getEndOfDay, getStartOfDay } from "@/lib/utils/time";
+import { and, between, eq, isNotNull, isNull, like, or } from "drizzle-orm";
 import { database } from "./useDatabase";
 
 export async function getProjectsForOwner({
@@ -44,10 +45,8 @@ export async function getProjectById(
 ): Promise<ProjectWithData> {
   const db = database();
 
-  const startOfDay = new Date();
-  startOfDay.setHours(0, 0, 0, 0);
-  const endOfDay = new Date();
-  endOfDay.setHours(23, 59, 59, 999);
+  const startOfDay = getStartOfDay(new Date());
+  const endOfDay = getEndOfDay(new Date());
 
   const data = await db.query.project
     .findFirst({
@@ -95,7 +94,8 @@ export async function getProjectById(
             events: {
               where: or(
                 between(calendarEvent.start, startOfDay, endOfDay),
-                between(calendarEvent.end, startOfDay, endOfDay)
+                between(calendarEvent.end, startOfDay, endOfDay),
+                isNotNull(calendarEvent.repeatRule)
               ),
               with: {
                 creator: {

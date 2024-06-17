@@ -134,7 +134,7 @@ export default async function ProjectDetails({ params }: Props) {
                 return (
                   <div
                     key={taskList.id}
-                    className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
+                    className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800"
                   >
                     <TaskListHeader
                       taskList={taskList}
@@ -188,7 +188,7 @@ export default async function ProjectDetails({ params }: Props) {
               {project.documents.map((document) => (
                 <div
                   key={document.id}
-                  className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
+                  className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800"
                 >
                   {/* @ts-ignore */}
                   <DocumentHeader document={document} />
@@ -197,7 +197,7 @@ export default async function ProjectDetails({ params }: Props) {
               {project.documentFolders.map((folder) => (
                 <div
                   key={folder.id}
-                  className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
+                  className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800"
                 >
                   <DocumentFolderHeader documentFolder={folder} />
                 </div>
@@ -227,7 +227,7 @@ export default async function ProjectDetails({ params }: Props) {
             </div>
           </div>
 
-          <div className="flex w-full rounded-md border bg-white dark:bg-black">
+          <div className="flex w-full rounded-lg border bg-white dark:bg-black">
             <EventsCalendar projectId={projectId} events={project.events} />
           </div>
         </div>

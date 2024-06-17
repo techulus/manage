@@ -3,7 +3,7 @@
 import { Calendar } from "@/components/ui/calendar";
 import { EventWithCreator } from "@/drizzle/types";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { DateTimePicker } from "./date-time-picker";
 import EventsList from "./events-list";
 
 export default function EventsCalendar({
@@ -13,16 +13,27 @@ export default function EventsCalendar({
   projectId: string;
   events: EventWithCreator[];
 }) {
-  const [date, setDate] = useState<Date | undefined>(new Date());
   const router = useRouter();
 
   return (
     <div className="flex w-full flex-col justify-center md:flex-row md:space-x-4">
+      <div className="p-3 md:hidden">
+        <DateTimePicker
+          dateOnly
+          defaultValue={new Date().toISOString()}
+          name="date"
+          onSelect={(date) => {
+            router.push(
+              `/console/projects/${projectId}/events?date=${date.toISOString()}`
+            );
+          }}
+        />
+      </div>
+
       <Calendar
-        className="m-auto"
+        className="m-auto hidden md:block"
         mode="single"
-        selected={date}
-        onSelect={setDate}
+        selected={new Date()}
         onDayClick={(date) => {
           router.push(
             `/console/projects/${projectId}/events?date=${date.toISOString()}`

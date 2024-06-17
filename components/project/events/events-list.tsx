@@ -10,20 +10,40 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EventWithCreator } from "@/drizzle/types";
+import { cn } from "@/lib/utils";
+import { getEndOfDay, getStartOfDay } from "@/lib/utils/time";
 import { CircleEllipsisIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { rrulestr } from "rrule";
 
+const filterByRepeatRule = (event: EventWithCreator, date: Date) => {
+  if (event.repeatRule) {
+    const rrule = rrulestr(event.repeatRule);
+    const start = new Date(getStartOfDay(date));
+    const end = new Date(getEndOfDay(date));
+
+    return rrule.between(start, end, true).length > 0;
+  }
+
+  return true;
+};
+
 export default function EventsList({
+  date = new Date().toISOString(),
   projectId,
   events,
   compact,
 }: {
+  date?: string;
   projectId: string;
   events: EventWithCreator[];
   compact?: boolean;
 }) {
+  const filteredEvents = events.filter((x) =>
+    filterByRepeatRule(x, new Date(date))
+  );
+
   return (
     <div className="flex w-full flex-col space-y-4 p-4">
       {!events.length ? (
@@ -34,10 +54,13 @@ export default function EventsList({
         />
       ) : null}
 
-      {events.map((event) => (
+      {filteredEvents.map((event, idx) => (
         <div
           key={event.id}
-          className="relative flex items-center justify-between border-b border-gray-200 dark:border-gray-800"
+          className={cn(
+            "relative flex items-center justify-between border-b border-gray-200 dark:border-gray-800",
+            idx === filteredEvents.length - 1 ? "border-b-0" : ""
+          )}
         >
           <div className="flex space-x-4">
             {event.creator.imageUrl ? (
@@ -52,7 +75,7 @@ export default function EventsList({
             <div className="flex-grow">
               <div className="text-lg font-semibold">{event.name}</div>
               <div
-                className="text-xs text-gray-500 dark:text-gray-400"
+                className="pb-2 text-xs text-gray-500 dark:text-gray-400"
                 suppressHydrationWarning
               >
                 {event.allDay

@@ -201,10 +201,12 @@ export function DateTimePicker({
   name,
   defaultValue,
   dateOnly = false,
+  onSelect,
 }: {
   name: string;
   defaultValue?: string | undefined;
   dateOnly?: boolean;
+  onSelect?: (date: Date) => void;
 }) {
   const [date, setDate] = React.useState<Date | undefined>(
     defaultValue ? new Date(defaultValue) : undefined
@@ -224,6 +226,7 @@ export function DateTimePicker({
     const diffInDays = diff / (1000 * 60 * 60 * 24);
     const newDateFull = add(date, { days: Math.ceil(diffInDays) });
     setDate(newDateFull);
+    onSelect?.(newDateFull);
   };
 
   return (

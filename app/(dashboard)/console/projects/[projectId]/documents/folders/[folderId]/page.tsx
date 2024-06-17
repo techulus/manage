@@ -141,7 +141,7 @@ export default async function FolderDetails({ params }: Props) {
               {folder.documents.map((document) => (
                 <div
                   key={document.id}
-                  className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
+                  className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800"
                 >
                   {/* @ts-ignore */}
                   <DocumentHeader document={document} />
@@ -152,7 +152,7 @@ export default async function FolderDetails({ params }: Props) {
                 ? folder.files.map((file) => (
                     <div
                       key={file.key}
-                      className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
+                      className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800"
                     >
                       <FileInfo
                         file={file}
