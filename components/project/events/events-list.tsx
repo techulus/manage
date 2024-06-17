@@ -2,6 +2,7 @@ import { deleteEvent } from "@/app/(dashboard)/console/projects/[projectId]/even
 import EmptyState from "@/components/core/empty-state";
 import { MarkdownView } from "@/components/core/markdown-view";
 import { DeleteButton } from "@/components/form/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,7 +14,6 @@ import { EventWithCreator } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { getEndOfDay, getStartOfDay } from "@/lib/utils/time";
 import { CircleEllipsisIcon } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { rrulestr } from "rrule";
 
@@ -46,9 +46,9 @@ export default function EventsList({
 
   return (
     <div className="flex w-full flex-col space-y-4 p-4">
-      {!events.length ? (
+      {!filteredEvents.length ? (
         <EmptyState
-          show={!events.length}
+          show={!filteredEvents.length}
           label="event"
           createLink={`/console/projects/${projectId}/events/new`}
         />
@@ -64,13 +64,12 @@ export default function EventsList({
         >
           <div className="flex space-x-4">
             {event.creator.imageUrl ? (
-              <Image
-                src={event.creator.imageUrl}
-                alt={event.creator?.firstName ?? "User"}
-                width={36}
-                height={36}
-                className="h-8 w-8 rounded-full"
-              />
+              <Avatar>
+                <AvatarImage src={event.creator.imageUrl} />
+                <AvatarFallback>
+                  {event.creator?.firstName ?? "User"}
+                </AvatarFallback>
+              </Avatar>
             ) : null}
             <div className="flex-grow">
               <div className="text-lg font-semibold">{event.name}</div>
@@ -94,7 +93,7 @@ export default function EventsList({
                 <DropdownMenuTrigger className="absolute right-0 top-0">
                   <CircleEllipsisIcon className="h-6 w-6" />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent align="end">
                   <DropdownMenuItem className="m-0 p-0">
                     <form action={deleteEvent}>
                       <input type="hidden" name="id" value={event.id} />

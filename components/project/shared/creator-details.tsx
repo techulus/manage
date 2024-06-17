@@ -1,5 +1,5 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User } from "@/drizzle/types";
-import Image from "next/image";
 
 export const CreatorDetails = ({
   user,
@@ -11,13 +11,10 @@ export const CreatorDetails = ({
   return (
     <div className="mt-auto flex items-center text-sm text-muted-foreground">
       {user?.imageUrl ? (
-        <Image
-          src={user?.imageUrl}
-          alt={user?.firstName ?? ""}
-          width={24}
-          height={24}
-          className="rounded-full"
-        />
+        <Avatar>
+          <AvatarImage src={user.imageUrl} />
+          <AvatarFallback>{user.firstName ?? "User"}</AvatarFallback>
+        </Avatar>
       ) : null}
 
       <p className="ml-2">

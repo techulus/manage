@@ -1,6 +1,7 @@
 import { deleteComment } from "@/app/(dashboard)/console/projects/actions";
 import { MarkdownView } from "@/components/core/markdown-view";
 import { DeleteButton } from "@/components/form/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +14,6 @@ import { database } from "@/lib/utils/useDatabase";
 import { auth } from "@clerk/nextjs/server";
 import { and, desc, eq } from "drizzle-orm";
 import { CircleEllipsisIcon } from "lucide-react";
-import Image from "next/image";
 
 export async function Comments({
   parentId,
@@ -46,13 +46,12 @@ export async function Comments({
               {new Date(comment.createdAt).toLocaleString()}
             </div>
             {comment.creator.imageUrl ? (
-              <Image
-                src={comment.creator.imageUrl}
-                alt={comment.creator?.firstName ?? "User"}
-                width={36}
-                height={36}
-                className="h-8 w-8 rounded-full"
-              />
+              <Avatar>
+                <AvatarImage src={comment.creator.imageUrl} />
+                <AvatarFallback>
+                  {comment.creator?.firstName ?? "User"}
+                </AvatarFallback>
+              </Avatar>
             ) : null}
             <div>
               <div className="font-semibold">

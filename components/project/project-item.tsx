@@ -1,8 +1,8 @@
 import { ProjectWithCreator } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { convertMarkdownToPlainText } from "@/lib/utils/useMarkdown";
-import Image from "next/image";
 import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 
 export const ProjecItem = ({
@@ -38,13 +38,10 @@ export const ProjecItem = ({
         aria-hidden="true"
       >
         {creator.imageUrl ? (
-          <Image
-            src={creator?.imageUrl}
-            alt={creator?.firstName ?? creator?.email}
-            width={24}
-            height={24}
-            className="rounded-full"
-          />
+          <Avatar>
+            <AvatarImage src={creator.imageUrl} />
+            <AvatarFallback>{creator?.firstName ?? "User"}</AvatarFallback>
+          </Avatar>
         ) : null}
       </span>
     </div>

@@ -3,8 +3,8 @@
 import { addComment } from "@/app/(dashboard)/console/projects/actions";
 import MarkdownEditor from "@/components/editor";
 import { ActionButton } from "@/components/form/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useUser } from "@clerk/nextjs";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 export default function CommentForm({
@@ -27,17 +27,10 @@ export default function CommentForm({
         <div className="hidden w-[160px] md:block"></div>
 
         {creator?.imageUrl ? (
-          <Image
-            src={creator?.imageUrl}
-            alt={
-              creator?.firstName ??
-              creator?.primaryEmailAddress?.emailAddress ??
-              "User"
-            }
-            width={36}
-            height={36}
-            className="h-8 w-8 rounded-full"
-          />
+          <Avatar>
+            <AvatarImage src={creator.imageUrl} />
+            <AvatarFallback>{creator?.firstName ?? "User"}</AvatarFallback>
+          </Avatar>
         ) : null}
 
         <div className="relative flex-grow">

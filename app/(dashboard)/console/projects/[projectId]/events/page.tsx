@@ -3,7 +3,17 @@ import EventsList from "@/components/project/events/events-list";
 import { calendarEvent } from "@/drizzle/schema";
 import { getEndOfDay, getStartOfDay } from "@/lib/utils/time";
 import { database } from "@/lib/utils/useDatabase";
-import { and, between, eq, gte, isNotNull, lte, or } from "drizzle-orm";
+import {
+  and,
+  asc,
+  between,
+  desc,
+  eq,
+  gte,
+  isNotNull,
+  lte,
+  or,
+} from "drizzle-orm";
 
 type Props = {
   params: {
@@ -37,6 +47,7 @@ export default async function EventDetails({ params, searchParams }: Props) {
           isNotNull(calendarEvent.repeatRule)
         )
       ),
+      orderBy: [desc(calendarEvent.start), asc(calendarEvent.allDay)],
       with: {
         creator: {
           columns: {
