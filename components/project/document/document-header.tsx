@@ -29,7 +29,7 @@ export async function DocumentHeader({
           />
         </div>
 
-        <div className="absolute pr-4 pt-16">{plainText}</div>
+        <div className="absolute pr-4 pt-24">{plainText}</div>
       </Link>
     </div>
   );

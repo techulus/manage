@@ -8,7 +8,6 @@ import { DocumentHeader } from "@/components/project/document/document-header";
 import EventsCalendar from "@/components/project/events/project-events";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import { getProjectById } from "@/lib/utils/useProjects";
 import {
   CalendarPlusIcon,
@@ -38,89 +37,80 @@ export default async function ProjectDetails({ params }: Props) {
         actionLabel="Edit"
         actionLink={`/console/projects/${projectId}/edit`}
       >
-        {project.dueDate ? (
-          <Badge variant="outline">
-            Due {project.dueDate.toLocaleDateString()}
-          </Badge>
-        ) : null}
-        {project.status == "archived" ? (
-          <Badge variant="outline" className="ml-2 text-red-500">
-            Archived
-          </Badge>
-        ) : null}
+        <div className="pt-2">
+          {project.dueDate ? (
+            <Badge variant="outline">
+              Due {project.dueDate.toLocaleDateString()}
+            </Badge>
+          ) : null}
+          {project.status == "archived" ? (
+            <Badge variant="outline" className="ml-2 text-red-500">
+              Archived
+            </Badge>
+          ) : null}
+        </div>
       </PageTitle>
 
-      <div className="mx-auto max-w-5xl space-y-12 px-4 lg:px-0">
+      <div className="mx-auto max-w-5xl space-y-12 px-4 md:space-y-0 md:divide-y md:border-l md:border-r md:px-0">
         {project.description ? (
-          <div className="flex flex-col pt-4">
+          <div className="flex flex-col p-8">
             <MarkdownView content={project.description ?? ""} />
           </div>
         ) : null}
 
-        <div className="flex h-12 flex-col justify-center border-t border-gray-200 dark:border-gray-800">
-          <div className="px-4 sm:px-6 lg:-mx-4 lg:px-8">
-            <div className="flex justify-between py-3">
-              {/* Left buttons */}
-              <div className="isolate inline-flex sm:space-x-3">
-                <span className="inline-flex space-x-1"></span>
-              </div>
-
-              {/* Right buttons */}
-              <nav aria-label="Pagination">
-                <span className="isolate inline-flex">
-                  {project.status == "archived" ? (
-                    <>
-                      <form action={unarchiveProject}>
-                        <input
-                          className="hidden"
-                          name="id"
-                          defaultValue={project.id}
-                        />
-                        <ActionButton label="Unarchive" variant="ghost" />
-                      </form>
-                      <form action={deleteProject}>
-                        <input
-                          className="hidden"
-                          name="id"
-                          defaultValue={project.id}
-                        />
-                        <DeleteButton action="Delete" />
-                      </form>
-                    </>
-                  ) : (
-                    <form action={archiveProject}>
-                      <input
-                        className="hidden"
-                        name="id"
-                        defaultValue={project.id}
-                      />
-                      <DeleteButton action="Archive" />
-                    </form>
-                  )}
-                </span>
-              </nav>
+        <div className="flex h-12 flex-col justify-center">
+          <div className="flex justify-between px-4 py-3">
+            {/* Left buttons */}
+            <div className="isolate inline-flex sm:space-x-3">
+              <span className="inline-flex space-x-1"></span>
             </div>
+
+            {/* Right buttons */}
+            <span className="isolate inline-flex">
+              {project.status == "archived" ? (
+                <>
+                  <form action={unarchiveProject}>
+                    <input
+                      className="hidden"
+                      name="id"
+                      defaultValue={project.id}
+                    />
+                    <ActionButton label="Unarchive" variant="link" />
+                  </form>
+                  <form action={deleteProject}>
+                    <input
+                      className="hidden"
+                      name="id"
+                      defaultValue={project.id}
+                    />
+                    <DeleteButton action="Delete" />
+                  </form>
+                </>
+              ) : (
+                <form action={archiveProject}>
+                  <input
+                    className="hidden"
+                    name="id"
+                    defaultValue={project.id}
+                  />
+                  <DeleteButton action="Archive" />
+                </form>
+              )}
+            </span>
           </div>
         </div>
 
-        <div
-          className={cn(
-            "flex flex-col space-y-4",
-            project.description ? "" : "mt-6"
-          )}
-        >
-          <div className="flex items-center justify-between">
-            <Link href={`/console/projects/${projectId}/tasklists`}>
-              <h2 className="text-2xl leading-7">Task Lists</h2>
-            </Link>
+        <div className="flex flex-col space-y-4 md:p-8">
+          <div className="flex flex-col justify-between lg:flex-row lg:items-center">
+            <h2 className="text-heading text-2xl leading-7">Task lists</h2>
 
-            <div>
+            <div className="mt-4 flex space-x-4 lg:mt-0">
               <Link
-                href={`/console/projects/${projectId}/tasklists/new`}
                 className="flex items-center"
+                href={`/console/projects/${projectId}/tasklists/new`}
               >
-                <ListPlusIcon className="mr-1 h-5 w-5" />
-                List<span className="sr-only">, tasklist</span>
+                <ListPlusIcon className="mr-1 h-5 w-5" /> Task list
+                <span className="sr-only">, document</span>
               </Link>
             </div>
           </div>
@@ -157,9 +147,11 @@ export default async function ProjectDetails({ params }: Props) {
           />
         </div>
 
-        <div className="flex flex-col space-y-4">
+        <div className="flex flex-col space-y-4 md:p-8">
           <div className="flex flex-col justify-between lg:flex-row lg:items-center">
-            <h2 className="text-2xl leading-7">Docs &amp; Files</h2>
+            <h2 className="text-heading text-2xl leading-7">
+              Docs &amp; Files
+            </h2>
 
             <div className="mt-4 flex space-x-4 lg:mt-0">
               <Link
@@ -212,9 +204,9 @@ export default async function ProjectDetails({ params }: Props) {
           />
         </div>
 
-        <div className="flex flex-col space-y-4">
+        <div className="flex flex-col space-y-4 md:p-8">
           <div className="flex flex-col justify-between lg:flex-row lg:items-center">
-            <h2 className="text-2xl leading-7">Events</h2>
+            <h2 className="text-heading text-2xl leading-7">Events</h2>
 
             <div className="mt-4 flex space-x-4 lg:mt-0">
               <Link
@@ -232,7 +224,9 @@ export default async function ProjectDetails({ params }: Props) {
           </div>
         </div>
 
-        <CommentsSection type="project" parentId={project.id} />
+        <div className="pb-12 md:p-8">
+          <CommentsSection type="project" parentId={project.id} />
+        </div>
       </div>
     </>
   );

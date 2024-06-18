@@ -1,4 +1,5 @@
 @import url("~easymde/dist/easymde.min.css");
+@import "../node_modules/cal-sans/index.css";
 
 @tailwind base;
 @tailwind components;
@@ -142,4 +143,8 @@ textarea {
 
 .simplemde-compact .CodeMirror {
   border-radius: var(--radius);
+}
+
+.text-heading {
+  font-family: "Cal Sans", sans-serif;
 }

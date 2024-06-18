@@ -30,6 +30,7 @@
     "@radix-ui/react-switch": "^1.0.3",
     "@vercel/analytics": "^1.1.1",
     "autoprefixer": "10.4.14",
+    "cal-sans": "^1.0.1",
     "class-variance-authority": "^0.6.1",
     "clsx": "^1.2.1",
     "cmdk": "^0.2.0",

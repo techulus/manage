@@ -35,7 +35,7 @@ export async function Comments({
   });
 
   return (
-    <div className={cn("flex flex-col divide-y-2 border-t", className)}>
+    <div className={cn("flex flex-col divide-y-2", className)}>
       {comments.map((comment) => (
         <div
           key={`${comment.type}-${comment.id}`}

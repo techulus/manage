@@ -6,7 +6,6 @@ import { task, taskList, user } from "@/drizzle/schema";
 import { User } from "@/drizzle/types";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
-import { getProjectById } from "@/lib/utils/useProjects";
 import { and, asc, eq, or } from "drizzle-orm";
 import Link from "next/link";
 import { createTask, partialUpdateTaskList } from "./actions";
@@ -23,8 +22,6 @@ type Props = {
 export default async function TaskLists({ params, searchParams }: Props) {
   const { userId, orgId } = getOwner();
   const { projectId } = params;
-
-  const project = await getProjectById(projectId);
 
   const filterByStatuses = searchParams.status?.split(",") ?? ["active"];
   const statusFilter = filterByStatuses.map((status) =>
@@ -79,7 +76,6 @@ export default async function TaskLists({ params, searchParams }: Props) {
     <>
       <PageTitle
         title="Task lists"
-        subTitle={project.name}
         backUrl={`/console/projects/${projectId}`}
         actionLabel="New"
         actionLink={`/console/projects/${projectId}/tasklists/new`}
