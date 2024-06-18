@@ -7,7 +7,7 @@ import { SignedIn } from "@clerk/nextjs";
 import { Transition } from "@headlessui/react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { useMemo } from "react";
 import logo from "../../public/images/logo.png";
 import { ThemedOrgSwitcher, ThemedUserButton } from "../core/auth";
@@ -16,22 +16,51 @@ import { createToastWrapper } from "../core/toast";
 export default function NavBar() {
   const appearance = useTheme();
   const path = usePathname();
+  const { projectId } = useParams();
 
   const [isSticky, ref] = useDetectSticky();
 
   const tabs = useMemo(
-    () => [
-      {
-        name: "Projects",
-        href: "/console/projects",
-        current: path.startsWith("/console/projects"),
-      },
-      {
-        name: "Settings",
-        href: "/console/settings",
-        current: path === "/console/settings",
-      },
-    ],
+    () =>
+      projectId
+        ? [
+            {
+              name: "Project",
+              href: `/console/projects/${projectId}`,
+              current: path === `/console/projects/${projectId}`,
+            },
+            {
+              name: "Tasklists",
+              href: `/console/projects/${projectId}/tasklists`,
+              current: path.startsWith(
+                `/console/projects/${projectId}/tasklists`
+              ),
+            },
+            {
+              name: "Docs & Files",
+              href: `/console/projects/${projectId}/documents`,
+              current: path.startsWith(
+                `/console/projects/${projectId}/documents`
+              ),
+            },
+            {
+              name: "Events",
+              href: `/console/projects/${projectId}/events`,
+              current: path.startsWith(`/console/projects/${projectId}/events`),
+            },
+          ]
+        : [
+            {
+              name: "Projects",
+              href: "/console/projects",
+              current: path.startsWith("/console/projects"),
+            },
+            {
+              name: "Settings",
+              href: "/console/settings",
+              current: path === "/console/settings",
+            },
+          ],
     [path]
   );
   return (

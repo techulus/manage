@@ -43,7 +43,7 @@ export default function PageTitle({
           )}
 
           <div className="flex flex-col">
-            <h1 className="flex-1 text-3xl font-semibold">{title}</h1>
+            <h1 className="flex-1 text-3xl font-extra-bold">{title}</h1>
             {subTitle ? (
               <p className="text-gray-500 dark:text-gray-400">{subTitle}</p>
             ) : null}
