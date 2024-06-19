@@ -43,14 +43,12 @@ export default function EventsCalendar({
         }}
       />
 
-      {events.length ? (
-        <EventsList
-          events={events}
-          projectId={projectId}
-          date={selectedDate}
-          compact
-        />
-      ) : null}
+      <EventsList
+        events={events}
+        projectId={projectId}
+        date={selectedDate}
+        compact
+      />
     </div>
   );
 }
