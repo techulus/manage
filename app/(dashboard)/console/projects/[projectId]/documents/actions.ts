@@ -58,7 +58,7 @@ export async function createDocument(payload: FormData) {
     );
     redirect(`/console/projects/${projectId}/documents/folders/${folderId}`);
   } else {
-    redirect(`/console/projects/${projectId}`);
+    redirect(`/console/projects/${projectId}/documents`);
   }
 }
 
@@ -92,7 +92,7 @@ export async function updateDocument(payload: FormData) {
     );
     redirect(`/console/projects/${projectId}/documents/folders/${folderId}`);
   } else {
-    redirect(`/console/projects/${projectId}`);
+    redirect(`/console/projects/${projectId}/documents/${id}`);
   }
 }
 
@@ -119,7 +119,8 @@ export async function createDocumentFolder(payload: FormData) {
     .run();
 
   revalidatePath(`/console/projects/${projectId}`);
-  redirect(`/console/projects/${projectId}`);
+  revalidatePath(`/console/projects/${projectId}/documents`);
+  redirect(`/console/projects/${projectId}/documents`);
 }
 
 export async function updateDocumentFolder(payload: FormData) {
@@ -161,7 +162,7 @@ export async function deleteDocumentFolder(payload: FormData) {
   ]);
 
   revalidatePath(currentPath);
-  redirect(`/console/projects/${projectId}`);
+  redirect(`/console/projects/${projectId}/documents`);
 }
 
 export async function deleteDocument(
@@ -191,8 +192,9 @@ export async function deleteDocument(
   }
 
   revalidatePath(`/console/projects/${projectId}`);
+  revalidatePath(`/console/projects/${projectId}/documents`);
   revalidatePath(`/console/projects/${projectId}/documents/${id}`);
-  redirect(`/console/projects/${projectId}`);
+  redirect(`/console/projects/${projectId}/documents`);
 }
 
 export async function reloadDocuments(

@@ -15,9 +15,10 @@ type Props = {
   };
 };
 
-export default async function EditTaskList({ params }: Props) {
+export default async function EditDocument({ params }: Props) {
   const document = await getDocumentById(params.documentId);
-  const backUrl = `/console/projects/${params.projectId}`;
+  const backUrl = `/console/projects/${params.projectId}/documents/${document.id}`;
+
   return (
     <>
       <PageTitle title="Update Document" backUrl={backUrl} />

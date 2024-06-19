@@ -34,13 +34,13 @@ export default async function DocumentDetails({ params }: Props) {
         title={documentDetails.name}
         subTitle={
           documentDetails.folder
-            ? `Docs / ${documentDetails.folder?.name}`
-            : "Docs"
+            ? `Documents / ${documentDetails.folder?.name}`
+            : "Document"
         }
         backUrl={
           documentDetails.folderId
             ? `/console/projects/${projectId}/documents/folders/${documentDetails.folderId}`
-            : `/console/projects/${projectId}`
+            : `/console/projects/${projectId}/documents`
         }
         actionLabel="Edit"
         actionLink={`/console/projects/${projectId}/documents/${documentId}/edit`}
@@ -83,8 +83,10 @@ export default async function DocumentDetails({ params }: Props) {
           </ul>
         </div>
 
-        {/* @ts-ignore */}
-        <CommentsSection type="document" parentId={+documentId} />
+        <div className="border-t pb-12 pt-4">
+          {/* @ts-ignore */}
+          <CommentsSection type="document" parentId={+documentId} />
+        </div>
       </div>
     </>
   );

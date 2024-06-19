@@ -5,6 +5,8 @@ import { DocumentHeader } from "@/components/project/document/document-header";
 import { document, project } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
 import { and, eq, isNull } from "drizzle-orm";
+import { FilePlus2Icon, FolderPlusIcon } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -62,7 +64,25 @@ export default async function ProjectDocuments({ params }: Props) {
 
   return (
     <>
-      <PageTitle title="Docs & Files" />
+      <PageTitle title="Docs & Files">
+        <div className="mt-4 flex space-x-4">
+          <Link
+            className="flex items-center"
+            href={`/console/projects/${projectId}/documents/new`}
+          >
+            <FilePlus2Icon className="mr-1 h-5 w-5" /> Document
+            <span className="sr-only">, document</span>
+          </Link>
+
+          <Link
+            className="flex items-center"
+            href={`/console/projects/${projectId}/documents/folders/new`}
+          >
+            <FolderPlusIcon className="mr-1 h-5 w-5" /> Folder
+            <span className="sr-only">, folder</span>
+          </Link>
+        </div>
+      </PageTitle>
 
       <div className="mx-auto my-12 max-w-5xl px-4 lg:px-0">
         <div className="flex flex-col space-y-4">
