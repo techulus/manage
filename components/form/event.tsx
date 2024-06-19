@@ -3,7 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { CalendarEvent } from "@/drizzle/types";
 import { useState } from "react";
-import { RRule } from "rrule";
+import { RRule, rrulestr } from "rrule";
 import MarkdownEditor from "../editor";
 import { DateTimePicker } from "../project/events/date-time-picker";
 import { Label } from "../ui/label";
@@ -24,6 +24,8 @@ export default function EventForm({ item }: { item?: CalendarEvent | null }) {
     : new Date(new Date().setHours(new Date().getHours() + 1));
 
   const end = item?.end ? new Date(item.end) : undefined;
+
+  const rrule = item?.repeatRule ? rrulestr(item.repeatRule) : null;
 
   return (
     <div className="my-2 space-y-4">
@@ -73,7 +75,12 @@ export default function EventForm({ item }: { item?: CalendarEvent | null }) {
         </div>
         <div className="flex flex-col space-y-2">
           <Label htmlFor="repeat">Repeat</Label>
-          <Select name="repeat">
+          <Select
+            name="repeat"
+            defaultValue={
+              rrule?.options.freq ? String(rrule?.options.freq) : undefined
+            }
+          >
             <SelectTrigger id="repeat">
               <SelectValue placeholder="Select repeat option" />
             </SelectTrigger>

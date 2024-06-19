@@ -18,7 +18,7 @@ export default function EventsCalendar({
   const router = useRouter();
 
   return (
-    <div className="flex w-full flex-col justify-center md:flex-row md:space-x-4">
+    <div className="flex w-full flex-col justify-center md:flex-row md:space-x-2">
       <div className="p-3 md:hidden">
         <DateTimePicker
           dateOnly
@@ -44,7 +44,12 @@ export default function EventsCalendar({
       />
 
       {events.length ? (
-        <EventsList events={events} projectId={projectId} compact />
+        <EventsList
+          events={events}
+          projectId={projectId}
+          date={selectedDate}
+          compact
+        />
       ) : null}
     </div>
   );

@@ -1,9 +1,10 @@
 "use server";
 
 import { calendarEvent } from "@/drizzle/schema";
+import { getEndOfDay, getStartOfDay } from "@/lib/utils/time";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Frequency, RRule } from "rrule";
@@ -58,14 +59,27 @@ export async function updateEvent(payload: FormData) {
     : null;
   const allDay = (payload.get("allDay") as string) === "on";
   const repeat = payload.get("repeat") as string;
+  const projectId = payload.get("projectId") as string;
 
   const repeatRule = repeat
     ? new RRule({
         freq: repeat as unknown as Frequency,
-        dtstart: start,
-        until: end,
+        dtstart: getStartOfDay(start),
+        until: end ? getEndOfDay(end) : null,
       })
     : undefined;
+
+  console.log({
+    id,
+    projectId,
+    name,
+    description,
+    start,
+    end,
+    allDay,
+    repeatRule: repeatRule?.toString(),
+    updatedAt: new Date(),
+  });
 
   await database()
     .update(calendarEvent)
@@ -78,11 +92,13 @@ export async function updateEvent(payload: FormData) {
       repeatRule: repeatRule?.toString(),
       updatedAt: new Date(),
     })
-    .where(eq(calendarEvent.id, id))
+    .where(
+      and(eq(calendarEvent.id, id), eq(calendarEvent.projectId, +projectId))
+    )
     .run();
 
-  revalidatePath(`/console/projects/${id}/events`);
-  redirect(`/console/projects/${id}/events?date=${start.toISOString()}`);
+  revalidatePath(`/console/projects/${projectId}/events`);
+  redirect(`/console/projects/${projectId}/events?date=${start.toISOString()}`);
 }
 
 export async function deleteEvent(payload: FormData) {

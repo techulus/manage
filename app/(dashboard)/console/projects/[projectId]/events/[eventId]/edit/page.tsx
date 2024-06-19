@@ -9,8 +9,7 @@ import { database } from "@/lib/utils/useDatabase";
 import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { rrulestr } from "rrule";
-import { createEvent } from "../../actions";
+import { updateEvent } from "../../actions";
 
 type Props = {
   params: {
@@ -32,14 +31,12 @@ export default async function CreateEvent({ params }: Props) {
 
   const backUrl = `/console/projects/${projectId}/events?date=${event.start.toISOString()}`;
 
-  const rrule = event?.repeatRule ? rrulestr(event.repeatRule) : null;
-  console.log("rrule", rrule?.toText());
-
   return (
     <>
       <PageTitle title="Edit Event" backUrl={backUrl} />
-      <form action={createEvent}>
-        <input type="hidden" name="projectId" defaultValue={params.projectId} />
+      <form action={updateEvent}>
+        <input type="hidden" name="id" defaultValue={eventId} />
+        <input type="hidden" name="projectId" defaultValue={projectId} />
         <ContentBlock>
           <CardContent>
             <EventForm item={event} />

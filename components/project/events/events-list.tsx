@@ -30,12 +30,12 @@ const filterByRepeatRule = (event: EventWithCreator, date: Date) => {
 };
 
 export default function EventsList({
-  date = new Date().toISOString(),
+  date,
   projectId,
   events,
   compact,
 }: {
-  date?: string;
+  date: string;
   projectId: string;
   events: EventWithCreator[];
   compact?: boolean;
@@ -80,7 +80,13 @@ export default function EventsList({
                 {event.allDay
                   ? event.start.toDateString()
                   : event.start.toLocaleString()}
-                {event.end ? ` - ${event.end.toLocaleString()}` : null}
+                {event.end
+                  ? ` - ${
+                      event.allDay
+                        ? event.end.toDateString()
+                        : event.end.toLocaleString()
+                    }`
+                  : null}
                 {event.repeatRule
                   ? `, ` + rrulestr(event.repeatRule).toText()
                   : null}
@@ -94,8 +100,8 @@ export default function EventsList({
                   <CircleEllipsisIcon className="h-6 w-6" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem className="m-0 p-0">
-                    <form action={deleteEvent}>
+                  <DropdownMenuItem className="w-full p-0">
+                    <form action={deleteEvent} className="w-full">
                       <input type="hidden" name="id" value={event.id} />
                       <Link
                         href={`/console/projects/${projectId}/events/${event.id}/edit`}
@@ -108,8 +114,8 @@ export default function EventsList({
                       </Link>
                     </form>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="m-0 p-0">
-                    <form action={deleteEvent}>
+                  <DropdownMenuItem className="w-full p-0">
+                    <form action={deleteEvent} className="w-full">
                       <input type="hidden" name="id" value={event.id} />
                       <DeleteButton
                         action="Delete"
