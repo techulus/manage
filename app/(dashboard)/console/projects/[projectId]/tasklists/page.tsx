@@ -76,7 +76,6 @@ export default async function TaskLists({ params, searchParams }: Props) {
     <>
       <PageTitle
         title="Task lists"
-        backUrl={`/console/projects/${projectId}`}
         actionLabel="New"
         actionLink={`/console/projects/${projectId}/tasklists/new`}
       />

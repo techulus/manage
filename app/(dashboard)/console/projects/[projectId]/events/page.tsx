@@ -1,5 +1,6 @@
 import PageTitle from "@/components/layout/page-title";
-import EventsList from "@/components/project/events/events-list";
+import { CommentsSection } from "@/components/project/comment/comments-section";
+import EventsCalendar from "@/components/project/events/events-calendar";
 import { calendarEvent } from "@/drizzle/schema";
 import { getEndOfDay, getStartOfDay } from "@/lib/utils/time";
 import { database } from "@/lib/utils/useDatabase";
@@ -29,6 +30,7 @@ export default async function EventDetails({ params, searchParams }: Props) {
   const { date } = searchParams;
 
   const selectedDate = date ? new Date(date) : new Date();
+  const dayCommentId = `${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDate()}`;
 
   const startOfDay = getStartOfDay(selectedDate);
   const endOfDay = getEndOfDay(selectedDate);
@@ -63,7 +65,6 @@ export default async function EventDetails({ params, searchParams }: Props) {
     <>
       <PageTitle
         title="Events"
-        backUrl={`/console/projects/${projectId}`}
         actionLabel="New"
         actionLink={`/console/projects/${projectId}/events/new`}
       >
@@ -72,12 +73,16 @@ export default async function EventDetails({ params, searchParams }: Props) {
         </div>
       </PageTitle>
 
-      <div className="mx-auto my-12 max-w-5xl px-4 lg:px-0">
-        <EventsList
-          events={events}
-          projectId={projectId}
-          date={selectedDate.toISOString()}
-        />
+      <div className="mx-auto my-12 max-w-5xl space-y-12 px-4 lg:px-0">
+        <div className="flex w-full rounded-lg border bg-white dark:bg-black">
+          <EventsCalendar
+            projectId={projectId}
+            events={events}
+            selectedDate={selectedDate.toISOString()}
+          />
+        </div>
+
+        <CommentsSection type="event" parentId={dayCommentId} />
       </div>
     </>
   );

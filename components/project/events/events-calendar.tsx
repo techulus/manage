@@ -9,9 +9,11 @@ import EventsList from "./events-list";
 export default function EventsCalendar({
   projectId,
   events,
+  selectedDate = new Date().toISOString(),
 }: {
   projectId: string;
   events: EventWithCreator[];
+  selectedDate?: string;
 }) {
   const router = useRouter();
 
@@ -20,7 +22,7 @@ export default function EventsCalendar({
       <div className="p-3 md:hidden">
         <DateTimePicker
           dateOnly
-          defaultValue={new Date().toISOString()}
+          defaultValue={selectedDate}
           name="date"
           onSelect={(date) => {
             router.push(
@@ -33,14 +35,17 @@ export default function EventsCalendar({
       <Calendar
         className="m-auto hidden md:block"
         mode="single"
-        selected={new Date()}
+        selected={new Date(selectedDate)}
         onDayClick={(date) => {
           router.push(
             `/console/projects/${projectId}/events?date=${date.toISOString()}`
           );
         }}
       />
-      <EventsList events={events} projectId={projectId} compact />
+
+      {events.length ? (
+        <EventsList events={events} projectId={projectId} compact />
+      ) : null}
     </div>
   );
 }

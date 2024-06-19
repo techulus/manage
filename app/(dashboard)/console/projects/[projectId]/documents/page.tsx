@@ -62,10 +62,7 @@ export default async function ProjectDocuments({ params }: Props) {
 
   return (
     <>
-      <PageTitle
-        title="Docs & Files"
-        backUrl={`/console/projects/${projectId}`}
-      />
+      <PageTitle title="Docs & Files" />
 
       <div className="mx-auto my-12 max-w-5xl px-4 lg:px-0">
         <div className="flex flex-col space-y-4">

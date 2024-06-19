@@ -5,7 +5,7 @@ import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import { DocumentFolderHeader } from "@/components/project/document/document-folder-header";
 import { DocumentHeader } from "@/components/project/document/document-header";
-import EventsCalendar from "@/components/project/events/project-events";
+import EventsCalendar from "@/components/project/events/events-calendar";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
 import { Badge } from "@/components/ui/badge";
 import { getProjectById } from "@/lib/utils/useProjects";
@@ -53,7 +53,7 @@ export default async function ProjectDetails({ params }: Props) {
 
       <div className="mx-auto max-w-5xl space-y-12 px-4 md:space-y-0 md:divide-y md:border-l md:border-r md:px-0">
         {project.description ? (
-          <div className="flex flex-col p-8">
+          <div className="flex flex-col px-8">
             <MarkdownView content={project.description ?? ""} />
           </div>
         ) : null}
@@ -225,6 +225,7 @@ export default async function ProjectDetails({ params }: Props) {
         </div>
 
         <div className="pb-12 md:p-8">
+          <h2 className="text-heading text-2xl leading-7">Discussions</h2>
           <CommentsSection type="project" parentId={project.id} />
         </div>
       </div>

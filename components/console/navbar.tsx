@@ -25,7 +25,7 @@ export default function NavBar() {
       projectId
         ? [
             {
-              name: "Project",
+              name: "Overview",
               href: `/console/projects/${projectId}`,
               current: path === `/console/projects/${projectId}`,
             },
