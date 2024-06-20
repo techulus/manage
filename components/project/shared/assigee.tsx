@@ -14,7 +14,7 @@ export function Assignee({
   return (
     <div className={cn("flex items-center", className)}>
       {user?.imageUrl ? (
-        <Avatar>
+        <Avatar className="h-5 w-5">
           <AvatarImage src={user.imageUrl} />
           <AvatarFallback>{user.firstName}</AvatarFallback>
         </Avatar>

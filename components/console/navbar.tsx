@@ -61,7 +61,7 @@ export default function NavBar() {
               current: path === "/console/settings",
             },
           ],
-    [path]
+    [path, projectId]
   );
   return (
     <>
@@ -113,7 +113,7 @@ export default function NavBar() {
 
       <div
         className={cn(
-          "sticky -top-[1px] z-10 -mb-px flex min-w-full self-start border-b border-gray-200 bg-background px-4 dark:border-gray-800 lg:px-8",
+          "sticky -top-[1px] z-10 -mb-px flex w-screen self-start border-b border-gray-200 bg-background px-4 dark:border-gray-800 lg:px-8",
           isSticky ? "pt-[1px] shadow-md" : ""
         )}
         ref={ref}
@@ -121,7 +121,7 @@ export default function NavBar() {
       >
         <Transition
           show={isSticky}
-          className="absolute self-center"
+          className="absolute hidden self-center md:block"
           enter="transition-all ease-in-out duration-300"
           enterFrom="transform  translate-y-[-100%] opacity-0"
           enterTo="transform  translate-y-0 opacity-100"
@@ -144,7 +144,7 @@ export default function NavBar() {
           className={cn(
             "flex space-x-1 overflow-y-scroll",
             "transition duration-300 ease-in-out",
-            isSticky ? "translate-x-[40px]" : "translate-x-0"
+            isSticky ? "md:translate-x-[40px]" : "md:translate-x-0"
           )}
         >
           {tabs.map((tab) => (
