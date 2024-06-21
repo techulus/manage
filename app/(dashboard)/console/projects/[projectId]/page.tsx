@@ -51,7 +51,7 @@ export default async function ProjectDetails({ params }: Props) {
         </div>
       </PageTitle>
 
-      <div className="mx-auto max-w-5xl space-y-12 px-4 md:space-y-0 md:divide-y md:border-l md:border-r md:px-0">
+      <div className="mx-auto max-w-7xl space-y-12 px-4 md:space-y-0 md:divide-y md:border-l md:border-r md:px-0">
         {project.description ? (
           <div className="flex flex-col px-8">
             <MarkdownView content={project.description ?? ""} />
@@ -220,7 +220,11 @@ export default async function ProjectDetails({ params }: Props) {
           </div>
 
           <div className="flex w-full rounded-lg border bg-white dark:bg-black">
-            <EventsCalendar projectId={projectId} events={project.events} />
+            <EventsCalendar
+              projectId={projectId}
+              events={project.events}
+              compact
+            />
           </div>
         </div>
 

@@ -46,7 +46,7 @@ export default async function DocumentDetails({ params }: Props) {
         actionLink={`/console/projects/${projectId}/documents/${documentId}/edit`}
       />
 
-      <div className="mx-auto max-w-5xl px-4 lg:px-0">
+      <div className="mx-auto max-w-7xl px-4 lg:px-0">
         <div className="flex h-12 flex-col justify-center border-b border-gray-200 dark:border-gray-800">
           <div className="px-4 sm:px-6 lg:-mx-4 lg:px-8">
             <div className="flex justify-between py-3">

@@ -72,7 +72,7 @@ export default async function FolderDetails({ params }: Props) {
         actionLink={`/console/projects/${projectId}/documents/folders/${folderId}/edit`}
       />
 
-      <div className="mx-auto max-w-5xl space-y-16 px-4 lg:px-0">
+      <div className="mx-auto max-w-7xl space-y-16 px-4 lg:px-0">
         {folder.description ? (
           <div className="flex flex-col">
             <MarkdownView content={folder.description ?? ""} />

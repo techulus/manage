@@ -1,5 +1,5 @@
 import NavBar from "@/components/console/navbar";
-import { isDatabaseReady, migrateDatabase } from "@/lib/utils/useDatabase";
+import { isDatabaseReady } from "@/lib/utils/useDatabase";
 import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -14,8 +14,6 @@ export default async function ConsoleLayout({
   if (!ready) {
     console.log("Database not ready, redirecting to start");
     redirect("/console/start");
-  } else {
-    await migrateDatabase();
   }
 
   return (

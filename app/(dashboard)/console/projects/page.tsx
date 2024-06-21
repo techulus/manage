@@ -40,7 +40,7 @@ export default async function Projects({ searchParams }: Props) {
           action="/console/projects"
           className="mx-4 flex flex-1 justify-center py-4 lg:justify-end xl:m-0 xl:pb-0 xl:pt-4"
         >
-          <div className="mx-auto w-full max-w-5xl">
+          <div className="mx-auto w-full max-w-7xl">
             <label htmlFor="search" className="sr-only">
               Search projects
             </label>
@@ -71,7 +71,7 @@ export default async function Projects({ searchParams }: Props) {
       </ContentBlock>
 
       {archivedProjects.length > 0 && (
-        <div className="mx-auto mt-12 flex w-full max-w-5xl flex-grow items-center border-t border-muted py-4">
+        <div className="mx-auto mt-12 flex w-full max-w-7xl flex-grow items-center border-t border-muted py-4">
           <p className="text-sm text-muted-foreground">
             {archivedProjects.length} archived project(s)
           </p>
