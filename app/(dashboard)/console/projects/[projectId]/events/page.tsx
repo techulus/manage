@@ -57,6 +57,16 @@ export default async function EventDetails({ params, searchParams }: Props) {
             imageUrl: true,
           },
         },
+        invites: {
+          with: {
+            user: {
+              columns: {
+                firstName: true,
+                imageUrl: true,
+              },
+            },
+          },
+        },
       },
     })
     .execute();

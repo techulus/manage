@@ -6,6 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import { calendarEvent } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
+import { allUser } from "@/lib/utils/useOwner";
 import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -18,11 +19,30 @@ type Props = {
   };
 };
 
-export default async function CreateEvent({ params }: Props) {
+export default async function EditEvent({ params }: Props) {
   const { projectId, eventId } = params;
 
+  const users = await allUser();
   const event = await database().query.calendarEvent.findFirst({
     where: eq(calendarEvent.id, +eventId),
+    with: {
+      creator: {
+        columns: {
+          firstName: true,
+          imageUrl: true,
+        },
+      },
+      invites: {
+        with: {
+          user: {
+            columns: {
+              firstName: true,
+              imageUrl: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   if (!event) {
@@ -39,7 +59,7 @@ export default async function CreateEvent({ params }: Props) {
         <input type="hidden" name="projectId" defaultValue={projectId} />
         <ContentBlock>
           <CardContent>
-            <EventForm item={event} />
+            <EventForm item={event} users={users} />
           </CardContent>
           <CardFooter>
             <div className="ml-auto flex items-center justify-end gap-x-6">

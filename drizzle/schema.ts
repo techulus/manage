@@ -1,5 +1,5 @@
 import { User } from "@clerk/nextjs/dist/types/server";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   customType,
   integer,
@@ -33,6 +33,8 @@ export const userRelations = relations(user, ({ many }) => ({
   projects: many(project),
   documents: many(document),
   taskLists: many(taskList),
+  events: many(calendarEvent),
+  eventInvites: many(eventInvite),
 }));
 
 export const project = sqliteTable("Project", {
@@ -241,14 +243,46 @@ export const calendarEvent = sqliteTable("Event", {
     .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
 });
 
-export const calendarEventRelations = relations(calendarEvent, ({ one }) => ({
-  creator: one(user, {
-    fields: [calendarEvent.createdByUser],
-    references: [user.id],
+export const calendarEventRelations = relations(
+  calendarEvent,
+  ({ one, many }) => ({
+    creator: one(user, {
+      fields: [calendarEvent.createdByUser],
+      references: [user.id],
+    }),
+    project: one(project, {
+      fields: [calendarEvent.projectId],
+      references: [project.id],
+    }),
+    invites: many(eventInvite),
+  })
+);
+
+export const eventInvite = sqliteTable("CalendarEventInvite", {
+  id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+  eventId: integer("eventId")
+    .notNull()
+    .references(() => calendarEvent.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  status: text("status"),
+  invitedAt: integer("createdAt", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
+
+export const eventInviteRelations = relations(eventInvite, ({ one }) => ({
+  event: one(calendarEvent, {
+    fields: [eventInvite.eventId],
+    references: [calendarEvent.id],
   }),
-  project: one(project, {
-    fields: [calendarEvent.projectId],
-    references: [project.id],
+  user: one(user, {
+    fields: [eventInvite.userId],
+    references: [user.id],
   }),
 }));
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { Calendar } from "@/components/ui/calendar";
-import { EventWithCreator } from "@/drizzle/types";
+import { EventWithInvites } from "@/drizzle/types";
 import { useRouter } from "next/navigation";
 import { DateTimePicker } from "./date-time-picker";
 import EventsList from "./events-list";
@@ -10,15 +10,17 @@ export default function EventsCalendar({
   projectId,
   events,
   selectedDate = new Date().toISOString(),
+  compact = false,
 }: {
   projectId: string;
-  events: EventWithCreator[];
+  events: EventWithInvites[];
   selectedDate?: string;
+  compact?: boolean;
 }) {
   const router = useRouter();
 
   return (
-    <div className="flex w-full flex-col justify-center md:flex-row md:space-x-2">
+    <div className="flex w-full flex-col md:flex-row md:space-x-2">
       <div className="p-3 md:hidden">
         <DateTimePicker
           dateOnly
@@ -33,7 +35,7 @@ export default function EventsCalendar({
       </div>
 
       <Calendar
-        className="m-auto hidden md:block"
+        className="hidden md:block"
         mode="single"
         selected={new Date(selectedDate)}
         onDayClick={(date) => {
@@ -47,7 +49,7 @@ export default function EventsCalendar({
         events={events}
         projectId={projectId}
         date={selectedDate}
-        compact
+        compact={compact}
       />
     </div>
   );

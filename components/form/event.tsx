@@ -1,11 +1,13 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { CalendarEvent } from "@/drizzle/types";
+import { EventWithInvites, User } from "@/drizzle/types";
 import { useState } from "react";
 import { RRule, rrulestr } from "rrule";
 import MarkdownEditor from "../editor";
 import { DateTimePicker } from "../project/events/date-time-picker";
+import { Assignee } from "../project/shared/assigee";
+import { MultiUserSelect } from "../project/shared/multi-user-select";
 import { Label } from "../ui/label";
 import {
   Select,
@@ -16,8 +18,17 @@ import {
 } from "../ui/select";
 import { Switch } from "../ui/switch";
 
-export default function EventForm({ item }: { item?: CalendarEvent | null }) {
+export default function EventForm({
+  item,
+  users,
+}: {
+  item?: EventWithInvites | null;
+  users: User[];
+}) {
   const [allDay, setAllDay] = useState(item?.allDay ?? false);
+  const [invites, setInvites] = useState<string[]>(
+    item?.invites?.map((invite) => invite.userId) ?? []
+  );
 
   const start = item?.start
     ? new Date(item.start)
@@ -94,6 +105,40 @@ export default function EventForm({ item }: { item?: CalendarEvent | null }) {
         </div>
       </div>
 
+      {users.length ? (
+        <div className="space-y-2">
+          <label
+            htmlFor="invite"
+            className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5 lg:text-left"
+          >
+            Invite
+          </label>
+          <div className="mt-2 sm:col-span-2 sm:mt-0">
+            <input type="hidden" name="invites" value={invites.join(",")} />
+            {invites.length ? (
+              <div className="mb-2 flex space-x-2">
+                {invites.map((userId) => (
+                  <div key={userId} className="flex items-center">
+                    <Assignee
+                      user={users.find((user) => user.id === userId)!}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {users.filter((user) => !invites.includes(user.id)).length ? (
+              <MultiUserSelect
+                users={users}
+                onUpdate={(userId) => {
+                  setInvites((invites) => [...invites, userId]);
+                }}
+              />
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+
       <div className="space-y-2">
         <label
           htmlFor="markdownContent"
@@ -105,6 +150,7 @@ export default function EventForm({ item }: { item?: CalendarEvent | null }) {
           <MarkdownEditor
             defaultValue={item?.description ?? ""}
             name="description"
+            compact
           />
         </div>
       </div>

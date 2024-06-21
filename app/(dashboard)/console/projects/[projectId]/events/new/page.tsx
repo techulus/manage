@@ -4,6 +4,7 @@ import EventForm from "@/components/form/event";
 import PageTitle from "@/components/layout/page-title";
 import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
+import { allUser } from "@/lib/utils/useOwner";
 import Link from "next/link";
 import { createEvent } from "../actions";
 
@@ -16,6 +17,8 @@ type Props = {
 export default async function CreateEvent({ params }: Props) {
   const backUrl = `/console/projects/${params.projectId}`;
 
+  const users = await allUser();
+
   return (
     <>
       <PageTitle title="Create Event" backUrl={backUrl} />
@@ -23,7 +26,7 @@ export default async function CreateEvent({ params }: Props) {
         <input type="hidden" name="projectId" defaultValue={params.projectId} />
         <ContentBlock>
           <CardContent>
-            <EventForm />
+            <EventForm users={users} />
           </CardContent>
           <CardFooter>
             <div className="ml-auto flex items-center justify-end gap-x-6">

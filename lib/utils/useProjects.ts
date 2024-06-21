@@ -104,6 +104,16 @@ export async function getProjectById(
                     imageUrl: true,
                   },
                 },
+                invites: {
+                  with: {
+                    user: {
+                      columns: {
+                        firstName: true,
+                        imageUrl: true,
+                      },
+                    },
+                  },
+                },
               },
             },
           }

@@ -1,4 +1,4 @@
-import { isDatabaseReady, migrateDatabase } from "@/lib/utils/useDatabase";
+import { isDatabaseReady } from "@/lib/utils/useDatabase";
 import { redirect } from "next/navigation";
 
 export default async function Start() {
@@ -9,6 +9,5 @@ export default async function Start() {
     redirect("/console/start");
   }
 
-  await migrateDatabase();
   redirect("/console/projects");
 }

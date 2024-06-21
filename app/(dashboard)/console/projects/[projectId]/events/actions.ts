@@ -1,6 +1,6 @@
 "use server";
 
-import { calendarEvent } from "@/drizzle/schema";
+import { calendarEvent, eventInvite } from "@/drizzle/schema";
 import { getEndOfDay, getStartOfDay } from "@/lib/utils/time";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
@@ -20,6 +20,9 @@ export async function createEvent(payload: FormData) {
     : null;
   const allDay = (payload.get("allDay") as string) === "on";
   const repeat = payload.get("repeat") as string;
+  const invites = ((payload.get("invites") as string) ?? "")
+    .split(",")
+    .filter(Boolean);
 
   const repeatRule = repeat
     ? new RRule({
@@ -29,7 +32,7 @@ export async function createEvent(payload: FormData) {
       })
     : undefined;
 
-  await database()
+  const createdEvent = await database()
     .insert(calendarEvent)
     .values({
       name,
@@ -43,7 +46,19 @@ export async function createEvent(payload: FormData) {
       createdAt: new Date(),
       updatedAt: new Date(),
     })
-    .run();
+    .returning()
+    .get();
+
+  for (const userId of invites) {
+    await database()
+      .insert(eventInvite)
+      .values({
+        eventId: createdEvent.id,
+        userId,
+        status: "invited",
+      })
+      .run();
+  }
 
   revalidatePath(`/console/projects/${projectId}`);
   redirect(`/console/projects/${projectId}`);
@@ -60,6 +75,7 @@ export async function updateEvent(payload: FormData) {
   const allDay = (payload.get("allDay") as string) === "on";
   const repeat = payload.get("repeat") as string;
   const projectId = payload.get("projectId") as string;
+  const invites = ((payload.get("invites") as string) ?? "").split(",");
 
   const repeatRule = repeat
     ? new RRule({
@@ -69,17 +85,18 @@ export async function updateEvent(payload: FormData) {
       })
     : undefined;
 
-  console.log({
-    id,
-    projectId,
-    name,
-    description,
-    start,
-    end,
-    allDay,
-    repeatRule: repeatRule?.toString(),
-    updatedAt: new Date(),
-  });
+  await database().delete(eventInvite).where(eq(eventInvite.eventId, id)).run();
+
+  for (const userId of invites) {
+    await database()
+      .insert(eventInvite)
+      .values({
+        eventId: id,
+        userId,
+        status: "invited",
+      })
+      .run();
+  }
 
   await database()
     .update(calendarEvent)

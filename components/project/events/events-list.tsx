@@ -10,14 +10,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { EventWithCreator } from "@/drizzle/types";
+import { EventWithInvites } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { getEndOfDay, getStartOfDay } from "@/lib/utils/time";
 import { CircleEllipsisIcon } from "lucide-react";
 import Link from "next/link";
 import { rrulestr } from "rrule";
+import { Assignee } from "../shared/assigee";
 
-const filterByRepeatRule = (event: EventWithCreator, date: Date) => {
+const filterByRepeatRule = (event: EventWithInvites, date: Date) => {
   if (event.repeatRule) {
     const rrule = rrulestr(event.repeatRule);
     const start = new Date(getStartOfDay(date));
@@ -37,7 +38,7 @@ export default function EventsList({
 }: {
   date: string;
   projectId: string;
-  events: EventWithCreator[];
+  events: EventWithInvites[];
   compact?: boolean;
 }) {
   const filteredEvents = events.filter((x) =>
@@ -91,6 +92,17 @@ export default function EventsList({
                   ? `, ` + rrulestr(event.repeatRule).toText()
                   : null}
               </div>
+
+              {event.invites.length ? (
+                <div className="my-2 flex space-x-2">
+                  {event.invites.map((invite) => (
+                    <div key={invite.userId} className="flex items-center">
+                      <Assignee user={invite.user} imageOnly={compact} />
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+
               {event.description && !compact ? (
                 <MarkdownView content={event.description ?? ""} />
               ) : null}
