@@ -2,12 +2,14 @@
 
 import { Input } from "@/components/ui/input";
 import { EventWithInvites, User } from "@/drizzle/types";
+import { Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import { RRule, rrulestr } from "rrule";
 import MarkdownEditor from "../editor";
 import { DateTimePicker } from "../project/events/date-time-picker";
 import { Assignee } from "../project/shared/assigee";
 import { MultiUserSelect } from "../project/shared/multi-user-select";
+import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import {
   Select,
@@ -122,6 +124,17 @@ export default function EventForm({
                     <Assignee
                       user={users.find((user) => user.id === userId)!}
                     />
+                    <Button
+                      variant="link"
+                      size="sm"
+                      onClick={() => {
+                        setInvites((invites) => [
+                          ...invites.filter((x) => x !== userId),
+                        ]);
+                      }}
+                    >
+                      <Trash2Icon className="h-5 w-5" />
+                    </Button>
                   </div>
                 ))}
               </div>
