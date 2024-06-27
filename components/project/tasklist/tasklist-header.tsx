@@ -1,15 +1,31 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { TaskList } from "@/drizzle/types";
+import { CircleEllipsisIcon } from "lucide-react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 export const TaskListHeader = ({
   taskList,
   totalCount,
   doneCount,
+  partialUpdateTaskList,
 }: {
   taskList: TaskList;
   totalCount?: number;
   doneCount?: number;
+  partialUpdateTaskList?: (
+    id: number,
+    data: { status: string }
+  ) => Promise<void>;
 }) => {
   const completedPercent =
     totalCount != null && doneCount != null ? doneCount / totalCount : null;
@@ -40,11 +56,53 @@ export const TaskListHeader = ({
           </Badge>
         ) : null}
         {taskList.dueDate ? (
-          <Badge variant="outline" className="ml-2">
+          <Badge variant="outline" className="ml-2" suppressHydrationWarning>
             Due {taskList.dueDate.toLocaleDateString()}
           </Badge>
         ) : null}
       </Link>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger className="absolute right-3 top-3">
+          <CircleEllipsisIcon className="h-6 w-6" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem className="w-full p-0">
+            <Link
+              href={`/console/projects/${taskList.projectId}/tasklists/${taskList.id}/edit`}
+              className={buttonVariants({
+                variant: "ghost",
+                className: "w-full",
+              })}
+            >
+              Edit
+            </Link>
+          </DropdownMenuItem>
+          {partialUpdateTaskList ? (
+            <DropdownMenuItem className="w-full p-0">
+              <Button
+                variant="ghost"
+                className="w-full"
+                onClick={async () => {
+                  toast.promise(
+                    partialUpdateTaskList(taskList.id, {
+                      status:
+                        taskList.status === "active" ? "archived" : "active",
+                    }),
+                    {
+                      loading: "Updating task list...",
+                      success: "Task list updated.",
+                      error: "Failed to update task list.",
+                    }
+                  );
+                }}
+              >
+                {taskList.status === "active" ? "Archive" : "Unarchive"}
+              </Button>
+            </DropdownMenuItem>
+          ) : null}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };
