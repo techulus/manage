@@ -28,6 +28,7 @@ export default async function EditEvent({ params }: Props) {
     with: {
       creator: {
         columns: {
+          id: true,
           firstName: true,
           imageUrl: true,
         },
