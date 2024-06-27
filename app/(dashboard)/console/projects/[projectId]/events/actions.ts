@@ -75,7 +75,9 @@ export async function updateEvent(payload: FormData) {
   const allDay = (payload.get("allDay") as string) === "on";
   const repeat = payload.get("repeat") as string;
   const projectId = payload.get("projectId") as string;
-  const invites = ((payload.get("invites") as string) ?? "").split(",");
+  const invites = ((payload.get("invites") as string) ?? "")
+    .split(",")
+    .filter(Boolean);
 
   const repeatRule = repeat
     ? new RRule({
