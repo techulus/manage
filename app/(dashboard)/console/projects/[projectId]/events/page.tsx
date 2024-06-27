@@ -83,7 +83,7 @@ export default async function EventDetails({ params, searchParams }: Props) {
         </div>
       </PageTitle>
 
-      <div className="mx-auto my-12 max-w-7xl space-y-12 px-4 lg:px-0">
+      <div className="mx-auto my-12 max-w-7xl space-y-12 px-4 lg:px-0 xl:-mt-6">
         <div className="flex w-full rounded-lg border bg-white dark:bg-black">
           <EventsCalendar
             projectId={projectId}
