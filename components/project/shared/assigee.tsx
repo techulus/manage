@@ -1,6 +1,6 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 
 export function Assignee({
   className,
@@ -14,13 +14,10 @@ export function Assignee({
   return (
     <div className={cn("flex items-center", className)}>
       {user?.imageUrl ? (
-        <Image
-          src={user?.imageUrl}
-          alt={user?.firstName ?? ""}
-          width={20}
-          height={20}
-          className="rounded-full"
-        />
+        <Avatar className="h-5 w-5">
+          <AvatarImage src={user.imageUrl} />
+          <AvatarFallback>{user.firstName}</AvatarFallback>
+        </Avatar>
       ) : null}
       {!imageOnly ? <p className="ml-2">{user?.firstName}</p> : null}
     </div>

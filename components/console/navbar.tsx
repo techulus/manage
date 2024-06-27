@@ -7,7 +7,7 @@ import { SignedIn } from "@clerk/nextjs";
 import { Transition } from "@headlessui/react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { useMemo } from "react";
 import logo from "../../public/images/logo.png";
 import { ThemedOrgSwitcher, ThemedUserButton } from "../core/auth";
@@ -16,23 +16,52 @@ import { createToastWrapper } from "../core/toast";
 export default function NavBar() {
   const appearance = useTheme();
   const path = usePathname();
+  const { projectId } = useParams();
 
   const [isSticky, ref] = useDetectSticky();
 
   const tabs = useMemo(
-    () => [
-      {
-        name: "Projects",
-        href: "/console/projects",
-        current: path.startsWith("/console/projects"),
-      },
-      {
-        name: "Settings",
-        href: "/console/settings",
-        current: path === "/console/settings",
-      },
-    ],
-    [path]
+    () =>
+      projectId
+        ? [
+            {
+              name: "Overview",
+              href: `/console/projects/${projectId}`,
+              current: path === `/console/projects/${projectId}`,
+            },
+            {
+              name: "Task lists",
+              href: `/console/projects/${projectId}/tasklists`,
+              current: path.startsWith(
+                `/console/projects/${projectId}/tasklists`
+              ),
+            },
+            {
+              name: "Docs & Files",
+              href: `/console/projects/${projectId}/documents`,
+              current: path.startsWith(
+                `/console/projects/${projectId}/documents`
+              ),
+            },
+            {
+              name: "Events",
+              href: `/console/projects/${projectId}/events`,
+              current: path.startsWith(`/console/projects/${projectId}/events`),
+            },
+          ]
+        : [
+            {
+              name: "Projects",
+              href: "/console/projects",
+              current: path.startsWith("/console/projects"),
+            },
+            {
+              name: "Settings",
+              href: "/console/settings",
+              current: path === "/console/settings",
+            },
+          ],
+    [path, projectId]
   );
   return (
     <>
@@ -73,18 +102,18 @@ export default function NavBar() {
               </SignedIn>
             </div>
 
-            <SignedIn>
-              <div className="ml-2 flex justify-center">
+            <div className="ml-2 flex justify-center">
+              <SignedIn>
                 <ThemedUserButton appearance={appearance} />
-              </div>
-            </SignedIn>
+              </SignedIn>
+            </div>
           </div>
         </div>
       </nav>
 
       <div
         className={cn(
-          "sticky -top-[1px] z-10 -mb-px flex min-w-full self-start border-b border-gray-200 bg-background px-4 dark:border-gray-800 lg:px-8",
+          "sticky -top-[1px] z-10 -mb-px flex w-screen self-start border-b border-gray-200 bg-background px-4 dark:border-gray-800 lg:px-8",
           isSticky ? "pt-[1px] shadow-md" : ""
         )}
         ref={ref}
@@ -92,7 +121,7 @@ export default function NavBar() {
       >
         <Transition
           show={isSticky}
-          className="absolute self-center"
+          className="absolute hidden self-center md:block"
           enter="transition-all ease-in-out duration-300"
           enterFrom="transform  translate-y-[-100%] opacity-0"
           enterTo="transform  translate-y-0 opacity-100"
@@ -115,7 +144,7 @@ export default function NavBar() {
           className={cn(
             "flex space-x-1 overflow-y-scroll",
             "transition duration-300 ease-in-out",
-            isSticky ? "translate-x-[40px]" : "translate-x-0"
+            isSticky ? "md:translate-x-[40px]" : "md:translate-x-0"
           )}
         >
           {tabs.map((tab) => (

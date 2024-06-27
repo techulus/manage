@@ -1,6 +1,6 @@
 "use client";
 
-import { updateTask } from "@/app/console/projects/[projectId]/tasklists/actions";
+import { updateTask } from "@/app/(dashboard)/console/projects/[projectId]/tasklists/actions";
 import { MarkdownView } from "@/components/core/markdown-view";
 import MarkdownEditor from "@/components/editor";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ export default function TaskNotesForm({ task }: { task: TaskWithDetails }) {
         <div className="mt-2">
           <Button
             className="mr-2"
-            variant="secondary"
+            variant="ghost"
             onClick={() => {
               setIsEditing(false);
             }}
@@ -46,7 +46,7 @@ export default function TaskNotesForm({ task }: { task: TaskWithDetails }) {
   return (
     <div className="flex flex-grow flex-col items-start">
       {task.description ? (
-        <span className="w-full rounded-md border border-muted p-2">
+        <span className="w-full rounded-lg border border-muted p-2">
           <MarkdownView content={task.description ?? ""} />
         </span>
       ) : null}

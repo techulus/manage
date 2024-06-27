@@ -3,7 +3,7 @@
 import {
   deleteTask,
   updateTask,
-} from "@/app/console/projects/[projectId]/tasklists/actions";
+} from "@/app/(dashboard)/console/projects/[projectId]/tasklists/actions";
 import { Task, TaskWithDetails, User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 // @ts-ignore

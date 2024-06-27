@@ -1,19 +1,19 @@
-import { deleteComment } from "@/app/console/projects/actions";
+import { deleteComment } from "@/app/(dashboard)/console/projects/actions";
 import { MarkdownView } from "@/components/core/markdown-view";
 import { DeleteButton } from "@/components/form/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuLabel,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { comment } from "@/drizzle/schema";
 import { cn } from "@/lib/utils";
 import { database } from "@/lib/utils/useDatabase";
-import { auth } from "@clerk/nextjs";
+import { getOwner } from "@/lib/utils/useOwner";
 import { and, desc, eq } from "drizzle-orm";
 import { CircleEllipsisIcon } from "lucide-react";
-import Image from "next/image";
 
 export async function Comments({
   parentId,
@@ -24,7 +24,7 @@ export async function Comments({
   parentId: string | number;
   className?: string;
 }) {
-  const { userId } = auth();
+  const { userId } = getOwner();
 
   const comments = await database().query.comment.findMany({
     where: and(eq(comment.parentId, +parentId), eq(comment.type, type)),
@@ -35,7 +35,7 @@ export async function Comments({
   });
 
   return (
-    <div className={cn("flex flex-col divide-y-2 border-t", className)}>
+    <div className={cn("flex flex-col divide-y-2", className)}>
       {comments.map((comment) => (
         <div
           key={`${comment.type}-${comment.id}`}
@@ -46,13 +46,12 @@ export async function Comments({
               {new Date(comment.createdAt).toLocaleString()}
             </div>
             {comment.creator.imageUrl ? (
-              <Image
-                src={comment.creator.imageUrl}
-                alt={comment.creator?.firstName ?? "User"}
-                width={36}
-                height={36}
-                className="h-8 w-8 rounded-full"
-              />
+              <Avatar>
+                <AvatarImage src={comment.creator.imageUrl} />
+                <AvatarFallback>
+                  {comment.creator?.firstName ?? "User"}
+                </AvatarFallback>
+              </Avatar>
             ) : null}
             <div>
               <div className="font-semibold">
@@ -71,16 +70,16 @@ export async function Comments({
                     <CircleEllipsisIcon className="h-6 w-6" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuLabel className="m-0 p-0">
+                    <DropdownMenuItem className="m-0 p-0">
                       <form action={deleteComment}>
                         <input type="hidden" name="id" value={comment.id} />
                         <DeleteButton
                           action="Delete"
-                          size="sm"
                           className="w-full"
+                          compact
                         />
                       </form>
-                    </DropdownMenuLabel>
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : null}

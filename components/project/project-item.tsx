@@ -1,8 +1,8 @@
 import { ProjectWithCreator } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { convertMarkdownToPlainText } from "@/lib/utils/useMarkdown";
-import Image from "next/image";
 import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 
 export const ProjecItem = ({
@@ -14,11 +14,11 @@ export const ProjecItem = ({
     <div
       key={id}
       className={cn(
-        "relative flex justify-between space-x-3 rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-sm hover:border-gray-400 dark:border-gray-800 dark:bg-black dark:hover:border-gray-700"
+        "relative flex h-[180px] justify-between space-x-3 rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-sm hover:border-gray-400 dark:border-gray-800 dark:bg-black dark:hover:border-gray-700"
       )}
     >
       <div>
-        <h3 className="text-xl font-semibold leading-6 tracking-tight text-gray-900 dark:text-gray-50">
+        <h3 className="text-heading text-2xl text-gray-900 dark:text-gray-50">
           <Link href={`/console/projects/${id}`} className="focus:outline-none">
             <span className="absolute inset-0" aria-hidden="true" />
             {name}
@@ -38,13 +38,10 @@ export const ProjecItem = ({
         aria-hidden="true"
       >
         {creator.imageUrl ? (
-          <Image
-            src={creator?.imageUrl}
-            alt={creator?.firstName ?? creator?.email}
-            width={24}
-            height={24}
-            className="rounded-full"
-          />
+          <Avatar>
+            <AvatarImage src={creator.imageUrl} />
+            <AvatarFallback>{creator?.firstName ?? "User"}</AvatarFallback>
+          </Avatar>
         ) : null}
       </span>
     </div>
