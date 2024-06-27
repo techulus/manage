@@ -4,6 +4,7 @@ import EventsCalendar from "@/components/project/events/events-calendar";
 import { calendarEvent } from "@/drizzle/schema";
 import { getEndOfDay, getStartOfDay } from "@/lib/utils/time";
 import { database } from "@/lib/utils/useDatabase";
+import { getOwner } from "@/lib/utils/useOwner";
 import {
   and,
   asc,
@@ -28,6 +29,7 @@ type Props = {
 export default async function EventDetails({ params, searchParams }: Props) {
   const { projectId } = params;
   const { date } = searchParams;
+  const { userId } = getOwner();
 
   const selectedDate = date ? new Date(date) : new Date();
   const dayCommentId = `${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDate()}`;
@@ -53,6 +55,7 @@ export default async function EventDetails({ params, searchParams }: Props) {
       with: {
         creator: {
           columns: {
+            id: true,
             firstName: true,
             imageUrl: true,
           },
@@ -87,6 +90,7 @@ export default async function EventDetails({ params, searchParams }: Props) {
         <div className="flex w-full rounded-lg border bg-white dark:bg-black">
           <EventsCalendar
             projectId={projectId}
+            userId={userId}
             events={events}
             selectedDate={selectedDate.toISOString()}
           />

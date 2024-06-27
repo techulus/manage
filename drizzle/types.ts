@@ -65,7 +65,7 @@ export type BlobWithCreater = Blob & {
 };
 
 export type EventWithCreator = CalendarEvent & {
-  creator: Pick<User, "firstName" | "imageUrl">;
+  creator: Pick<User, "id" | "firstName" | "imageUrl">;
 };
 
 export type EventInviteWithUser = EventInvite & {

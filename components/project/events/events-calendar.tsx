@@ -8,11 +8,13 @@ import EventsList from "./events-list";
 
 export default function EventsCalendar({
   projectId,
+  userId,
   events,
   selectedDate = new Date().toISOString(),
   compact = false,
 }: {
   projectId: string;
+  userId: string;
   events: EventWithInvites[];
   selectedDate?: string;
   compact?: boolean;
@@ -48,6 +50,7 @@ export default function EventsCalendar({
       <EventsList
         events={events}
         projectId={projectId}
+        userId={userId}
         date={selectedDate}
         compact={compact}
       />

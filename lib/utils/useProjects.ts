@@ -100,6 +100,7 @@ export async function getProjectById(
               with: {
                 creator: {
                   columns: {
+                    id: true,
                     firstName: true,
                     imageUrl: true,
                   },

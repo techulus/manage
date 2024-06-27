@@ -8,6 +8,7 @@ import { DocumentHeader } from "@/components/project/document/document-header";
 import EventsCalendar from "@/components/project/events/events-calendar";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
 import { Badge } from "@/components/ui/badge";
+import { getOwner } from "@/lib/utils/useOwner";
 import { getProjectById } from "@/lib/utils/useProjects";
 import {
   CalendarPlusIcon,
@@ -28,6 +29,7 @@ export default async function ProjectDetails({ params }: Props) {
   const { projectId } = params;
 
   const project = await getProjectById(projectId, true);
+  const { userId } = getOwner();
 
   return (
     <>
@@ -222,6 +224,7 @@ export default async function ProjectDetails({ params }: Props) {
           <div className="flex w-full rounded-lg border bg-white dark:bg-black">
             <EventsCalendar
               projectId={projectId}
+              userId={userId}
               events={project.events}
               compact
             />

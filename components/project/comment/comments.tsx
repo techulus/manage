@@ -11,7 +11,7 @@ import {
 import { comment } from "@/drizzle/schema";
 import { cn } from "@/lib/utils";
 import { database } from "@/lib/utils/useDatabase";
-import { auth } from "@clerk/nextjs/server";
+import { getOwner } from "@/lib/utils/useOwner";
 import { and, desc, eq } from "drizzle-orm";
 import { CircleEllipsisIcon } from "lucide-react";
 
@@ -24,7 +24,7 @@ export async function Comments({
   parentId: string | number;
   className?: string;
 }) {
-  const { userId } = auth();
+  const { userId } = getOwner();
 
   const comments = await database().query.comment.findMany({
     where: and(eq(comment.parentId, +parentId), eq(comment.type, type)),

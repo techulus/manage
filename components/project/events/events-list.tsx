@@ -33,11 +33,13 @@ const filterByRepeatRule = (event: EventWithInvites, date: Date) => {
 export default function EventsList({
   date,
   projectId,
+  userId,
   events,
   compact,
 }: {
   date: string;
   projectId: string;
+  userId: string;
   events: EventWithInvites[];
   compact?: boolean;
 }) {
@@ -107,37 +109,39 @@ export default function EventsList({
                 <MarkdownView content={event.description ?? ""} />
               ) : null}
 
-              <DropdownMenu>
-                <DropdownMenuTrigger className="absolute right-0 top-0">
-                  <CircleEllipsisIcon className="h-6 w-6" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem className="w-full p-0">
-                    <form action={deleteEvent} className="w-full">
-                      <input type="hidden" name="id" value={event.id} />
-                      <Link
-                        href={`/console/projects/${projectId}/events/${event.id}/edit`}
-                        className={buttonVariants({
-                          variant: "ghost",
-                          className: "w-full",
-                        })}
-                      >
-                        Edit
-                      </Link>
-                    </form>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="w-full p-0">
-                    <form action={deleteEvent} className="w-full">
-                      <input type="hidden" name="id" value={event.id} />
-                      <DeleteButton
-                        action="Delete"
-                        className="w-full"
-                        compact
-                      />
-                    </form>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {event.creator.id === userId ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="absolute right-0 top-0">
+                    <CircleEllipsisIcon className="h-6 w-6" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem className="w-full p-0">
+                      <form action={deleteEvent} className="w-full">
+                        <input type="hidden" name="id" value={event.id} />
+                        <Link
+                          href={`/console/projects/${projectId}/events/${event.id}/edit`}
+                          className={buttonVariants({
+                            variant: "ghost",
+                            className: "w-full",
+                          })}
+                        >
+                          Edit
+                        </Link>
+                      </form>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="w-full p-0">
+                      <form action={deleteEvent} className="w-full">
+                        <input type="hidden" name="id" value={event.id} />
+                        <DeleteButton
+                          action="Delete"
+                          className="w-full"
+                          compact
+                        />
+                      </form>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : null}
             </div>
           </div>
         </div>
