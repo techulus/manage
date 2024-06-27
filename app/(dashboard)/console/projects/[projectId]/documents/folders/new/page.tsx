@@ -18,7 +18,7 @@ export default async function CreateDocumentFolder({ params }: Props) {
   return (
     <>
       <PageTitle title="Create Folder" backUrl={backUrl} />
-      <form action={createDocumentFolder}>
+      <form action={createDocumentFolder} className="xl:-mt-8">
         <input type="hidden" name="projectId" defaultValue={params.projectId} />
         <ContentBlock>
           <CardContent>

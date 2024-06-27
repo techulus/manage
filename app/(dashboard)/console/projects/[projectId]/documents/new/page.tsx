@@ -19,7 +19,7 @@ export default async function CreateDocument({ params }: Props) {
   return (
     <>
       <PageTitle title="Create Document" backUrl={backUrl} />
-      <form action={createDocument}>
+      <form action={createDocument} className="xl:-mt-8">
         <input type="hidden" name="projectId" defaultValue={params.projectId} />
         <ContentBlock>
           <CardContent>

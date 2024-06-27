@@ -11,7 +11,7 @@ export default async function CreateProject() {
   return (
     <>
       <PageTitle title="Create Project" backUrl="/console/projects" />
-      <form action={createProject}>
+      <form action={createProject} className="xl:-mt-8">
         <ContentBlock>
           <CardContent>
             <SharedForm />

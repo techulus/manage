@@ -18,7 +18,7 @@ export default async function CreateTaskList({ params }: Props) {
   return (
     <>
       <PageTitle title="Create task list" backUrl={backUrl} />
-      <form action={createTaskList}>
+      <form action={createTaskList} className="xl:-mt-8">
         <input type="hidden" name="projectId" defaultValue={params.projectId} />
         <ContentBlock>
           <CardContent>

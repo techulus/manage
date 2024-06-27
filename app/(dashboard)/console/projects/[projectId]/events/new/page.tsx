@@ -22,7 +22,7 @@ export default async function CreateEvent({ params }: Props) {
   return (
     <>
       <PageTitle title="Create Event" backUrl={backUrl} />
-      <form action={createEvent}>
+      <form action={createEvent} className="xl:-mt-8">
         <input type="hidden" name="projectId" defaultValue={params.projectId} />
         <ContentBlock>
           <CardContent>
