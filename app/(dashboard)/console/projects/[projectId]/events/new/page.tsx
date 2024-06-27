@@ -15,7 +15,7 @@ type Props = {
 };
 
 export default async function CreateEvent({ params }: Props) {
-  const backUrl = `/console/projects/${params.projectId}`;
+  const backUrl = `/console/projects/${params.projectId}/events`;
 
   const users = await allUser();
 

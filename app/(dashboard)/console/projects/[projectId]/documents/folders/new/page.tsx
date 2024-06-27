@@ -14,7 +14,7 @@ type Props = {
 };
 
 export default async function CreateDocumentFolder({ params }: Props) {
-  const backUrl = `/console/projects/${params.projectId}`;
+  const backUrl = `/console/projects/${params.projectId}/documents`;
   return (
     <>
       <PageTitle title="Create Folder" backUrl={backUrl} />
