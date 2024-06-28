@@ -304,3 +304,29 @@ export const commentRelations = relations(comment, ({ one }) => ({
     references: [user.id],
   }),
 }));
+
+export const activity = sqliteTable("Activity", {
+  id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+  type: text("type").notNull(),
+  message: text("message"),
+  parentId: integer("parentId").notNull(),
+  projectId: integer("projectId")
+    .notNull()
+    .references(() => project.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+});
+
+export const activityRelations = relations(activity, ({ one }) => ({
+  actor: one(user, {
+    fields: [activity.userId],
+    references: [user.id],
+  }),
+  project: one(project, {
+    fields: [activity.projectId],
+    references: [project.id],
+  }),
+}));

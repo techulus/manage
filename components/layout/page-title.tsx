@@ -23,7 +23,7 @@ export default function PageTitle({
 }: PropsWithChildren<Props>) {
   return (
     <div className="flex justify-center border-b bg-gray-50 pb-4 pl-4 pr-6 pt-4 dark:bg-card dark:text-white sm:pl-6 lg:pl-8 xl:border-t-0 xl:px-8 xl:py-14">
-      <div className="flex w-full max-w-7xl justify-between">
+      <div className="flex w-full max-w-5xl justify-between">
         <div className="flex items-center">
           {backUrl && (
             <SignedIn>

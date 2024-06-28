@@ -1,5 +1,5 @@
 @import url("~easymde/dist/easymde.min.css");
-@import "../node_modules/cal-sans/index.css";
+@import "/fonts/Mona-Sans.woff2";
 
 @tailwind base;
 @tailwind components;
@@ -145,6 +145,14 @@ textarea {
   border-radius: var(--radius);
 }
 
+@font-face {
+  font-family: "Mona Sans";
+  src: url("/fonts/Mona-Sans.woff2") format("woff2 supports variations"),
+    url("/fonts/Mona-Sans.woff2") format("woff2-variations");
+  font-weight: 900 600;
+  font-stretch: 150% 125%;
+}
+
 .text-heading {
-  font-family: "Cal Sans", sans-serif;
+  font-family: "Mona Sans", sans-serif;
 }

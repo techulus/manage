@@ -39,7 +39,7 @@ export const TaskListHeader = ({
         />
       ) : null}
       <Link
-        href={`/console/projects/${taskList.projectId}/tasklists`}
+        href={`/console/projects/${taskList.projectId}/tasklists/${taskList.id}`}
         className="text-sm font-medium"
       >
         <span className="absolute inset-0" aria-hidden="true" />

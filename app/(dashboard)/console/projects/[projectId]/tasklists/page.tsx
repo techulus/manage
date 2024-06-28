@@ -80,14 +80,17 @@ export default async function TaskLists({ params, searchParams }: Props) {
         actionLink={`/console/projects/${projectId}/tasklists/new`}
       />
 
-      <div className="mx-auto my-12 max-w-7xl px-4 lg:px-0 xl:-mt-12">
+      <div className="mx-auto my-12 max-w-5xl px-4 lg:px-0 xl:-mt-12">
         <EmptyState
           show={!taskLists.length}
           label="task list"
           createLink={`/console/projects/${projectId}/tasklists/new`}
         />
 
-        <ul role="list" className="mt-6 space-y-6">
+        <ul
+          role="list"
+          className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2"
+        >
           {taskLists.map((taskList) => (
             <TaskListItem
               key={taskList.id}

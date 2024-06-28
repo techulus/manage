@@ -1,6 +1,7 @@
 "use server";
 
 import { comment, project } from "@/drizzle/schema";
+import { logActivity } from "@/lib/activity";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { and, eq } from "drizzle-orm";
@@ -36,7 +37,7 @@ export async function createProject(payload: FormData) {
     status: "active",
   });
 
-  await database()
+  const newProject = await database()
     .insert(project)
     .values({
       ...data,
@@ -44,13 +45,22 @@ export async function createProject(payload: FormData) {
       createdAt: new Date(),
       updatedAt: new Date(),
     })
-    .run();
+    .returning()
+    .get();
+
+  await logActivity({
+    type: "create",
+    parentId: newProject.id,
+    projectId: newProject.id,
+    userId,
+  });
 
   revalidatePath(`/console/projects`);
   redirect(`/console/projects`);
 }
 
 export async function updateProject(payload: FormData) {
+  const { userId } = getOwner();
   const id = Number(payload.get("id"));
   const name = payload.get("name") as string;
   const description = payload.get("description") as string;
@@ -71,6 +81,13 @@ export async function updateProject(payload: FormData) {
     })
     .where(eq(project.id, id))
     .run();
+
+  await logActivity({
+    type: "update",
+    parentId: +id,
+    projectId: +id,
+    userId,
+  });
 
   revalidatePath(`/console/projects/${id}`);
   redirect(`/console/projects/${id}`);

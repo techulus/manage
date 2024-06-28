@@ -84,7 +84,7 @@ export default async function ProjectDocuments({ params }: Props) {
         </div>
       </PageTitle>
 
-      <div className="mx-auto my-12 max-w-7xl px-4 lg:px-0 xl:-mt-6">
+      <div className="mx-auto my-12 max-w-5xl px-4 lg:px-0 xl:-mt-6">
         <div className="flex flex-col space-y-4">
           {data.documents.length || data.documentFolders.length ? (
             <ul

@@ -8,6 +8,7 @@ import { DocumentHeader } from "@/components/project/document/document-header";
 import EventsCalendar from "@/components/project/events/events-calendar";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
 import { Badge } from "@/components/ui/badge";
+import { logActivity } from "@/lib/activity";
 import { getOwner } from "@/lib/utils/useOwner";
 import { getProjectById } from "@/lib/utils/useProjects";
 import {
@@ -17,6 +18,7 @@ import {
   ListPlusIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { archiveProject, deleteProject, unarchiveProject } from "../actions";
 
 type Props = {
@@ -30,6 +32,17 @@ export default async function ProjectDetails({ params }: Props) {
 
   const project = await getProjectById(projectId, true);
   const { userId } = getOwner();
+
+  if (!project) {
+    return notFound();
+  }
+
+  await logActivity({
+    type: "view",
+    parentId: project.id,
+    projectId: +projectId,
+    userId,
+  });
 
   return (
     <>
@@ -53,52 +66,54 @@ export default async function ProjectDetails({ params }: Props) {
         </div>
       </PageTitle>
 
-      <div className="mx-auto max-w-7xl space-y-12 px-4 md:space-y-0 md:divide-y md:border-l md:border-r md:px-0">
-        {project.description ? (
-          <div className="flex flex-col px-8">
-            <MarkdownView content={project.description ?? ""} />
-          </div>
-        ) : null}
-
-        <div className="flex h-12 flex-col justify-center">
-          <div className="flex justify-between px-4 py-3">
-            {/* Left buttons */}
-            <div className="isolate inline-flex sm:space-x-3">
-              <span className="inline-flex space-x-1"></span>
+      <div className="mx-auto max-w-5xl space-y-12 px-4 md:space-y-0 md:divide-y md:border-l md:border-r md:px-0">
+        <div className="flex flex-col">
+          {project.description ? (
+            <div className="flex flex-col px-4 lg:px-8">
+              <MarkdownView content={project.description ?? ""} />
             </div>
+          ) : null}
 
-            {/* Right buttons */}
-            <span className="isolate inline-flex">
-              {project.status == "archived" ? (
-                <>
-                  <form action={unarchiveProject}>
+          <div className="flex h-12 flex-col justify-center">
+            <div className="flex justify-between px-4 py-3">
+              {/* Left buttons */}
+              <div className="isolate inline-flex sm:space-x-3">
+                <span className="inline-flex space-x-1"></span>
+              </div>
+
+              {/* Right buttons */}
+              <span className="isolate inline-flex">
+                {project.status == "archived" ? (
+                  <>
+                    <form action={unarchiveProject}>
+                      <input
+                        className="hidden"
+                        name="id"
+                        defaultValue={project.id}
+                      />
+                      <ActionButton label="Unarchive" variant="link" />
+                    </form>
+                    <form action={deleteProject}>
+                      <input
+                        className="hidden"
+                        name="id"
+                        defaultValue={project.id}
+                      />
+                      <DeleteButton action="Delete" />
+                    </form>
+                  </>
+                ) : (
+                  <form action={archiveProject}>
                     <input
                       className="hidden"
                       name="id"
                       defaultValue={project.id}
                     />
-                    <ActionButton label="Unarchive" variant="link" />
+                    <DeleteButton action="Archive" />
                   </form>
-                  <form action={deleteProject}>
-                    <input
-                      className="hidden"
-                      name="id"
-                      defaultValue={project.id}
-                    />
-                    <DeleteButton action="Delete" />
-                  </form>
-                </>
-              ) : (
-                <form action={archiveProject}>
-                  <input
-                    className="hidden"
-                    name="id"
-                    defaultValue={project.id}
-                  />
-                  <DeleteButton action="Archive" />
-                </form>
-              )}
-            </span>
+                )}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -232,7 +247,6 @@ export default async function ProjectDetails({ params }: Props) {
         </div>
 
         <div className="pb-12 md:p-8">
-          <h2 className="text-heading text-2xl leading-7">Discussions</h2>
           <CommentsSection type="project" parentId={project.id} />
         </div>
       </div>

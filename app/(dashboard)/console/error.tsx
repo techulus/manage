@@ -16,7 +16,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-auto flex-col justify-center px-6 py-24 lg:px-8">
+    <div className="mx-auto flex w-full max-w-5xl flex-auto flex-col justify-center px-6 py-24 lg:px-8">
       <p className="text-base font-semibold leading-8 text-teal-600">Oops!</p>
       <h1 className="mt-4 text-3xl font-bold tracking-tight text-red-600 sm:text-3xl">
         <AlertTriangle className="inline h-8 w-8" /> Something went wrong.
