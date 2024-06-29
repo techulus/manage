@@ -38,7 +38,7 @@ async function ActivityItem({ id, isLast }: { id: number; isLast: boolean }) {
       <div className={cn("relative pb-8", isLast ? "pb-2" : "")}>
         {!isLast ? (
           <span
-            className="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200"
+            className="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-800"
             aria-hidden="true"
           />
         ) : null}
@@ -46,7 +46,7 @@ async function ActivityItem({ id, isLast }: { id: number; isLast: boolean }) {
           <>
             <div className="relative">
               {activityItem.actor?.imageUrl ? (
-                <Avatar className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-400 ring-8 ring-white">
+                <Avatar className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-400 ring-8 ring-white dark:bg-black dark:ring-black">
                   <AvatarImage src={activityItem.actor.imageUrl} />
                   <AvatarFallback>
                     {activityItem.actor?.firstName ?? "User"}
@@ -54,7 +54,7 @@ async function ActivityItem({ id, isLast }: { id: number; isLast: boolean }) {
                 </Avatar>
               ) : null}
 
-              <span className="absolute -bottom-0.5 -right-1 rounded-tl bg-white px-0.5 py-px">
+              <span className="absolute -bottom-0.5 -right-1 rounded-tl-md bg-white px-0.5 py-px dark:bg-black">
                 {activityItem.action === "created" ? (
                   <PlusCircleIcon
                     className="h-5 w-5 text-gray-400"
@@ -79,14 +79,14 @@ async function ActivityItem({ id, isLast }: { id: number; isLast: boolean }) {
               <div className="text-sm">
                 <a
                   href={activityItem.actor.id}
-                  className="font-medium text-gray-900"
+                  className="font-medium text-primary"
                 >
                   {activityItem.actor.firstName}
                 </a>
               </div>
               <div className="flex w-full flex-col md:flex-row md:justify-between">
                 {activityItem.message ? (
-                  <div className="mt-1 text-sm text-gray-700">
+                  <div className="mt-1 text-sm text-gray-700 dark:text-gray-400">
                     <p className="text-sm font-semibold">
                       {activityItem.message}
                     </p>
