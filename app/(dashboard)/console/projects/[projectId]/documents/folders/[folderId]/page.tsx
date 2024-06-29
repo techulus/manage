@@ -172,7 +172,11 @@ export default async function FolderDetails({ params }: Props) {
           />
         </div>
 
-        <CommentsSection type="folder" parentId={folderId} />
+        <CommentsSection
+          type="folder"
+          parentId={folderId}
+          projectId={+projectId}
+        />
       </div>
     </>
   );

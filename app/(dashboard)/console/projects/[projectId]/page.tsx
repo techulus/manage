@@ -239,7 +239,11 @@ export default async function ProjectDetails({ params }: Props) {
         </div>
 
         <div className="pb-12 md:p-8">
-          <CommentsSection type="project" parentId={project.id} />
+          <CommentsSection
+            type="project"
+            parentId={project.id}
+            projectId={projectId}
+          />
         </div>
       </div>
     </>

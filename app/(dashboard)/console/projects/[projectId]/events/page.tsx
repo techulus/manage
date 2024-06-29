@@ -96,7 +96,11 @@ export default async function EventDetails({ params, searchParams }: Props) {
           />
         </div>
 
-        <CommentsSection type="event" parentId={dayCommentId} />
+        <CommentsSection
+          type="event"
+          parentId={dayCommentId}
+          projectId={+projectId}
+        />
       </div>
     </>
   );

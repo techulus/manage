@@ -81,7 +81,11 @@ export default async function TaskLists({ params }: Props) {
 
         <div className="border-t pb-12 pt-4">
           {/* @ts-ignore */}
-          <CommentsSection type="tasklist" parentId={+tasklistId} />
+          <CommentsSection
+            type="tasklist"
+            parentId={+tasklistId}
+            projectId={+projectId}
+          />
         </div>
       </div>
     </>

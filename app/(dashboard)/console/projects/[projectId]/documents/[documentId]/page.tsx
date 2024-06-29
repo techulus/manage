@@ -85,7 +85,11 @@ export default async function DocumentDetails({ params }: Props) {
 
         <div className="border-t pb-12 pt-4">
           {/* @ts-ignore */}
-          <CommentsSection type="document" parentId={+documentId} />
+          <CommentsSection
+            type="document"
+            parentId={+documentId}
+            projectId={+projectId}
+          />
         </div>
       </div>
     </>

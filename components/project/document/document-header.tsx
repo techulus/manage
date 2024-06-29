@@ -8,7 +8,7 @@ export async function DocumentHeader({
 }: {
   document: DocumentWithCreator;
 }) {
-  const plainText = await convertMarkdownToPlainText(document.markdownContent);
+  const plainText = convertMarkdownToPlainText(document.markdownContent);
 
   return (
     <div className="relative flex h-[240px] gap-x-4 overflow-hidden border-b border-gray-900/5 bg-white p-3 dark:bg-black">

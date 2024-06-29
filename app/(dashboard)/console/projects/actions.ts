@@ -3,6 +3,7 @@
 import { comment, project } from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
 import { database } from "@/lib/utils/useDatabase";
+import { convertMarkdownToPlainText } from "@/lib/utils/useMarkdown";
 import { getOwner } from "@/lib/utils/useOwner";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -146,6 +147,7 @@ export async function addComment(payload: FormData) {
   const parentId = Number(payload.get("parentId"));
   const content = payload.get("content") as string;
   const type = payload.get("type") as string;
+  const projectId = Number(payload.get("projectId"));
 
   await database().insert(comment).values({
     type,
@@ -156,14 +158,31 @@ export async function addComment(payload: FormData) {
     updatedAt: new Date(),
   });
 
+  await logActivity({
+    action: "created",
+    type: "comment",
+    message: `Created comment: ${convertMarkdownToPlainText(content)}`,
+    parentId,
+    projectId,
+  });
+
   const currentPath = payload.get("currentPath") as string;
   revalidatePath(currentPath);
 }
 
 export async function deleteComment(payload: FormData) {
   const id = Number(payload.get("id"));
+  const projectId = Number(payload.get("projectId"));
 
   await database().delete(comment).where(eq(comment.id, id)).run();
+
+  await logActivity({
+    action: "deleted",
+    type: "comment",
+    message: `Deleted comment`,
+    parentId: id,
+    projectId,
+  });
 
   const currentPath = payload.get("currentPath") as string;
   revalidatePath(currentPath);
