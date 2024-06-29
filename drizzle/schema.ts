@@ -307,6 +307,7 @@ export const commentRelations = relations(comment, ({ one }) => ({
 
 export const activity = sqliteTable("Activity", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+  action: text("action").notNull(),
   type: text("type").notNull(),
   message: text("message"),
   parentId: integer("parentId").notNull(),
@@ -317,7 +318,6 @@ export const activity = sqliteTable("Activity", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
 });
 
 export const activityRelations = relations(activity, ({ one }) => ({

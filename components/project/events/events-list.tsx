@@ -116,22 +116,24 @@ export default function EventsList({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem className="w-full p-0">
-                      <form action={deleteEvent} className="w-full">
-                        <input type="hidden" name="id" value={event.id} />
-                        <Link
-                          href={`/console/projects/${projectId}/events/${event.id}/edit`}
-                          className={buttonVariants({
-                            variant: "ghost",
-                            className: "w-full",
-                          })}
-                        >
-                          Edit
-                        </Link>
-                      </form>
+                      <Link
+                        href={`/console/projects/${projectId}/events/${event.id}/edit`}
+                        className={buttonVariants({
+                          variant: "ghost",
+                          className: "w-full",
+                        })}
+                      >
+                        Edit
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem className="w-full p-0">
                       <form action={deleteEvent} className="w-full">
                         <input type="hidden" name="id" value={event.id} />
+                        <input
+                          type="hidden"
+                          name="projectId"
+                          value={event.projectId}
+                        />
                         <DeleteButton
                           action="Delete"
                           className="w-full"

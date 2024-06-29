@@ -1,30 +1,39 @@
 import { activity } from "@/drizzle/schema";
 import { database } from "../utils/useDatabase";
+import { getOwner } from "../utils/useOwner";
 
 export async function logActivity({
+  action,
   type,
   message,
   parentId,
   projectId,
-  userId,
 }: {
-  type: "view" | "create" | "update" | "delete";
-  message?: string;
+  action: "created" | "updated" | "deleted";
+  type:
+    | "tasklist"
+    | "task"
+    | "project"
+    | "document"
+    | "folder"
+    | "event"
+    | "comment";
+  message: string;
   parentId: number;
   projectId: number;
-  userId: string;
 }) {
   const db = database();
+  const userId = getOwner().userId;
   await db
     .insert(activity)
     .values({
+      action,
       type,
       message,
       parentId,
       projectId,
       userId,
       createdAt: new Date(),
-      updatedAt: new Date(),
     })
     .run();
 }

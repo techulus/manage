@@ -49,10 +49,11 @@ export async function createProject(payload: FormData) {
     .get();
 
   await logActivity({
-    type: "create",
+    action: "created",
+    type: "project",
+    message: `Created project ${name}`,
     parentId: newProject.id,
     projectId: newProject.id,
-    userId,
   });
 
   revalidatePath(`/console/projects`);
@@ -60,7 +61,6 @@ export async function createProject(payload: FormData) {
 }
 
 export async function updateProject(payload: FormData) {
-  const { userId } = getOwner();
   const id = Number(payload.get("id"));
   const name = payload.get("name") as string;
   const description = payload.get("description") as string;
@@ -83,10 +83,11 @@ export async function updateProject(payload: FormData) {
     .run();
 
   await logActivity({
-    type: "update",
+    action: "updated",
+    type: "project",
+    message: `Updated project ${name}`,
     parentId: +id,
     projectId: +id,
-    userId,
   });
 
   revalidatePath(`/console/projects/${id}`);

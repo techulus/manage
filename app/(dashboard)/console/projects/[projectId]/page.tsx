@@ -8,7 +8,6 @@ import { DocumentHeader } from "@/components/project/document/document-header";
 import EventsCalendar from "@/components/project/events/events-calendar";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
 import { Badge } from "@/components/ui/badge";
-import { logActivity } from "@/lib/activity";
 import { getOwner } from "@/lib/utils/useOwner";
 import { getProjectById } from "@/lib/utils/useProjects";
 import {
@@ -36,13 +35,6 @@ export default async function ProjectDetails({ params }: Props) {
   if (!project) {
     return notFound();
   }
-
-  await logActivity({
-    type: "view",
-    parentId: project.id,
-    projectId: +projectId,
-    userId,
-  });
 
   return (
     <>

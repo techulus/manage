@@ -1,6 +1,7 @@
 "use server";
 
 import { calendarEvent, eventInvite } from "@/drizzle/schema";
+import { logActivity } from "@/lib/activity";
 import { getEndOfDay, getStartOfDay } from "@/lib/utils/time";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
@@ -60,8 +61,16 @@ export async function createEvent(payload: FormData) {
       .run();
   }
 
-  revalidatePath(`/console/projects/${projectId}`);
-  redirect(`/console/projects/${projectId}`);
+  await logActivity({
+    action: "created",
+    type: "event",
+    message: `Created event ${name}`,
+    parentId: createdEvent.id,
+    projectId: +projectId,
+  });
+
+  revalidatePath(`/console/projects/${projectId}/events`);
+  redirect(`/console/projects/${projectId}/events?date=${start.toISOString()}`);
 }
 
 export async function updateEvent(payload: FormData) {
@@ -116,6 +125,14 @@ export async function updateEvent(payload: FormData) {
     )
     .run();
 
+  await logActivity({
+    action: "updated",
+    type: "event",
+    message: `Updated event ${name}`,
+    parentId: id,
+    projectId: +projectId,
+  });
+
   revalidatePath(`/console/projects/${projectId}/events`);
   redirect(`/console/projects/${projectId}/events?date=${start.toISOString()}`);
 }
@@ -123,8 +140,16 @@ export async function updateEvent(payload: FormData) {
 export async function deleteEvent(payload: FormData) {
   const id = +(payload.get("id") as string);
   const currentPath = payload.get("currentPath") as string;
+  const projectId = payload.get("projectId") as string;
 
   await database().delete(calendarEvent).where(eq(calendarEvent.id, id)).run();
+  await logActivity({
+    action: "deleted",
+    type: "event",
+    message: `Deleted event`,
+    parentId: id,
+    projectId: +projectId,
+  });
 
   revalidatePath(currentPath);
 }
