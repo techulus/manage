@@ -115,8 +115,11 @@ export default async function ActivityDetails({ params }: Props) {
       columns: {
         id: true,
       },
+      limit: 20,
     })
     .execute();
+
+  // TODO: Add pagination
 
   return (
     <>

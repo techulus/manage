@@ -80,7 +80,7 @@ export default async function TaskLists({ params, searchParams }: Props) {
         actionLink={`/console/projects/${projectId}/tasklists/new`}
       />
 
-      <div className="mx-auto my-12 max-w-5xl px-4 lg:px-0 xl:-mt-12">
+      <div className="mx-auto my-12 max-w-5xl px-4 lg:px-0 xl:-mt-6">
         <EmptyState
           show={!taskLists.length}
           label="task list"
@@ -114,6 +114,7 @@ export default async function TaskLists({ params, searchParams }: Props) {
               <Link
                 href={`/console/projects/${projectId}/tasklists`}
                 className={buttonVariants({ variant: "link" })}
+                prefetch={false}
               >
                 Hide
               </Link>
@@ -121,6 +122,7 @@ export default async function TaskLists({ params, searchParams }: Props) {
               <Link
                 href={`/console/projects/${projectId}/tasklists?status=active,archived`}
                 className={buttonVariants({ variant: "link" })}
+                prefetch={false}
               >
                 Show
               </Link>

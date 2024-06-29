@@ -41,6 +41,7 @@ export const FileInfo = ({
         target="_blank"
         rel="noopener noreferrer"
         className="flex w-full flex-col justify-between text-sm font-medium"
+        prefetch={false}
       >
         {/* <span className="absolute inset-0" aria-hidden="true" /> */}
         <div className="z-10 flex-shrink space-y-2">

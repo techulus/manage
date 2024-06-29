@@ -30,6 +30,7 @@ export default function PageTitle({
               <Link
                 href={backUrl}
                 className="text-md mr-2 flex items-center font-medium text-gray-600 hover:text-gray-900"
+                prefetch={false}
               >
                 <ArrowLeftIcon
                   className={cn(
@@ -47,12 +48,12 @@ export default function PageTitle({
             {subTitle ? (
               <p className="text-gray-500 dark:text-gray-400">{subTitle}</p>
             ) : null}
-            <div className="flex space-x-2">{children}</div>
+            {children}
           </div>
         </div>
 
         {actionLink && actionLabel ? (
-          <Link href={actionLink} className={buttonVariants()}>
+          <Link href={actionLink} className={buttonVariants()} prefetch={false}>
             {actionLabel}
           </Link>
         ) : null}

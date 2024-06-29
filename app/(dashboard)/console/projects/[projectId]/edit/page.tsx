@@ -34,6 +34,7 @@ export default async function EditProject({ params }: Props) {
               <Link
                 href="/console/projects"
                 className={buttonVariants({ variant: "ghost" })}
+                prefetch={false}
               >
                 Cancel
               </Link>

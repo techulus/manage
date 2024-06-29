@@ -77,7 +77,7 @@ export default function NavBar() {
         <div className="mx-auto px-4 lg:px-8">
           <div className="relative flex h-16 items-center justify-between">
             <div className="flex">
-              <Link href="/console/projects" className="ml-1">
+              <Link href="/console/projects" className="ml-1" prefetch={false}>
                 <div className="flex items-center lg:px-0">
                   <Image
                     src={logo}
@@ -136,7 +136,7 @@ export default function NavBar() {
           leaveFrom="transform  translate-y-0 opacity-100"
           leaveTo="transform  translate-y-[-100%] opacity-0"
         >
-          <Link href="/">
+          <Link href="/" prefetch={false}>
             <Image
               className="rounded-md"
               src={logo}
@@ -165,6 +165,7 @@ export default function NavBar() {
                 "whitespace-nowrap border-b-2 py-3 text-sm font-medium"
               )}
               aria-current={tab.current ? "page" : undefined}
+              prefetch={false}
             >
               <span className="rounded-md px-4 py-2 transition duration-300 ease-in-out hover:bg-gray-100 hover:text-black dark:hover:bg-gray-800 dark:hover:text-white">
                 {tab.name}

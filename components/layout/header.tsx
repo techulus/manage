@@ -18,7 +18,7 @@ export function Header() {
             className="-mt-2 mr-2 rounded-md"
           />
 
-          <Link href="/" className="-m-1.5 p-1.5">
+          <Link href="/" className="-m-1.5 p-1.5" prefetch={false}>
             <p className="hero relative">
               Manage
               <sup className="absolute left-[calc(100%+.1rem)] top-0 text-xs">

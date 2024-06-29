@@ -44,18 +44,20 @@ export default async function ProjectDetails({ params }: Props) {
         actionLabel="Edit"
         actionLink={`/console/projects/${projectId}/edit`}
       >
-        <div className="pt-2">
-          {project.dueDate ? (
-            <Badge variant="outline">
-              Due {project.dueDate.toLocaleDateString()}
-            </Badge>
-          ) : null}
-          {project.status == "archived" ? (
-            <Badge variant="outline" className="ml-2 text-red-500">
-              Archived
-            </Badge>
-          ) : null}
-        </div>
+        {project.dueDate || project.status == "archived" ? (
+          <div className="flex space-x-2 pt-2">
+            {project.dueDate ? (
+              <Badge variant="outline">
+                Due {project.dueDate.toLocaleDateString()}
+              </Badge>
+            ) : null}
+            {project.status == "archived" ? (
+              <Badge variant="outline" className="ml-2 text-red-500">
+                Archived
+              </Badge>
+            ) : null}
+          </div>
+        ) : null}
       </PageTitle>
 
       <div className="mx-auto max-w-5xl space-y-12 px-4 md:space-y-0 md:divide-y md:border-l md:border-r md:px-0">
@@ -117,6 +119,7 @@ export default async function ProjectDetails({ params }: Props) {
               <Link
                 className="flex items-center"
                 href={`/console/projects/${projectId}/tasklists/new`}
+                prefetch={false}
               >
                 <ListPlusIcon className="mr-1 h-5 w-5" /> Task list
                 <span className="sr-only">, document</span>
@@ -166,6 +169,7 @@ export default async function ProjectDetails({ params }: Props) {
               <Link
                 className="flex items-center"
                 href={`/console/projects/${projectId}/documents/new`}
+                prefetch={false}
               >
                 <FilePlus2Icon className="mr-1 h-5 w-5" /> Document
                 <span className="sr-only">, document</span>
@@ -174,6 +178,7 @@ export default async function ProjectDetails({ params }: Props) {
               <Link
                 className="flex items-center"
                 href={`/console/projects/${projectId}/documents/folders/new`}
+                prefetch={false}
               >
                 <FolderPlusIcon className="mr-1 h-5 w-5" /> Folder
                 <span className="sr-only">, folder</span>
@@ -221,6 +226,7 @@ export default async function ProjectDetails({ params }: Props) {
               <Link
                 className="flex items-center"
                 href={`/console/projects/${projectId}/events/new`}
+                prefetch={false}
               >
                 <CalendarPlusIcon className="mr-1 h-5 w-5" /> Event
                 <span className="sr-only">, document</span>

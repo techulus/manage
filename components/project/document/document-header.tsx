@@ -15,6 +15,7 @@ export async function DocumentHeader({
       <Link
         href={`/console/projects/${document.projectId}/documents/${document.id}`}
         className="flex flex-col text-sm font-medium"
+        prefetch={false}
       >
         <span
           className="absolute inset-0 top-2 z-10 bg-gradient-to-t from-gray-100 dark:from-black"

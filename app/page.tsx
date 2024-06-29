@@ -92,6 +92,7 @@ export default async function Home() {
               <Link
                 href="/console/start"
                 className="rounded-full bg-teal-600 px-8 py-2.5 text-sm font-semibold text-white hover:bg-teal-500 hover:shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+                prefetch={false}
               >
                 Get started
               </Link>
@@ -101,6 +102,7 @@ export default async function Home() {
                 target="_blank"
                 rel="noreferrer"
                 className="flex"
+                prefetch={false}
               >
                 <div className="flex h-10 w-10 items-center justify-center space-x-2 rounded-md border border-muted bg-muted">
                   <svg

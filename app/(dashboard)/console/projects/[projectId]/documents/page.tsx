@@ -69,6 +69,7 @@ export default async function ProjectDocuments({ params }: Props) {
           <Link
             className="flex items-center"
             href={`/console/projects/${projectId}/documents/new`}
+            prefetch={false}
           >
             <FilePlus2Icon className="mr-1 h-5 w-5" /> Document
             <span className="sr-only">, document</span>
@@ -77,6 +78,7 @@ export default async function ProjectDocuments({ params }: Props) {
           <Link
             className="flex items-center"
             href={`/console/projects/${projectId}/documents/folders/new`}
+            prefetch={false}
           >
             <FolderPlusIcon className="mr-1 h-5 w-5" /> Folder
             <span className="sr-only">, folder</span>

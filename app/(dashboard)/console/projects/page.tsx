@@ -79,6 +79,7 @@ export default async function Projects({ searchParams }: Props) {
             <Link
               href={`/console/projects/projects`}
               className={buttonVariants({ variant: "link" })}
+              prefetch={false}
             >
               Hide
             </Link>
@@ -86,6 +87,7 @@ export default async function Projects({ searchParams }: Props) {
             <Link
               href={`/console/projects?status=active,archived`}
               className={buttonVariants({ variant: "link" })}
+              prefetch={false}
             >
               Show
             </Link>
