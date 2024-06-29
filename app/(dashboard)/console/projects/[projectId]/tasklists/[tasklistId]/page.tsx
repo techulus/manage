@@ -79,7 +79,7 @@ export default async function TaskLists({ params }: Props) {
           hideHeader
         />
 
-        <div className="border-t pb-12 pt-4">
+        <div className="pb-12 pt-4">
           {/* @ts-ignore */}
           <CommentsSection
             type="tasklist"
