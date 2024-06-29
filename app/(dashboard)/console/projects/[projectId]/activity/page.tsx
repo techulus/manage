@@ -1,15 +1,7 @@
 import { ContentBlock } from "@/components/core/content-block";
 import PageTitle from "@/components/layout/page-title";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  activity,
-  calendarEvent,
-  document,
-  documentFolder,
-  project,
-  task,
-  taskList,
-} from "@/drizzle/schema";
+import { activity } from "@/drizzle/schema";
 import { cn } from "@/lib/utils";
 import { database } from "@/lib/utils/useDatabase";
 import { and, desc, eq } from "drizzle-orm";
@@ -84,28 +76,27 @@ async function ActivityItem({ id, isLast }: { id: number; isLast: boolean }) {
               </span>
             </div>
             <div className="min-w-0 flex-1">
-              <div>
-                <div className="text-sm">
-                  <a
-                    href={activityItem.actor.id}
-                    className="font-medium text-gray-900"
-                  >
-                    {activityItem.actor.firstName}
-                  </a>
-                </div>
+              <div className="text-sm">
+                <a
+                  href={activityItem.actor.id}
+                  className="font-medium text-gray-900"
+                >
+                  {activityItem.actor.firstName}
+                </a>
+              </div>
+              <div className="flex w-full flex-col md:flex-row md:justify-between">
+                {activityItem.message ? (
+                  <div className="mt-1 text-sm text-gray-700">
+                    <p className="text-sm font-semibold">
+                      {activityItem.message}
+                    </p>
+                  </div>
+                ) : null}
                 <p className="mt-0.5 text-sm text-gray-500">
-                  {activityItem.action} {activityItem.type} at{" "}
                   {activityItem.createdAt.toLocaleTimeString()},{" "}
                   {activityItem.createdAt.toDateString()}
                 </p>
               </div>
-              {activityItem.message ? (
-                <div className="mt-1 text-sm text-gray-700">
-                  <p className="text-sm font-semibold">
-                    {activityItem.message}
-                  </p>
-                </div>
-              ) : null}
             </div>
           </>
         </div>
