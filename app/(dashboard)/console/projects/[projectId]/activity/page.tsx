@@ -1,4 +1,3 @@
-import { ContentBlock } from "@/components/core/content-block";
 import PageTitle from "@/components/layout/page-title";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { activity } from "@/drizzle/schema";
@@ -125,24 +124,26 @@ export default async function ActivityDetails({ params }: Props) {
     <>
       <PageTitle title="Activity" />
 
-      <ContentBlock className="mx-auto my-12 max-w-5xl space-y-12 px-4 lg:px-0 xl:-mt-6">
-        {activities.length ? (
-          <ul role="list" className="py-4 md:p-6">
-            {activities.map((activityItem, activityItemIdx) => {
-              return (
-                // @ts-ignore
-                <ActivityItem
-                  key={activityItem.id}
-                  id={activityItem.id}
-                  isLast={activityItemIdx === activities.length - 1}
-                />
-              );
-            })}
-          </ul>
-        ) : (
-          <p className="p-12 text-center text-sm">No activity found</p>
-        )}
-      </ContentBlock>
+      <div className="mx-auto my-12 max-w-5xl space-y-12 px-4 lg:px-0 xl:-mt-6">
+        <div className="flex w-full rounded-lg border bg-white dark:bg-black">
+          {activities.length ? (
+            <ul role="list" className="w-full px-6 py-4 md:p-6">
+              {activities.map((activityItem, activityItemIdx) => {
+                return (
+                  // @ts-ignore
+                  <ActivityItem
+                    key={activityItem.id}
+                    id={activityItem.id}
+                    isLast={activityItemIdx === activities.length - 1}
+                  />
+                );
+              })}
+            </ul>
+          ) : (
+            <p className="p-12 text-center text-sm">No activity found</p>
+          )}
+        </div>
+      </div>
     </>
   );
 }
