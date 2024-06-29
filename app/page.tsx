@@ -188,7 +188,7 @@ export default async function Home() {
                 {tier.name}
               </h3>
               <p className="mt-4 flex items-baseline gap-x-2">
-                <span className="text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-50">
+                <span className="text-heading text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-50">
                   {tier.priceMonthly}
                 </span>
                 <span className="text-base text-gray-500 dark:text-gray-400">
