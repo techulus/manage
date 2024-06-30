@@ -98,14 +98,23 @@ export async function updateProject(payload: FormData) {
 export async function archiveProject(payload: FormData) {
   const id = Number(payload.get("id"));
 
-  await database()
+  const projectDetails = await database()
     .update(project)
     .set({
       status: "archived",
       updatedAt: new Date(),
     })
     .where(eq(project.id, id))
-    .run();
+    .returning()
+    .get();
+
+  await logActivity({
+    action: "updated",
+    type: "project",
+    message: `Archived project ${projectDetails.name}`,
+    parentId: id,
+    projectId: id,
+  });
 
   revalidatePath("/console/projects");
   redirect("/console/projects");
@@ -114,14 +123,23 @@ export async function archiveProject(payload: FormData) {
 export async function unarchiveProject(payload: FormData) {
   const id = Number(payload.get("id"));
 
-  await database()
+  const projectDetails = await database()
     .update(project)
     .set({
       status: "active",
       updatedAt: new Date(),
     })
     .where(eq(project.id, id))
-    .run();
+    .returning()
+    .get();
+
+  await logActivity({
+    action: "updated",
+    type: "project",
+    message: `Unarchived project ${projectDetails.name}`,
+    parentId: id,
+    projectId: id,
+  });
 
   revalidatePath("/console/projects");
   revalidatePath(`/console/projects/${id}`);

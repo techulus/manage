@@ -54,7 +54,7 @@ const tiers = [
     href: "/console/start",
     priceMonthly: "$99",
     description: "A plan that scales with your rapidly growing business.",
-    features: ["Unlimited users", "50 GB storage", "Priority support"],
+    features: ["Upto 50 users", "50 GB storage", "Priority support"],
     featured: false,
     callToAction: "Coming soon",
   },

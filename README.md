@@ -15,10 +15,12 @@ Manage is an open-source alternative to Basecamp, offering a streamlined project
 - [x] Task lists and tasks
 - [x] Documents - Creating and sharing markdown documents
 - [x] Files - Uploading and sharing files
-- [x] Discussions / Comments
+- [x] Comments
 - [x] Events / Calendar
 - [ ] Activity logs
+- [ ] Discussions / Forums
 - [ ] Notifications
+- [ ] Chat
 - [ ] Search
 - [ ] Permissions
 - [ ] Billing
