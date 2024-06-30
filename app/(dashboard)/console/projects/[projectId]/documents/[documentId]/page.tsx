@@ -1,4 +1,5 @@
 import { MarkdownView } from "@/components/core/markdown-view";
+import PageSection from "@/components/core/section";
 import { DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
@@ -46,47 +47,49 @@ export default async function DocumentDetails({ params }: Props) {
         actionLink={`/console/projects/${projectId}/documents/${documentId}/edit`}
       />
 
-      <div className="mx-auto max-w-7xl px-4 lg:px-0">
-        <div className="flex h-12 flex-col justify-center border-b border-gray-200 dark:border-gray-800">
-          <div className="px-4 sm:px-6 lg:-mx-4 lg:px-8">
-            <div className="flex justify-between py-3">
-              {/* Left buttons */}
-              <div className="isolate inline-flex sm:space-x-3">
-                <span className="inline-flex space-x-1"></span>
-              </div>
+      <PageSection topInset>
+        <div className="p-4 lg:p-8">
+          <MarkdownView content={documentDetails.markdownContent} />
+        </div>
+      </PageSection>
 
-              {/* Right buttons */}
-              <nav aria-label="Pagination">
-                <span className="isolate inline-flex">
-                  <form
-                    action={async () => {
-                      "use server";
-                      await deleteDocument(
-                        documentId,
-                        projectId,
-                        documentDetails?.markdownContent,
-                        documentDetails?.folderId
-                      );
-                    }}
-                  >
-                    <DeleteButton />
-                  </form>
-                </span>
-              </nav>
+      <PageSection bottomMargin={false}>
+        <div className="flex h-12 flex-col justify-center bg-white dark:bg-gray-950 xl:rounded-lg">
+          <div className="flex justify-between py-3">
+            {/* Left buttons */}
+            <div className="isolate inline-flex sm:space-x-3">
+              <span className="inline-flex space-x-1"></span>
             </div>
+
+            {/* Right buttons */}
+            <nav aria-label="Pagination">
+              <span className="isolate inline-flex">
+                <form
+                  action={async () => {
+                    "use server";
+                    await deleteDocument(
+                      documentId,
+                      projectId,
+                      documentDetails?.markdownContent,
+                      documentDetails?.folderId
+                    );
+                  }}
+                >
+                  <DeleteButton />
+                </form>
+              </span>
+            </nav>
           </div>
         </div>
+      </PageSection>
 
-        <div className="mx-auto my-12 max-w-2xl  lg:mx-0 lg:max-w-none">
-          <ul role="list" className="mt-6 space-y-6">
-            <MarkdownView content={documentDetails.markdownContent} />
-          </ul>
-        </div>
-
-        <div className="border-t pb-12 pt-4">
-          {/* @ts-ignore */}
-          <CommentsSection type="document" parentId={+documentId} />
-        </div>
+      <div className="mx-auto max-w-5xl py-8">
+        {/* @ts-ignore */}
+        <CommentsSection
+          type="document"
+          parentId={+documentId}
+          projectId={+projectId}
+        />
       </div>
     </>
   );

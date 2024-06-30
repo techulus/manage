@@ -1,7 +1,9 @@
 "use server";
 
 import { comment, project } from "@/drizzle/schema";
+import { logActivity } from "@/lib/activity";
 import { database } from "@/lib/utils/useDatabase";
+import { convertMarkdownToPlainText } from "@/lib/utils/useMarkdown";
 import { getOwner } from "@/lib/utils/useOwner";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -36,7 +38,7 @@ export async function createProject(payload: FormData) {
     status: "active",
   });
 
-  await database()
+  const newProject = await database()
     .insert(project)
     .values({
       ...data,
@@ -44,7 +46,16 @@ export async function createProject(payload: FormData) {
       createdAt: new Date(),
       updatedAt: new Date(),
     })
-    .run();
+    .returning()
+    .get();
+
+  await logActivity({
+    action: "created",
+    type: "project",
+    message: `Created project ${name}`,
+    parentId: newProject.id,
+    projectId: newProject.id,
+  });
 
   revalidatePath(`/console/projects`);
   redirect(`/console/projects`);
@@ -72,6 +83,14 @@ export async function updateProject(payload: FormData) {
     .where(eq(project.id, id))
     .run();
 
+  await logActivity({
+    action: "updated",
+    type: "project",
+    message: `Updated project ${name}`,
+    parentId: +id,
+    projectId: +id,
+  });
+
   revalidatePath(`/console/projects/${id}`);
   redirect(`/console/projects/${id}`);
 }
@@ -79,14 +98,23 @@ export async function updateProject(payload: FormData) {
 export async function archiveProject(payload: FormData) {
   const id = Number(payload.get("id"));
 
-  await database()
+  const projectDetails = await database()
     .update(project)
     .set({
       status: "archived",
       updatedAt: new Date(),
     })
     .where(eq(project.id, id))
-    .run();
+    .returning()
+    .get();
+
+  await logActivity({
+    action: "updated",
+    type: "project",
+    message: `Archived project ${projectDetails.name}`,
+    parentId: id,
+    projectId: id,
+  });
 
   revalidatePath("/console/projects");
   redirect("/console/projects");
@@ -95,14 +123,23 @@ export async function archiveProject(payload: FormData) {
 export async function unarchiveProject(payload: FormData) {
   const id = Number(payload.get("id"));
 
-  await database()
+  const projectDetails = await database()
     .update(project)
     .set({
       status: "active",
       updatedAt: new Date(),
     })
     .where(eq(project.id, id))
-    .run();
+    .returning()
+    .get();
+
+  await logActivity({
+    action: "updated",
+    type: "project",
+    message: `Unarchived project ${projectDetails.name}`,
+    parentId: id,
+    projectId: id,
+  });
 
   revalidatePath("/console/projects");
   revalidatePath(`/console/projects/${id}`);
@@ -128,6 +165,7 @@ export async function addComment(payload: FormData) {
   const parentId = Number(payload.get("parentId"));
   const content = payload.get("content") as string;
   const type = payload.get("type") as string;
+  const projectId = Number(payload.get("projectId"));
 
   await database().insert(comment).values({
     type,
@@ -138,14 +176,31 @@ export async function addComment(payload: FormData) {
     updatedAt: new Date(),
   });
 
+  await logActivity({
+    action: "created",
+    type: "comment",
+    message: `Created comment: ${convertMarkdownToPlainText(content)}`,
+    parentId,
+    projectId,
+  });
+
   const currentPath = payload.get("currentPath") as string;
   revalidatePath(currentPath);
 }
 
 export async function deleteComment(payload: FormData) {
   const id = Number(payload.get("id"));
+  const projectId = Number(payload.get("projectId"));
 
   await database().delete(comment).where(eq(comment.id, id)).run();
+
+  await logActivity({
+    action: "deleted",
+    type: "comment",
+    message: `Deleted comment`,
+    parentId: id,
+    projectId,
+  });
 
   const currentPath = payload.get("currentPath") as string;
   revalidatePath(currentPath);

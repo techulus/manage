@@ -10,9 +10,11 @@ import { usePathname } from "next/navigation";
 export default function CommentForm({
   type,
   parentId,
+  projectId,
 }: {
   type: string;
   parentId: string | number;
+  projectId: string | number;
 }) {
   const pathname = usePathname();
   const { user: creator } = useUser();
@@ -21,6 +23,7 @@ export default function CommentForm({
     <form className="pb-12" action={addComment}>
       <input value={pathname} type="hidden" name="currentPath" />
       <input value={parentId} type="hidden" name="parentId" />
+      <input value={projectId} type="hidden" name="projectId" />
       <input value={type} type="hidden" name="type" />
 
       <div className="flex w-full flex-row space-x-4">

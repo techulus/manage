@@ -18,7 +18,7 @@ type Props = {
 };
 
 export default async function EditDocumentFolder({ params }: Props) {
-  const backUrl = `/console/projects/${params.projectId}/folders/${params.folderId}`;
+  const backUrl = `/console/projects/${params.projectId}/documents/folders/${params.folderId}`;
   const folder = await database().query.documentFolder.findFirst({
     where: eq(documentFolder.id, +params.folderId),
   });
@@ -26,7 +26,8 @@ export default async function EditDocumentFolder({ params }: Props) {
   return (
     <>
       <PageTitle title="Update Folder" backUrl={backUrl} />
-      <form action={updateDocumentFolder}>
+
+      <form action={updateDocumentFolder} className="xl:-mt-8">
         <input type="hidden" name="projectId" defaultValue={params.projectId} />
         <input type="hidden" name="id" defaultValue={params.folderId} />
         <ContentBlock>
@@ -38,6 +39,7 @@ export default async function EditDocumentFolder({ params }: Props) {
               <Link
                 href={backUrl}
                 className={buttonVariants({ variant: "ghost" })}
+                prefetch={false}
               >
                 Cancel
               </Link>

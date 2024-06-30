@@ -20,7 +20,7 @@ interface Result {
   images: Image[];
 }
 
-export async function convertMarkdownToPlainText(markdown: string | null) {
+export function convertMarkdownToPlainText(markdown: string | null) {
   return markdown ? remark().use(strip).processSync(markdown).toString() : "";
 }
 

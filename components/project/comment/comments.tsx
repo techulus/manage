@@ -17,11 +17,13 @@ import { CircleEllipsisIcon } from "lucide-react";
 
 export async function Comments({
   parentId,
+  projectId,
   type,
   className,
 }: {
   type: string;
   parentId: string | number;
+  projectId: string | number;
   className?: string;
 }) {
   const { userId } = getOwner();
@@ -73,6 +75,11 @@ export async function Comments({
                     <DropdownMenuItem className="m-0 p-0">
                       <form action={deleteComment}>
                         <input type="hidden" name="id" value={comment.id} />
+                        <input
+                          type="hidden"
+                          name="projectId"
+                          value={projectId}
+                        />
                         <DeleteButton
                           action="Delete"
                           className="w-full"

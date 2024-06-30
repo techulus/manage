@@ -1,6 +1,7 @@
 "use server";
 
 import { blob, comment, document, documentFolder } from "@/drizzle/schema";
+import { logActivity } from "@/lib/activity";
 import { deleteFile } from "@/lib/blobStore";
 import { database } from "@/lib/utils/useDatabase";
 import { deleteFilesInMarkdown } from "@/lib/utils/useMarkdown";
@@ -50,6 +51,14 @@ export async function createDocument(payload: FormData) {
     })
     .run();
 
+  await logActivity({
+    action: "created",
+    type: "document",
+    message: `Created document ${name}`,
+    parentId: +folderId,
+    projectId: +projectId,
+  });
+
   revalidatePath(`/console/projects/${projectId}`);
 
   if (folderId) {
@@ -75,14 +84,23 @@ export async function updateDocument(payload: FormData) {
     status: "active",
   });
 
-  await database()
+  const documentDetails = await database()
     .update(document)
     .set({
       ...data,
       updatedAt: new Date(),
     })
     .where(eq(document.id, +id))
-    .run();
+    .returning()
+    .get();
+
+  await logActivity({
+    action: "updated",
+    type: "document",
+    message: `Updated document ${documentDetails.name}`,
+    parentId: +id,
+    projectId: +projectId,
+  });
 
   revalidatePath(`/console/projects/${projectId}`);
 
@@ -118,6 +136,14 @@ export async function createDocumentFolder(payload: FormData) {
     })
     .run();
 
+  await logActivity({
+    action: "created",
+    type: "folder",
+    message: `Created document folder ${name}`,
+    parentId: +projectId,
+    projectId: +projectId,
+  });
+
   revalidatePath(`/console/projects/${projectId}`);
   revalidatePath(`/console/projects/${projectId}/documents`);
   redirect(`/console/projects/${projectId}/documents`);
@@ -134,14 +160,23 @@ export async function updateDocumentFolder(payload: FormData) {
     description,
   });
 
-  await database()
+  const folderDetails = await database()
     .update(documentFolder)
     .set({
       ...data,
       updatedAt: new Date(),
     })
     .where(eq(documentFolder.id, +id))
-    .run();
+    .returning()
+    .get();
+
+  await logActivity({
+    action: "updated",
+    type: "folder",
+    message: `Updated document folder ${folderDetails.name}`,
+    parentId: +id,
+    projectId: +projectId,
+  });
 
   revalidatePath(`/console/projects/${projectId}`);
   revalidatePath(`/console/projects/${projectId}/documents/folders/${id}`);
@@ -153,13 +188,25 @@ export async function deleteDocumentFolder(payload: FormData) {
   const projectId = payload.get("projectId") as string;
   const currentPath = payload.get("currentPath") as string;
 
-  await Promise.all([
-    database().delete(documentFolder).where(eq(documentFolder.id, +id)).run(),
+  const [folderDetails, ..._] = await Promise.all([
+    database()
+      .delete(documentFolder)
+      .where(eq(documentFolder.id, +id))
+      .returning()
+      .get(),
     database()
       .delete(comment)
       .where(and(eq(comment.type, "folder"), eq(comment.parentId, +id)))
       .run(),
   ]);
+
+  await logActivity({
+    action: "deleted",
+    type: "folder",
+    message: `Deleted document folder ${folderDetails?.name}`,
+    parentId: +id,
+    projectId: +projectId,
+  });
 
   revalidatePath(currentPath);
   redirect(`/console/projects/${projectId}/documents`);
@@ -175,13 +222,21 @@ export async function deleteDocument(
     await deleteFilesInMarkdown(content);
   }
 
-  await Promise.all([
-    database().delete(document).where(eq(document.id, +id)).run(),
+  const [documentDetails, ..._] = await Promise.all([
+    database().delete(document).where(eq(document.id, +id)).returning().get(),
     database()
       .delete(comment)
       .where(and(eq(comment.type, "document"), eq(comment.parentId, +id)))
       .run(),
   ]);
+
+  await logActivity({
+    action: "deleted",
+    type: "document",
+    message: `Deleted document ${documentDetails?.name}`,
+    parentId: +id,
+    projectId: +projectId,
+  });
 
   if (folderId) {
     revalidatePath(
@@ -214,5 +269,16 @@ export async function reloadDocuments(
 
 export async function deleteBlob(file: { id: string; key: string }) {
   await deleteFile(file.key);
-  await database().delete(blob).where(eq(blob.id, file.id)).run();
+  const blobDetails = await database()
+    .delete(blob)
+    .where(eq(blob.id, file.id))
+    .returning()
+    .get();
+  await logActivity({
+    action: "deleted",
+    type: "blob",
+    message: `Deleted file ${blobDetails?.name}`,
+    parentId: +file.id,
+    projectId: +file.id,
+  });
 }

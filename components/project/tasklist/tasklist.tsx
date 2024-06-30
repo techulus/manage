@@ -14,6 +14,7 @@ export const TaskListItem = ({
   users,
   createTask,
   partialUpdateTaskList,
+  hideHeader = false,
 }: {
   taskList: TaskListWithTasks;
   userId: string;
@@ -24,6 +25,7 @@ export const TaskListItem = ({
     id: number,
     data: { status: string }
   ) => Promise<void>;
+  hideHeader?: boolean;
 }) => {
   const todoItems = useMemo(
     () => taskList.tasks.filter((task) => task.status === "todo"),
@@ -36,17 +38,21 @@ export const TaskListItem = ({
 
   return (
     <div className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-black">
-      <TaskListHeader
-        taskList={taskList}
-        totalCount={taskList.tasks.length}
-        doneCount={doneItems.length}
-        partialUpdateTaskList={partialUpdateTaskList}
-      />
+      {!hideHeader ? (
+        <TaskListHeader
+          taskList={taskList}
+          totalCount={taskList.tasks.length}
+          doneCount={doneItems.length}
+          partialUpdateTaskList={partialUpdateTaskList}
+        />
+      ) : null}
+
       {taskList.description ? (
         <div className="border-b border-gray-900/5 px-6">
           <MarkdownView content={taskList.description ?? ""} />
         </div>
       ) : null}
+
       <div className="flex flex-col justify-center divide-y">
         {todoItems.map((task) => (
           <TaskItem

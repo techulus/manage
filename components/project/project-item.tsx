@@ -19,7 +19,11 @@ export const ProjecItem = ({
     >
       <div>
         <h3 className="text-heading text-2xl text-gray-900 dark:text-gray-50">
-          <Link href={`/console/projects/${id}`} className="focus:outline-none">
+          <Link
+            href={`/console/projects/${id}`}
+            className="focus:outline-none"
+            prefetch={false}
+          >
             <span className="absolute inset-0" aria-hidden="true" />
             {name}
           </Link>

@@ -48,6 +48,13 @@ export default function NavBar() {
               href: `/console/projects/${projectId}/events`,
               current: path.startsWith(`/console/projects/${projectId}/events`),
             },
+            {
+              name: "Activity",
+              href: `/console/projects/${projectId}/activity`,
+              current: path.startsWith(
+                `/console/projects/${projectId}/activity`
+              ),
+            },
           ]
         : [
             {
@@ -66,11 +73,11 @@ export default function NavBar() {
   return (
     <>
       {createToastWrapper(appearance)}
-      <nav className="flex-shrink-0 text-black dark:text-white">
+      <nav className="flex-shrink-0 bg-background text-black dark:bg-gray-950 dark:text-white">
         <div className="mx-auto px-4 lg:px-8">
           <div className="relative flex h-16 items-center justify-between">
             <div className="flex">
-              <Link href="/console/projects" className="ml-1">
+              <Link href="/console/projects" className="ml-1" prefetch={false}>
                 <div className="flex items-center lg:px-0">
                   <Image
                     src={logo}
@@ -113,7 +120,7 @@ export default function NavBar() {
 
       <div
         className={cn(
-          "sticky -top-[1px] z-10 -mb-px flex w-screen self-start border-b border-gray-200 bg-background px-4 dark:border-gray-800 lg:px-8",
+          "sticky -top-[1px] z-10 -mb-px flex w-screen self-start border-b border-gray-200 bg-background px-4 dark:border-gray-800 dark:bg-gray-950 lg:px-8",
           isSticky ? "pt-[1px] shadow-md" : ""
         )}
         ref={ref}
@@ -129,7 +136,7 @@ export default function NavBar() {
           leaveFrom="transform  translate-y-0 opacity-100"
           leaveTo="transform  translate-y-[-100%] opacity-0"
         >
-          <Link href="/">
+          <Link href="/" prefetch={false}>
             <Image
               className="rounded-md"
               src={logo}
@@ -142,8 +149,7 @@ export default function NavBar() {
 
         <div
           className={cn(
-            "flex space-x-1 overflow-y-scroll",
-            "transition duration-300 ease-in-out",
+            "hidden-scrollbar flex space-x-1 overflow-y-scroll transition duration-300 ease-in-out",
             isSticky ? "md:translate-x-[40px]" : "md:translate-x-0"
           )}
         >
@@ -158,6 +164,7 @@ export default function NavBar() {
                 "whitespace-nowrap border-b-2 py-3 text-sm font-medium"
               )}
               aria-current={tab.current ? "page" : undefined}
+              prefetch={false}
             >
               <span className="rounded-md px-4 py-2 transition duration-300 ease-in-out hover:bg-gray-100 hover:text-black dark:hover:bg-gray-800 dark:hover:text-white">
                 {tab.name}

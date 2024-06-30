@@ -12,6 +12,7 @@ export const DocumentFolderHeader = ({
       <Link
         href={`/console/projects/${documentFolder.projectId}/documents/folders/${documentFolder.id}`}
         className="flex flex-col text-sm font-medium"
+        prefetch={false}
       >
         <span className="absolute inset-0" aria-hidden="true" />
         <div className="flex-shrink space-y-2">

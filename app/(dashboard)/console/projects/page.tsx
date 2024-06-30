@@ -14,8 +14,6 @@ interface Props {
   };
 }
 
-export const dynamic = "force-dynamic";
-
 export default async function Projects({ searchParams }: Props) {
   const statuses = searchParams?.status?.split(",") ?? ["active"];
 
@@ -38,24 +36,25 @@ export default async function Projects({ searchParams }: Props) {
       {projects.length ? (
         <form
           action="/console/projects"
-          className="mx-4 flex flex-1 justify-center py-4 lg:justify-end xl:m-0 xl:pb-0 xl:pt-4"
+          className="mx-4 flex flex-1 justify-center py-4 lg:justify-end xl:m-0 xl:-mt-8 xl:pb-0 xl:pt-4"
         >
-          <div className="mx-auto w-full max-w-7xl">
+          <div className="mx-auto w-full max-w-5xl">
             <label htmlFor="search" className="sr-only">
               Search projects
             </label>
-            <div className="relative text-gray-600 focus-within:text-gray-800 dark:text-gray-400 dark:focus-within:text-gray-200">
+            <div className="relative text-gray-600  focus-within:text-gray-800 dark:text-gray-400 dark:focus-within:text-gray-200">
               <Input
                 name="search"
                 placeholder="Search projects"
                 type="search"
+                className="h-12"
               />
             </div>
           </div>
         </form>
       ) : null}
 
-      <ContentBlock className="border-none bg-transparent shadow-none">
+      <ContentBlock className="max-w-5xl border-none bg-transparent shadow-none">
         <EmptyState
           show={!projects.length}
           isSearchResult={!!searchParams?.search}
@@ -71,7 +70,7 @@ export default async function Projects({ searchParams }: Props) {
       </ContentBlock>
 
       {archivedProjects.length > 0 && (
-        <div className="mx-auto mt-12 flex w-full max-w-7xl flex-grow items-center border-t border-muted py-4">
+        <div className="mx-auto mt-12 flex w-full max-w-5xl flex-grow items-center border-t border-muted py-4">
           <p className="text-sm text-muted-foreground">
             {archivedProjects.length} archived project(s)
           </p>
@@ -79,6 +78,7 @@ export default async function Projects({ searchParams }: Props) {
             <Link
               href={`/console/projects/projects`}
               className={buttonVariants({ variant: "link" })}
+              prefetch={false}
             >
               Hide
             </Link>
@@ -86,6 +86,7 @@ export default async function Projects({ searchParams }: Props) {
             <Link
               href={`/console/projects?status=active,archived`}
               className={buttonVariants({ variant: "link" })}
+              prefetch={false}
             >
               Show
             </Link>

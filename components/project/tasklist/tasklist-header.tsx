@@ -39,8 +39,9 @@ export const TaskListHeader = ({
         />
       ) : null}
       <Link
-        href={`/console/projects/${taskList.projectId}/tasklists`}
+        href={`/console/projects/${taskList.projectId}/tasklists/${taskList.id}`}
         className="text-sm font-medium"
+        prefetch={false}
       >
         <span className="absolute inset-0" aria-hidden="true" />
         <div className="mb-2 flex">
@@ -74,6 +75,7 @@ export const TaskListHeader = ({
                 variant: "ghost",
                 className: "w-full",
               })}
+              prefetch={false}
             >
               Edit
             </Link>

@@ -23,7 +23,8 @@ export default async function EditTaskList({ params }: Props) {
   return (
     <>
       <PageTitle title="Update Task list" backUrl={backUrl} />
-      <form action={updateTaskList}>
+
+      <form action={updateTaskList} className="xl:-mt-8">
         <input type="hidden" name="id" defaultValue={params.tasklistId} />
         <input type="hidden" name="projectId" defaultValue={params.projectId} />
         <ContentBlock>
@@ -35,6 +36,7 @@ export default async function EditTaskList({ params }: Props) {
               <Link
                 href={backUrl}
                 className={buttonVariants({ variant: "ghost" })}
+                prefetch={false}
               >
                 Cancel
               </Link>

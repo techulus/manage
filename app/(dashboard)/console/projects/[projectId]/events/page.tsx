@@ -1,3 +1,4 @@
+import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import EventsCalendar from "@/components/project/events/events-calendar";
@@ -86,8 +87,8 @@ export default async function EventDetails({ params, searchParams }: Props) {
         </div>
       </PageTitle>
 
-      <div className="mx-auto my-12 max-w-7xl space-y-12 px-4 lg:px-0 xl:-mt-6">
-        <div className="flex w-full rounded-lg border bg-white dark:bg-black">
+      <PageSection topInset>
+        <div className="flex w-full rounded-lg bg-white dark:bg-black">
           <EventsCalendar
             projectId={projectId}
             userId={userId}
@@ -95,8 +96,14 @@ export default async function EventDetails({ params, searchParams }: Props) {
             selectedDate={selectedDate.toISOString()}
           />
         </div>
+      </PageSection>
 
-        <CommentsSection type="event" parentId={dayCommentId} />
+      <div className="mx-auto max-w-5xl p-4 lg:p-0">
+        <CommentsSection
+          type="event"
+          parentId={dayCommentId}
+          projectId={+projectId}
+        />
       </div>
     </>
   );

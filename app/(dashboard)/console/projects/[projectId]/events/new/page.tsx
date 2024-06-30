@@ -33,6 +33,7 @@ export default async function CreateEvent({ params }: Props) {
               <Link
                 href={backUrl}
                 className={buttonVariants({ variant: "ghost" })}
+                prefetch={false}
               >
                 Cancel
               </Link>

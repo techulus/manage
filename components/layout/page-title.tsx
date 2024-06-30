@@ -22,14 +22,15 @@ export default function PageTitle({
   children,
 }: PropsWithChildren<Props>) {
   return (
-    <div className="flex justify-center border-b bg-gray-50 pb-4 pl-4 pr-6 pt-4 dark:bg-card dark:text-white sm:pl-6 lg:pl-8 xl:border-t-0 xl:px-8 xl:py-14">
-      <div className="flex w-full max-w-7xl justify-between">
+    <div className="flex min-h-[80px] justify-center border-b bg-gray-50 pb-4 pl-4 pr-6 pt-4 dark:bg-card dark:text-white sm:pl-6 lg:min-h-[120px] lg:pl-8 xl:min-h-[200px] xl:border-t-0">
+      <div className="flex w-full max-w-5xl items-center justify-between">
         <div className="flex items-center">
           {backUrl && (
             <SignedIn>
               <Link
                 href={backUrl}
                 className="text-md mr-2 flex items-center font-medium text-gray-600 hover:text-gray-900"
+                prefetch={false}
               >
                 <ArrowLeftIcon
                   className={cn(
@@ -43,16 +44,16 @@ export default function PageTitle({
           )}
 
           <div className="flex flex-col">
-            <h1 className="text-heading flex-1 text-3xl">{title}</h1>
+            <h1 className="text-heading flex-1 text-xl lg:text-3xl">{title}</h1>
             {subTitle ? (
               <p className="text-gray-500 dark:text-gray-400">{subTitle}</p>
             ) : null}
-            <div className="flex space-x-2">{children}</div>
+            {children}
           </div>
         </div>
 
         {actionLink && actionLabel ? (
-          <Link href={actionLink} className={buttonVariants()}>
+          <Link href={actionLink} className={buttonVariants()} prefetch={false}>
             {actionLabel}
           </Link>
         ) : null}

@@ -1,16 +1,14 @@
-import { ContentBlock } from "@/components/core/content-block";
+import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
-
-export const dynamic = "force-dynamic";
 
 export default async function Today() {
   return (
     <>
       <PageTitle title="Today" />
 
-      <ContentBlock>
-        <h1>Hello</h1>
-      </ContentBlock>
+      <PageSection topInset>
+        <h1 className="p-8">Hello</h1>
+      </PageSection>
     </>
   );
 }

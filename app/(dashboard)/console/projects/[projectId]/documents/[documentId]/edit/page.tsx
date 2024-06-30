@@ -22,7 +22,8 @@ export default async function EditDocument({ params }: Props) {
   return (
     <>
       <PageTitle title="Update Document" backUrl={backUrl} />
-      <form action={updateDocument}>
+
+      <form action={updateDocument} className="xl:-mt-8">
         <input type="hidden" name="id" defaultValue={params.documentId} />
         <input type="hidden" name="projectId" defaultValue={params.projectId} />
         {document.folderId && (
@@ -41,6 +42,7 @@ export default async function EditDocument({ params }: Props) {
               <Link
                 href={backUrl}
                 className={buttonVariants({ variant: "ghost" })}
+                prefetch={false}
               >
                 Cancel
               </Link>

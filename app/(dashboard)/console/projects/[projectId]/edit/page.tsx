@@ -23,7 +23,7 @@ export default async function EditProject({ params }: Props) {
     <>
       <PageTitle title={project.name} backUrl="/console/projects" />
 
-      <form action={updateProject}>
+      <form action={updateProject} className="xl:-mt-8">
         <ContentBlock>
           <CardContent>
             <input type="hidden" name="id" defaultValue={projectId} />
@@ -34,6 +34,7 @@ export default async function EditProject({ params }: Props) {
               <Link
                 href="/console/projects"
                 className={buttonVariants({ variant: "ghost" })}
+                prefetch={false}
               >
                 Cancel
               </Link>

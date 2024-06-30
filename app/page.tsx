@@ -54,7 +54,7 @@ const tiers = [
     href: "/console/start",
     priceMonthly: "$99",
     description: "A plan that scales with your rapidly growing business.",
-    features: ["Unlimited users", "50 GB storage", "Priority support"],
+    features: ["Upto 50 users", "50 GB storage", "Priority support"],
     featured: false,
     callToAction: "Coming soon",
   },
@@ -92,6 +92,7 @@ export default async function Home() {
               <Link
                 href="/console/start"
                 className="rounded-full bg-teal-600 px-8 py-2.5 text-sm font-semibold text-white hover:bg-teal-500 hover:shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+                prefetch={false}
               >
                 Get started
               </Link>
@@ -101,6 +102,7 @@ export default async function Home() {
                 target="_blank"
                 rel="noreferrer"
                 className="flex"
+                prefetch={false}
               >
                 <div className="flex h-10 w-10 items-center justify-center space-x-2 rounded-md border border-muted bg-muted">
                   <svg
@@ -186,7 +188,7 @@ export default async function Home() {
                 {tier.name}
               </h3>
               <p className="mt-4 flex items-baseline gap-x-2">
-                <span className="text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-50">
+                <span className="text-heading text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-50">
                   {tier.priceMonthly}
                 </span>
                 <span className="text-base text-gray-500 dark:text-gray-400">
