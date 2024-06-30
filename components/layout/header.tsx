@@ -19,7 +19,7 @@ export function Header() {
           />
 
           <Link href="/" className="-m-1.5 p-1.5" prefetch={false}>
-            <p className="hero relative">
+            <p className="hero text-heading relative">
               Manage
               <sup className="absolute left-[calc(100%+.1rem)] top-0 text-xs">
                 [beta]
@@ -27,24 +27,6 @@ export function Header() {
             </p>
           </Link>
         </div>
-        {/* <div className="hidden lg:flex lg:flex-1 lg:justify-end"> */}
-        {/*   <SignedIn> */}
-        {/*     <Link */}
-        {/*       href="/console/projects" */}
-        {/*       className="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200" */}
-        {/*     > */}
-        {/*       Console <span aria-hidden="true">&rarr;</span> */}
-        {/*     </Link> */}
-        {/*   </SignedIn> */}
-        {/*   <SignedOut> */}
-        {/*     <Link */}
-        {/*       href="/console/projects" */}
-        {/*       className="text-sm font-semibold leading-6 text-gray-900" */}
-        {/*     > */}
-        {/*       Log in <span aria-hidden="true">&rarr;</span> */}
-        {/*     </Link> */}
-        {/*   </SignedOut> */}
-        {/* </div> */}
       </nav>
     </header>
   );
