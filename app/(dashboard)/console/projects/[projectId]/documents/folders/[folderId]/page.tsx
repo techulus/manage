@@ -1,5 +1,6 @@
 import EmptyState from "@/components/core/empty-state";
 import { MarkdownView } from "@/components/core/markdown-view";
+import PageSection from "@/components/core/section";
 import { DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
@@ -72,67 +73,61 @@ export default async function FolderDetails({ params }: Props) {
         actionLink={`/console/projects/${projectId}/documents/folders/${folderId}/edit`}
       />
 
-      <div className="mx-auto max-w-5xl space-y-8 px-4 lg:px-0">
+      <PageSection topInset>
         {folder.description ? (
-          <div className="flex flex-col">
+          <div className="flex flex-col px-4">
             <MarkdownView content={folder.description ?? ""} />
           </div>
         ) : null}
 
-        <div className="flex h-16 flex-col justify-center rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950 xl:-mt-6">
-          <div className="px-4 sm:px-6 lg:-mx-4 lg:px-8">
-            <div className="flex justify-between py-3">
-              {/* Left buttons */}
-              <div className="isolate inline-flex sm:space-x-3">
-                <span className="inline-flex space-x-1">
-                  <FileUploader
-                    folderId={Number(folderId)}
-                    projectId={+projectId}
-                    reloadDocuments={reloadDocuments}
-                  />
-                </span>
-              </div>
-
-              {/* Right buttons */}
-              <nav aria-label="Pagination">
-                <span className="isolate inline-flex">
-                  <Link
-                    href={`/console/projects/${projectId}/documents/folders/${folderId}/new`}
-                    className={buttonVariants({ variant: "link" })}
-                    prefetch={false}
-                  >
-                    <FilePlus2 className="mr-1 h-5 w-5" /> Document
-                    <span className="sr-only">, document</span>
-                  </Link>
-
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <CircleEllipsisIcon className="h-6 w-6" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem className="m-0 p-0">
-                        <form action={deleteDocumentFolder}>
-                          <input type="hidden" name="id" value={folderId} />
-                          <input
-                            type="hidden"
-                            name="projectId"
-                            value={projectId}
-                          />
-                          <DeleteButton
-                            action="Delete folder"
-                            className="w-full"
-                            compact
-                          />
-                        </form>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </span>
-              </nav>
-            </div>
+        <div className="flex justify-between px-4 py-3">
+          {/* Left buttons */}
+          <div className="isolate inline-flex sm:space-x-3">
+            <span className="inline-flex space-x-1">
+              <FileUploader
+                folderId={Number(folderId)}
+                projectId={+projectId}
+                reloadDocuments={reloadDocuments}
+              />
+            </span>
           </div>
-        </div>
 
+          {/* Right buttons */}
+          <nav aria-label="Pagination">
+            <span className="isolate inline-flex">
+              <Link
+                href={`/console/projects/${projectId}/documents/folders/${folderId}/new`}
+                className={buttonVariants({ variant: "link" })}
+                prefetch={false}
+              >
+                <FilePlus2 className="mr-1 h-5 w-5" /> Document
+                <span className="sr-only">, document</span>
+              </Link>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <CircleEllipsisIcon className="h-6 w-6" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem className="m-0 p-0">
+                    <form action={deleteDocumentFolder}>
+                      <input type="hidden" name="id" value={folderId} />
+                      <input type="hidden" name="projectId" value={projectId} />
+                      <DeleteButton
+                        action="Delete folder"
+                        className="w-full"
+                        compact
+                      />
+                    </form>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </span>
+          </nav>
+        </div>
+      </PageSection>
+
+      <div className="mx-auto max-w-5xl space-y-8 px-4 lg:px-0">
         <div className="flex flex-col space-y-4">
           {folder.documents.length || folder.files.length ? (
             <ul
@@ -173,7 +168,7 @@ export default async function FolderDetails({ params }: Props) {
           />
         </div>
 
-        <div className="pt-4">
+        <div className="py-8">
           <CommentsSection
             type="folder"
             parentId={folderId}

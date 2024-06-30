@@ -1,5 +1,6 @@
 import EmptyState from "@/components/core/empty-state";
 import { MarkdownView } from "@/components/core/markdown-view";
+import PageSection from "@/components/core/section";
 import { ActionButton, DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
@@ -60,58 +61,58 @@ export default async function ProjectDetails({ params }: Props) {
         ) : null}
       </PageTitle>
 
-      <div className="mx-auto mb-8 max-w-5xl space-y-12 bg-white px-4 dark:bg-gray-950 md:space-y-0 md:divide-y md:border-l md:border-r md:px-0 xl:-mt-6 xl:rounded-lg xl:border">
-        <div className="flex flex-col">
-          {project.description ? (
-            <div className="flex flex-col px-4 lg:px-8">
-              <MarkdownView content={project.description ?? ""} />
+      <PageSection topInset>
+        {project.description ? (
+          <div className="flex flex-col px-4 lg:px-8">
+            <MarkdownView content={project.description ?? ""} />
+          </div>
+        ) : null}
+
+        <div className="flex h-12 flex-col justify-center">
+          <div className="flex justify-between px-4 py-3">
+            {/* Left buttons */}
+            <div className="isolate inline-flex sm:space-x-3">
+              <span className="inline-flex space-x-1"></span>
             </div>
-          ) : null}
 
-          <div className="flex h-12 flex-col justify-center">
-            <div className="flex justify-between px-4 py-3">
-              {/* Left buttons */}
-              <div className="isolate inline-flex sm:space-x-3">
-                <span className="inline-flex space-x-1"></span>
-              </div>
-
-              {/* Right buttons */}
-              <span className="isolate inline-flex">
-                {project.status == "archived" ? (
-                  <>
-                    <form action={unarchiveProject}>
-                      <input
-                        className="hidden"
-                        name="id"
-                        defaultValue={project.id}
-                      />
-                      <ActionButton label="Unarchive" variant="link" />
-                    </form>
-                    <form action={deleteProject}>
-                      <input
-                        className="hidden"
-                        name="id"
-                        defaultValue={project.id}
-                      />
-                      <DeleteButton action="Delete" />
-                    </form>
-                  </>
-                ) : (
-                  <form action={archiveProject}>
+            {/* Right buttons */}
+            <span className="isolate inline-flex">
+              {project.status == "archived" ? (
+                <>
+                  <form action={unarchiveProject}>
                     <input
                       className="hidden"
                       name="id"
                       defaultValue={project.id}
                     />
-                    <DeleteButton action="Archive" />
+                    <ActionButton label="Unarchive" variant="link" />
                   </form>
-                )}
-              </span>
-            </div>
+                  <form action={deleteProject}>
+                    <input
+                      className="hidden"
+                      name="id"
+                      defaultValue={project.id}
+                    />
+                    <DeleteButton action="Delete" />
+                  </form>
+                </>
+              ) : (
+                <form action={archiveProject}>
+                  <input
+                    className="hidden"
+                    name="id"
+                    defaultValue={project.id}
+                  />
+                  <DeleteButton action="Archive" />
+                </form>
+              )}
+            </span>
           </div>
         </div>
+      </PageSection>
 
-        <div className="flex flex-col space-y-4 md:p-8">
+      <PageSection bottomMargin={false}>
+        <div className="flex flex-col space-y-4 p-4 lg:p-8">
           <div className="flex flex-col justify-between lg:flex-row lg:items-center">
             <h2 className="text-heading text-2xl leading-7">Task lists</h2>
 
@@ -159,7 +160,7 @@ export default async function ProjectDetails({ params }: Props) {
           />
         </div>
 
-        <div className="flex flex-col space-y-4 md:p-8">
+        <div className="flex flex-col space-y-4 p-4 lg:p-8">
           <div className="flex flex-col justify-between lg:flex-row lg:items-center">
             <h2 className="text-heading text-2xl leading-7">
               Docs &amp; Files
@@ -218,7 +219,7 @@ export default async function ProjectDetails({ params }: Props) {
           />
         </div>
 
-        <div className="flex flex-col space-y-4 md:p-8">
+        <div className="flex flex-col space-y-4 p-4 lg:p-8">
           <div className="flex flex-col justify-between lg:flex-row lg:items-center">
             <h2 className="text-heading text-2xl leading-7">Events</h2>
 
@@ -243,14 +244,14 @@ export default async function ProjectDetails({ params }: Props) {
             />
           </div>
         </div>
+      </PageSection>
 
-        <div className="pb-12 md:p-8">
-          <CommentsSection
-            type="project"
-            parentId={project.id}
-            projectId={projectId}
-          />
-        </div>
+      <div className="mx-auto max-w-5xl p-4 lg:p-8">
+        <CommentsSection
+          type="project"
+          parentId={project.id}
+          projectId={projectId}
+        />
       </div>
     </>
   );

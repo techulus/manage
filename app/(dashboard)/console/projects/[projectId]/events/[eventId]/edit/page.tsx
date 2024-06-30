@@ -55,7 +55,8 @@ export default async function EditEvent({ params }: Props) {
   return (
     <>
       <PageTitle title="Edit Event" backUrl={backUrl} />
-      <form action={updateEvent}>
+
+      <form action={updateEvent} className="xl:-mt-8">
         <input type="hidden" name="id" defaultValue={eventId} />
         <input type="hidden" name="projectId" defaultValue={projectId} />
         <ContentBlock>

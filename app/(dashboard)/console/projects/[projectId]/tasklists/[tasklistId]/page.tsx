@@ -65,6 +65,8 @@ export default async function TaskLists({ params }: Props) {
       <PageTitle
         title={list.name}
         backUrl={`/console/projects/${projectId}/tasklists`}
+        actionLabel="Edit"
+        actionLink={`/console/projects/${projectId}/tasklists/${list.id}/edit`}
       />
 
       <div className="mx-auto my-12 max-w-5xl px-4 lg:px-0 xl:-mt-8">
@@ -79,7 +81,7 @@ export default async function TaskLists({ params }: Props) {
           hideHeader
         />
 
-        <div className="pb-12 pt-4">
+        <div className="py-8">
           {/* @ts-ignore */}
           <CommentsSection
             type="tasklist"

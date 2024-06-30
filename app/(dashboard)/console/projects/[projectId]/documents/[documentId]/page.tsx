@@ -1,4 +1,5 @@
 import { MarkdownView } from "@/components/core/markdown-view";
+import PageSection from "@/components/core/section";
 import { DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
@@ -46,12 +47,14 @@ export default async function DocumentDetails({ params }: Props) {
         actionLink={`/console/projects/${projectId}/documents/${documentId}/edit`}
       />
 
-      <div className="mx-auto max-w-5xl px-4 lg:px-0">
-        <div className="mx-auto my-8 rounded-lg border bg-white px-4 dark:bg-gray-950 lg:mx-0 lg:max-w-none xl:-mt-6">
+      <PageSection topInset>
+        <div className="p-4 lg:p-8">
           <MarkdownView content={documentDetails.markdownContent} />
         </div>
+      </PageSection>
 
-        <div className="flex h-12 flex-col justify-center border bg-white dark:bg-gray-950 xl:rounded-lg">
+      <PageSection bottomMargin={false}>
+        <div className="flex h-12 flex-col justify-center bg-white dark:bg-gray-950 xl:rounded-lg">
           <div className="flex justify-between py-3">
             {/* Left buttons */}
             <div className="isolate inline-flex sm:space-x-3">
@@ -78,15 +81,15 @@ export default async function DocumentDetails({ params }: Props) {
             </nav>
           </div>
         </div>
+      </PageSection>
 
-        <div className="pt-4">
-          {/* @ts-ignore */}
-          <CommentsSection
-            type="document"
-            parentId={+documentId}
-            projectId={+projectId}
-          />
-        </div>
+      <div className="mx-auto max-w-5xl py-8">
+        {/* @ts-ignore */}
+        <CommentsSection
+          type="document"
+          parentId={+documentId}
+          projectId={+projectId}
+        />
       </div>
     </>
   );

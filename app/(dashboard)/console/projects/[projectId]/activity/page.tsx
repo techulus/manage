@@ -1,3 +1,4 @@
+import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { activity } from "@/drizzle/schema";
@@ -124,8 +125,8 @@ export default async function ActivityDetails({ params }: Props) {
     <>
       <PageTitle title="Activity" />
 
-      <div className="mx-auto my-12 max-w-5xl space-y-12 px-4 lg:px-0 xl:-mt-6">
-        <div className="flex w-full rounded-lg border bg-white dark:bg-black">
+      <PageSection topInset>
+        <div className="flex w-full rounded-lg bg-white dark:bg-black">
           {activities.length ? (
             <ul role="list" className="w-full px-6 py-4 md:p-6">
               {activities.map((activityItem, activityItemIdx) => {
@@ -143,7 +144,7 @@ export default async function ActivityDetails({ params }: Props) {
             <p className="p-12 text-center text-sm">No activity found</p>
           )}
         </div>
-      </div>
+      </PageSection>
     </>
   );
 }
