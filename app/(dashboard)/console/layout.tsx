@@ -2,7 +2,8 @@ import NavBar from "@/components/console/navbar";
 import { isDatabaseReady } from "@/lib/utils/useDatabase";
 import { redirect } from "next/navigation";
 
-export const fetchCache = "force-no-store";
+export const fetchCache = "force-no-store"; // disable cache for console pages
+export const dynamic = "force-dynamic"; // disable static generation for console pages
 
 export default async function ConsoleLayout({
   children,

@@ -6,8 +6,6 @@ import { database } from "@/lib/utils/useDatabase";
 import { currentUser } from "@clerk/nextjs/server";
 import { sql } from "drizzle-orm";
 
-export const dynamic = "force-dynamic";
-
 export default async function Settings() {
   const user = await currentUser();
 

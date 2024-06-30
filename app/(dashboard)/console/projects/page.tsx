@@ -14,8 +14,6 @@ interface Props {
   };
 }
 
-export const dynamic = "force-dynamic";
-
 export default async function Projects({ searchParams }: Props) {
   const statuses = searchParams?.status?.split(",") ?? ["active"];
 
