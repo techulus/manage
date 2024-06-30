@@ -1,6 +1,7 @@
 "use server";
 
 import { task, taskList } from "@/drizzle/schema";
+import { logActivity } from "@/lib/activity";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { desc, eq } from "drizzle-orm";
@@ -54,7 +55,7 @@ export async function createTaskList(payload: FormData) {
     status: "active",
   });
 
-  await database()
+  const newTaskList = await database()
     .insert(taskList)
     .values({
       ...data,
@@ -63,7 +64,16 @@ export async function createTaskList(payload: FormData) {
       createdAt: new Date(),
       updatedAt: new Date(),
     })
-    .run();
+    .returning()
+    .get();
+
+  await logActivity({
+    action: "created",
+    type: "tasklist",
+    message: `Created task list ${name}`,
+    parentId: newTaskList.id,
+    projectId: +projectId,
+  });
 
   revalidatePath(`/console/projects/${projectId}/tasklists`);
   redirect(`/console/projects/${projectId}/tasklists`);
@@ -92,6 +102,14 @@ export async function updateTaskList(payload: FormData) {
     .where(eq(taskList.id, +id))
     .run();
 
+  await logActivity({
+    action: "updated",
+    type: "tasklist",
+    message: `Updated task list ${name}`,
+    parentId: +id,
+    projectId: +projectId,
+  });
+
   revalidatePath(`/console/projects/${projectId}/tasklists`);
   redirect(`/console/projects/${projectId}/tasklists`);
 }
@@ -109,6 +127,14 @@ export async function partialUpdateTaskList(
     .where(eq(taskList.id, +id))
     .returning()
     .get();
+
+  await logActivity({
+    action: "updated",
+    type: "tasklist",
+    message: `Updated task list ${updated.name}`,
+    parentId: +id,
+    projectId: +updated.projectId,
+  });
 
   revalidatePath(`/console/projects/${updated.projectId}/tasklists`);
 }
@@ -158,6 +184,14 @@ export async function createTask({
     })
     .run();
 
+  await logActivity({
+    action: "created",
+    type: "task",
+    message: `Created task ${name}`,
+    parentId: +taskListId,
+    projectId: +projectId,
+  });
+
   revalidatePath(`/console/projects/${projectId}/tasklists`);
 }
 
@@ -171,14 +205,23 @@ export async function updateTask(
     | { name: string }
     | { assignedToUser: string | null }
 ) {
-  await database()
+  const taskDetails = await database()
     .update(task)
     .set({
       ...data,
       updatedAt: new Date(),
     })
     .where(eq(task.id, +id))
-    .run();
+    .returning()
+    .get();
+
+  await logActivity({
+    action: "updated",
+    type: "task",
+    message: `Updated task ${taskDetails.name}`,
+    parentId: +id,
+    projectId: +projectId,
+  });
 
   revalidatePath(`/console/projects/${projectId}/tasklists`);
 }
@@ -190,7 +233,19 @@ export async function deleteTask({
   id: number;
   projectId: number;
 }) {
-  await database().delete(task).where(eq(task.id, +id)).run();
+  const taskDetails = await database()
+    .delete(task)
+    .where(eq(task.id, +id))
+    .returning()
+    .get();
+
+  await logActivity({
+    action: "deleted",
+    type: "task",
+    message: `Deleted task ${taskDetails?.name}`,
+    parentId: +id,
+    projectId: +projectId,
+  });
 
   revalidatePath(`/console/projects/${projectId}/tasklists`);
 }

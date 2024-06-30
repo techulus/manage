@@ -15,6 +15,7 @@ export async function logActivity({
     | "task"
     | "project"
     | "document"
+    | "blob"
     | "folder"
     | "event"
     | "comment";

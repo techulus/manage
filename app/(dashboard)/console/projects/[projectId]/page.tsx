@@ -60,7 +60,7 @@ export default async function ProjectDetails({ params }: Props) {
         ) : null}
       </PageTitle>
 
-      <div className="mx-auto max-w-5xl space-y-12 px-4 md:space-y-0 md:divide-y md:border-l md:border-r md:px-0">
+      <div className="mx-auto mb-8 max-w-5xl space-y-12 bg-white px-4 dark:bg-gray-950 md:space-y-0 md:divide-y md:border-l md:border-r md:px-0 xl:-mt-6 xl:rounded-lg xl:border">
         <div className="flex flex-col">
           {project.description ? (
             <div className="flex flex-col px-4 lg:px-8">

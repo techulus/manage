@@ -72,14 +72,14 @@ export default async function FolderDetails({ params }: Props) {
         actionLink={`/console/projects/${projectId}/documents/folders/${folderId}/edit`}
       />
 
-      <div className="mx-auto max-w-5xl space-y-16 px-4 lg:px-0">
+      <div className="mx-auto max-w-5xl space-y-8 px-4 lg:px-0">
         {folder.description ? (
           <div className="flex flex-col">
             <MarkdownView content={folder.description ?? ""} />
           </div>
         ) : null}
 
-        <div className="flex h-12 flex-col justify-center border-b border-gray-200 dark:border-gray-800">
+        <div className="flex h-16 flex-col justify-center rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950 xl:-mt-6">
           <div className="px-4 sm:px-6 lg:-mx-4 lg:px-8">
             <div className="flex justify-between py-3">
               {/* Left buttons */}
@@ -173,11 +173,13 @@ export default async function FolderDetails({ params }: Props) {
           />
         </div>
 
-        <CommentsSection
-          type="folder"
-          parentId={folderId}
-          projectId={+projectId}
-        />
+        <div className="pt-4">
+          <CommentsSection
+            type="folder"
+            parentId={folderId}
+            projectId={+projectId}
+          />
+        </div>
       </div>
     </>
   );

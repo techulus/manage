@@ -73,7 +73,7 @@ export default function NavBar() {
   return (
     <>
       {createToastWrapper(appearance)}
-      <nav className="flex-shrink-0 bg-background text-black dark:bg-gray-900 dark:text-white">
+      <nav className="flex-shrink-0 bg-background text-black dark:bg-gray-950 dark:text-white">
         <div className="mx-auto px-4 lg:px-8">
           <div className="relative flex h-16 items-center justify-between">
             <div className="flex">
@@ -120,7 +120,7 @@ export default function NavBar() {
 
       <div
         className={cn(
-          "sticky -top-[1px] z-10 -mb-px flex w-screen self-start border-b border-gray-200 bg-background px-4 dark:border-gray-800 dark:bg-gray-900 lg:px-8",
+          "sticky -top-[1px] z-10 -mb-px flex w-screen self-start border-b border-gray-200 bg-background px-4 dark:border-gray-800 dark:bg-gray-950 lg:px-8",
           isSticky ? "pt-[1px] shadow-md" : ""
         )}
         ref={ref}

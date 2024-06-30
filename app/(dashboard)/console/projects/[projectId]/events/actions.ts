@@ -142,11 +142,16 @@ export async function deleteEvent(payload: FormData) {
   const currentPath = payload.get("currentPath") as string;
   const projectId = payload.get("projectId") as string;
 
-  await database().delete(calendarEvent).where(eq(calendarEvent.id, id)).run();
+  const eventDetails = await database()
+    .delete(calendarEvent)
+    .where(eq(calendarEvent.id, id))
+    .returning()
+    .get();
+
   await logActivity({
     action: "deleted",
     type: "event",
-    message: `Deleted event`,
+    message: `Deleted event ${eventDetails?.name}`,
     parentId: id,
     projectId: +projectId,
   });
