@@ -156,3 +156,12 @@ textarea {
 .text-heading {
   font-family: "Mona Sans", sans-serif;
 }
+
+.hidden-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hidden-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}

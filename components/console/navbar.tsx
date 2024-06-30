@@ -149,8 +149,7 @@ export default function NavBar() {
 
         <div
           className={cn(
-            "flex space-x-1 overflow-y-scroll",
-            "transition duration-300 ease-in-out",
+            "hidden-scrollbar flex space-x-1 overflow-y-scroll transition duration-300 ease-in-out",
             isSticky ? "md:translate-x-[40px]" : "md:translate-x-0"
           )}
         >
