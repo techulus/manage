@@ -19,7 +19,7 @@ export function Header() {
           />
 
           <Link href="/" className="-m-1.5 p-1.5" prefetch={false}>
-            <p className="hero text-heading relative">
+            <p className="hero relative tracking-tight">
               Manage
               <sup className="absolute left-[calc(100%+.1rem)] top-0 text-xs">
                 [beta]
