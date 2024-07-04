@@ -82,7 +82,7 @@ export default async function Home() {
         </div>
         <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
           <div className="text-center">
-            <h1 className="hero text-heading bg-gradient-to-r from-teal-500 to-yellow-700 bg-clip-text text-4xl font-bold text-gray-900 text-transparent sm:text-6xl">
+            <h1 className="hero bg-gradient-to-r from-teal-500 to-yellow-700 bg-clip-text text-4xl font-bold tracking-tighter text-gray-900 text-transparent sm:text-6xl">
               {SITE_METADATA.TAGLINE}
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
@@ -155,7 +155,7 @@ export default async function Home() {
           <h2 className="text-base font-semibold leading-7 text-teal-600 dark:text-teal-500">
             Pricing
           </h2>
-          <p className="text-heading mt-2 text-4xl font-bold text-gray-900 dark:text-gray-50 sm:text-5xl">
+          <p className="mt-2 text-4xl font-bold tracking-tighter text-gray-900 dark:text-gray-50 sm:text-5xl">
             Free during beta
           </p>
         </div>
@@ -188,7 +188,7 @@ export default async function Home() {
                 {tier.name}
               </h3>
               <p className="mt-4 flex items-baseline gap-x-2">
-                <span className="text-heading text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-50">
+                <span className="text-5xl font-bold tracking-tighter text-gray-900 dark:text-gray-50">
                   {tier.priceMonthly}
                 </span>
                 <span className="text-base text-gray-500 dark:text-gray-400">

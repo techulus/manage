@@ -201,7 +201,14 @@ export default function RootLayout({
         />
       </head>
 
-      <ClerkProvider>
+      <ClerkProvider
+        appearance={{
+          variables: {
+            fontFamily: GeistSans.style.fontFamily,
+            fontSize: "14px",
+          },
+        }}
+      >
         <body
           className={cn(
             "min-h-full min-w-full flex-1",

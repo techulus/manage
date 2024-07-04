@@ -111,140 +111,138 @@ export default async function ProjectDetails({ params }: Props) {
         </div>
       </PageSection>
 
-      <PageSection bottomMargin={false}>
-        <div className="flex flex-col space-y-4 p-4 lg:p-8">
-          <div className="flex flex-col justify-between lg:flex-row lg:items-center">
-            <h2 className="text-heading text-2xl leading-7">Task lists</h2>
+      <div className="mx-auto flex max-w-5xl flex-col space-y-4 p-4 lg:p-0 lg:pb-12">
+        <div className="flex flex-col justify-between lg:flex-row lg:items-center">
+          <h2 className="text-2xl leading-7 tracking-tight">Task lists</h2>
 
-            <div className="mt-4 flex space-x-4 lg:mt-0">
-              <Link
-                className="flex items-center"
-                href={`/console/projects/${projectId}/tasklists/new`}
-                prefetch={false}
-              >
-                <ListPlusIcon className="mr-1 h-5 w-5" /> Task list
-                <span className="sr-only">, document</span>
-              </Link>
-            </div>
-          </div>
-
-          {project.taskLists.length ? (
-            <ul
-              role="list"
-              className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2"
+          <div className="mt-4 flex space-x-4 lg:mt-0">
+            <Link
+              className="flex items-center"
+              href={`/console/projects/${projectId}/tasklists/new`}
+              prefetch={false}
             >
-              {project.taskLists.map((taskList) => {
-                return (
-                  <div
-                    key={taskList.id}
-                    className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800"
-                  >
-                    <TaskListHeader
-                      taskList={taskList}
-                      totalCount={taskList.tasks.length}
-                      doneCount={
-                        taskList.tasks.filter((task) => task.status === "done")
-                          .length
-                      }
-                    />
-                  </div>
-                );
-              })}
-            </ul>
-          ) : null}
-
-          <EmptyState
-            show={!project.taskLists.length}
-            label="task list"
-            createLink={`/console/projects/${projectId}/tasklists/new`}
-          />
+              <ListPlusIcon className="mr-1 h-5 w-5" /> Task list
+              <span className="sr-only">, document</span>
+            </Link>
+          </div>
         </div>
 
-        <div className="flex flex-col space-y-4 p-4 lg:p-8">
-          <div className="flex flex-col justify-between lg:flex-row lg:items-center">
-            <h2 className="text-heading text-2xl leading-7">
-              Docs &amp; Files
-            </h2>
-
-            <div className="mt-4 flex space-x-4 lg:mt-0">
-              <Link
-                className="flex items-center"
-                href={`/console/projects/${projectId}/documents/new`}
-                prefetch={false}
-              >
-                <FilePlus2Icon className="mr-1 h-5 w-5" /> Document
-                <span className="sr-only">, document</span>
-              </Link>
-
-              <Link
-                className="flex items-center"
-                href={`/console/projects/${projectId}/documents/folders/new`}
-                prefetch={false}
-              >
-                <FolderPlusIcon className="mr-1 h-5 w-5" /> Folder
-                <span className="sr-only">, folder</span>
-              </Link>
-            </div>
-          </div>
-
-          {project.documents.length || project.documentFolders.length ? (
-            <ul
-              role="list"
-              className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2"
-            >
-              {project.documents.map((document) => (
+        {project.taskLists.length ? (
+          <ul
+            role="list"
+            className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2"
+          >
+            {project.taskLists.map((taskList) => {
+              return (
                 <div
-                  key={document.id}
+                  key={taskList.id}
                   className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800"
                 >
-                  {/* @ts-ignore */}
-                  <DocumentHeader document={document} />
+                  <TaskListHeader
+                    taskList={taskList}
+                    totalCount={taskList.tasks.length}
+                    doneCount={
+                      taskList.tasks.filter((task) => task.status === "done")
+                        .length
+                    }
+                  />
                 </div>
-              ))}
-              {project.documentFolders.map((folder) => (
-                <div
-                  key={folder.id}
-                  className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800"
-                >
-                  <DocumentFolderHeader documentFolder={folder} />
-                </div>
-              ))}
-            </ul>
-          ) : null}
+              );
+            })}
+          </ul>
+        ) : null}
 
-          <EmptyState
-            show={!project.documents.length && !project.documentFolders.length}
-            label="document"
-            createLink={`/console/projects/${projectId}/documents/new`}
+        <EmptyState
+          show={!project.taskLists.length}
+          label="task list"
+          createLink={`/console/projects/${projectId}/tasklists/new`}
+        />
+      </div>
+
+      <div className="mx-auto flex max-w-5xl flex-col space-y-4 p-4 lg:p-0 lg:pb-12">
+        <div className="flex flex-col justify-between lg:flex-row lg:items-center">
+          <h2 className="text-2xl leading-7 tracking-tight">
+            Docs &amp; Files
+          </h2>
+
+          <div className="mt-4 flex space-x-4 lg:mt-0">
+            <Link
+              className="flex items-center"
+              href={`/console/projects/${projectId}/documents/new`}
+              prefetch={false}
+            >
+              <FilePlus2Icon className="mr-1 h-5 w-5" /> Document
+              <span className="sr-only">, document</span>
+            </Link>
+
+            <Link
+              className="flex items-center"
+              href={`/console/projects/${projectId}/documents/folders/new`}
+              prefetch={false}
+            >
+              <FolderPlusIcon className="mr-1 h-5 w-5" /> Folder
+              <span className="sr-only">, folder</span>
+            </Link>
+          </div>
+        </div>
+
+        {project.documents.length || project.documentFolders.length ? (
+          <ul
+            role="list"
+            className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2"
+          >
+            {project.documents.map((document) => (
+              <div
+                key={document.id}
+                className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800"
+              >
+                {/* @ts-ignore */}
+                <DocumentHeader document={document} />
+              </div>
+            ))}
+            {project.documentFolders.map((folder) => (
+              <div
+                key={folder.id}
+                className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800"
+              >
+                <DocumentFolderHeader documentFolder={folder} />
+              </div>
+            ))}
+          </ul>
+        ) : null}
+
+        <EmptyState
+          show={!project.documents.length && !project.documentFolders.length}
+          label="document"
+          createLink={`/console/projects/${projectId}/documents/new`}
+        />
+      </div>
+
+      <div className="mx-auto flex max-w-5xl flex-col space-y-4 p-4 lg:p-0">
+        <div className="flex flex-col justify-between lg:flex-row lg:items-center">
+          <h2 className="text-2xl leading-7 tracking-tight">Events</h2>
+
+          <div className="mt-4 flex space-x-4 lg:mt-0">
+            <Link
+              className="flex items-center"
+              href={`/console/projects/${projectId}/events/new`}
+              prefetch={false}
+            >
+              <CalendarPlusIcon className="mr-1 h-5 w-5" /> Event
+              <span className="sr-only">, document</span>
+            </Link>
+          </div>
+        </div>
+
+        <div className="flex w-full rounded-lg border bg-white dark:bg-black">
+          <EventsCalendar
+            projectId={projectId}
+            userId={userId}
+            events={project.events}
+            compact
           />
         </div>
-
-        <div className="flex flex-col space-y-4 p-4 lg:p-8">
-          <div className="flex flex-col justify-between lg:flex-row lg:items-center">
-            <h2 className="text-heading text-2xl leading-7">Events</h2>
-
-            <div className="mt-4 flex space-x-4 lg:mt-0">
-              <Link
-                className="flex items-center"
-                href={`/console/projects/${projectId}/events/new`}
-                prefetch={false}
-              >
-                <CalendarPlusIcon className="mr-1 h-5 w-5" /> Event
-                <span className="sr-only">, document</span>
-              </Link>
-            </div>
-          </div>
-
-          <div className="flex w-full rounded-lg border bg-white dark:bg-black">
-            <EventsCalendar
-              projectId={projectId}
-              userId={userId}
-              events={project.events}
-              compact
-            />
-          </div>
-        </div>
-      </PageSection>
+      </div>
 
       <div className="mx-auto max-w-5xl p-4 lg:p-8">
         <CommentsSection
