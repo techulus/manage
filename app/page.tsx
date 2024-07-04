@@ -82,7 +82,7 @@ export default async function Home() {
         </div>
         <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
           <div className="text-center">
-            <h1 className="hero bg-gradient-to-r from-teal-500 to-yellow-700 bg-clip-text text-4xl font-bold tracking-tighter text-gray-900 text-transparent sm:text-6xl">
+            <h1 className="bg-gradient-to-r from-teal-500 to-yellow-700 bg-clip-text text-4xl font-bold tracking-tighter text-gray-900 text-transparent sm:text-6xl">
               {SITE_METADATA.TAGLINE}
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
