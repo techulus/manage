@@ -13,9 +13,6 @@ function getDatabaseNameForOwner(ownerId: string) {
 
 export async function isDatabaseReady(): Promise<boolean> {
   try {
-    // const { ownerId } = getOwner();
-    // const db = getDatabaseForOwner(ownerId);
-    // await db.query.project.findFirst();
     await migrateDatabase();
     return true;
   } catch (e) {

@@ -5,6 +5,9 @@ import { cn } from "@/lib/utils";
 import { CheckIcon } from "lucide-react";
 import Link from "next/link";
 
+export const revalidate = 86400;
+export const runtime = "edge";
+
 async function getGitHubStars(): Promise<string | null> {
   try {
     const response = await fetch(
@@ -12,9 +15,6 @@ async function getGitHubStars(): Promise<string | null> {
       {
         headers: {
           Accept: "application/vnd.github+json",
-        },
-        next: {
-          revalidate: 86400,
         },
       }
     );
@@ -80,7 +80,7 @@ export default async function Home() {
             }}
           />
         </div>
-        <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
+        <div className="mx-auto max-w-4xl py-32 sm:py-48 lg:py-56">
           <div className="text-center">
             <h1 className="bg-gradient-to-r from-teal-500 to-yellow-700 bg-clip-text text-4xl font-bold tracking-tighter text-gray-900 text-transparent sm:text-6xl">
               {SITE_METADATA.TAGLINE}
