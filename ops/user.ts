@@ -1,4 +1,4 @@
-import { currentUser } from "@clerk/nextjs/dist/types/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { opsDb } from "./database";
 import { _user } from "./schema";
 
