@@ -1,4 +1,5 @@
 import { isDatabaseReady } from "@/lib/utils/useDatabase";
+import { reportLastActive } from "@/ops/user";
 import { redirect } from "next/navigation";
 
 export default async function Start() {
@@ -9,5 +10,6 @@ export default async function Start() {
     redirect("/console/start");
   }
 
+  await reportLastActive();
   redirect("/console/projects");
 }

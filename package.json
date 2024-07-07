@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "migrate": "drizzle-kit push",
-    "generate:migrations": "drizzle-kit generate"
+    "generate:migrations": "drizzle-kit generate",
+    "migrate:ops": "drizzle-kit push --config=drizzle-ops.config.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.367.0",
@@ -60,7 +61,10 @@
     "tailwindcss-animate": "^1.0.6",
     "typescript": "5.0.4",
     "uuid": "^9.0.0",
-    "zod": "^3.21.4"
+    "zod": "^3.21.4",
+    "@trigger.dev/sdk": "^2.3.19",
+    "@trigger.dev/nextjs": "^2.3.19",
+    "@trigger.dev/react": "^2.3.19"
   },
   "devDependencies": {
     "@aws-sdk/s3-request-presigner": "^3.369.0",
@@ -75,5 +79,8 @@
     "drizzle-kit": "^0.22.2",
     "encoding": "^0.1.13",
     "prettier-plugin-tailwindcss": "^0.3.0"
+  },
+  "trigger.dev": {
+    "endpointId": "manage-3J3S"
   }
 }
