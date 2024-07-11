@@ -152,3 +152,8 @@ textarea {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+.text-hero {
+  font-family: var(--font-bricolage-grotesque);
+  font-weight: 600;
+}

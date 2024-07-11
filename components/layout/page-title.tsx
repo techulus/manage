@@ -44,7 +44,7 @@ export default function PageTitle({
           )}
 
           <div className="flex flex-col">
-            <h1 className="flex-1 text-xl font-semibold tracking-tighter lg:text-4xl">
+            <h1 className="text-hero flex-1 text-xl font-semibold tracking-tighter lg:text-4xl">
               {title}
             </h1>
             {subTitle ? (
