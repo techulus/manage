@@ -36,7 +36,7 @@ const tiers = [
     name: "Personal",
     id: "tier-personal",
     href: "/console/start",
-    priceMonthly: "$4",
+    priceMonthly: "$9",
     description: "The perfect plan if you're working solo or a small team.",
     features: [
       "Upto 3 users",
