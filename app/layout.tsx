@@ -209,6 +209,17 @@ export default function RootLayout({
           media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
           href="splash_screens/8.3__iPad_Mini_portrait.png"
         />
+
+        <meta
+          name="theme-color"
+          content="#FFF"
+          media="(prefers-color-scheme: light)"
+        />
+        <meta
+          name="theme-color"
+          content="#000"
+          media="(prefers-color-scheme: dark)"
+        />
       </head>
 
       <ClerkProvider

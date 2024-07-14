@@ -1,6 +1,7 @@
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
+import { Badge } from "@/components/ui/badge";
 import { task, taskList, user } from "@/drizzle/schema";
 import { User } from "@/drizzle/types";
 import { database } from "@/lib/utils/useDatabase";
@@ -60,6 +61,9 @@ export default async function TaskLists({ params }: Props) {
 
   const users: User[] = orgId ? orgUsers : [currentUser!];
 
+  const totalCount = list.tasks.length;
+  const doneCount = list.tasks.filter((task) => task.status === "done").length;
+
   return (
     <>
       <PageTitle
@@ -67,7 +71,20 @@ export default async function TaskLists({ params }: Props) {
         backUrl={`/console/projects/${projectId}/tasklists`}
         actionLabel="Edit"
         actionLink={`/console/projects/${projectId}/tasklists/${list.id}/edit`}
-      />
+      >
+        <div className="flex space-x-2 pt-2">
+          {totalCount != null && doneCount != null ? (
+            <Badge variant="outline">
+              {doneCount}/{totalCount} completed
+            </Badge>
+          ) : null}
+          {list.dueDate ? (
+            <Badge variant="outline" className="ml-2" suppressHydrationWarning>
+              Due {list.dueDate.toLocaleDateString()}
+            </Badge>
+          ) : null}
+        </div>
+      </PageTitle>
 
       <div className="mx-auto my-12 max-w-5xl px-4 lg:px-0 xl:-mt-8">
         <TaskListItem
