@@ -4,6 +4,8 @@ import {
   deleteDatabaseForOwner,
   getDatabaseForOwner,
 } from "@/lib/utils/useDatabase";
+import { opsDb } from "@/ops/database";
+import { _user } from "@/ops/schema";
 import { and, eq } from "drizzle-orm";
 import { Webhook, WebhookRequiredHeaders } from "svix";
 
@@ -46,6 +48,7 @@ export async function POST(request: Request) {
     const data = msg.data;
     let db;
 
+    const admin = opsDb();
     console.log("POST /webhooks/auth Message:", msg);
 
     switch (msg.type) {
@@ -64,6 +67,18 @@ export async function POST(request: Request) {
             updatedAt: new Date(),
           })
           .run();
+
+        await admin
+          .insert(_user)
+          .values({
+            id: data.id,
+            email: data.email_addresses[0].email_address,
+            lastActiveAt: new Date(),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .onConflictDoNothing()
+          .run();
         break;
 
       case "user.updated":
@@ -79,6 +94,14 @@ export async function POST(request: Request) {
             updatedAt: new Date(),
           })
           .where(eq(user.id, data.id))
+          .run();
+
+        await admin
+          .update(_user)
+          .set({
+            email: data.email_addresses[0].email_address,
+          })
+          .where(eq(_user.id, data.id))
           .run();
         break;
 
@@ -114,6 +137,7 @@ export async function POST(request: Request) {
       case "user.deleted":
       case "organization.deleted":
         await deleteDatabaseForOwner(data.id);
+        await admin.delete(_user).where(eq(_user.id, data.id)).run();
         break;
 
       default:

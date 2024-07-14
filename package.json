@@ -5,11 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "dev:turbo": "next dev --turbo",
+    "prebuild": "npm run migrate:ops",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "migrate": "drizzle-kit push",
-    "generate:migrations": "drizzle-kit generate"
+    "generate:migrations": "drizzle-kit generate",
+    "migrate:ops": "drizzle-kit push --config=drizzle-ops.config.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.367.0",
@@ -28,6 +30,10 @@
     "@radix-ui/react-separator": "^1.0.3",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-switch": "^1.0.3",
+    "@trigger.dev/nextjs": "^2.3.19",
+    "@trigger.dev/react": "^2.3.19",
+    "@trigger.dev/resend": "^2.3.19",
+    "@trigger.dev/sdk": "^2.3.19",
     "@vercel/analytics": "^1.1.1",
     "autoprefixer": "10.4.14",
     "class-variance-authority": "^0.6.1",
@@ -75,5 +81,8 @@
     "drizzle-kit": "^0.22.2",
     "encoding": "^0.1.13",
     "prettier-plugin-tailwindcss": "^0.3.0"
+  },
+  "trigger.dev": {
+    "endpointId": "manage-3J3S"
   }
 }

@@ -76,14 +76,14 @@ export default function NavBar() {
       <nav className="flex-shrink-0 bg-background text-black dark:bg-gray-950 dark:text-white">
         <div className="mx-auto px-4 lg:px-8">
           <div className="relative flex h-16 items-center justify-between">
-            <div className="flex">
-              <Link href="/console/projects" className="ml-1" prefetch={false}>
-                <div className="flex items-center lg:px-0">
+            <div className="ml-1 flex items-center justify-center">
+              <Link href="/console/projects" prefetch={false}>
+                <div className="lg:px-0">
                   <Image
                     src={logo}
                     alt="Manage"
-                    width={32}
-                    height={32}
+                    width={24}
+                    height={24}
                     className="mr-2 rounded-md"
                   />
                 </div>
@@ -100,7 +100,7 @@ export default function NavBar() {
                   strokeWidth="1"
                   viewBox="0 0 24 24"
                   width="32"
-                  className="mr-2 text-gray-300 dark:text-gray-700 xl:block"
+                  className="text-gray-300 dark:text-gray-700 xl:block"
                 >
                   <path d="M16.88 3.549L7.12 20.451"></path>
                 </svg>

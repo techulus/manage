@@ -5,6 +5,9 @@ import { cn } from "@/lib/utils";
 import { CheckIcon } from "lucide-react";
 import Link from "next/link";
 
+export const revalidate = 86400;
+export const runtime = "edge";
+
 async function getGitHubStars(): Promise<string | null> {
   try {
     const response = await fetch(
@@ -12,9 +15,6 @@ async function getGitHubStars(): Promise<string | null> {
       {
         headers: {
           Accept: "application/vnd.github+json",
-        },
-        next: {
-          revalidate: 86400,
         },
       }
     );
@@ -35,8 +35,8 @@ const tiers = [
   {
     name: "Personal",
     id: "tier-personal",
-    href: "/console/start",
-    priceMonthly: "$4",
+    href: "mailto:hello@managee.xyz",
+    priceMonthly: "$9",
     description: "The perfect plan if you're working solo or a small team.",
     features: [
       "Upto 3 users",
@@ -46,12 +46,12 @@ const tiers = [
       "Email & GitHub support",
     ],
     featured: true,
-    callToAction: "Start for free",
+    callToAction: "Request access",
   },
   {
     name: "Team",
     id: "tier-team",
-    href: "/console/start",
+    href: "",
     priceMonthly: "$99",
     description: "A plan that scales with your rapidly growing business.",
     features: ["Upto 50 users", "50 GB storage", "Priority support"],
@@ -80,22 +80,22 @@ export default async function Home() {
             }}
           />
         </div>
-        <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
+        <div className="mx-auto max-w-4xl py-32 sm:py-48 lg:py-56">
           <div className="text-center">
-            <h1 className="bg-gradient-to-r from-teal-500 to-yellow-700 bg-clip-text text-4xl font-bold tracking-tighter text-gray-900 text-transparent sm:text-6xl">
+            <h1 className="text-hero bg-gradient-to-r from-teal-500 to-yellow-700 bg-clip-text text-4xl font-bold tracking-tighter text-gray-900 text-transparent sm:text-6xl">
               {SITE_METADATA.TAGLINE}
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
               {SITE_METADATA.DESCRIPTION}
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-y-6 md:flex-row md:gap-x-6 md:gap-y-0">
-              <Link
+              {/* <Link
                 href="/console/start"
                 className="rounded-full bg-teal-600 px-8 py-2.5 text-sm font-semibold text-white hover:bg-teal-500 hover:shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
                 prefetch={false}
               >
                 Get started
-              </Link>
+              </Link> */}
 
               <Link
                 href="https://github.com/techulus/manage"
@@ -155,7 +155,7 @@ export default async function Home() {
           <h2 className="text-base font-semibold leading-7 text-teal-600 dark:text-teal-500">
             Pricing
           </h2>
-          <p className="mt-2 text-4xl font-bold tracking-tighter text-gray-900 dark:text-gray-50 sm:text-5xl">
+          <p className="text-hero mt-2 text-4xl font-bold tracking-tighter text-gray-900 dark:text-gray-50 sm:text-5xl">
             Free during beta
           </p>
         </div>
@@ -188,7 +188,7 @@ export default async function Home() {
                 {tier.name}
               </h3>
               <p className="mt-4 flex items-baseline gap-x-2">
-                <span className="text-5xl font-bold tracking-tighter text-gray-900 dark:text-gray-50">
+                <span className="text-hero text-5xl font-bold tracking-tighter text-gray-900 dark:text-gray-50">
                   {tier.priceMonthly}
                 </span>
                 <span className="text-base text-gray-500 dark:text-gray-400">

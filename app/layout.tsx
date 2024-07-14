@@ -3,8 +3,14 @@ import { cn } from "@/lib/utils";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/react";
 import { GeistSans } from "geist/font/sans";
+import { Bricolage_Grotesque } from "next/font/google";
 
 import "./globals.css";
+
+const bricolageGrotesque = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-bricolage-grotesque",
+});
 
 export const metadata = {
   title: SITE_METADATA.TITLE,
@@ -19,7 +25,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("dark flex min-h-full min-w-full", GeistSans.className)}
+      className={cn(
+        "dark flex min-h-full min-w-full",
+        GeistSans.className,
+        bricolageGrotesque.variable
+      )}
       suppressHydrationWarning
     >
       <head>
