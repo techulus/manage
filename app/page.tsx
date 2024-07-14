@@ -35,7 +35,7 @@ const tiers = [
   {
     name: "Personal",
     id: "tier-personal",
-    href: "/console/start",
+    href: "mailto:hello@managee.xyz",
     priceMonthly: "$9",
     description: "The perfect plan if you're working solo or a small team.",
     features: [
@@ -46,12 +46,12 @@ const tiers = [
       "Email & GitHub support",
     ],
     featured: true,
-    callToAction: "Start for free",
+    callToAction: "Request access",
   },
   {
     name: "Team",
     id: "tier-team",
-    href: "/console/start",
+    href: "",
     priceMonthly: "$99",
     description: "A plan that scales with your rapidly growing business.",
     features: ["Upto 50 users", "50 GB storage", "Priority support"],
@@ -89,13 +89,13 @@ export default async function Home() {
               {SITE_METADATA.DESCRIPTION}
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-y-6 md:flex-row md:gap-x-6 md:gap-y-0">
-              <Link
+              {/* <Link
                 href="/console/start"
                 className="rounded-full bg-teal-600 px-8 py-2.5 text-sm font-semibold text-white hover:bg-teal-500 hover:shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
                 prefetch={false}
               >
                 Get started
-              </Link>
+              </Link> */}
 
               <Link
                 href="https://github.com/techulus/manage"
