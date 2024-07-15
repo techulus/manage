@@ -217,7 +217,7 @@ export default function RootLayout({
         />
         <meta
           name="theme-color"
-          content="#000"
+          content="#0a0a0a"
           media="(prefers-color-scheme: dark)"
         />
       </head>

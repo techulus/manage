@@ -72,7 +72,7 @@ export default async function TaskLists({ params }: Props) {
         actionLabel="Edit"
         actionLink={`/console/projects/${projectId}/tasklists/${list.id}/edit`}
       >
-        <div className="flex space-x-2 pt-2">
+        <div className="flex space-x-2">
           {totalCount != null && doneCount != null ? (
             <Badge variant="outline">
               {doneCount}/{totalCount} completed

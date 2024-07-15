@@ -46,7 +46,7 @@ export default async function ProjectDetails({ params }: Props) {
         actionLink={`/console/projects/${projectId}/edit`}
       >
         {project.dueDate || project.status == "archived" ? (
-          <div className="flex space-x-2 pt-2">
+          <div className="flex space-x-2">
             {project.dueDate ? (
               <Badge variant="outline">
                 Due {project.dueDate.toLocaleDateString()}

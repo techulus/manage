@@ -65,7 +65,7 @@ export default async function ProjectDocuments({ params }: Props) {
   return (
     <>
       <PageTitle title="Docs & Files">
-        <div className="mt-4 flex space-x-4">
+        <div className="flex space-x-4">
           <Link
             className="flex items-center"
             href={`/console/projects/${projectId}/documents/new`}
