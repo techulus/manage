@@ -40,7 +40,7 @@ export const TaskItem = ({
 
   if (detailsOpen) {
     return (
-      <Card className="flex w-full flex-col rounded-none bg-gray-50 dark:bg-gray-900">
+      <Card className="my-2 mb-0.5 flex w-full scale-105 flex-col rounded-xl border-green-500 bg-gray-50 transition-transform duration-300 ease-in-out dark:bg-gray-900">
         <CardHeader className="pt-0">
           <div className="flex items-center space-x-2">
             <Checkbox

@@ -20,7 +20,7 @@ export const ThemedUserButton = ({ appearance }: Props) => {
     <UserButton
       appearance={appearance === "dark" ? { baseTheme: dark } : {}}
       afterSignOutUrl={"/"}
-      signInUrl={"/console/start"}
+      signInUrl={"/console/projects"}
     />
   );
 };
