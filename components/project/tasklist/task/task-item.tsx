@@ -40,7 +40,7 @@ export const TaskItem = ({
 
   if (detailsOpen) {
     return (
-      <Card className="my-2 mb-0.5 flex w-full scale-105 flex-col rounded-xl border-green-500 bg-gray-50 transition-transform duration-300 ease-in-out dark:bg-gray-900">
+      <Card className="my-1.5 flex w-full scale-[1.03] flex-col rounded-xl border-2 border-green-500 bg-gray-50 transition-transform duration-300 ease-in-out dark:bg-gray-900">
         <CardHeader className="pt-0">
           <div className="flex items-center space-x-2">
             <Checkbox
@@ -61,6 +61,7 @@ export const TaskItem = ({
               }}
               disabled={isEditing}
             />
+
             {isEditing ? (
               <Input
                 type="text"
@@ -82,7 +83,7 @@ export const TaskItem = ({
           </div>
         </CardHeader>
         <CardContent className="pb-3">
-          <div className="border-t border-gray-100 text-primary dark:border-gray-800">
+          <div className="text-primary">
             <dl>
               <div className="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                 <dt className="text-sm font-medium leading-6">Created By</dt>
@@ -208,7 +209,12 @@ export const TaskItem = ({
         )}
         onClick={() => setDetailsOpen(true)}
       >
-        <div className="flex items-center">
+        <div
+          className={cn(
+            "flex items-center py-2",
+            task.status != "done" ? "border-b" : ""
+          )}
+        >
           {task.assignee ? (
             <Assignee className="mr-2" user={task.assignee} imageOnly />
           ) : null}

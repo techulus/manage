@@ -53,7 +53,7 @@ export const TaskListItem = ({
         </div>
       ) : null}
 
-      <div className="flex flex-col justify-center divide-y">
+      <div className="flex flex-col justify-center">
         {todoItems.map((task) => (
           <TaskItem
             key={task.id}
