@@ -113,7 +113,7 @@ export default async function ProjectDetails({ params }: Props) {
 
       <div className="mx-auto flex max-w-5xl flex-col space-y-4 p-4 lg:p-0 lg:pb-12">
         <div className="flex flex-col justify-between lg:flex-row lg:items-center">
-          <h2 className="text-2xl leading-7 tracking-tight">Task lists</h2>
+          <h2 className="text-2xl leading-7 tracking-tight">Task Lists</h2>
 
           <div className="mt-4 flex space-x-4 lg:mt-0">
             <Link

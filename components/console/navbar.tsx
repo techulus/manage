@@ -30,7 +30,7 @@ export default function NavBar() {
               current: path === `/console/projects/${projectId}`,
             },
             {
-              name: "Task lists",
+              name: "Task Lists",
               href: `/console/projects/${projectId}/tasklists`,
               current: path.startsWith(
                 `/console/projects/${projectId}/tasklists`
