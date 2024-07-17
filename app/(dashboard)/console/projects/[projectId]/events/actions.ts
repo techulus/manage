@@ -1,7 +1,7 @@
 "use server";
 
 import { calendarEvent, eventInvite } from "@/drizzle/schema";
-import { logActivity } from "@/lib/activity";
+import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { getEndOfDay, getStartOfDay } from "@/lib/utils/time";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
@@ -109,6 +109,15 @@ export async function updateEvent(payload: FormData) {
       .run();
   }
 
+  const currentEvent = await database()
+    .query.calendarEvent.findFirst({
+      where: and(
+        eq(calendarEvent.id, id),
+        eq(calendarEvent.projectId, +projectId)
+      ),
+    })
+    .execute();
+
   await database()
     .update(calendarEvent)
     .set({
@@ -128,7 +137,13 @@ export async function updateEvent(payload: FormData) {
   await logActivity({
     action: "updated",
     type: "event",
-    message: `Updated event ${name}`,
+    message: `Updated event ${name}, ${generateObjectDiffMessage(currentEvent, {
+      name,
+      description,
+      start,
+      end,
+      allDay,
+    })}`,
     parentId: id,
     projectId: +projectId,
   });

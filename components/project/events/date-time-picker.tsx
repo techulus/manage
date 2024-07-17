@@ -270,6 +270,15 @@ export function DateTimePicker({
               <TimePicker setDate={setDate} date={date} />
             </div>
           ) : null}
+          <Button
+            variant="link"
+            type="button"
+            onClick={() => {
+              setDate(undefined);
+            }}
+          >
+            Clear
+          </Button>
         </PopoverContent>
       </Popover>
     </>

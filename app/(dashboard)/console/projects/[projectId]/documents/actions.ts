@@ -1,7 +1,7 @@
 "use server";
 
 import { blob, comment, document, documentFolder } from "@/drizzle/schema";
-import { logActivity } from "@/lib/activity";
+import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { deleteFile } from "@/lib/blobStore";
 import { database } from "@/lib/utils/useDatabase";
 import { deleteFilesInMarkdown } from "@/lib/utils/useMarkdown";
@@ -84,6 +84,10 @@ export async function updateDocument(payload: FormData) {
     status: "active",
   });
 
+  const currentDocument = await database()
+    .query.document.findFirst({ where: eq(document.id, +id) })
+    .execute();
+
   const documentDetails = await database()
     .update(document)
     .set({
@@ -97,7 +101,9 @@ export async function updateDocument(payload: FormData) {
   await logActivity({
     action: "updated",
     type: "document",
-    message: `Updated document ${documentDetails.name}`,
+    message: `Updated document ${
+      documentDetails.name
+    }, ${generateObjectDiffMessage(currentDocument, data)}`,
     parentId: +id,
     projectId: +projectId,
   });
@@ -160,6 +166,10 @@ export async function updateDocumentFolder(payload: FormData) {
     description,
   });
 
+  const currentFolder = await database()
+    .query.documentFolder.findFirst({ where: eq(documentFolder.id, +id) })
+    .execute();
+
   const folderDetails = await database()
     .update(documentFolder)
     .set({
@@ -173,7 +183,9 @@ export async function updateDocumentFolder(payload: FormData) {
   await logActivity({
     action: "updated",
     type: "folder",
-    message: `Updated document folder ${folderDetails.name}`,
+    message: `Updated document folder ${
+      folderDetails.name
+    }, ${generateObjectDiffMessage(currentFolder, data)}`,
     parentId: +id,
     projectId: +projectId,
   });

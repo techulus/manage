@@ -1,19 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { DocumentFolder, Project, TaskList } from "@/drizzle/types";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { CalendarDaysIcon } from "lucide-react";
-import { useState } from "react";
 import MarkdownEditor from "../editor";
+import { DateTimePicker } from "../project/events/date-time-picker";
 
 export default function SharedForm({
   item,
@@ -22,8 +12,6 @@ export default function SharedForm({
   item?: Project | TaskList | DocumentFolder | null;
   showDueDate?: boolean;
 }) {
-  const [date, setDate] = useState<Date>();
-
   return (
     <div className="my-2 space-y-4">
       <div className="space-y-2">
@@ -52,36 +40,19 @@ export default function SharedForm({
 
       {showDueDate ? (
         <div className="py-2 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4">
-          <input type="hidden" name="dueDate" value={date?.toISOString()} />
           <label
             htmlFor="description"
             className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5 lg:text-left"
           >
             Due on
           </label>
-          <div className="mt-2 sm:col-span-2 sm:mt-0">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-[280px] justify-start text-left font-normal",
-                    !date && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarDaysIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>Pick a due date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+          <div className="mt-2 max-w-xs sm:col-span-2 sm:mt-0">
+            <DateTimePicker
+              name="dueDate"
+              // @ts-ignore
+              defaultValue={item?.dueDate}
+              dateOnly
+            />
           </div>
         </div>
       ) : null}

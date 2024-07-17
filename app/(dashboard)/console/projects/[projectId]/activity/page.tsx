@@ -86,7 +86,7 @@ async function ActivityItem({ id, isLast }: { id: number; isLast: boolean }) {
               </div>
               <div className="flex w-full flex-col md:flex-row md:justify-between">
                 {activityItem.message ? (
-                  <div className="mt-1 text-sm text-gray-700 dark:text-gray-400">
+                  <div className="mt-1 max-w-md text-sm text-gray-700 dark:text-gray-400">
                     <p className="text-sm font-semibold">
                       {activityItem.message}
                     </p>

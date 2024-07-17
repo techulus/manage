@@ -1,7 +1,7 @@
 "use server";
 
 import { task, taskList } from "@/drizzle/schema";
-import { logActivity } from "@/lib/activity";
+import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { desc, eq } from "drizzle-orm";
@@ -93,6 +93,12 @@ export async function updateTaskList(payload: FormData) {
     status: "active",
   });
 
+  const currentTasklist = await database()
+    .query.taskList.findFirst({
+      where: eq(taskList.id, +id),
+    })
+    .execute();
+
   await database()
     .update(taskList)
     .set({
@@ -105,7 +111,10 @@ export async function updateTaskList(payload: FormData) {
   await logActivity({
     action: "updated",
     type: "tasklist",
-    message: `Updated task list ${name}`,
+    message: `Updated task list ${name}, ${generateObjectDiffMessage(
+      currentTasklist,
+      data
+    )}`,
     parentId: +id,
     projectId: +projectId,
   });
@@ -118,6 +127,12 @@ export async function partialUpdateTaskList(
   id: number,
   data: { description: string } | { status: string }
 ) {
+  const currentTasklist = await database()
+    .query.taskList.findFirst({
+      where: eq(taskList.id, +id),
+    })
+    .execute();
+
   const updated = await database()
     .update(taskList)
     .set({
@@ -131,7 +146,10 @@ export async function partialUpdateTaskList(
   await logActivity({
     action: "updated",
     type: "tasklist",
-    message: `Updated task list ${updated.name}`,
+    message: `Updated task list ${updated.name}, ${generateObjectDiffMessage(
+      currentTasklist,
+      updated
+    )}`,
     parentId: +id,
     projectId: +updated.projectId,
   });
@@ -206,6 +224,12 @@ export async function updateTask(
     | { assignedToUser: string | null }
     | { dueDate: Date | null }
 ) {
+  const currentTask = await database()
+    .query.task.findFirst({
+      where: eq(task.id, +id),
+    })
+    .execute();
+
   const taskDetails = await database()
     .update(task)
     .set({
@@ -219,7 +243,10 @@ export async function updateTask(
   await logActivity({
     action: "updated",
     type: "task",
-    message: `Updated task ${taskDetails.name}`,
+    message: `Updated task ${taskDetails.name}, ${generateObjectDiffMessage(
+      currentTask,
+      taskDetails
+    )}`,
     parentId: +id,
     projectId: +projectId,
   });

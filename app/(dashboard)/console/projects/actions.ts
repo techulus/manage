@@ -1,7 +1,7 @@
 "use server";
 
 import { comment, project } from "@/drizzle/schema";
-import { logActivity } from "@/lib/activity";
+import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { database } from "@/lib/utils/useDatabase";
 import { convertMarkdownToPlainText } from "@/lib/utils/useMarkdown";
 import { getOwner } from "@/lib/utils/useOwner";
@@ -74,6 +74,12 @@ export async function updateProject(payload: FormData) {
     status: "active",
   });
 
+  const currentProject = await database()
+    .query.project.findFirst({
+      where: eq(project.id, +id),
+    })
+    .execute();
+
   await database()
     .update(project)
     .set({
@@ -86,7 +92,10 @@ export async function updateProject(payload: FormData) {
   await logActivity({
     action: "updated",
     type: "project",
-    message: `Updated project ${name}`,
+    message: `Updated project ${name}, ${generateObjectDiffMessage(
+      currentProject,
+      data
+    )}`,
     parentId: +id,
     projectId: +id,
   });

@@ -76,7 +76,7 @@ export default async function TaskLists({ params, searchParams }: Props) {
   return (
     <>
       <PageTitle
-        title="Task lists"
+        title="Task Lists"
         actionLabel="New"
         actionLink={`/console/projects/${projectId}/tasklists/new`}
       />
