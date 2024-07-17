@@ -6,7 +6,6 @@ import { CheckIcon } from "lucide-react";
 import Link from "next/link";
 
 export const revalidate = 86400;
-export const runtime = "edge";
 
 async function getGitHubStars(): Promise<string | null> {
   try {

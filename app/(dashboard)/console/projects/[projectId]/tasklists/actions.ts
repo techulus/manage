@@ -204,6 +204,7 @@ export async function updateTask(
     | { position: number }
     | { name: string }
     | { assignedToUser: string | null }
+    | { dueDate: Date | null }
 ) {
   const taskDetails = await database()
     .update(task)

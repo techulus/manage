@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TaskList } from "@/drizzle/types";
+import { cn } from "@/lib/utils";
 import { CircleEllipsisIcon } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -31,10 +32,13 @@ export const TaskListHeader = ({
     totalCount != null && doneCount != null ? doneCount / totalCount : null;
 
   return (
-    <div className="group relative flex items-center gap-x-4 border-b border-gray-900/5 bg-white p-3 pt-4 dark:bg-black">
+    <div className="group relative flex items-center gap-x-4 rounded-tl-lg rounded-tr-lg border-b border-gray-900/5 bg-white p-3 pt-4 dark:bg-black">
       {completedPercent != null ? (
         <div
-          className="absolute left-0 top-0 z-0 h-2 w-full rounded-lg bg-green-200 opacity-70 transition-all dark:bg-green-900"
+          className={cn(
+            "absolute left-0 top-0 z-0 h-2 rounded-tl-lg bg-green-200 opacity-70 transition-all dark:bg-green-900",
+            completedPercent === 1 ? "rounded-tr-lg" : null
+          )}
           style={{ width: `${completedPercent * 100}%` }}
         />
       ) : null}

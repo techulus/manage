@@ -26,7 +26,7 @@ export default function PageTitle({
           {backUrl && (
             <Link
               href={backUrl}
-              className="text-md absolute -top-6 left-0 mr-2 flex items-center justify-center rounded-md  font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+              className="text-md absolute -left-2 -top-6 mr-2 flex items-center justify-center rounded-md p-0.5 px-2 font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-300"
               prefetch={false}
             >
               <ArrowLeftIcon

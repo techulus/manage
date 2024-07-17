@@ -15,6 +15,7 @@ export const TaskListItem = ({
   createTask,
   partialUpdateTaskList,
   hideHeader = false,
+  hideDone = false,
 }: {
   taskList: TaskListWithTasks;
   userId: string;
@@ -26,6 +27,7 @@ export const TaskListItem = ({
     data: { status: string }
   ) => Promise<void>;
   hideHeader?: boolean;
+  hideDone?: boolean;
 }) => {
   const todoItems = useMemo(
     () => taskList.tasks.filter((task) => task.status === "todo"),
@@ -78,14 +80,16 @@ export const TaskListItem = ({
           <InlineTaskForm />
         </form>
 
-        {doneItems.map((task) => (
-          <TaskItem
-            key={task.id}
-            task={task}
-            projectId={+projectId}
-            users={users}
-          />
-        ))}
+        {!hideDone
+          ? doneItems.map((task) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                projectId={+projectId}
+                users={users}
+              />
+            ))
+          : null}
       </div>
     </div>
   );

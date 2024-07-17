@@ -101,6 +101,7 @@ export default async function TaskLists({ params, searchParams }: Props) {
               users={users}
               createTask={createTask}
               partialUpdateTaskList={partialUpdateTaskList}
+              hideDone
             />
           ))}
         </ul>
