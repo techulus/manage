@@ -100,7 +100,8 @@ input[type="time"],
 input[type="url"],
 input[type="week"],
 select:focus,
-textarea {
+textarea,
+.CodeMirror {
   font-size: 16px !important;
 }
 
