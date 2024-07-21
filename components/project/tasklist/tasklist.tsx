@@ -45,6 +45,10 @@ export const TaskListItem = ({
     for (const task of data.array) {
       updateTask(+task.item, projectId, { position: (+task.slot + 1) * 1000 });
     }
+
+    if (window?.getSelection) {
+      window?.getSelection()?.removeAllRanges();
+    }
   }, 500);
 
   useEffect(() => {

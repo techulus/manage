@@ -7,7 +7,7 @@ import {
 import { Task, TaskWithDetails, User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { FileIcon } from "lucide-react";
+import { AlignJustifyIcon, FileIcon } from "lucide-react";
 import { useReducer, useState } from "react";
 import toast from "react-hot-toast";
 import { Card, CardContent, CardHeader } from "../../../ui/card";
@@ -258,7 +258,7 @@ export const TaskItem = ({
           >
             <div
               className={cn(
-                "flex items-center py-2",
+                "flex w-full items-center py-2",
                 task.status != "done" ? "border-b" : ""
               )}
             >
@@ -271,6 +271,12 @@ export const TaskItem = ({
               ) : null}
             </div>
           </button>
+
+          {task.status !== "done" ? (
+            <div data-swapy-handle className="cursor-move p-2 pr-4">
+              <AlignJustifyIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+            </div>
+          ) : null}
         </>
       )}
     </Card>
