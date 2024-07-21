@@ -6,7 +6,6 @@ import {
 } from "@/app/(dashboard)/console/projects/[projectId]/tasklists/actions";
 import { Task, TaskWithDetails, User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-// @ts-ignore
 import { Input } from "@/components/ui/input";
 import { FileIcon } from "lucide-react";
 import { useReducer, useState } from "react";
@@ -47,10 +46,11 @@ export const TaskItem = ({
 
   return (
     <Card
+      data-swapy-item={task.id}
       className={cn(
-        "flex scale-100 shadow-none transition-transform duration-200 ease-in-out",
+        "flex shadow-none",
         detailsOpen
-          ? "my-1 w-full scale-[1.03] flex-col rounded-xl border-2 border-green-500 bg-gray-50 dark:bg-gray-900"
+          ? "w-full flex-col rounded-xl border-2 border-green-500 bg-gray-50 dark:bg-gray-900"
           : "flex-row space-x-2 border-none"
       )}
     >
@@ -62,7 +62,7 @@ export const TaskItem = ({
                 checked={status === "done"}
                 className={cn(
                   status === "done" ? "opacity-50" : "",
-                  "my-4 mr-1 scale-125"
+                  "my-4 mr-1"
                 )}
                 onCheckedChange={async (checked) => {
                   const status = checked ? "done" : "todo";
@@ -236,7 +236,7 @@ export const TaskItem = ({
           <Checkbox
             checked={status === "done"}
             className={cn(
-              "my-4 ml-6 mr-1 scale-125 transition-all",
+              "my-4 ml-6 mr-1 transition-all",
               status === "done" ? "my-2.5 opacity-50" : ""
             )}
             onCheckedChange={async (checked) => {

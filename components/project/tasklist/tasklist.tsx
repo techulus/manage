@@ -1,11 +1,14 @@
 "use client";
 
 import { TaskListWithTasks, User } from "@/drizzle/types";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { MarkdownView } from "../../core/markdown-view";
 import InlineTaskForm from "../../form/task";
 import { TaskItem } from "./task/task-item";
 import { TaskListHeader } from "./tasklist-header";
+import { createSwapy } from "swapy";
+import { useDebouncedCallback } from "use-debounce";
+import { updateTask } from "@/app/(dashboard)/console/projects/[projectId]/tasklists/actions";
 
 export const TaskListItem = ({
   taskList,
@@ -38,6 +41,22 @@ export const TaskListItem = ({
     [taskList.tasks]
   );
 
+  const onSwapEnd = useDebouncedCallback(({ data }) => {
+    for (const task of data.array) {
+      updateTask(+task.item, projectId, { position: (+task.slot + 1) * 1000 });
+    }
+  }, 500);
+
+  useEffect(() => {
+    const el = document.querySelector(`.swap-tasklist-${taskList.id}`);
+    if (!el) return;
+
+    const swapy = createSwapy(el, {
+      animation: "none",
+    });
+    swapy.onSwap(onSwapEnd);
+  }, [onSwapEnd, taskList.id]);
+
   return (
     <div className="rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-black">
       {!hideHeader ? (
@@ -56,14 +75,18 @@ export const TaskListItem = ({
       ) : null}
 
       <div className="flex flex-col justify-center">
-        {todoItems.map((task) => (
-          <TaskItem
-            key={task.id}
-            task={task}
-            projectId={+projectId}
-            users={users}
-          />
-        ))}
+        <div className={`swap-tasklist-${taskList.id}`}>
+          {todoItems.map((task, idx) => (
+            <div data-swapy-slot={idx} key={idx}>
+              <TaskItem
+                key={task.id}
+                task={task}
+                projectId={+projectId}
+                users={users}
+              />
+            </div>
+          ))}
+        </div>
 
         <form
           className="px-6 py-2"

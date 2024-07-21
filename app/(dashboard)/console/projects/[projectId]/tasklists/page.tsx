@@ -9,7 +9,6 @@ import { getOwner } from "@/lib/utils/useOwner";
 import { and, asc, eq, or } from "drizzle-orm";
 import Link from "next/link";
 import { createTask, partialUpdateTaskList } from "./actions";
-import { Badge } from "@/components/ui/badge";
 
 type Props = {
   params: {

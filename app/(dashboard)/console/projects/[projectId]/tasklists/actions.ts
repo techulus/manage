@@ -223,7 +223,20 @@ export async function updateTask(
     | { name: string }
     | { assignedToUser: string | null }
     | { dueDate: Date | null }
+    | { position: number }
 ) {
+  if ("position" in data) {
+    await database()
+      .update(task)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(task.id, +id))
+      .execute();
+    return;
+  }
+
   const currentTask = await database()
     .query.task.findFirst({
       where: eq(task.id, +id),
