@@ -285,7 +285,7 @@ export const TaskItem = ({
 
           {task.status !== "done" ? (
             <div
-              className="cursor-move p-2 pr-4"
+              className="cursor-move touch-none p-2 pr-4"
               {...attributes}
               {...listeners}
             >
