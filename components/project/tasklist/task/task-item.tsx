@@ -16,6 +16,8 @@ import { Assignee } from "../../shared/assigee";
 import { AssignToUser } from "../../shared/assign-to-user";
 import TaskNotesForm from "./notes-form";
 import { DateTimePicker } from "../../events/date-time-picker";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 export const TaskItem = ({
   task,
@@ -36,6 +38,14 @@ export const TaskItem = ({
     task
   );
 
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: task.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
   const { id, name, status } = optimisticTask;
 
   const updateTaskToastOptions = {
@@ -46,13 +56,14 @@ export const TaskItem = ({
 
   return (
     <Card
-      data-swapy-item={task.id}
       className={cn(
-        "flex rounded-lg border-none shadow-none dark:bg-black",
+        "flex scale-100 rounded-lg border-none shadow-none dark:bg-black",
         detailsOpen
-          ? "flex-col bg-gray-50 dark:bg-gray-950"
-          : "flex-row items-center justify-center space-x-2"
+          ? "scale-[1.02] flex-col border-gray-200 bg-gray-50 shadow-md"
+          : "flex-row items-center justify-center space-x-2 border-none"
       )}
+      ref={setNodeRef}
+      style={style}
     >
       {detailsOpen ? (
         <>
@@ -273,7 +284,11 @@ export const TaskItem = ({
           </button>
 
           {task.status !== "done" ? (
-            <div data-swapy-handle className="cursor-move p-2 pr-4">
+            <div
+              className="cursor-move p-2 pr-4"
+              {...attributes}
+              {...listeners}
+            >
               <AlignJustifyIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
             </div>
           ) : null}

@@ -223,20 +223,7 @@ export async function updateTask(
     | { name: string }
     | { assignedToUser: string | null }
     | { dueDate: Date | null }
-    | { position: number }
 ) {
-  if ("position" in data) {
-    await database()
-      .update(task)
-      .set({
-        ...data,
-        updatedAt: new Date(),
-      })
-      .where(eq(task.id, +id))
-      .execute();
-    return;
-  }
-
   const currentTask = await database()
     .query.task.findFirst({
       where: eq(task.id, +id),
@@ -284,6 +271,32 @@ export async function deleteTask({
     action: "deleted",
     type: "task",
     message: `Deleted task ${taskDetails?.name}`,
+    parentId: +id,
+    projectId: +projectId,
+  });
+
+  revalidatePath(`/console/projects/${projectId}/tasklists`);
+}
+
+export async function repositionTask(
+  id: number,
+  projectId: number,
+  position: number
+) {
+  const taskDetails = await database()
+    .update(task)
+    .set({
+      position,
+      updatedAt: new Date(),
+    })
+    .where(eq(task.id, +id))
+    .returning()
+    .get();
+
+  await logActivity({
+    action: "updated",
+    type: "task",
+    message: `Repositioned task ${taskDetails.name}`,
     parentId: +id,
     projectId: +projectId,
   });

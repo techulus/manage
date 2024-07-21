@@ -1,14 +1,24 @@
 "use client";
 
 import { TaskListWithTasks, User } from "@/drizzle/types";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { MarkdownView } from "../../core/markdown-view";
 import InlineTaskForm from "../../form/task";
 import { TaskItem } from "./task/task-item";
 import { TaskListHeader } from "./tasklist-header";
-import { createSwapy } from "swapy";
-import { useDebouncedCallback } from "use-debounce";
-import { updateTask } from "@/app/(dashboard)/console/projects/[projectId]/tasklists/actions";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { repositionTask } from "@/app/(dashboard)/console/projects/[projectId]/tasklists/actions";
 
 export const TaskListItem = ({
   taskList,
@@ -36,30 +46,47 @@ export const TaskListItem = ({
     () => taskList.tasks.filter((task) => task.status === "todo"),
     [taskList.tasks]
   );
+
+  const [localTodoItems, setLocalTodoItems] = useState(todoItems);
+  useEffect(() => {
+    setLocalTodoItems(todoItems);
+  }, [todoItems]);
+
   const doneItems = useMemo(
     () => taskList.tasks.filter((task) => task.status === "done"),
     [taskList.tasks]
   );
 
-  const onSwapEnd = useDebouncedCallback(({ data }) => {
-    for (const task of data.array) {
-      updateTask(+task.item, projectId, { position: (+task.slot + 1) * 1000 });
-    }
+  const sensors = useSensors(useSensor(PointerSensor));
 
-    if (window?.getSelection) {
-      window?.getSelection()?.removeAllRanges();
-    }
-  }, 500);
+  const handleDragEnd = useCallback(
+    ({ active, over }: any) => {
+      if (active.id === over.id) return;
 
-  useEffect(() => {
-    const el = document.querySelector(`.swap-tasklist-${taskList.id}`);
-    if (!el) return;
+      const movedTaskIndex = localTodoItems.findIndex(
+        (x) => x.id === active.id
+      );
+      const movedTask = localTodoItems[movedTaskIndex];
 
-    const swapy = createSwapy(el, {
-      animation: "none",
-    });
-    swapy.onSwap(onSwapEnd);
-  }, [onSwapEnd, taskList.id]);
+      const overTaskIndex = localTodoItems.findIndex((x) => x.id === over.id);
+
+      const newPosition =
+        overTaskIndex === 0
+          ? localTodoItems[0].position / 2
+          : overTaskIndex === localTodoItems.length - 1
+          ? localTodoItems[localTodoItems.length - 1].position + 1000
+          : (localTodoItems[overTaskIndex - 1].position +
+              localTodoItems[overTaskIndex].position) /
+            2;
+
+      repositionTask(movedTask.id, projectId, newPosition);
+
+      setLocalTodoItems((items) =>
+        arrayMove(items, movedTaskIndex, overTaskIndex)
+      );
+    },
+    [localTodoItems, projectId]
+  );
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-black">
@@ -79,18 +106,25 @@ export const TaskListItem = ({
       ) : null}
 
       <div className="flex flex-col justify-center">
-        <div className={`swap-tasklist-${taskList.id}`}>
-          {todoItems.map((task, idx) => (
-            <div data-swapy-slot={idx} key={idx}>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={localTodoItems}
+            strategy={verticalListSortingStrategy}
+          >
+            {localTodoItems.map((task) => (
               <TaskItem
                 key={task.id}
                 task={task}
                 projectId={+projectId}
                 users={users}
               />
-            </div>
-          ))}
-        </div>
+            ))}
+          </SortableContext>
+        </DndContext>
 
         <form
           className="px-6 py-2"
