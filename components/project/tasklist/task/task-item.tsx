@@ -48,10 +48,10 @@ export const TaskItem = ({
     <Card
       data-swapy-item={task.id}
       className={cn(
-        "flex shadow-none",
+        "flex rounded-lg border-none shadow-none dark:bg-black",
         detailsOpen
-          ? "w-full flex-col rounded-xl border-2 border-green-500 bg-gray-50 dark:bg-gray-900"
-          : "flex-row space-x-2 border-none"
+          ? "flex-col bg-gray-50 dark:bg-gray-950"
+          : "flex-row items-center justify-center space-x-2"
       )}
     >
       {detailsOpen ? (
