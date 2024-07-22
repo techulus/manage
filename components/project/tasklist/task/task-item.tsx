@@ -57,9 +57,9 @@ export const TaskItem = ({
   return (
     <Card
       className={cn(
-        "flex scale-100 rounded-lg border-none shadow-none dark:bg-black",
+        "flex scale-100 rounded-lg shadow-none dark:bg-black",
         detailsOpen
-          ? "scale-[1.02] flex-col border-gray-200 bg-gray-50 shadow-md"
+          ? "scale-[1.02] flex-col border-2 border-gray-200 bg-gray-50 shadow-md dark:border-gray-700"
           : "flex-row items-center justify-center space-x-2 border-none"
       )}
       ref={setNodeRef}
@@ -285,7 +285,7 @@ export const TaskItem = ({
 
           {task.status !== "done" ? (
             <div
-              className="cursor-move touch-none p-2 pr-4"
+              className="cursor-move touch-none p-1 pr-3"
               {...attributes}
               {...listeners}
             >
