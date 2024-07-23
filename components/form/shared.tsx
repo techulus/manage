@@ -34,7 +34,7 @@ export default function SharedForm({
           Notes
         </label>
         <div className="mt-2 sm:col-span-2 sm:mt-0">
-          <MarkdownEditor defaultValue={item?.description ?? ""} />
+          <MarkdownEditor defaultValue={item?.description ?? ""} compact />
         </div>
       </div>
 
