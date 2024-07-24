@@ -34,7 +34,8 @@ export function Footer() {
         </nav>
 
         <p className="mt-4 text-sm leading-5 text-gray-500 sm:text-center">
-          &copy; 2023 Techulus. All rights reserved.
+          &copy; {new Date().getFullYear()} Techulus. All rights reserved. |{" "}
+          {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ?? "dev"}
         </p>
       </div>
     </footer>
