@@ -2,6 +2,7 @@ import { logout, switchOrganization } from "@/app/(auth)/actions";
 import { Organization } from "@/ops/types";
 import { ChevronsUpDown, Plus, User } from "lucide-react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
@@ -32,7 +33,15 @@ export const OrgSwitcher = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem asChild>
-          <form action={switchOrganization}>
+          <form
+            action={(formData) =>
+              toast.promise(switchOrganization(formData), {
+                loading: "Switching to personal...",
+                success: "Done!",
+                error: "Failed to switch organization.",
+              })
+            }
+          >
             <button type="submit" className="flex w-full">
               Personal
             </button>
@@ -40,7 +49,16 @@ export const OrgSwitcher = ({
         </DropdownMenuItem>
         {orgs.map((org) => (
           <DropdownMenuItem key={org.id} asChild>
-            <form key={org.id} action={switchOrganization}>
+            <form
+              key={org.id}
+              action={(formData) =>
+                toast.promise(switchOrganization(formData), {
+                  loading: `Switching to ${org.name}...`,
+                  success: "Done!",
+                  error: "Failed to switch organization.",
+                })
+              }
+            >
               <input type="hidden" name="id" value={org.id} />
               <button
                 type="submit"

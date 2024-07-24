@@ -20,7 +20,7 @@ import { login } from "../actions";
 
 export default function SignInForm() {
   return (
-    <div className="flex h-full items-center justify-center">
+    <div className="m-6 flex h-full items-center justify-center">
       <Header />
       {createToastWrapper("dark")}
 
@@ -63,7 +63,13 @@ export default function SignInForm() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => signIn("passkey")}
+            onClick={() =>
+              toast.promise(signIn("passkey"), {
+                loading: "Signing in...",
+                success: "Signed in!",
+                error: "Failed to sign in.",
+              })
+            }
             className="w-full"
           >
             Sign in with Passkey (beta)
