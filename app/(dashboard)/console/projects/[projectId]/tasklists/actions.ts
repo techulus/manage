@@ -4,7 +4,7 @@ import { task, taskList } from "@/drizzle/schema";
 import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
@@ -305,6 +305,62 @@ export async function repositionTask(
     type: "task",
     message: `Repositioned task ${taskDetails.name}`,
     parentId: +id,
+    projectId: +projectId,
+  });
+
+  revalidatePath(`/console/projects/${projectId}/tasklists`);
+}
+
+export async function forkTaskList(taskListId: number, projectId: number) {
+  const db = await database();
+
+  const taskListDetails = await db.query.taskList
+    .findFirst({
+      where: eq(taskList.id, +taskListId),
+    })
+    .execute();
+  if (!taskListDetails) {
+    throw new Error("Task list not found");
+  }
+
+  await db
+    .update(taskList)
+    .set({
+      status: "archived",
+      updatedAt: new Date(),
+    })
+    .where(eq(taskList.id, +taskListId))
+    .run();
+
+  const newTaskList = await db
+    .insert(taskList)
+    .values({
+      name: taskListDetails.name,
+      description: taskListDetails.description,
+      dueDate: taskListDetails.dueDate,
+      status: "active",
+      projectId: taskListDetails.projectId,
+      createdByUser: taskListDetails.createdByUser,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .returning()
+    .get();
+
+  await db
+    .update(task)
+    .set({
+      taskListId: newTaskList.id,
+      updatedAt: new Date(),
+    })
+    .where(and(eq(task.taskListId, +taskListId), eq(task.status, "todo")))
+    .run();
+
+  await logActivity({
+    action: "updated",
+    type: "tasklist",
+    message: `Forked task list ${taskListDetails.name}`,
+    parentId: +taskListId,
     projectId: +projectId,
   });
 

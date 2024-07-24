@@ -1,5 +1,6 @@
 "use client";
 
+import { forkTaskList } from "@/app/(dashboard)/console/projects/[projectId]/tasklists/actions";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -107,6 +108,21 @@ export const TaskListHeader = ({
               </Button>
             </DropdownMenuItem>
           ) : null}
+          <DropdownMenuItem className="w-full p-0">
+            <Button
+              variant="ghost"
+              className="w-full"
+              onClick={async () => {
+                toast.promise(forkTaskList(taskList.id, taskList.projectId), {
+                  loading: "Creating new task list...",
+                  success: "New task list created.",
+                  error: "Failed to create task list.",
+                });
+              }}
+            >
+              Fork Todos
+            </Button>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
