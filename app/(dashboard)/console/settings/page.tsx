@@ -1,15 +1,18 @@
+import { auth } from "@/auth";
 import { ContentBlock } from "@/components/core/content-block";
+import { RegisterPasskeyButton } from "@/components/core/passkey";
 import PageTitle from "@/components/layout/page-title";
 import { blob } from "@/drizzle/schema";
 import { bytesToMegabytes } from "@/lib/blobStore";
 import { database } from "@/lib/utils/useDatabase";
-import { currentUser } from "@clerk/nextjs/server";
 import { sql } from "drizzle-orm";
 
 export default async function Settings() {
-  const user = await currentUser();
+  const session = await auth();
+  const user = session?.user;
 
-  const storage = await database()
+  const db = await database();
+  const storage = await db
     .select({
       count: sql<number>`count(*)`,
       usage: sql<number>`sum(${blob.contentSize})`,
@@ -54,23 +57,23 @@ export default async function Settings() {
               <dl className="mt-6 space-y-6 divide-y divide-gray-100 border-t border-gray-200 text-sm leading-6 dark:divide-gray-800 dark:border-gray-800">
                 <div className="pt-6 sm:flex">
                   <dt className="font-medium text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
-                    Full name
+                    Passkey
                   </dt>
                   <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
                     <div className="text-gray-900 dark:text-gray-200">
-                      {user?.firstName} {user?.lastName}
+                      <RegisterPasskeyButton />
                     </div>
                   </dd>
                 </div>
 
-                {user?.emailAddresses?.length ? (
+                {user?.email ? (
                   <div className="pt-6 sm:flex">
                     <dt className="font-medium text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
                       Email address
                     </dt>
                     <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
                       <div className="text-gray-900 dark:text-gray-200">
-                        {user?.emailAddresses[0].emailAddress}
+                        {user.email}
                       </div>
                     </dd>
                   </div>

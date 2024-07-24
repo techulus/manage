@@ -1,4 +1,3 @@
-import { User } from "@clerk/nextjs/dist/types/server";
 import { relations, sql } from "drizzle-orm";
 import {
   customType,
@@ -24,7 +23,7 @@ export const user = sqliteTable("User", {
   firstName: text("firstName"),
   lastName: text("lastName"),
   imageUrl: text("imageUrl"),
-  rawData: dbJson("rawData").notNull().$type<User>(),
+  rawData: dbJson("rawData").notNull(),
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
 });

@@ -30,7 +30,7 @@ type Props = {
 export default async function EventDetails({ params, searchParams }: Props) {
   const { projectId } = params;
   const { date } = searchParams;
-  const { userId } = getOwner();
+  const { userId } = await getOwner();
 
   const selectedDate = date ? new Date(date) : new Date();
   const dayCommentId = `${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDate()}`;
@@ -38,8 +38,9 @@ export default async function EventDetails({ params, searchParams }: Props) {
   const startOfDay = getStartOfDay(selectedDate);
   const endOfDay = getEndOfDay(selectedDate);
 
-  const events = await database()
-    .query.calendarEvent.findMany({
+  const db = await database();
+  const events = await db.query.calendarEvent
+    .findMany({
       where: and(
         eq(calendarEvent.projectId, +projectId),
         or(

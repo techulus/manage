@@ -23,7 +23,8 @@ export default async function EditEvent({ params }: Props) {
   const { projectId, eventId } = params;
 
   const users = await allUser();
-  const event = await database().query.calendarEvent.findFirst({
+  const db = await database();
+  const event = await db.query.calendarEvent.findFirst({
     where: eq(calendarEvent.id, +eventId),
     with: {
       creator: {

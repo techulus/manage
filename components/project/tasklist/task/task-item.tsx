@@ -4,20 +4,20 @@ import {
   deleteTask,
   updateTask,
 } from "@/app/(dashboard)/console/projects/[projectId]/tasklists/actions";
+import { Input } from "@/components/ui/input";
 import { Task, TaskWithDetails, User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { AlignJustifyIcon, FileIcon } from "lucide-react";
 import { useReducer, useState } from "react";
 import toast from "react-hot-toast";
 import { Card, CardContent, CardHeader } from "../../../ui/card";
 import { Checkbox } from "../../../ui/checkbox";
+import { DateTimePicker } from "../../events/date-time-picker";
 import { Assignee } from "../../shared/assigee";
 import { AssignToUser } from "../../shared/assign-to-user";
 import TaskNotesForm from "./notes-form";
-import { DateTimePicker } from "../../events/date-time-picker";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 
 export const TaskItem = ({
   task,

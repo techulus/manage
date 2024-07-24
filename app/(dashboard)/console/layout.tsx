@@ -1,5 +1,6 @@
 import NavBar from "@/components/console/navbar";
 import { isDatabaseReady } from "@/lib/utils/useDatabase";
+import { getOrgs, getOwner } from "@/lib/utils/useOwner";
 import { redirect } from "next/navigation";
 
 export const fetchCache = "force-no-store"; // disable cache for console pages
@@ -9,8 +10,12 @@ export default async function ConsoleLayout({
   children,
 }: {
   children: React.ReactNode;
+  params: any;
 }) {
   const ready = await isDatabaseReady();
+  const { orgId } = await getOwner();
+  const orgs = await getOrgs();
+  const activeOrg = orgs.find((org) => org.id === orgId);
 
   if (!ready) {
     console.log("Database not ready, redirecting to start");
@@ -19,7 +24,7 @@ export default async function ConsoleLayout({
 
   return (
     <div className="relative flex min-h-full flex-col">
-      <NavBar />
+      <NavBar orgs={orgs} activeOrg={activeOrg} />
 
       <div className="mx-auto w-full flex-grow lg:flex">
         <div className="min-w-0 flex-1 xl:flex">

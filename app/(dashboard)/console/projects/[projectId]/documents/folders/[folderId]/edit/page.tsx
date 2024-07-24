@@ -19,7 +19,8 @@ type Props = {
 
 export default async function EditDocumentFolder({ params }: Props) {
   const backUrl = `/console/projects/${params.projectId}/documents/folders/${params.folderId}`;
-  const folder = await database().query.documentFolder.findFirst({
+  const db = await database();
+  const folder = await db.query.documentFolder.findFirst({
     where: eq(documentFolder.id, +params.folderId),
   });
 

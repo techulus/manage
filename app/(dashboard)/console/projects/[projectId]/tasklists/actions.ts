@@ -42,7 +42,7 @@ const taskSchema = z.object({
 });
 
 export async function createTaskList(payload: FormData) {
-  const { userId } = getOwner();
+  const { userId } = await getOwner();
   const name = payload.get("name") as string;
   const description = payload.get("description") as string;
   const dueDate = payload.get("dueDate") as string;
@@ -55,7 +55,8 @@ export async function createTaskList(payload: FormData) {
     status: "active",
   });
 
-  const newTaskList = await database()
+  const db = await database();
+  const newTaskList = await db
     .insert(taskList)
     .values({
       ...data,
@@ -93,13 +94,14 @@ export async function updateTaskList(payload: FormData) {
     status: "active",
   });
 
-  const currentTasklist = await database()
-    .query.taskList.findFirst({
+  const db = await database();
+  const currentTasklist = await db.query.taskList
+    .findFirst({
       where: eq(taskList.id, +id),
     })
     .execute();
 
-  await database()
+  await db
     .update(taskList)
     .set({
       ...data,
@@ -127,13 +129,14 @@ export async function partialUpdateTaskList(
   id: number,
   data: { description: string } | { status: string }
 ) {
-  const currentTasklist = await database()
-    .query.taskList.findFirst({
+  const db = await database();
+  const currentTasklist = await db.query.taskList
+    .findFirst({
       where: eq(taskList.id, +id),
     })
     .execute();
 
-  const updated = await database()
+  const updated = await db
     .update(taskList)
     .set({
       ...data,
@@ -179,8 +182,9 @@ export async function createTask({
     status: "todo",
   });
 
-  const lastPosition = await database()
-    .query.task.findFirst({
+  const db = await database();
+  const lastPosition = await db.query.task
+    .findFirst({
       where: eq(task.taskListId, +taskListId),
       orderBy: [desc(task.position)],
     })
@@ -190,7 +194,7 @@ export async function createTask({
     ? lastPosition?.position + POSITION_INCREMENT
     : 1;
 
-  await database()
+  await db
     .insert(task)
     .values({
       ...data,
@@ -224,13 +228,14 @@ export async function updateTask(
     | { assignedToUser: string | null }
     | { dueDate: Date | null }
 ) {
-  const currentTask = await database()
-    .query.task.findFirst({
+  const db = await database();
+  const currentTask = await db.query.task
+    .findFirst({
       where: eq(task.id, +id),
     })
     .execute();
 
-  const taskDetails = await database()
+  const taskDetails = await db
     .update(task)
     .set({
       ...data,
@@ -261,7 +266,8 @@ export async function deleteTask({
   id: number;
   projectId: number;
 }) {
-  const taskDetails = await database()
+  const db = await database();
+  const taskDetails = await db
     .delete(task)
     .where(eq(task.id, +id))
     .returning()
@@ -283,7 +289,8 @@ export async function repositionTask(
   projectId: number,
   position: number
 ) {
-  const taskDetails = await database()
+  const db = await database();
+  const taskDetails = await db
     .update(task)
     .set({
       position,

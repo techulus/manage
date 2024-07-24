@@ -14,7 +14,7 @@ export async function getProjectsForOwner({
   projects: ProjectWithCreator[];
   archivedProjects: ProjectWithCreator[];
 }> {
-  const db = database();
+  const db = await database();
 
   const statusFilter = statuses?.map((status) => eq(project.status, status));
 
@@ -43,7 +43,7 @@ export async function getProjectById(
   projectId: string | number,
   withTasksAndDocs = false
 ): Promise<ProjectWithData> {
-  const db = database();
+  const db = await database();
 
   const startOfDay = getStartOfDay(new Date());
   const endOfDay = getEndOfDay(new Date());
@@ -130,7 +130,7 @@ export async function getProjectById(
 }
 
 export async function getTaskListById(taskListId: string | number) {
-  const db = database();
+  const db = await database();
   const data = await db.query.taskList
     .findFirst({
       where: eq(taskList.id, +taskListId),
@@ -145,7 +145,7 @@ export async function getTaskListById(taskListId: string | number) {
 }
 
 export async function getDocumentById(documentId: string | number) {
-  const db = database();
+  const db = await database();
   const data = await db.query.document
     .findFirst({
       where: eq(document.id, +documentId),

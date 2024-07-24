@@ -3,17 +3,23 @@
 import { useDetectSticky } from "@/lib/hooks/useDetectSticky";
 import { useTheme } from "@/lib/hooks/useTheme";
 import { cn } from "@/lib/utils";
-import { SignedIn } from "@clerk/nextjs";
+import { Organization } from "@/ops/types";
 import { Transition } from "@headlessui/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useMemo } from "react";
 import logo from "../../public/images/logo.png";
-import { ThemedOrgSwitcher, ThemedUserButton } from "../core/auth";
+import { OrgSwitcher, UserButton } from "../core/auth";
 import { createToastWrapper } from "../core/toast";
 
-export default function NavBar() {
+export default function NavBar({
+  orgs,
+  activeOrg,
+}: {
+  orgs: Organization[];
+  activeOrg: Organization | undefined;
+}) {
   const appearance = useTheme();
   const path = usePathname();
   const { projectId } = useParams();
@@ -82,37 +88,33 @@ export default function NavBar() {
                   <Image
                     src={logo}
                     alt="Manage"
-                    width={24}
-                    height={24}
-                    className="mr-2 rounded-md"
+                    width={40}
+                    height={40}
+                    className="rounded-md"
                   />
                 </div>
               </Link>
 
-              <SignedIn>
-                <svg
-                  fill="none"
-                  height="32"
-                  shapeRendering="geometricPrecision"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1"
-                  viewBox="0 0 24 24"
-                  width="32"
-                  className="text-gray-300 dark:text-gray-700 xl:block"
-                >
-                  <path d="M16.88 3.549L7.12 20.451"></path>
-                </svg>
+              <svg
+                fill="none"
+                height="32"
+                shapeRendering="geometricPrecision"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1"
+                viewBox="0 0 24 24"
+                width="40"
+                className="ml-4 text-gray-300 dark:text-gray-700 xl:block"
+              >
+                <path d="M16.88 3.549L7.12 20.451"></path>
+              </svg>
 
-                <ThemedOrgSwitcher appearance={appearance} />
-              </SignedIn>
+              <OrgSwitcher orgs={orgs} activeOrg={activeOrg} />
             </div>
 
             <div className="ml-2 flex justify-center">
-              <SignedIn>
-                <ThemedUserButton appearance={appearance} />
-              </SignedIn>
+              <UserButton />
             </div>
           </div>
         </div>

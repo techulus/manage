@@ -11,7 +11,7 @@ import { redirect } from "next/navigation";
 import { Frequency, RRule } from "rrule";
 
 export async function createEvent(payload: FormData) {
-  const { userId } = getOwner();
+  const { userId } = await getOwner();
   const projectId = +(payload.get("projectId") as string);
   const name = payload.get("name") as string;
   const description = payload.get("description") as string;
@@ -33,7 +33,8 @@ export async function createEvent(payload: FormData) {
       })
     : undefined;
 
-  const createdEvent = await database()
+  const db = await database();
+  const createdEvent = await db
     .insert(calendarEvent)
     .values({
       name,
@@ -51,7 +52,7 @@ export async function createEvent(payload: FormData) {
     .get();
 
   for (const userId of invites) {
-    await database()
+    await db
       .insert(eventInvite)
       .values({
         eventId: createdEvent.id,
@@ -96,10 +97,11 @@ export async function updateEvent(payload: FormData) {
       })
     : undefined;
 
-  await database().delete(eventInvite).where(eq(eventInvite.eventId, id)).run();
+  const db = await database();
+  await db.delete(eventInvite).where(eq(eventInvite.eventId, id)).run();
 
   for (const userId of invites) {
-    await database()
+    await db
       .insert(eventInvite)
       .values({
         eventId: id,
@@ -109,8 +111,8 @@ export async function updateEvent(payload: FormData) {
       .run();
   }
 
-  const currentEvent = await database()
-    .query.calendarEvent.findFirst({
+  const currentEvent = await db.query.calendarEvent
+    .findFirst({
       where: and(
         eq(calendarEvent.id, id),
         eq(calendarEvent.projectId, +projectId)
@@ -118,7 +120,7 @@ export async function updateEvent(payload: FormData) {
     })
     .execute();
 
-  await database()
+  await db
     .update(calendarEvent)
     .set({
       name,
@@ -157,7 +159,8 @@ export async function deleteEvent(payload: FormData) {
   const currentPath = payload.get("currentPath") as string;
   const projectId = payload.get("projectId") as string;
 
-  const eventDetails = await database()
+  const db = await database();
+  const eventDetails = await db
     .delete(calendarEvent)
     .where(eq(calendarEvent.id, id))
     .returning()

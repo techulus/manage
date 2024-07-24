@@ -23,8 +23,8 @@ export async function logActivity({
   parentId: number;
   projectId: number;
 }) {
-  const db = database();
-  const userId = getOwner().userId;
+  const db = await database();
+  const { userId } = await getOwner();
   await db
     .insert(activity)
     .values({

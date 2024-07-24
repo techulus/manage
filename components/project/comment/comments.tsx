@@ -26,9 +26,10 @@ export async function Comments({
   projectId: string | number;
   className?: string;
 }) {
-  const { userId } = getOwner();
+  const { userId } = await getOwner();
 
-  const comments = await database().query.comment.findMany({
+  const db = await database();
+  const comments = await db.query.comment.findMany({
     where: and(eq(comment.parentId, +parentId), eq(comment.type, type)),
     orderBy: desc(comment.createdAt),
     with: {

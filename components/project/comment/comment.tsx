@@ -4,20 +4,21 @@ import { addComment } from "@/app/(dashboard)/console/projects/actions";
 import MarkdownEditor from "@/components/editor";
 import { ActionButton } from "@/components/form/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useUser } from "@clerk/nextjs";
+import { User } from "@/drizzle/types";
 import { usePathname } from "next/navigation";
 
 export default function CommentForm({
   type,
   parentId,
   projectId,
+  creator,
 }: {
   type: string;
   parentId: string | number;
   projectId: string | number;
+  creator: User;
 }) {
   const pathname = usePathname();
-  const { user: creator } = useUser();
 
   return (
     <form className="pb-12" action={addComment}>

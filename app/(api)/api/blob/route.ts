@@ -15,14 +15,14 @@ export type BlobUploadResult = {
 };
 
 export async function PUT(request: NextRequest) {
-  const { ownerId, userId } = getOwner();
+  const { ownerId, userId } = await getOwner();
   const body = await request.blob();
   const extension = mime.extension(body.type);
   const folder = request.nextUrl.searchParams.get("folder") ?? null;
   const projectId = request.nextUrl.searchParams.get("projectId");
   const name = request.nextUrl.searchParams.get("name") ?? uuidv4();
 
-  const db = database();
+  const db = await database();
 
   try {
     if (folder) {

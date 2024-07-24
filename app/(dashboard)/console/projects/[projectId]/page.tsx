@@ -31,7 +31,7 @@ export default async function ProjectDetails({ params }: Props) {
   const { projectId } = params;
 
   const project = await getProjectById(projectId, true);
-  const { userId } = getOwner();
+  const { userId } = await getOwner();
 
   if (!project) {
     return notFound();

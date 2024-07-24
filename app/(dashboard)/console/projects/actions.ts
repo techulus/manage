@@ -26,7 +26,7 @@ const projectSchema = z.object({
 });
 
 export async function createProject(payload: FormData) {
-  const { userId } = getOwner();
+  const { userId } = await getOwner();
   const name = payload.get("name") as string;
   const description = payload.get("description") as string;
   const dueDate = payload.get("dueDate") as string;
@@ -38,7 +38,8 @@ export async function createProject(payload: FormData) {
     status: "active",
   });
 
-  const newProject = await database()
+  const db = await database();
+  const newProject = await db
     .insert(project)
     .values({
       ...data,
@@ -74,13 +75,14 @@ export async function updateProject(payload: FormData) {
     status: "active",
   });
 
-  const currentProject = await database()
-    .query.project.findFirst({
+  const db = await database();
+  const currentProject = await db.query.project
+    .findFirst({
       where: eq(project.id, +id),
     })
     .execute();
 
-  await database()
+  await db
     .update(project)
     .set({
       ...data,
@@ -107,7 +109,8 @@ export async function updateProject(payload: FormData) {
 export async function archiveProject(payload: FormData) {
   const id = Number(payload.get("id"));
 
-  const projectDetails = await database()
+  const db = await database();
+  const projectDetails = await db
     .update(project)
     .set({
       status: "archived",
@@ -132,7 +135,8 @@ export async function archiveProject(payload: FormData) {
 export async function unarchiveProject(payload: FormData) {
   const id = Number(payload.get("id"));
 
-  const projectDetails = await database()
+  const db = await database();
+  const projectDetails = await db
     .update(project)
     .set({
       status: "active",
@@ -156,11 +160,12 @@ export async function unarchiveProject(payload: FormData) {
 }
 
 export async function deleteProject(payload: FormData) {
+  const db = await database();
   const id = Number(payload.get("id"));
 
   await Promise.all([
-    database().delete(project).where(eq(project.id, id)).run(),
-    database()
+    db.delete(project).where(eq(project.id, id)).run(),
+    db
       .delete(comment)
       .where(and(eq(comment.parentId, id), eq(comment.type, "project")))
       .run(),
@@ -175,12 +180,14 @@ export async function addComment(payload: FormData) {
   const content = payload.get("content") as string;
   const type = payload.get("type") as string;
   const projectId = Number(payload.get("projectId"));
+  const { userId } = await getOwner();
 
-  await database().insert(comment).values({
+  const db = await database();
+  await db.insert(comment).values({
     type,
     parentId,
     content,
-    createdByUser: getOwner().userId,
+    createdByUser: userId,
     createdAt: new Date(),
     updatedAt: new Date(),
   });
@@ -201,7 +208,8 @@ export async function deleteComment(payload: FormData) {
   const id = Number(payload.get("id"));
   const projectId = Number(payload.get("projectId"));
 
-  await database().delete(comment).where(eq(comment.id, id)).run();
+  const db = await database();
+  await db.delete(comment).where(eq(comment.id, id)).run();
 
   await logActivity({
     action: "deleted",

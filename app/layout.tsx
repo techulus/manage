@@ -1,6 +1,5 @@
 import { SITE_METADATA } from "@/data/marketing";
 import { cn } from "@/lib/utils";
-import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/react";
 import { GeistSans } from "geist/font/sans";
 import { Bricolage_Grotesque } from "next/font/google";
@@ -222,24 +221,15 @@ export default function RootLayout({
         />
       </head>
 
-      <ClerkProvider
-        appearance={{
-          variables: {
-            fontFamily: GeistSans.style.fontFamily,
-            fontSize: "14px",
-          },
-        }}
+      <body
+        className={cn(
+          "min-h-full min-w-full flex-1",
+          "rounded-tl-xl rounded-tr-xl md:rounded-none"
+        )}
       >
-        <body
-          className={cn(
-            "min-h-full min-w-full flex-1",
-            "rounded-tl-xl rounded-tr-xl md:rounded-none"
-          )}
-        >
-          {children}
-        </body>
-        <Analytics />
-      </ClerkProvider>
+        {children}
+      </body>
+      <Analytics />
     </html>
   );
 }

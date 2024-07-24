@@ -1,14 +1,10 @@
 "use client";
 
+import { repositionTask } from "@/app/(dashboard)/console/projects/[projectId]/tasklists/actions";
 import { TaskListWithTasks, User } from "@/drizzle/types";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { MarkdownView } from "../../core/markdown-view";
-import InlineTaskForm from "../../form/task";
-import { TaskItem } from "./task/task-item";
-import { TaskListHeader } from "./tasklist-header";
 import {
-  DndContext,
   closestCenter,
+  DndContext,
   PointerSensor,
   TouchSensor,
   useSensor,
@@ -19,7 +15,11 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { repositionTask } from "@/app/(dashboard)/console/projects/[projectId]/tasklists/actions";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { MarkdownView } from "../../core/markdown-view";
+import InlineTaskForm from "../../form/task";
+import { TaskItem } from "./task/task-item";
+import { TaskListHeader } from "./tasklist-header";
 
 export const TaskListItem = ({
   taskList,

@@ -18,11 +18,12 @@ type Props = {
 };
 
 export default async function TaskLists({ params }: Props) {
-  const { userId, orgId } = getOwner();
+  const { userId, orgId } = await getOwner();
   const { projectId, tasklistId } = params;
 
-  const list = await database()
-    .query.taskList.findFirst({
+  const db = await database();
+  const list = await db.query.taskList
+    .findFirst({
       where: and(
         eq(taskList.projectId, +projectId),
         eq(taskList.id, +tasklistId)
@@ -53,11 +54,11 @@ export default async function TaskLists({ params }: Props) {
     return notFound();
   }
 
-  const currentUser = await database().query.user.findFirst({
+  const currentUser = await db.query.user.findFirst({
     where: eq(user.id, userId),
   });
 
-  const orgUsers = orgId ? await database().query.user.findMany() : [];
+  const orgUsers = orgId ? await db.query.user.findMany() : [];
 
   const users: User[] = orgId ? orgUsers : [currentUser!];
 

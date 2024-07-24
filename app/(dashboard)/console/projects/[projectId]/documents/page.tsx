@@ -18,8 +18,9 @@ type Props = {
 export default async function ProjectDocuments({ params }: Props) {
   const { projectId } = params;
 
-  const data = await database()
-    .query.project.findFirst({
+  const db = await database();
+  const data = await db.query.project
+    .findFirst({
       where: and(eq(project.id, +projectId)),
       with: {
         documents: {
