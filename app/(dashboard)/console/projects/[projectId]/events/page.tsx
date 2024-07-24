@@ -100,6 +100,7 @@ export default async function EventDetails({ params, searchParams }: Props) {
       </PageSection>
 
       <div className="mx-auto max-w-5xl p-4 lg:p-0">
+        {/* @ts-ignore */}
         <CommentsSection
           type="event"
           parentId={dayCommentId}

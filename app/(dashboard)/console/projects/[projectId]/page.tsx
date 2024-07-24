@@ -245,6 +245,7 @@ export default async function ProjectDetails({ params }: Props) {
       </div>
 
       <div className="mx-auto max-w-5xl p-4 lg:p-8">
+        {/* @ts-ignore */}
         <CommentsSection
           type="project"
           parentId={project.id}

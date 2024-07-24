@@ -170,6 +170,7 @@ export default async function FolderDetails({ params }: Props) {
         </div>
 
         <div className="py-8">
+          {/* @ts-ignore */}
           <CommentsSection
             type="folder"
             parentId={folderId}

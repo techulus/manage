@@ -1,5 +1,5 @@
 import { opsDb } from "@/ops/database";
-import { _user } from "@/ops/schema";
+import { users } from "@/ops/schema";
 import { client } from "@/trigger";
 import { cronTrigger } from "@trigger.dev/sdk";
 import { lt } from "drizzle-orm";
@@ -14,18 +14,18 @@ client.defineJob({
   run: async (_, io, __) => {
     const admin = opsDb();
 
-    const users = await io.runTask(
+    const dormantUsers = await io.runTask(
       "fetch-users",
       async () => {
         const dormancyDate = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000);
         return await admin
           .select()
-          .from(_user)
-          .where(lt(_user.lastActiveAt, dormancyDate));
+          .from(users)
+          .where(lt(users.lastActiveAt, dormancyDate));
       },
       { name: "Fetch users to deactivate" }
     );
 
-    await io.logger.info(`Found ${users.length} users to deactivate`);
+    await io.logger.info(`Found ${dormantUsers.length} users to deactivate`);
   },
 });
