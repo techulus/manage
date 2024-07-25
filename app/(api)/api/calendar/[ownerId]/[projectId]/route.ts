@@ -1,8 +1,8 @@
-import { NextRequest } from "next/server";
-import ical, { ICalCalendarMethod } from "ical-generator";
-import { getDatabaseForOwner } from "@/lib/utils/useDatabase";
 import { calendarEvent, project } from "@/drizzle/schema";
+import { getDatabaseForOwner } from "@/lib/utils/useDatabase";
 import { and, desc, eq } from "drizzle-orm";
+import ical, { ICalCalendarMethod } from "ical-generator";
+import { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -51,6 +51,9 @@ export async function GET(
   const headers = new Headers();
   headers.set("Content-Type", "text/calendar; charset=utf-8");
   headers.set("Content-Disposition", "attachment; filename=calendar.ics");
+  headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
+  headers.set("Pragma", "no-cache");
+  headers.set("Expires", "0");
 
   return new Response(calendar.toString(), {
     headers,
