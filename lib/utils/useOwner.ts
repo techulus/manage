@@ -8,13 +8,10 @@ import { cookies } from "next/headers";
 import { Organization } from "./../../ops/types";
 import { database } from "./useDatabase";
 
-export type OwnerType = "user" | "org";
-
 type Result = {
   ownerId: string;
   userId: string;
   orgId: string | null;
-  type: OwnerType;
 };
 
 export async function getUser(): Promise<User> {
@@ -65,7 +62,6 @@ export async function getOwner(): Promise<Result> {
     ownerId,
     userId,
     orgId: activeOrgId,
-    type: ownerId === userId ? "user" : "org",
   } as Result;
 }
 

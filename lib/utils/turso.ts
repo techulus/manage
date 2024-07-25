@@ -3,22 +3,15 @@ import { drizzle } from "drizzle-orm/libsql";
 import { migrate } from "drizzle-orm/libsql/migrator";
 import path from "path";
 import * as schema from "../../drizzle/schema";
-import { OwnerType } from "./useOwner";
 
 export const tursoOrganizationName = process.env.TURSO_ORGANIZATION_NAME;
 
-export function getDatabaseNameForOwner(ownerId: string, type: OwnerType) {
-  return `${type}-${ownerId
-    .replace(/-/g, "")
-    .replace(/_/g, "-")
-    .toLowerCase()}`;
+export function getDatabaseNameForOwner(ownerId: string) {
+  return ownerId.replace(/-/g, "").replace(/_/g, "-").toLowerCase();
 }
 
-export async function createDatabaseAndMigrate(
-  ownerId: string,
-  type: OwnerType
-) {
-  const name = getDatabaseNameForOwner(ownerId, type);
+export async function createDatabaseAndMigrate(ownerId: string) {
+  const name = getDatabaseNameForOwner(ownerId);
   const database = await fetch(
     `https://api.turso.tech/v1/organizations/${tursoOrganizationName}/databases`,
     {
@@ -53,8 +46,8 @@ export async function createDatabaseAndMigrate(
   return db;
 }
 
-export async function deleteDatabaseForOwner(ownerId: string, type: OwnerType) {
-  const databaseName = getDatabaseNameForOwner(ownerId, type);
+export async function deleteDatabaseForOwner(ownerId: string) {
+  const databaseName = getDatabaseNameForOwner(ownerId);
 
   await fetch(
     `https://api.turso.tech/v1/organizations/${tursoOrganizationName}/databases/${databaseName}`,
@@ -69,11 +62,8 @@ export async function deleteDatabaseForOwner(ownerId: string, type: OwnerType) {
   console.log("Deleted database for", databaseName);
 }
 
-export async function isDatabaseCreatedForOwner(
-  ownerId: string,
-  type: OwnerType
-) {
-  const databaseName = getDatabaseNameForOwner(ownerId, type);
+export async function isDatabaseCreatedForOwner(ownerId: string) {
+  const databaseName = getDatabaseNameForOwner(ownerId);
 
   const database = await fetch(
     `https://api.turso.tech/v1/organizations/${tursoOrganizationName}/databases/${databaseName}`,

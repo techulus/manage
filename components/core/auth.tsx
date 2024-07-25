@@ -36,8 +36,8 @@ export const OrgSwitcher = ({
           <form
             action={(formData) =>
               toast.promise(switchOrganization(formData), {
-                loading: "Switching to personal...",
-                success: "Done!",
+                loading: "Switching to Personal...",
+                success: "Switched to Personal!",
                 error: "Failed to switch organization.",
               })
             }
@@ -54,7 +54,7 @@ export const OrgSwitcher = ({
               action={(formData) =>
                 toast.promise(switchOrganization(formData), {
                   loading: `Switching to ${org.name}...`,
-                  success: "Done!",
+                  success: `Switched to ${org.name}!`,
                   error: "Failed to switch organization.",
                 })
               }

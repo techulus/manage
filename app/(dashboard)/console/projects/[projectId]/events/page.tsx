@@ -2,6 +2,7 @@ import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import EventsCalendar from "@/components/project/events/events-calendar";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { calendarEvent } from "@/drizzle/schema";
 import { getEndOfDay, getStartOfDay } from "@/lib/utils/time";
 import { database } from "@/lib/utils/useDatabase";
@@ -17,6 +18,7 @@ import {
   lte,
   or,
 } from "drizzle-orm";
+import Link from "next/link";
 
 type Props = {
   params: {
@@ -30,7 +32,7 @@ type Props = {
 export default async function EventDetails({ params, searchParams }: Props) {
   const { projectId } = params;
   const { date } = searchParams;
-  const { userId } = await getOwner();
+  const { userId, ownerId } = await getOwner();
 
   const selectedDate = date ? new Date(date) : new Date();
   const dayCommentId = `${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDate()}`;
@@ -76,6 +78,8 @@ export default async function EventDetails({ params, searchParams }: Props) {
     })
     .execute();
 
+  const calendarUrl = `/api/calendar/${ownerId}/${projectId}/calendar.ics`;
+
   return (
     <>
       <PageTitle
@@ -86,6 +90,12 @@ export default async function EventDetails({ params, searchParams }: Props) {
         <div className="font-medium text-gray-500">
           {selectedDate.toDateString()}
         </div>
+        <Link
+          href={calendarUrl}
+          className={buttonVariants({ variant: "link" })}
+        >
+          Get Calendar URL
+        </Link>
       </PageTitle>
 
       <PageSection topInset>

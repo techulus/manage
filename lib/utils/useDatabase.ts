@@ -4,7 +4,7 @@ import { migrate } from "drizzle-orm/libsql/migrator";
 import path from "path";
 import * as schema from "../../drizzle/schema";
 import { getDatabaseNameForOwner, tursoOrganizationName } from "./turso";
-import { getOwner, OwnerType } from "./useOwner";
+import { getOwner } from "./useOwner";
 
 export async function isDatabaseReady(): Promise<boolean> {
   try {
@@ -17,14 +17,14 @@ export async function isDatabaseReady(): Promise<boolean> {
 }
 
 export async function migrateDatabase(): Promise<void> {
-  const { ownerId, type } = await getOwner();
-  const db = getDatabaseForOwner(ownerId, type);
+  const { ownerId } = await getOwner();
+  const db = getDatabaseForOwner(ownerId);
   const migrationsFolder = path.resolve(process.cwd(), "drizzle");
   await migrate(db, { migrationsFolder: migrationsFolder });
 }
 
-export function getDatabaseForOwner(ownerId: string, type: OwnerType) {
-  const databaseName = getDatabaseNameForOwner(ownerId, type);
+export function getDatabaseForOwner(ownerId: string) {
+  const databaseName = getDatabaseNameForOwner(ownerId);
   const databaseUrl = `libsql://${databaseName}-${tursoOrganizationName}.turso.io`;
 
   const client = createClient({
@@ -36,13 +36,13 @@ export function getDatabaseForOwner(ownerId: string, type: OwnerType) {
 }
 
 export async function database(): Promise<LibSQLDatabase<typeof schema>> {
-  const { ownerId, type } = await getOwner();
+  const { ownerId } = await getOwner();
 
   if (!ownerId) {
     throw new Error("Owner ID not found");
   }
 
-  const databaseName = getDatabaseNameForOwner(ownerId, type);
+  const databaseName = getDatabaseNameForOwner(ownerId);
   const databaseUrl = `libsql://${databaseName}-${tursoOrganizationName}.turso.io`;
 
   const client = createClient({

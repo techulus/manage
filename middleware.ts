@@ -7,6 +7,7 @@ const publicAppPaths = [
   "/webhooks",
   "/api/trigger",
   "/api/auth",
+  "/api/calendar",
 ];
 
 export default auth(async (req) => {

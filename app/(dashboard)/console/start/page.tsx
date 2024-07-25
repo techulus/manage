@@ -8,12 +8,12 @@ import { addUserToTenantDb, reportLastActive } from "@/ops/user";
 import { redirect } from "next/navigation";
 
 export default async function Start() {
-  const { ownerId, type } = await getOwner();
+  const { ownerId } = await getOwner();
 
-  const isDatabaseCreated = await isDatabaseCreatedForOwner(ownerId, type);
+  const isDatabaseCreated = await isDatabaseCreatedForOwner(ownerId);
   if (isDatabaseCreated.error) {
     console.log("Database not created, creating...");
-    await createDatabaseAndMigrate(ownerId, type);
+    await createDatabaseAndMigrate(ownerId);
   }
 
   const ready = await isDatabaseReady();
