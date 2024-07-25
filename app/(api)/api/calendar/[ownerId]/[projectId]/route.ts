@@ -2,12 +2,12 @@ import { calendarEvent, project } from "@/drizzle/schema";
 import { getDatabaseForOwner } from "@/lib/utils/useDatabase";
 import { and, desc, eq } from "drizzle-orm";
 import ical, { ICalCalendarMethod } from "ical-generator";
-import { NextRequest } from "next/server";
 
+export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
 export async function GET(
-  _: NextRequest,
+  _: Request,
   { params }: { params: { projectId: string; ownerId: string } }
 ) {
   const { projectId, ownerId } = params;
