@@ -1,4 +1,5 @@
 import NavBar from "@/components/console/navbar";
+import { ReportTimezone } from "@/components/core/report-timezone";
 import { isDatabaseReady } from "@/lib/utils/useDatabase";
 import { getOrgs, getOwner } from "@/lib/utils/useOwner";
 import { redirect } from "next/navigation";
@@ -33,6 +34,7 @@ export default async function ConsoleLayout({
           </div>
         </div>
       </div>
+      <ReportTimezone />
     </div>
   );
 }

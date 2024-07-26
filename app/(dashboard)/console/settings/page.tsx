@@ -7,7 +7,7 @@ import { blob } from "@/drizzle/schema";
 import { bytesToMegabytes } from "@/lib/blobStore";
 import { database } from "@/lib/utils/useDatabase";
 import { opsDb } from "@/ops/database";
-import { authenticators } from "@/ops/schema";
+import { authenticators, users } from "@/ops/schema";
 import { eq, sql } from "drizzle-orm";
 import { HardDrive, User2 } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -20,18 +20,23 @@ export default async function Settings() {
     return notFound();
   }
 
-  const passkey = await opsDb().query.authenticators.findFirst({
-    where: eq(authenticators.userId, user?.id),
-  });
-
   const db = await database();
-  const storage = await db
-    .select({
-      count: sql<number>`count(*)`,
-      usage: sql<number>`sum(${blob.contentSize})`,
-    })
-    .from(blob)
-    .get();
+
+  const [storage, userDetails, passkey] = await Promise.all([
+    db
+      .select({
+        count: sql<number>`count(*)`,
+        usage: sql<number>`sum(${blob.contentSize})`,
+      })
+      .from(blob)
+      .get(),
+    opsDb().query.users.findFirst({
+      where: eq(users.id, user.id),
+    }),
+    opsDb().query.authenticators.findFirst({
+      where: eq(authenticators.userId, user?.id),
+    }),
+  ]);
 
   return (
     <>
@@ -93,6 +98,19 @@ export default async function Settings() {
               <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
                 <div className="text-gray-900 dark:text-gray-200">
                   {user.email}
+                </div>
+              </dd>
+            </div>
+          ) : null}
+
+          {userDetails?.timezone ? (
+            <div className="pt-6 sm:flex">
+              <dt className="font-semibold text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
+                Timezone
+              </dt>
+              <dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
+                <div className="text-gray-900 dark:text-gray-200">
+                  {userDetails.timezone}
                 </div>
               </dd>
             </div>

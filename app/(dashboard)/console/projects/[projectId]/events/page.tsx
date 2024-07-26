@@ -7,6 +7,7 @@ import { calendarEvent } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import {
   and,
@@ -19,6 +20,7 @@ import {
   lte,
   or,
 } from "drizzle-orm";
+import { cookies } from "next/headers";
 import Link from "next/link";
 
 type Props = {
@@ -31,11 +33,14 @@ type Props = {
 };
 
 dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export default async function EventDetails({ params, searchParams }: Props) {
   const { projectId } = params;
   const { date } = searchParams;
   const { userId, ownerId } = await getOwner();
+
+  const userTimezone = cookies().get("userTimezone")?.value ?? dayjs.tz.guess();
 
   const selectedDate = date ? dayjs(date).utc() : dayjs().utc();
   const dayCommentId = `${projectId}${selectedDate.year()}${selectedDate.month()}${selectedDate.date()}`;
@@ -91,7 +96,7 @@ export default async function EventDetails({ params, searchParams }: Props) {
         actionLink={`/console/projects/${projectId}/events/new`}
       >
         <div className="font-medium text-gray-500">
-          {selectedDate.local().format("dddd, MMMM D, YYYY")}
+          {selectedDate.tz(userTimezone).format("dddd, MMMM D, YYYY")}
         </div>
       </PageTitle>
 

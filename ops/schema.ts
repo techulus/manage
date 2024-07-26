@@ -14,6 +14,7 @@ export const users = sqliteTable("user", {
   name: text("name"),
   email: text("email").notNull(),
   emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
+  timezone: text("timezone"),
   lastActiveAt: integer("lastActiveAt", { mode: "timestamp" }).$defaultFn(
     () => new Date()
   ),
