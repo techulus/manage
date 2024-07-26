@@ -131,19 +131,3 @@ export const ActionButton = ({
     </Button>
   );
 };
-
-export const UpdateProfileButton = () => (
-  <Button
-    type="button"
-    variant="link"
-    onClick={() => {
-      // @ts-ignore
-      if (window?.Clerk) {
-        // @ts-ignore
-        window.Clerk.openUserProfile();
-      }
-    }}
-  >
-    Update
-  </Button>
-);

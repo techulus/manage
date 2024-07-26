@@ -18,8 +18,9 @@ type Props = {
 export default async function ProjectDocuments({ params }: Props) {
   const { projectId } = params;
 
-  const data = await database()
-    .query.project.findFirst({
+  const db = await database();
+  const data = await db.query.project
+    .findFirst({
       where: and(eq(project.id, +projectId)),
       with: {
         documents: {
@@ -65,7 +66,7 @@ export default async function ProjectDocuments({ params }: Props) {
   return (
     <>
       <PageTitle title="Docs & Files">
-        <div className="mt-4 flex space-x-4">
+        <div className="flex space-x-4">
           <Link
             className="flex items-center"
             href={`/console/projects/${projectId}/documents/new`}

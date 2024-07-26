@@ -1,20 +1,26 @@
 import { ProjectWithCreator } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { convertMarkdownToPlainText } from "@/lib/utils/useMarkdown";
+import { getTimezone } from "@/lib/utils/useOwner";
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
+
+dayjs.extend(timezone);
 
 export const ProjecItem = ({
   project: { id, name, description, creator, dueDate },
 }: {
   project: ProjectWithCreator;
 }) => {
+  const timezone = getTimezone();
   return (
     <div
       key={id}
       className={cn(
-        "relative flex h-[180px] justify-between space-x-3 rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-sm hover:border-gray-400 dark:border-gray-800 dark:bg-black dark:hover:border-gray-700"
+        "relative flex h-[120px] justify-between space-x-3 rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-sm hover:border-gray-400 dark:border-gray-800 dark:bg-black dark:hover:border-gray-700"
       )}
     >
       <div>
@@ -33,7 +39,7 @@ export const ProjecItem = ({
         </p>
         {dueDate ? (
           <Badge className="mt-2" variant="outline">
-            Due {dueDate.toLocaleDateString()}
+            Due {dayjs(dueDate).tz(timezone).format("dddd, MMMM D, YYYY")}
           </Badge>
         ) : null}
       </div>

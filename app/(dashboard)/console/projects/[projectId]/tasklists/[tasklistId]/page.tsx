@@ -1,6 +1,7 @@
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
+import { Badge } from "@/components/ui/badge";
 import { task, taskList, user } from "@/drizzle/schema";
 import { User } from "@/drizzle/types";
 import { database } from "@/lib/utils/useDatabase";
@@ -17,11 +18,12 @@ type Props = {
 };
 
 export default async function TaskLists({ params }: Props) {
-  const { userId, orgId } = getOwner();
+  const { userId, orgId } = await getOwner();
   const { projectId, tasklistId } = params;
 
-  const list = await database()
-    .query.taskList.findFirst({
+  const db = await database();
+  const list = await db.query.taskList
+    .findFirst({
       where: and(
         eq(taskList.projectId, +projectId),
         eq(taskList.id, +tasklistId)
@@ -52,13 +54,16 @@ export default async function TaskLists({ params }: Props) {
     return notFound();
   }
 
-  const currentUser = await database().query.user.findFirst({
+  const currentUser = await db.query.user.findFirst({
     where: eq(user.id, userId),
   });
 
-  const orgUsers = orgId ? await database().query.user.findMany() : [];
+  const orgUsers = orgId ? await db.query.user.findMany() : [];
 
   const users: User[] = orgId ? orgUsers : [currentUser!];
+
+  const totalCount = list.tasks.length;
+  const doneCount = list.tasks.filter((task) => task.status === "done").length;
 
   return (
     <>
@@ -67,7 +72,20 @@ export default async function TaskLists({ params }: Props) {
         backUrl={`/console/projects/${projectId}/tasklists`}
         actionLabel="Edit"
         actionLink={`/console/projects/${projectId}/tasklists/${list.id}/edit`}
-      />
+      >
+        <div className="flex space-x-2">
+          {totalCount != null && doneCount != null ? (
+            <Badge variant="outline">
+              {doneCount}/{totalCount} completed
+            </Badge>
+          ) : null}
+          {list.dueDate ? (
+            <Badge variant="outline" className="ml-2" suppressHydrationWarning>
+              Due {list.dueDate.toLocaleDateString()}
+            </Badge>
+          ) : null}
+        </div>
+      </PageTitle>
 
       <div className="mx-auto my-12 max-w-5xl px-4 lg:px-0 xl:-mt-8">
         <TaskListItem

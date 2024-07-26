@@ -1,7 +1,21 @@
 "use client";
 
+import { repositionTask } from "@/app/(dashboard)/console/projects/[projectId]/tasklists/actions";
 import { TaskListWithTasks, User } from "@/drizzle/types";
-import { useMemo } from "react";
+import {
+  closestCenter,
+  DndContext,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { MarkdownView } from "../../core/markdown-view";
 import InlineTaskForm from "../../form/task";
 import { TaskItem } from "./task/task-item";
@@ -15,6 +29,7 @@ export const TaskListItem = ({
   createTask,
   partialUpdateTaskList,
   hideHeader = false,
+  hideDone = false,
 }: {
   taskList: TaskListWithTasks;
   userId: string;
@@ -26,18 +41,56 @@ export const TaskListItem = ({
     data: { status: string }
   ) => Promise<void>;
   hideHeader?: boolean;
+  hideDone?: boolean;
 }) => {
   const todoItems = useMemo(
     () => taskList.tasks.filter((task) => task.status === "todo"),
     [taskList.tasks]
   );
+
+  const [localTodoItems, setLocalTodoItems] = useState(todoItems);
+  useEffect(() => {
+    setLocalTodoItems(todoItems);
+  }, [todoItems]);
+
   const doneItems = useMemo(
     () => taskList.tasks.filter((task) => task.status === "done"),
     [taskList.tasks]
   );
 
+  const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor));
+
+  const handleDragEnd = useCallback(
+    ({ active, over }: any) => {
+      if (active.id === over.id) return;
+
+      const movedTaskIndex = localTodoItems.findIndex(
+        (x) => x.id === active.id
+      );
+      const movedTask = localTodoItems[movedTaskIndex];
+
+      const overTaskIndex = localTodoItems.findIndex((x) => x.id === over.id);
+
+      const newPosition =
+        overTaskIndex === 0
+          ? localTodoItems[0].position / 2
+          : overTaskIndex === localTodoItems.length - 1
+          ? localTodoItems[localTodoItems.length - 1].position + 1000
+          : (localTodoItems[overTaskIndex - 1].position +
+              localTodoItems[overTaskIndex].position) /
+            2;
+
+      repositionTask(movedTask.id, projectId, newPosition);
+
+      setLocalTodoItems((items) =>
+        arrayMove(items, movedTaskIndex, overTaskIndex)
+      );
+    },
+    [localTodoItems, projectId]
+  );
+
   return (
-    <div className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-black">
+    <div className="rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-black">
       {!hideHeader ? (
         <TaskListHeader
           taskList={taskList}
@@ -48,20 +101,31 @@ export const TaskListItem = ({
       ) : null}
 
       {taskList.description ? (
-        <div className="border-b border-gray-900/5 px-6">
+        <div className="border-b border-gray-200 px-6 dark:border-gray-800">
           <MarkdownView content={taskList.description ?? ""} />
         </div>
       ) : null}
 
-      <div className="flex flex-col justify-center divide-y">
-        {todoItems.map((task) => (
-          <TaskItem
-            key={task.id}
-            task={task}
-            projectId={+projectId}
-            users={users}
-          />
-        ))}
+      <div className="flex flex-col justify-center">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={localTodoItems}
+            strategy={verticalListSortingStrategy}
+          >
+            {localTodoItems.map((task) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                projectId={+projectId}
+                users={users}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
 
         <form
           className="px-6 py-2"
@@ -78,14 +142,16 @@ export const TaskListItem = ({
           <InlineTaskForm />
         </form>
 
-        {doneItems.map((task) => (
-          <TaskItem
-            key={task.id}
-            task={task}
-            projectId={+projectId}
-            users={users}
-          />
-        ))}
+        {!hideDone
+          ? doneItems.map((task) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                projectId={+projectId}
+                users={users}
+              />
+            ))
+          : null}
       </div>
     </div>
   );

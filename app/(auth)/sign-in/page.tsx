@@ -1,35 +1,81 @@
-import { SignIn } from "@clerk/nextjs";
+"use client";
 
-export default function SignInPage() {
+import { createToastWrapper } from "@/components/core/toast";
+import { ActionButton } from "@/components/form/button";
+import { Header } from "@/components/layout/header";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { signIn } from "next-auth/webauthn";
+import toast from "react-hot-toast";
+import { login } from "../actions";
+
+export default function SignInForm() {
   return (
-    <div className="relative flex h-full items-center justify-center overflow-hidden">
-      <div
-        className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
-        aria-hidden="true"
-      >
-        <div
-          className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#2563eb] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
-          style={{
-            clipPath:
-              "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-          }}
-        />
-      </div>
+    <div className="m-6 flex h-full items-center justify-center">
+      <Header />
+      {createToastWrapper("dark")}
 
-      <SignIn forceRedirectUrl="/console/start" signUpUrl="/sign-up" />
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-hero text-4xl">Get Started</CardTitle>
+          <CardDescription>
+            Enter your email below to login to your account.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4">
+          <div className="grid gap-2">
+            <form
+              action={(formData) => {
+                toast.promise(login(formData), {
+                  loading: "Logging in...",
+                  success: "Logged in!",
+                  error: "Failed to log in.",
+                });
+              }}
+            >
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="john.doe@managee.xyz"
+                name="email"
+                required
+              />
 
-      <div
-        className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
-        aria-hidden="true"
-      >
-        <div
-          className="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-[#2563eb] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
-          style={{
-            clipPath:
-              "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-          }}
-        />
-      </div>
+              <ActionButton
+                className="mt-2 w-full"
+                label="Sign in"
+                loadingLabel="Logging in..."
+              />
+            </form>
+          </div>
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() =>
+              toast.promise(signIn("passkey"), {
+                loading: "Signing in...",
+                success: "Signed in!",
+                error: "Failed to sign in.",
+              })
+            }
+            className="w-full"
+          >
+            Sign in with Passkey (beta)
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use server";
 
 import { blob, comment, document, documentFolder } from "@/drizzle/schema";
-import { logActivity } from "@/lib/activity";
+import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { deleteFile } from "@/lib/blobStore";
 import { database } from "@/lib/utils/useDatabase";
 import { deleteFilesInMarkdown } from "@/lib/utils/useMarkdown";
@@ -27,7 +27,7 @@ const documentFolderSchema = z.object({
 });
 
 export async function createDocument(payload: FormData) {
-  const { userId } = getOwner();
+  const { userId } = await getOwner();
   const name = payload.get("name") as string;
   const markdownContent = payload.get("markdownContent") as string;
   const projectId = payload.get("projectId") as string;
@@ -39,7 +39,8 @@ export async function createDocument(payload: FormData) {
     status: "active",
   });
 
-  await database()
+  const db = await database();
+  await db
     .insert(document)
     .values({
       ...data,
@@ -84,7 +85,12 @@ export async function updateDocument(payload: FormData) {
     status: "active",
   });
 
-  const documentDetails = await database()
+  const db = await database();
+  const currentDocument = await db.query.document
+    .findFirst({ where: eq(document.id, +id) })
+    .execute();
+
+  const documentDetails = await db
     .update(document)
     .set({
       ...data,
@@ -97,7 +103,9 @@ export async function updateDocument(payload: FormData) {
   await logActivity({
     action: "updated",
     type: "document",
-    message: `Updated document ${documentDetails.name}`,
+    message: `Updated document ${
+      documentDetails.name
+    }, ${generateObjectDiffMessage(currentDocument, data)}`,
     parentId: +id,
     projectId: +projectId,
   });
@@ -115,7 +123,7 @@ export async function updateDocument(payload: FormData) {
 }
 
 export async function createDocumentFolder(payload: FormData) {
-  const { userId } = getOwner();
+  const { userId } = await getOwner();
   const name = payload.get("name") as string;
   const description = payload.get("description") as string;
   const projectId = payload.get("projectId") as string;
@@ -125,7 +133,8 @@ export async function createDocumentFolder(payload: FormData) {
     description,
   });
 
-  await database()
+  const db = await database();
+  await db
     .insert(documentFolder)
     .values({
       ...data,
@@ -160,7 +169,12 @@ export async function updateDocumentFolder(payload: FormData) {
     description,
   });
 
-  const folderDetails = await database()
+  const db = await database();
+  const currentFolder = await db.query.documentFolder
+    .findFirst({ where: eq(documentFolder.id, +id) })
+    .execute();
+
+  const folderDetails = await db
     .update(documentFolder)
     .set({
       ...data,
@@ -173,7 +187,9 @@ export async function updateDocumentFolder(payload: FormData) {
   await logActivity({
     action: "updated",
     type: "folder",
-    message: `Updated document folder ${folderDetails.name}`,
+    message: `Updated document folder ${
+      folderDetails.name
+    }, ${generateObjectDiffMessage(currentFolder, data)}`,
     parentId: +id,
     projectId: +projectId,
   });
@@ -188,13 +204,14 @@ export async function deleteDocumentFolder(payload: FormData) {
   const projectId = payload.get("projectId") as string;
   const currentPath = payload.get("currentPath") as string;
 
+  const db = await database();
   const [folderDetails, ..._] = await Promise.all([
-    database()
+    db
       .delete(documentFolder)
       .where(eq(documentFolder.id, +id))
       .returning()
       .get(),
-    database()
+    db
       .delete(comment)
       .where(and(eq(comment.type, "folder"), eq(comment.parentId, +id)))
       .run(),
@@ -222,9 +239,10 @@ export async function deleteDocument(
     await deleteFilesInMarkdown(content);
   }
 
+  const db = await database();
   const [documentDetails, ..._] = await Promise.all([
-    database().delete(document).where(eq(document.id, +id)).returning().get(),
-    database()
+    db.delete(document).where(eq(document.id, +id)).returning().get(),
+    db
       .delete(comment)
       .where(and(eq(comment.type, "document"), eq(comment.parentId, +id)))
       .run(),
@@ -269,11 +287,14 @@ export async function reloadDocuments(
 
 export async function deleteBlob(file: { id: string; key: string }) {
   await deleteFile(file.key);
-  const blobDetails = await database()
+
+  const db = await database();
+  const blobDetails = await db
     .delete(blob)
     .where(eq(blob.id, file.id))
     .returning()
     .get();
+
   await logActivity({
     action: "deleted",
     type: "blob",

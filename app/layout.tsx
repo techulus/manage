@@ -1,6 +1,5 @@
 import { SITE_METADATA } from "@/data/marketing";
 import { cn } from "@/lib/utils";
-import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/react";
 import { GeistSans } from "geist/font/sans";
 import { Bricolage_Grotesque } from "next/font/google";
@@ -209,26 +208,28 @@ export default function RootLayout({
           media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
           href="splash_screens/8.3__iPad_Mini_portrait.png"
         />
+
+        <meta
+          name="theme-color"
+          content="#FFF"
+          media="(prefers-color-scheme: light)"
+        />
+        <meta
+          name="theme-color"
+          content="#0a0a0a"
+          media="(prefers-color-scheme: dark)"
+        />
       </head>
 
-      <ClerkProvider
-        appearance={{
-          variables: {
-            fontFamily: GeistSans.style.fontFamily,
-            fontSize: "14px",
-          },
-        }}
+      <body
+        className={cn(
+          "min-h-full min-w-full flex-1",
+          "rounded-tl-xl rounded-tr-xl md:rounded-none"
+        )}
       >
-        <body
-          className={cn(
-            "min-h-full min-w-full flex-1",
-            "rounded-tl-xl rounded-tr-xl md:rounded-none"
-          )}
-        >
-          {children}
-        </body>
-        <Analytics />
-      </ClerkProvider>
+        {children}
+      </body>
+      <Analytics />
     </html>
   );
 }

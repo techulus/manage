@@ -1,20 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: {
-    remotePatterns: [
+  rewrites: async () => {
+    return [
       {
-        protocol: "https",
-        hostname: "images.clerk.dev",
-        port: "",
-        pathname: "/**",
+        source: "/api/calendar/:ownerId/:projectId/calendar.ics",
+        destination: "/api/calendar/:ownerId/:projectId",
       },
-      {
-        protocol: "https",
-        hostname: "img.clerk.com",
-        port: "",
-        pathname: "/**",
-      },
-    ],
+    ];
   },
   experimental: {
     serverComponentsExternalPackages: ["@libsql"],

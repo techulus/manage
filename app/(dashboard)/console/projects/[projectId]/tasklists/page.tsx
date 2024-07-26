@@ -20,15 +20,17 @@ type Props = {
 };
 
 export default async function TaskLists({ params, searchParams }: Props) {
-  const { userId, orgId } = getOwner();
+  const { userId, orgId } = await getOwner();
   const { projectId } = params;
 
   const filterByStatuses = searchParams.status?.split(",") ?? ["active"];
   const statusFilter = filterByStatuses.map((status) =>
     eq(taskList.status, status)
   );
-  const taskLists = await database()
-    .query.taskList.findMany({
+
+  const db = await database();
+  const taskLists = await db.query.taskList
+    .findMany({
       where: and(eq(taskList.projectId, +projectId), or(...statusFilter)),
       with: {
         tasks: {
@@ -52,8 +54,8 @@ export default async function TaskLists({ params, searchParams }: Props) {
     })
     .execute();
 
-  const archivedTaskLists = await database()
-    .query.taskList.findMany({
+  const archivedTaskLists = await db.query.taskList
+    .findMany({
       columns: {
         id: true,
       },
@@ -64,18 +66,18 @@ export default async function TaskLists({ params, searchParams }: Props) {
     })
     .execute();
 
-  const currentUser = await database().query.user.findFirst({
+  const currentUser = await db.query.user.findFirst({
     where: eq(user.id, userId),
   });
 
-  const orgUsers = orgId ? await database().query.user.findMany() : [];
+  const orgUsers = orgId ? await db.query.user.findMany() : [];
 
   const users: User[] = orgId ? orgUsers : [currentUser!];
 
   return (
     <>
       <PageTitle
-        title="Task lists"
+        title="Task Lists"
         actionLabel="New"
         actionLink={`/console/projects/${projectId}/tasklists/new`}
       />
@@ -100,6 +102,7 @@ export default async function TaskLists({ params, searchParams }: Props) {
               users={users}
               createTask={createTask}
               partialUpdateTaskList={partialUpdateTaskList}
+              hideDone
             />
           ))}
         </ul>

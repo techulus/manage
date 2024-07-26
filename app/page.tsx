@@ -6,7 +6,6 @@ import { CheckIcon } from "lucide-react";
 import Link from "next/link";
 
 export const revalidate = 86400;
-export const runtime = "edge";
 
 async function getGitHubStars(): Promise<string | null> {
   try {
@@ -90,7 +89,7 @@ export default async function Home() {
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-y-6 md:flex-row md:gap-x-6 md:gap-y-0">
               {/* <Link
-                href="/console/start"
+                href="/console/projects"
                 className="rounded-full bg-teal-600 px-8 py-2.5 text-sm font-semibold text-white hover:bg-teal-500 hover:shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
                 prefetch={false}
               >

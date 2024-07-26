@@ -1,10 +1,10 @@
 "use server";
 
 import { task, taskList } from "@/drizzle/schema";
-import { logActivity } from "@/lib/activity";
+import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
@@ -42,7 +42,7 @@ const taskSchema = z.object({
 });
 
 export async function createTaskList(payload: FormData) {
-  const { userId } = getOwner();
+  const { userId } = await getOwner();
   const name = payload.get("name") as string;
   const description = payload.get("description") as string;
   const dueDate = payload.get("dueDate") as string;
@@ -55,7 +55,8 @@ export async function createTaskList(payload: FormData) {
     status: "active",
   });
 
-  const newTaskList = await database()
+  const db = await database();
+  const newTaskList = await db
     .insert(taskList)
     .values({
       ...data,
@@ -93,7 +94,14 @@ export async function updateTaskList(payload: FormData) {
     status: "active",
   });
 
-  await database()
+  const db = await database();
+  const currentTasklist = await db.query.taskList
+    .findFirst({
+      where: eq(taskList.id, +id),
+    })
+    .execute();
+
+  await db
     .update(taskList)
     .set({
       ...data,
@@ -105,7 +113,10 @@ export async function updateTaskList(payload: FormData) {
   await logActivity({
     action: "updated",
     type: "tasklist",
-    message: `Updated task list ${name}`,
+    message: `Updated task list ${name}, ${generateObjectDiffMessage(
+      currentTasklist,
+      data
+    )}`,
     parentId: +id,
     projectId: +projectId,
   });
@@ -118,7 +129,14 @@ export async function partialUpdateTaskList(
   id: number,
   data: { description: string } | { status: string }
 ) {
-  const updated = await database()
+  const db = await database();
+  const currentTasklist = await db.query.taskList
+    .findFirst({
+      where: eq(taskList.id, +id),
+    })
+    .execute();
+
+  const updated = await db
     .update(taskList)
     .set({
       ...data,
@@ -131,7 +149,10 @@ export async function partialUpdateTaskList(
   await logActivity({
     action: "updated",
     type: "tasklist",
-    message: `Updated task list ${updated.name}`,
+    message: `Updated task list ${updated.name}, ${generateObjectDiffMessage(
+      currentTasklist,
+      updated
+    )}`,
     parentId: +id,
     projectId: +updated.projectId,
   });
@@ -161,8 +182,9 @@ export async function createTask({
     status: "todo",
   });
 
-  const lastPosition = await database()
-    .query.task.findFirst({
+  const db = await database();
+  const lastPosition = await db.query.task
+    .findFirst({
       where: eq(task.taskListId, +taskListId),
       orderBy: [desc(task.position)],
     })
@@ -172,7 +194,7 @@ export async function createTask({
     ? lastPosition?.position + POSITION_INCREMENT
     : 1;
 
-  await database()
+  await db
     .insert(task)
     .values({
       ...data,
@@ -204,8 +226,16 @@ export async function updateTask(
     | { position: number }
     | { name: string }
     | { assignedToUser: string | null }
+    | { dueDate: Date | null }
 ) {
-  const taskDetails = await database()
+  const db = await database();
+  const currentTask = await db.query.task
+    .findFirst({
+      where: eq(task.id, +id),
+    })
+    .execute();
+
+  const taskDetails = await db
     .update(task)
     .set({
       ...data,
@@ -218,7 +248,10 @@ export async function updateTask(
   await logActivity({
     action: "updated",
     type: "task",
-    message: `Updated task ${taskDetails.name}`,
+    message: `Updated task ${taskDetails.name}, ${generateObjectDiffMessage(
+      currentTask,
+      taskDetails
+    )}`,
     parentId: +id,
     projectId: +projectId,
   });
@@ -233,7 +266,8 @@ export async function deleteTask({
   id: number;
   projectId: number;
 }) {
-  const taskDetails = await database()
+  const db = await database();
+  const taskDetails = await db
     .delete(task)
     .where(eq(task.id, +id))
     .returning()
@@ -244,6 +278,89 @@ export async function deleteTask({
     type: "task",
     message: `Deleted task ${taskDetails?.name}`,
     parentId: +id,
+    projectId: +projectId,
+  });
+
+  revalidatePath(`/console/projects/${projectId}/tasklists`);
+}
+
+export async function repositionTask(
+  id: number,
+  projectId: number,
+  position: number
+) {
+  const db = await database();
+  const taskDetails = await db
+    .update(task)
+    .set({
+      position,
+      updatedAt: new Date(),
+    })
+    .where(eq(task.id, +id))
+    .returning()
+    .get();
+
+  await logActivity({
+    action: "updated",
+    type: "task",
+    message: `Repositioned task ${taskDetails.name}`,
+    parentId: +id,
+    projectId: +projectId,
+  });
+
+  revalidatePath(`/console/projects/${projectId}/tasklists`);
+}
+
+export async function forkTaskList(taskListId: number, projectId: number) {
+  const db = await database();
+
+  const taskListDetails = await db.query.taskList
+    .findFirst({
+      where: eq(taskList.id, +taskListId),
+    })
+    .execute();
+  if (!taskListDetails) {
+    throw new Error("Task list not found");
+  }
+
+  await db
+    .update(taskList)
+    .set({
+      status: "archived",
+      updatedAt: new Date(),
+    })
+    .where(eq(taskList.id, +taskListId))
+    .run();
+
+  const newTaskList = await db
+    .insert(taskList)
+    .values({
+      name: taskListDetails.name,
+      description: taskListDetails.description,
+      dueDate: taskListDetails.dueDate,
+      status: "active",
+      projectId: taskListDetails.projectId,
+      createdByUser: taskListDetails.createdByUser,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .returning()
+    .get();
+
+  await db
+    .update(task)
+    .set({
+      taskListId: newTaskList.id,
+      updatedAt: new Date(),
+    })
+    .where(and(eq(task.taskListId, +taskListId), eq(task.status, "todo")))
+    .run();
+
+  await logActivity({
+    action: "updated",
+    type: "tasklist",
+    message: `Forked task list ${taskListDetails.name}`,
+    parentId: +taskListId,
     projectId: +projectId,
   });
 

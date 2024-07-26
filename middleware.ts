@@ -1,22 +1,42 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+import { auth } from "./auth";
 
-const isPublicRoute = createRouteMatcher([
-  "/",
+const publicAppPaths = [
   "/sign-in",
-  "/sign-up",
   "/terms",
-  "/webhooks/(.*)",
+  "/webhooks",
   "/api/trigger",
-]);
+  "/api/auth",
+  "/api/calendar",
+];
 
-export default clerkMiddleware(
-  (auth, req) => {
-    if (!isPublicRoute(req)) auth().protect();
-  },
-  {
-    debug: false,
+export default auth(async (req) => {
+  const pathname = req.nextUrl.pathname;
+
+  if (req.auth && pathname === "/sign-in") {
+    return NextResponse.redirect(
+      new URL("/console/projects", req.nextUrl.href)
+    );
   }
-);
+
+  const isPublicAppPath = publicAppPaths.some((path) =>
+    pathname.startsWith(path)
+  );
+  if (isPublicAppPath || pathname == "/") {
+    return NextResponse.next();
+  }
+
+  if (!req.auth) {
+    return NextResponse.redirect(
+      new URL(
+        `/sign-in?redirectTo=${encodeURIComponent(req.nextUrl.href)}`,
+        req.url
+      )
+    );
+  }
+
+  return NextResponse.next();
+});
 
 export const config = {
   matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],

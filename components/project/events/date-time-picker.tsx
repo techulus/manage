@@ -218,15 +218,23 @@ export function DateTimePicker({
    */
   const handleSelect = (newDay: Date | undefined) => {
     if (!newDay) return;
+
+    if (dateOnly) {
+      onSelect?.(newDay);
+      setDate(newDay);
+      return;
+    }
+
     if (!date) {
       setDate(newDay);
       return;
     }
+
     const diff = newDay.getTime() - date.getTime();
     const diffInDays = diff / (1000 * 60 * 60 * 24);
     const newDateFull = add(date, { days: Math.ceil(diffInDays) });
     setDate(newDateFull);
-    onSelect?.(newDateFull);
+    onSelect?.(newDay);
   };
 
   return (
@@ -262,6 +270,15 @@ export function DateTimePicker({
               <TimePicker setDate={setDate} date={date} />
             </div>
           ) : null}
+          <Button
+            variant="link"
+            type="button"
+            onClick={() => {
+              setDate(undefined);
+            }}
+          >
+            Clear
+          </Button>
         </PopoverContent>
       </Popover>
     </>

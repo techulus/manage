@@ -2,10 +2,13 @@ import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import EventsCalendar from "@/components/project/events/events-calendar";
+import { buttonVariants } from "@/components/ui/button";
 import { calendarEvent } from "@/drizzle/schema";
-import { getEndOfDay, getStartOfDay } from "@/lib/utils/time";
 import { database } from "@/lib/utils/useDatabase";
-import { getOwner } from "@/lib/utils/useOwner";
+import { getOwner, getTimezone } from "@/lib/utils/useOwner";
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import {
   and,
   asc,
@@ -17,6 +20,8 @@ import {
   lte,
   or,
 } from "drizzle-orm";
+import { RssIcon } from "lucide-react";
+import Link from "next/link";
 
 type Props = {
   params: {
@@ -27,19 +32,25 @@ type Props = {
   };
 };
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 export default async function EventDetails({ params, searchParams }: Props) {
   const { projectId } = params;
   const { date } = searchParams;
-  const { userId } = getOwner();
+  const { userId, ownerId } = await getOwner();
 
-  const selectedDate = date ? new Date(date) : new Date();
-  const dayCommentId = `${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDate()}`;
+  const timezone = getTimezone();
 
-  const startOfDay = getStartOfDay(selectedDate);
-  const endOfDay = getEndOfDay(selectedDate);
+  const selectedDate = date ? dayjs(date).utc() : dayjs().utc();
+  const dayCommentId = `${projectId}${selectedDate.year()}${selectedDate.month()}${selectedDate.date()}`;
 
-  const events = await database()
-    .query.calendarEvent.findMany({
+  const startOfDay = selectedDate.startOf("day").toDate();
+  const endOfDay = selectedDate.endOf("day").toDate();
+
+  const db = await database();
+  const events = await db.query.calendarEvent
+    .findMany({
       where: and(
         eq(calendarEvent.projectId, +projectId),
         or(
@@ -75,6 +86,8 @@ export default async function EventDetails({ params, searchParams }: Props) {
     })
     .execute();
 
+  const calendarSubscriptionUrl = `/api/calendar/${ownerId}/${projectId}/calendar.ics`;
+
   return (
     <>
       <PageTitle
@@ -83,11 +96,28 @@ export default async function EventDetails({ params, searchParams }: Props) {
         actionLink={`/console/projects/${projectId}/events/new`}
       >
         <div className="font-medium text-gray-500">
-          {selectedDate.toDateString()}
+          {selectedDate.tz(timezone).format("dddd, MMMM D, YYYY")}
         </div>
       </PageTitle>
 
       <PageSection topInset>
+        <div className="flex justify-between p-1">
+          {/* Left buttons */}
+          <div className="isolate inline-flex sm:space-x-3">
+            <span className="inline-flex space-x-1">
+              <Link
+                href={calendarSubscriptionUrl}
+                className={buttonVariants({ variant: "link" })}
+              >
+                <RssIcon className="mr-2 h-5 w-5" />
+                Calendar Subscription
+              </Link>
+            </span>
+          </div>
+        </div>
+      </PageSection>
+
+      <PageSection>
         <div className="flex w-full rounded-lg bg-white dark:bg-black">
           <EventsCalendar
             projectId={projectId}
@@ -99,6 +129,7 @@ export default async function EventDetails({ params, searchParams }: Props) {
       </PageSection>
 
       <div className="mx-auto max-w-5xl p-4 lg:p-0">
+        {/* @ts-ignore */}
         <CommentsSection
           type="event"
           parentId={dayCommentId}

@@ -32,8 +32,9 @@ type Props = {
 export default async function FolderDetails({ params }: Props) {
   const { projectId, folderId } = params;
 
+  const db = await database();
   const folder: FolderWithContents | undefined =
-    await database().query.documentFolder.findFirst({
+    await db.query.documentFolder.findFirst({
       where: eq(documentFolder.id, Number(folderId)),
       with: {
         documents: {
@@ -169,6 +170,7 @@ export default async function FolderDetails({ params }: Props) {
         </div>
 
         <div className="py-8">
+          {/* @ts-ignore */}
           <CommentsSection
             type="folder"
             parentId={folderId}

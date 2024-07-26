@@ -59,7 +59,8 @@ export async function deleteFilesInMarkdown(content: string) {
     const parts = linkedFile.url.split("/");
     const fileId = parts[parts.length - 2];
     try {
-      const file = await database().query.blob.findFirst({
+      const db = await database();
+      const file = await db.query.blob.findFirst({
         where: eq(blob.id, fileId),
       });
       if (file) {

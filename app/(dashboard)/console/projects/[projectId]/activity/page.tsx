@@ -14,8 +14,9 @@ type Props = {
 };
 
 async function ActivityItem({ id, isLast }: { id: number; isLast: boolean }) {
-  const activityItem = await database()
-    .query.activity.findFirst({
+  const db = await database();
+  const activityItem = await db.query.activity
+    .findFirst({
       where: and(eq(activity.id, id)),
       with: {
         actor: {
@@ -86,7 +87,7 @@ async function ActivityItem({ id, isLast }: { id: number; isLast: boolean }) {
               </div>
               <div className="flex w-full flex-col md:flex-row md:justify-between">
                 {activityItem.message ? (
-                  <div className="mt-1 text-sm text-gray-700 dark:text-gray-400">
+                  <div className="mt-1 max-w-md text-sm text-gray-700 dark:text-gray-400">
                     <p className="text-sm font-semibold">
                       {activityItem.message}
                     </p>
@@ -108,8 +109,9 @@ async function ActivityItem({ id, isLast }: { id: number; isLast: boolean }) {
 export default async function ActivityDetails({ params }: Props) {
   const { projectId } = params;
 
-  const activities = await database()
-    .query.activity.findMany({
+  const db = await database();
+  const activities = await db.query.activity
+    .findMany({
       where: eq(activity.projectId, +projectId),
       orderBy: [desc(activity.createdAt)],
       columns: {

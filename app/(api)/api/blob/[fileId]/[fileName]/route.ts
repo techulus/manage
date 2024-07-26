@@ -9,8 +9,8 @@ export async function GET(
   _: NextRequest,
   { params }: { params: { fileId: string; fileName: string } }
 ) {
-  const { ownerId } = getOwner();
-  const db = database();
+  const { ownerId } = await getOwner();
+  const db = await database();
   const { fileId } = params;
   const key = `${ownerId}/${fileId}`;
 

@@ -1,23 +1,29 @@
 "use server";
 
 import { calendarEvent, eventInvite } from "@/drizzle/schema";
-import { logActivity } from "@/lib/activity";
-import { getEndOfDay, getStartOfDay } from "@/lib/utils/time";
+import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Frequency, RRule } from "rrule";
+dayjs.extend(utc);
 
 export async function createEvent(payload: FormData) {
-  const { userId } = getOwner();
+  const { userId } = await getOwner();
   const projectId = +(payload.get("projectId") as string);
   const name = payload.get("name") as string;
   const description = payload.get("description") as string;
-  const start = new Date(payload.get("start") as string);
+  const start = dayjs(payload.get("start") as string)
+    .utc()
+    .toDate();
   const end = payload.get("end")
-    ? new Date(payload.get("end") as string)
+    ? dayjs(payload.get("end") as string)
+        .utc()
+        .toDate()
     : null;
   const allDay = (payload.get("allDay") as string) === "on";
   const repeat = payload.get("repeat") as string;
@@ -33,7 +39,8 @@ export async function createEvent(payload: FormData) {
       })
     : undefined;
 
-  const createdEvent = await database()
+  const db = await database();
+  const createdEvent = await db
     .insert(calendarEvent)
     .values({
       name,
@@ -51,7 +58,7 @@ export async function createEvent(payload: FormData) {
     .get();
 
   for (const userId of invites) {
-    await database()
+    await db
       .insert(eventInvite)
       .values({
         eventId: createdEvent.id,
@@ -77,9 +84,13 @@ export async function updateEvent(payload: FormData) {
   const id = +(payload.get("id") as string);
   const name = payload.get("name") as string;
   const description = payload.get("description") as string;
-  const start = new Date(payload.get("start") as string);
+  const start = dayjs(payload.get("start") as string)
+    .utc()
+    .toDate();
   const end = payload.get("end")
-    ? new Date(payload.get("end") as string)
+    ? dayjs(payload.get("end") as string)
+        .utc()
+        .toDate()
     : null;
   const allDay = (payload.get("allDay") as string) === "on";
   const repeat = payload.get("repeat") as string;
@@ -91,15 +102,16 @@ export async function updateEvent(payload: FormData) {
   const repeatRule = repeat
     ? new RRule({
         freq: repeat as unknown as Frequency,
-        dtstart: getStartOfDay(start),
-        until: end ? getEndOfDay(end) : null,
+        dtstart: dayjs(start).startOf("day").toDate(),
+        until: end ? dayjs(end).endOf("day").toDate() : null,
       })
     : undefined;
 
-  await database().delete(eventInvite).where(eq(eventInvite.eventId, id)).run();
+  const db = await database();
+  await db.delete(eventInvite).where(eq(eventInvite.eventId, id)).run();
 
   for (const userId of invites) {
-    await database()
+    await db
       .insert(eventInvite)
       .values({
         eventId: id,
@@ -109,7 +121,16 @@ export async function updateEvent(payload: FormData) {
       .run();
   }
 
-  await database()
+  const currentEvent = await db.query.calendarEvent
+    .findFirst({
+      where: and(
+        eq(calendarEvent.id, id),
+        eq(calendarEvent.projectId, +projectId)
+      ),
+    })
+    .execute();
+
+  await db
     .update(calendarEvent)
     .set({
       name,
@@ -128,7 +149,13 @@ export async function updateEvent(payload: FormData) {
   await logActivity({
     action: "updated",
     type: "event",
-    message: `Updated event ${name}`,
+    message: `Updated event ${name}, ${generateObjectDiffMessage(currentEvent, {
+      name,
+      description,
+      start,
+      end,
+      allDay,
+    })}`,
     parentId: id,
     projectId: +projectId,
   });
@@ -142,7 +169,8 @@ export async function deleteEvent(payload: FormData) {
   const currentPath = payload.get("currentPath") as string;
   const projectId = payload.get("projectId") as string;
 
-  const eventDetails = await database()
+  const db = await database();
+  const eventDetails = await db
     .delete(calendarEvent)
     .where(eq(calendarEvent.id, id))
     .returning()
