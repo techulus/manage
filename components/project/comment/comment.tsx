@@ -46,7 +46,7 @@ export default function CommentForm({
           />
           <ActionButton
             size="sm"
-            className="absolute -bottom-10 left-0"
+            className="absolute -bottom-12 left-0"
             label="Comment"
           />
         </div>

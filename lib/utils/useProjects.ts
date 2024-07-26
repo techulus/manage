@@ -1,6 +1,6 @@
 import { calendarEvent, document, project, taskList } from "@/drizzle/schema";
 import { ProjectWithCreator, ProjectWithData } from "@/drizzle/types";
-import { getEndOfDay, getStartOfDay } from "@/lib/utils/time";
+import dayjs from "dayjs";
 import { and, between, eq, isNotNull, isNull, like, or } from "drizzle-orm";
 import { database } from "./useDatabase";
 
@@ -45,8 +45,8 @@ export async function getProjectById(
 ): Promise<ProjectWithData> {
   const db = await database();
 
-  const startOfDay = getStartOfDay(new Date());
-  const endOfDay = getEndOfDay(new Date());
+  const startOfDay = dayjs().startOf("day").toDate();
+  const endOfDay = dayjs().endOf("day").toDate();
 
   const data = await db.query.project
     .findFirst({

@@ -2,22 +2,28 @@
 
 import { calendarEvent, eventInvite } from "@/drizzle/schema";
 import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
-import { getEndOfDay, getStartOfDay } from "@/lib/utils/time";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Frequency, RRule } from "rrule";
+dayjs.extend(utc);
 
 export async function createEvent(payload: FormData) {
   const { userId } = await getOwner();
   const projectId = +(payload.get("projectId") as string);
   const name = payload.get("name") as string;
   const description = payload.get("description") as string;
-  const start = new Date(payload.get("start") as string);
+  const start = dayjs(payload.get("start") as string)
+    .utc()
+    .toDate();
   const end = payload.get("end")
-    ? new Date(payload.get("end") as string)
+    ? dayjs(payload.get("end") as string)
+        .utc()
+        .toDate()
     : null;
   const allDay = (payload.get("allDay") as string) === "on";
   const repeat = payload.get("repeat") as string;
@@ -78,9 +84,13 @@ export async function updateEvent(payload: FormData) {
   const id = +(payload.get("id") as string);
   const name = payload.get("name") as string;
   const description = payload.get("description") as string;
-  const start = new Date(payload.get("start") as string);
+  const start = dayjs(payload.get("start") as string)
+    .utc()
+    .toDate();
   const end = payload.get("end")
-    ? new Date(payload.get("end") as string)
+    ? dayjs(payload.get("end") as string)
+        .utc()
+        .toDate()
     : null;
   const allDay = (payload.get("allDay") as string) === "on";
   const repeat = payload.get("repeat") as string;
@@ -92,8 +102,8 @@ export async function updateEvent(payload: FormData) {
   const repeatRule = repeat
     ? new RRule({
         freq: repeat as unknown as Frequency,
-        dtstart: getStartOfDay(start),
-        until: end ? getEndOfDay(end) : null,
+        dtstart: dayjs(start).startOf("day").toDate(),
+        until: end ? dayjs(end).endOf("day").toDate() : null,
       })
     : undefined;
 

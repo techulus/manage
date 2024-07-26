@@ -72,7 +72,7 @@ export const TaskItem = ({
               <Checkbox
                 checked={status === "done"}
                 className={cn(
-                  status === "done" ? "opacity-50" : "",
+                  status === "done" ? "opacity-50" : "scale-125",
                   "my-4 mr-1"
                 )}
                 onCheckedChange={async (checked) => {
@@ -248,7 +248,7 @@ export const TaskItem = ({
             checked={status === "done"}
             className={cn(
               "my-4 ml-6 mr-1 transition-all",
-              status === "done" ? "my-2.5 opacity-50" : ""
+              status === "done" ? "my-2.5 opacity-50" : "scale-125"
             )}
             onCheckedChange={async (checked) => {
               const status = checked ? "done" : "todo";

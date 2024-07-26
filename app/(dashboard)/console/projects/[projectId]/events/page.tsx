@@ -4,9 +4,10 @@ import { CommentsSection } from "@/components/project/comment/comments-section";
 import EventsCalendar from "@/components/project/events/events-calendar";
 import { buttonVariants } from "@/components/ui/button";
 import { calendarEvent } from "@/drizzle/schema";
-import { getEndOfDay, getStartOfDay } from "@/lib/utils/time";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import {
   and,
   asc,
@@ -29,16 +30,18 @@ type Props = {
   };
 };
 
+dayjs.extend(utc);
+
 export default async function EventDetails({ params, searchParams }: Props) {
   const { projectId } = params;
   const { date } = searchParams;
   const { userId, ownerId } = await getOwner();
 
-  const selectedDate = date ? new Date(date) : new Date();
-  const dayCommentId = `${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDate()}`;
+  const selectedDate = date ? dayjs(date).utc() : dayjs().utc();
+  const dayCommentId = `${projectId}${selectedDate.year()}${selectedDate.month()}${selectedDate.date()}`;
 
-  const startOfDay = getStartOfDay(selectedDate);
-  const endOfDay = getEndOfDay(selectedDate);
+  const startOfDay = selectedDate.startOf("day").toDate();
+  const endOfDay = selectedDate.endOf("day").toDate();
 
   const db = await database();
   const events = await db.query.calendarEvent
@@ -88,7 +91,7 @@ export default async function EventDetails({ params, searchParams }: Props) {
         actionLink={`/console/projects/${projectId}/events/new`}
       >
         <div className="font-medium text-gray-500">
-          {selectedDate.toDateString()}
+          {selectedDate.local().format("dddd, MMMM D, YYYY")}
         </div>
       </PageTitle>
 

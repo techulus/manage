@@ -13,7 +13,7 @@ export function Spinner({
   return (
     <div className="flex items-center justify-center">
       <svg
-        className={cn("h-5 w-5 animate-spin text-teal-500", className)}
+        className={cn("h-5 w-5 animate-spin text-black", className)}
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"

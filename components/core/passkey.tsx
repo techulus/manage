@@ -6,7 +6,7 @@ import { Button } from "../ui/button";
 export const RegisterPasskeyButton = () => {
   return (
     <Button
-      variant="link"
+      variant="outline"
       onClick={() => signIn("passkey", { action: "register" })}
     >
       Register new Passkey (beta)
