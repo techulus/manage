@@ -1,4 +1,3 @@
-import { ContentBlock } from "@/components/core/content-block";
 import EmptyState from "@/components/core/empty-state";
 import PageTitle from "@/components/layout/page-title";
 import { ProjecItem } from "@/components/project/project-item";
@@ -54,7 +53,7 @@ export default async function Projects({ searchParams }: Props) {
         </form>
       ) : null}
 
-      <ContentBlock className="max-w-5xl border-none bg-transparent shadow-none">
+      <div className="mx-auto mt-8 flex max-w-5xl flex-col">
         <EmptyState
           show={!projects.length}
           isSearchResult={!!searchParams?.search}
@@ -67,7 +66,7 @@ export default async function Projects({ searchParams }: Props) {
             <ProjecItem key={project.id} project={project} />
           ))}
         </div>
-      </ContentBlock>
+      </div>
 
       {archivedProjects.length > 0 && (
         <div className="mx-auto mt-12 flex w-full max-w-5xl flex-grow items-center border-t border-muted py-4">
