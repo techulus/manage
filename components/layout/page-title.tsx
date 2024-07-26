@@ -20,7 +20,7 @@ export default function PageTitle({
   children,
 }: PropsWithChildren<Props>) {
   return (
-    <div className="flex min-h-[160px] justify-center border-b bg-gray-50 pb-4 pl-4 pr-6 pt-4 dark:bg-card dark:text-white sm:pl-6 lg:pl-8 xl:min-h-[220px] xl:border-t-0">
+    <div className="flex min-h-[160px] justify-center border-b bg-gray-50 pb-4 pl-4 pr-6 pt-4 dark:bg-card dark:bg-gray-900 dark:text-white sm:pl-6 lg:pl-8 xl:min-h-[220px] xl:border-t-0">
       <div className="flex w-full max-w-5xl items-center justify-between">
         <div className="relative flex w-full flex-col">
           {backUrl && (
@@ -37,7 +37,7 @@ export default function PageTitle({
             </Link>
           )}
 
-          <h1 className="flex-1 text-3xl font-semibold tracking-tighter lg:text-4xl">
+          <h1 className="text-hero flex-1 text-3xl font-semibold tracking-tighter lg:text-4xl">
             {title}
           </h1>
           {subTitle ? (

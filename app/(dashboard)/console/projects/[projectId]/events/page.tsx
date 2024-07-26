@@ -2,7 +2,7 @@ import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import EventsCalendar from "@/components/project/events/events-calendar";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { calendarEvent } from "@/drizzle/schema";
 import { getEndOfDay, getStartOfDay } from "@/lib/utils/time";
 import { database } from "@/lib/utils/useDatabase";
@@ -78,7 +78,7 @@ export default async function EventDetails({ params, searchParams }: Props) {
     })
     .execute();
 
-  const calendarUrl = `/api/calendar/${ownerId}/${projectId}/calendar.ics`;
+  const calendarSubscriptionUrl = `/api/calendar/${ownerId}/${projectId}/calendar.ics`;
 
   return (
     <>
@@ -90,15 +90,25 @@ export default async function EventDetails({ params, searchParams }: Props) {
         <div className="font-medium text-gray-500">
           {selectedDate.toDateString()}
         </div>
-        <Link
-          href={calendarUrl}
-          className={buttonVariants({ variant: "link" })}
-        >
-          Get Calendar URL
-        </Link>
       </PageTitle>
 
       <PageSection topInset>
+        <div className="flex justify-between p-1">
+          {/* Left buttons */}
+          <div className="isolate inline-flex sm:space-x-3">
+            <span className="inline-flex space-x-1">
+              <Link
+                href={calendarSubscriptionUrl}
+                className={buttonVariants({ variant: "link" })}
+              >
+                Calendar Subscription
+              </Link>
+            </span>
+          </div>
+        </div>
+      </PageSection>
+
+      <PageSection>
         <div className="flex w-full rounded-lg bg-white dark:bg-black">
           <EventsCalendar
             projectId={projectId}

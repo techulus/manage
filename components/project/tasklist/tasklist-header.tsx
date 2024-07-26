@@ -120,7 +120,7 @@ export const TaskListHeader = ({
                 });
               }}
             >
-              Fork Todos
+              Fork
             </Button>
           </DropdownMenuItem>
         </DropdownMenuContent>
