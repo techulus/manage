@@ -1,6 +1,6 @@
-import { calendarEvent, project } from "@/drizzle/schema";
+import { calendarEvent, project, task, taskList } from "@/drizzle/schema";
 import { getDatabaseForOwner } from "@/lib/utils/useDatabase";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, lte } from "drizzle-orm";
 import ical, { ICalCalendarMethod } from "ical-generator";
 
 export const revalidate = 0;
@@ -24,18 +24,29 @@ export async function GET(
     return new Response("Project not found", { status: 404 });
   }
 
-  const events = await db.query.calendarEvent
-    .findMany({
-      where: and(eq(calendarEvent.projectId, +projectId)),
-      orderBy: [desc(calendarEvent.start)],
-    })
-    .execute();
+  const [events, tasklists] = await Promise.all([
+    db.query.calendarEvent
+      .findMany({
+        where: and(eq(calendarEvent.projectId, +projectId)),
+        orderBy: [desc(calendarEvent.start)],
+      })
+      .execute(),
+    db.query.taskList.findMany({
+      where: and(eq(taskList.projectId, +projectId)),
+      with: {
+        tasks: {
+          where: and(eq(task.status, "todo"), lte(task.dueDate, new Date())),
+          orderBy: [desc(task.dueDate)],
+        },
+      },
+    }),
+  ]);
 
   const calendar = ical({ name: projectDetails.name });
 
   calendar.method(ICalCalendarMethod.REQUEST);
 
-  events.forEach((event) => {
+  for (const event of events) {
     calendar.createEvent({
       id: event.id,
       start: event.start,
@@ -45,8 +56,31 @@ export async function GET(
       allDay: event.allDay,
       created: event.createdAt,
       lastModified: event.updatedAt,
+      repeating: event.repeatRule,
     });
-  });
+  }
+
+  for (const tasklist of tasklists) {
+    if (tasklist.tasks.length === 0) {
+      continue;
+    }
+    for (const task of tasklist.tasks) {
+      if (task.dueDate === null) {
+        continue;
+      }
+
+      calendar.createEvent({
+        id: task.id,
+        start: task.dueDate,
+        end: task.dueDate,
+        summary: `[${tasklist.name}] ${task.name}`,
+        description: task.description,
+        allDay: true,
+        created: task.createdAt,
+        lastModified: task.updatedAt,
+      });
+    }
+  }
 
   const headers = new Headers();
   headers.set("Content-Type", "text/calendar; charset=utf-8");
