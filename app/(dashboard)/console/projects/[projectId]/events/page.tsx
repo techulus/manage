@@ -5,7 +5,7 @@ import EventsCalendar from "@/components/project/events/events-calendar";
 import { buttonVariants } from "@/components/ui/button";
 import { calendarEvent } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
-import { getOwner } from "@/lib/utils/useOwner";
+import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
@@ -20,7 +20,7 @@ import {
   lte,
   or,
 } from "drizzle-orm";
-import { cookies } from "next/headers";
+import { RssIcon } from "lucide-react";
 import Link from "next/link";
 
 type Props = {
@@ -40,7 +40,7 @@ export default async function EventDetails({ params, searchParams }: Props) {
   const { date } = searchParams;
   const { userId, ownerId } = await getOwner();
 
-  const userTimezone = cookies().get("userTimezone")?.value ?? dayjs.tz.guess();
+  const timezone = getTimezone();
 
   const selectedDate = date ? dayjs(date).utc() : dayjs().utc();
   const dayCommentId = `${projectId}${selectedDate.year()}${selectedDate.month()}${selectedDate.date()}`;
@@ -96,7 +96,7 @@ export default async function EventDetails({ params, searchParams }: Props) {
         actionLink={`/console/projects/${projectId}/events/new`}
       >
         <div className="font-medium text-gray-500">
-          {selectedDate.tz(userTimezone).format("dddd, MMMM D, YYYY")}
+          {selectedDate.tz(timezone).format("dddd, MMMM D, YYYY")}
         </div>
       </PageTitle>
 
@@ -109,6 +109,7 @@ export default async function EventDetails({ params, searchParams }: Props) {
                 href={calendarSubscriptionUrl}
                 className={buttonVariants({ variant: "link" })}
               >
+                <RssIcon className="mr-2 h-5 w-5" />
                 Calendar Subscription
               </Link>
             </span>

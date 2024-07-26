@@ -3,10 +3,16 @@ import { user } from "@/drizzle/schema";
 import { User } from "@/drizzle/types";
 import { opsDb } from "@/ops/database";
 import { organizationMembers } from "@/ops/schema";
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { Organization } from "./../../ops/types";
 import { database } from "./useDatabase";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 type Result = {
   ownerId: string;
@@ -70,4 +76,8 @@ export async function allUser(): Promise<User[]> {
   const { userId } = await getOwner();
   const users: User[] = (await db.query.user.findMany()) ?? [];
   return users.filter((user) => user.id !== userId);
+}
+
+export function getTimezone() {
+  return cookies().get("userTimezone")?.value ?? dayjs.tz.guess();
 }
