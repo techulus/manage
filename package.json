@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:turbo": "next dev --turbo",
-    "prebuild": "npm run migrate:ops",
+    "prebuild": "npm run migrate:ops && npx trigger.dev@beta deploy",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
