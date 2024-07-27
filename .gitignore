@@ -38,3 +38,5 @@ next-env.d.ts
 # vscode
 .vscode
 .idea
+
+.trigger
