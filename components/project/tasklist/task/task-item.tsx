@@ -112,134 +112,132 @@ export const TaskItem = ({
             </div>
           </CardHeader>
           <CardContent className="pb-3">
-            <div className="text-primary">
-              <dl>
-                <div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt className="text-sm font-medium leading-6">Created By</dt>
-                  <dd className="mt-1 flex text-sm leading-6 sm:col-span-2 sm:mt-0">
-                    <span className="flex-grow">{task.creator?.firstName}</span>
-                    <button
-                      className="mr-4 text-teal-600"
-                      onClick={async () => {
-                        setIsEditing((val) => !val);
+            <dl>
+              <div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-sm font-medium leading-6">Created By</dt>
+                <dd className="mt-1 flex text-sm leading-6 sm:col-span-2 sm:mt-0">
+                  <span className="flex-grow">{task.creator?.firstName}</span>
+                  <button
+                    className="mr-4 text-primary"
+                    onClick={async () => {
+                      setIsEditing((val) => !val);
 
-                        if (!isEditing) return;
+                      if (!isEditing) return;
 
-                        await toast.promise(
-                          updateTask(id, projectId, { name }),
+                      await toast.promise(
+                        updateTask(id, projectId, { name }),
+                        updateTaskToastOptions
+                      );
+                    }}
+                  >
+                    {isEditing ? "Save" : "Edit"}
+                  </button>
+                  <button
+                    className="text-primary hover:text-red-500"
+                    onClick={() => {
+                      toast.promise(
+                        deleteTask({
+                          id,
+                          projectId,
+                        }),
+                        {
+                          loading: "Deleting...",
+                          success: "Deleted!",
+                          error: "Error while deleting, please try again.",
+                        }
+                      );
+                    }}
+                  >
+                    Delete
+                  </button>
+                </dd>
+              </div>
+            </dl>
+            <dl>
+              <div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-sm font-medium leading-6">Assigned to</dt>
+                <dd className="mt-1 flex text-sm leading-6 sm:col-span-2 sm:mt-0">
+                  {task.assignee ? (
+                    <>
+                      <span className="flex-grow">
+                        <Assignee user={task.assignee} />
+                      </span>
+                      <button
+                        className="text-primary hover:text-red-500"
+                        onClick={() => {
+                          toast.promise(
+                            updateTask(id, projectId, {
+                              assignedToUser: null,
+                            }),
+                            updateTaskToastOptions
+                          );
+                        }}
+                      >
+                        Unassign
+                      </button>
+                    </>
+                  ) : (
+                    <AssignToUser
+                      users={users}
+                      onUpdate={(userId) => {
+                        toast.promise(
+                          updateTask(id, projectId, {
+                            assignedToUser: userId,
+                          }),
                           updateTaskToastOptions
                         );
                       }}
-                    >
-                      {isEditing ? "Save" : "Edit"}
-                    </button>
-                    <button
-                      className="text-teal-600 hover:text-red-500"
-                      onClick={() => {
+                    />
+                  )}
+                </dd>
+              </div>
+            </dl>
+            <dl>
+              <div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-sm font-medium leading-6">Due</dt>
+                <dd className="mt-1 flex items-start text-sm leading-6 sm:col-span-2 sm:mt-0">
+                  {task.dueDate ? (
+                    <div className="flex w-full items-center justify-between">
+                      <p>{task.dueDate.toLocaleDateString()}</p>
+                      <button
+                        className="text-primary hover:text-red-500"
+                        onClick={() => {
+                          toast.promise(
+                            updateTask(id, projectId, {
+                              dueDate: null,
+                            }),
+                            updateTaskToastOptions
+                          );
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <DateTimePicker
+                      dateOnly
+                      name="dueDate"
+                      onSelect={(date) => {
                         toast.promise(
-                          deleteTask({
-                            id,
-                            projectId,
+                          updateTask(id, projectId, {
+                            dueDate: date,
                           }),
-                          {
-                            loading: "Deleting...",
-                            success: "Deleted!",
-                            error: "Error while deleting, please try again.",
-                          }
+                          updateTaskToastOptions
                         );
                       }}
-                    >
-                      Delete
-                    </button>
-                  </dd>
-                </div>
-              </dl>
-              <dl>
-                <div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt className="text-sm font-medium leading-6">Assigned to</dt>
-                  <dd className="mt-1 flex text-sm leading-6 sm:col-span-2 sm:mt-0">
-                    {task.assignee ? (
-                      <>
-                        <span className="flex-grow">
-                          <Assignee user={task.assignee} />
-                        </span>
-                        <button
-                          className="text-teal-600 hover:text-red-500"
-                          onClick={() => {
-                            toast.promise(
-                              updateTask(id, projectId, {
-                                assignedToUser: null,
-                              }),
-                              updateTaskToastOptions
-                            );
-                          }}
-                        >
-                          Unassign
-                        </button>
-                      </>
-                    ) : (
-                      <AssignToUser
-                        users={users}
-                        onUpdate={(userId) => {
-                          toast.promise(
-                            updateTask(id, projectId, {
-                              assignedToUser: userId,
-                            }),
-                            updateTaskToastOptions
-                          );
-                        }}
-                      />
-                    )}
-                  </dd>
-                </div>
-              </dl>
-              <dl>
-                <div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt className="text-sm font-medium leading-6">Due</dt>
-                  <dd className="mt-1 flex items-start text-sm leading-6 sm:col-span-2 sm:mt-0">
-                    {task.dueDate ? (
-                      <div className="flex w-full items-center justify-between">
-                        <p>{task.dueDate.toLocaleDateString()}</p>
-                        <button
-                          className="text-teal-600 hover:text-red-500"
-                          onClick={() => {
-                            toast.promise(
-                              updateTask(id, projectId, {
-                                dueDate: null,
-                              }),
-                              updateTaskToastOptions
-                            );
-                          }}
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ) : (
-                      <DateTimePicker
-                        dateOnly
-                        name="dueDate"
-                        onSelect={(date) => {
-                          toast.promise(
-                            updateTask(id, projectId, {
-                              dueDate: date,
-                            }),
-                            updateTaskToastOptions
-                          );
-                        }}
-                      />
-                    )}
-                  </dd>
-                </div>
-              </dl>
-              <dl>
-                <div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt className="text-sm font-medium leading-6">Notes</dt>
-                  <dd className="mt-1 flex items-start text-sm leading-6 sm:col-span-2 sm:mt-0">
-                    <TaskNotesForm task={task} />
-                  </dd>
-                </div>
-              </dl>
-            </div>
+                    />
+                  )}
+                </dd>
+              </div>
+            </dl>
+            <dl>
+              <div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-sm font-medium leading-6">Notes</dt>
+                <dd className="mt-1 flex items-start text-sm leading-6 sm:col-span-2 sm:mt-0">
+                  <TaskNotesForm task={task} />
+                </dd>
+              </div>
+            </dl>
           </CardContent>
         </>
       ) : (
@@ -278,7 +276,7 @@ export const TaskItem = ({
               ) : null}
               {name}
               {task.description ? (
-                <FileIcon className="ml-2 h-4 w-4 text-teal-600 dark:text-teal-700" />
+                <FileIcon className="ml-2 h-4 w-4 text-primary" />
               ) : null}
             </div>
           </button>
