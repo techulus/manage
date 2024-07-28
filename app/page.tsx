@@ -1,5 +1,6 @@
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
+import { buttonVariants } from "@/components/ui/button";
 import { SITE_METADATA } from "@/data/marketing";
 import { cn } from "@/lib/utils";
 import { CheckIcon } from "lucide-react";
@@ -32,30 +33,45 @@ async function getGitHubStars(): Promise<string | null> {
 
 const tiers = [
   {
-    name: "Personal",
-    id: "tier-personal",
-    href: "mailto:hello@managee.xyz",
-    priceMonthly: "$9",
-    description: "The perfect plan if you're working solo or a small team.",
+    name: "Self-hosted",
+    id: "tier-free",
+    priceMonthly: "$0",
+    description: "You can host it yourself",
     features: [
-      "Upto 3 users",
+      "Unlimited users",
       "Unlimited projects",
-      "Unlimited documents & files",
-      "5 GB storage",
-      "Email & GitHub support",
+      "Unlimited storage",
+      "Community support",
+    ],
+    featured: false,
+    href: "https://github.com/techulus/manage",
+    callToAction: "Get Started",
+  },
+  {
+    name: "Scale",
+    id: "tier-scale",
+    priceMonthly: "$99",
+    description: "A plan that scales with your rapidly growing business.",
+    features: [
+      "Upto 50 users",
+      "Unlimited projects",
+      "Multiple organizations",
+      "200 GB storage",
+      "Priority support",
     ],
     featured: true,
+    href: "mailto:hello+scale@managee.xyz",
     callToAction: "Request access",
   },
   {
-    name: "Team",
-    id: "tier-team",
-    href: "",
-    priceMonthly: "$99",
-    description: "A plan that scales with your rapidly growing business.",
-    features: ["Upto 50 users", "50 GB storage", "Priority support"],
+    name: "Solo",
+    id: "tier-solo",
+    priceMonthly: "$5",
+    description: "The perfect plan if you're working solo",
+    features: ["Single user", "10 projects", "5 GB storage", "Email support"],
     featured: false,
-    callToAction: "Coming soon",
+    href: "mailto:hello@managee.xyz",
+    callToAction: "Request access",
   },
 ];
 
@@ -81,7 +97,7 @@ export default async function Home() {
         </div>
         <div className="mx-auto max-w-4xl py-32 sm:py-48 lg:py-56">
           <div className="text-center">
-            <h1 className="text-hero bg-gradient-to-r from-teal-500 to-yellow-700 bg-clip-text text-4xl font-bold tracking-tighter text-gray-900 text-transparent sm:text-6xl">
+            <h1 className="text-hero bg-gradient-to-r from-green-500 to-yellow-700 bg-clip-text text-4xl font-bold tracking-tighter text-gray-900 text-transparent sm:text-6xl">
               {SITE_METADATA.TAGLINE}
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
@@ -90,7 +106,6 @@ export default async function Home() {
             <div className="mt-10 flex flex-col items-center justify-center gap-y-6 md:flex-row md:gap-x-6 md:gap-y-0">
               {/* <Link
                 href="/console/projects"
-                className="rounded-full bg-teal-600 px-8 py-2.5 text-sm font-semibold text-white hover:bg-teal-500 hover:shadow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
                 prefetch={false}
               >
                 Get started
@@ -151,20 +166,19 @@ export default async function Home() {
           />
         </div>
         <div className="mx-auto max-w-2xl text-center lg:max-w-4xl">
-          <h2 className="text-base font-semibold leading-7 text-teal-600 dark:text-teal-500">
+          <h2 className="text-base font-semibold leading-7 text-primary">
             Pricing
           </h2>
           <p className="text-hero mt-2 text-4xl font-bold tracking-tighter text-gray-900 dark:text-gray-50 sm:text-5xl">
-            Free during beta
+            From Solo to Scale
           </p>
         </div>
         <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-600 dark:text-gray-300">
-          This will be a paid service once it&apos;s out of beta, but you can
-          use the service for free during the beta period. Note that prices are
-          subject to change and are not guaranteed to stay the same after the
-          beta.
+          This project is still under development and is currently in beta, the
+          pricing is subject to change.
         </p>
-        <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-center gap-y-6 sm:mt-20 sm:gap-y-0 lg:max-w-4xl lg:grid-cols-2">
+
+        <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-center gap-y-6 sm:mt-20 sm:gap-y-0 lg:max-w-4xl lg:grid-cols-3">
           {tiers.map((tier, tierIdx) => (
             <div
               key={tier.id}
@@ -182,12 +196,12 @@ export default async function Home() {
             >
               <h3
                 id={tier.id}
-                className="text-base font-semibold leading-7 text-teal-600 dark:text-teal-500"
+                className="text-base font-semibold leading-7 text-primary"
               >
                 {tier.name}
               </h3>
               <p className="mt-4 flex items-baseline gap-x-2">
-                <span className="text-hero text-5xl font-bold tracking-tighter text-gray-900 dark:text-gray-50">
+                <span className="text-hero text-5xl tracking-tighter text-gray-900 dark:text-gray-50">
                   {tier.priceMonthly}
                 </span>
                 <span className="text-base text-gray-500 dark:text-gray-400">
@@ -204,7 +218,7 @@ export default async function Home() {
                 {tier.features.map((feature) => (
                   <li key={feature} className="flex gap-x-3">
                     <CheckIcon
-                      className="h-6 w-5 flex-none text-teal-600"
+                      className="h-6 w-5 flex-none text-primary"
                       aria-hidden="true"
                     />
                     {feature}
@@ -215,10 +229,10 @@ export default async function Home() {
                 href={tier.href}
                 aria-describedby={tier.id}
                 className={cn(
-                  tier.featured
-                    ? "bg-teal-600 text-white shadow hover:bg-teal-500"
-                    : "text-teal-600 ring-1 ring-inset ring-teal-200 hover:ring-teal-300",
-                  "mt-8 block rounded-md px-3.5 py-2.5 text-center text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 sm:mt-10"
+                  buttonVariants({
+                    variant: tier.featured ? "default" : "outline",
+                  }),
+                  "mt-8 w-full"
                 )}
               >
                 {tier.callToAction}

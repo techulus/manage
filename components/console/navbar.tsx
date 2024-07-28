@@ -161,7 +161,7 @@ export default function NavBar({
               href={tab.href}
               className={cn(
                 tab.current
-                  ? "border-teal-500 text-teal-600 dark:text-teal-500"
+                  ? "border-primary text-primary"
                   : "border-transparent text-gray-500 dark:text-gray-400",
                 "whitespace-nowrap border-b-2 py-3 text-sm font-medium"
               )}

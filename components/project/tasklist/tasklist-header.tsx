@@ -37,7 +37,7 @@ export const TaskListHeader = ({
       {completedPercent != null ? (
         <div
           className={cn(
-            "absolute left-0 top-0 z-0 h-2 rounded-tl-lg bg-green-200 opacity-70 transition-all dark:bg-green-900",
+            "absolute left-0 top-0 z-0 h-2 rounded-tl-lg bg-primary opacity-70 transition-all",
             completedPercent === 1 ? "rounded-tr-lg" : null
           )}
           style={{ width: `${completedPercent * 100}%` }}

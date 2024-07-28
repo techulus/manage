@@ -78,10 +78,7 @@ async function ActivityItem({ id, isLast }: { id: number; isLast: boolean }) {
             </div>
             <div className="min-w-0 flex-1">
               <div className="text-sm">
-                <a
-                  href={activityItem.actor.id}
-                  className="font-medium text-primary"
-                >
+                <a href={activityItem.actor.id} className="font-medium">
                   {activityItem.actor.firstName}
                 </a>
               </div>
