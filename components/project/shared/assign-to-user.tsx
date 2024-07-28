@@ -1,5 +1,3 @@
-import { Check, ChevronsUpDown } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -15,6 +13,7 @@ import {
 } from "@/components/ui/popover";
 import { User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Assignee } from "./assigee";
 
@@ -37,14 +36,16 @@ export function AssignToUser({
 
   if (!isAssigning) {
     return (
-      <button
+      <Button
+        size="sm"
+        variant="outline"
         className="mr-4 text-primary"
         onClick={async () => {
           setIsAssigning(true);
         }}
       >
         Assign
-      </button>
+      </Button>
     );
   }
 

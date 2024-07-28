@@ -4,6 +4,13 @@ import {
   deleteTask,
   updateTask,
 } from "@/app/(dashboard)/console/projects/[projectId]/tasklists/actions";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Task, TaskWithDetails, User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
@@ -59,7 +66,7 @@ export const TaskItem = ({
       className={cn(
         "flex scale-100 rounded-lg shadow-none dark:bg-black",
         detailsOpen
-          ? "scale-[1.02] flex-col border-2 border-gray-200 bg-gray-50 shadow-md dark:border-gray-700"
+          ? "my-1 scale-[1.02] flex-col border-2 border-gray-200 bg-gray-50 shadow-md dark:border-gray-700"
           : "flex-row items-center justify-center space-x-2 border-none"
       )}
       ref={setNodeRef}
@@ -117,8 +124,10 @@ export const TaskItem = ({
                 <dt className="text-sm font-medium leading-6">Created By</dt>
                 <dd className="mt-1 flex text-sm leading-6 sm:col-span-2 sm:mt-0">
                   <span className="flex-grow">{task.creator?.firstName}</span>
-                  <button
-                    className="mr-4 text-primary"
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="mr-2 text-primary"
                     onClick={async () => {
                       setIsEditing((val) => !val);
 
@@ -131,8 +140,10 @@ export const TaskItem = ({
                     }}
                   >
                     {isEditing ? "Save" : "Edit"}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
                     className="text-primary hover:text-red-500"
                     onClick={() => {
                       toast.promise(
@@ -149,7 +160,7 @@ export const TaskItem = ({
                     }}
                   >
                     Delete
-                  </button>
+                  </Button>
                 </dd>
               </div>
             </dl>
@@ -162,7 +173,9 @@ export const TaskItem = ({
                       <span className="flex-grow">
                         <Assignee user={task.assignee} />
                       </span>
-                      <button
+                      <Button
+                        size="sm"
+                        variant="outline"
                         className="text-primary hover:text-red-500"
                         onClick={() => {
                           toast.promise(
@@ -174,7 +187,7 @@ export const TaskItem = ({
                         }}
                       >
                         Unassign
-                      </button>
+                      </Button>
                     </>
                   ) : (
                     <AssignToUser
@@ -235,6 +248,42 @@ export const TaskItem = ({
                 <dt className="text-sm font-medium leading-6">Notes</dt>
                 <dd className="mt-1 flex items-start text-sm leading-6 sm:col-span-2 sm:mt-0">
                   <TaskNotesForm task={task} />
+                </dd>
+              </div>
+            </dl>
+            <dl>
+              <div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-sm font-medium leading-6">Actions</dt>
+                <dd className="mt-1 flex items-start space-x-2 text-sm leading-6 sm:col-span-2 sm:mt-0">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-primary"
+                      >
+                        Move to...
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56">
+                      <DropdownMenuItem>Document</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-primary"
+                      >
+                        Copy to...
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56">
+                      <DropdownMenuItem>Document</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </dd>
               </div>
             </dl>

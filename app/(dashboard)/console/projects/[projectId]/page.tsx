@@ -63,7 +63,7 @@ export default async function ProjectDetails({ params }: Props) {
 
       <PageSection topInset>
         {project.description ? (
-          <div className="flex flex-col px-4 lg:px-8">
+          <div className="flex flex-col px-4 py-2 lg:px-8">
             <MarkdownView content={project.description ?? ""} />
           </div>
         ) : null}
@@ -244,7 +244,7 @@ export default async function ProjectDetails({ params }: Props) {
         </div>
       </div>
 
-      <div className="mx-auto max-w-5xl p-4 lg:p-8">
+      <div className="mx-auto max-w-5xl p-4 lg:p-0 lg:py-8">
         {/* @ts-ignore */}
         <CommentsSection
           type="project"

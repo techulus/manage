@@ -109,7 +109,9 @@ export default function EventsList({
               ) : null}
 
               {event.description && !compact ? (
-                <MarkdownView content={event.description ?? ""} />
+                <div className="pb-2">
+                  <MarkdownView content={event.description ?? ""} />
+                </div>
               ) : null}
 
               {event.creator.id === userId ? (

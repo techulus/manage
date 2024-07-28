@@ -50,9 +50,14 @@ export default function TaskNotesForm({ task }: { task: TaskWithDetails }) {
           <MarkdownView content={task.description ?? ""} />
         </span>
       ) : null}
-      <button className="p-0 text-primary" onClick={() => setIsEditing(true)}>
+      <Button
+        size="sm"
+        variant="outline"
+        className="mt-2 text-primary"
+        onClick={() => setIsEditing(true)}
+      >
         Edit notes
-      </button>
+      </Button>
     </div>
   );
 }

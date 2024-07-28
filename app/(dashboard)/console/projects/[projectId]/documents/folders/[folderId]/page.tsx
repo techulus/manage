@@ -76,7 +76,7 @@ export default async function FolderDetails({ params }: Props) {
 
       <PageSection topInset>
         {folder.description ? (
-          <div className="flex flex-col px-4">
+          <div className="flex flex-col px-4 py-2">
             <MarkdownView content={folder.description ?? ""} />
           </div>
         ) : null}
