@@ -9,6 +9,7 @@ interface Props {
   actionLink?: string;
   actionLabel?: string;
   backUrl?: string;
+  actions?: JSX.Element;
 }
 
 export default function PageTitle({
@@ -18,6 +19,7 @@ export default function PageTitle({
   actionLink,
   actionLabel,
   children,
+  actions,
 }: PropsWithChildren<Props>) {
   return (
     <div className="flex min-h-[160px] justify-center border-b bg-gray-50 pb-4 pl-4 pr-6 pt-4 dark:bg-card dark:bg-gray-900 dark:text-white sm:pl-6 lg:pl-8 xl:min-h-[220px] xl:border-t-0">
@@ -43,9 +45,7 @@ export default function PageTitle({
           {subTitle ? (
             <p className="text-gray-500 dark:text-gray-400">{subTitle}</p>
           ) : null}
-          <div className="absolute left-0 top-9 block w-full pt-2">
-            {children}
-          </div>
+          <div className="block w-full pt-2">{children}</div>
         </div>
 
         {actionLink && actionLabel ? (
@@ -53,6 +53,8 @@ export default function PageTitle({
             {actionLabel}
           </Link>
         ) : null}
+
+        {actions ?? null}
       </div>
     </div>
   );

@@ -2,10 +2,16 @@ import EmptyState from "@/components/core/empty-state";
 import PageTitle from "@/components/layout/page-title";
 import { DocumentFolderHeader } from "@/components/project/document/document-folder-header";
 import { DocumentHeader } from "@/components/project/document/document-header";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { document, project } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
 import { and, eq, isNull } from "drizzle-orm";
-import { FilePlus2Icon, FolderPlusIcon } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -65,27 +71,36 @@ export default async function ProjectDocuments({ params }: Props) {
 
   return (
     <>
-      <PageTitle title="Docs & Files">
-        <div className="flex space-x-4">
-          <Link
-            className="flex items-center"
-            href={`/console/projects/${projectId}/documents/new`}
-            prefetch={false}
-          >
-            <FilePlus2Icon className="mr-1 h-5 w-5" /> Document
-            <span className="sr-only">, document</span>
-          </Link>
-
-          <Link
-            className="flex items-center"
-            href={`/console/projects/${projectId}/documents/folders/new`}
-            prefetch={false}
-          >
-            <FolderPlusIcon className="mr-1 h-5 w-5" /> Folder
-            <span className="sr-only">, folder</span>
-          </Link>
-        </div>
-      </PageTitle>
+      <PageTitle
+        title="Docs & Files"
+        actions={
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button>New</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuItem>
+                <Link
+                  className="w-full"
+                  href={`/console/projects/${projectId}/documents/new`}
+                  prefetch={false}
+                >
+                  Document
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link
+                  className="w-full"
+                  href={`/console/projects/${projectId}/documents/folders/new`}
+                  prefetch={false}
+                >
+                  Folder
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        }
+      />
 
       <div className="mx-auto my-12 max-w-5xl px-4 lg:px-0 xl:-mt-6">
         <div className="flex flex-col space-y-4">
