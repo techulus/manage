@@ -33,30 +33,45 @@ async function getGitHubStars(): Promise<string | null> {
 
 const tiers = [
   {
-    name: "Personal",
-    id: "tier-personal",
-    href: "mailto:hello@managee.xyz",
-    priceMonthly: "$9",
-    description: "The perfect plan if you're working solo or a small team.",
+    name: "Self-hosted",
+    id: "tier-free",
+    priceMonthly: "$0",
+    description: "You can host it yourself",
     features: [
-      "Upto 3 users",
+      "Unlimited users",
       "Unlimited projects",
-      "Unlimited documents & files",
-      "5 GB storage",
-      "Email & GitHub support",
+      "Unlimited storage",
+      "Community support",
+    ],
+    featured: false,
+    href: "https://github.com/techulus/manage",
+    callToAction: "Get Started",
+  },
+  {
+    name: "Scale",
+    id: "tier-scale",
+    priceMonthly: "$99",
+    description: "A plan that scales with your rapidly growing business.",
+    features: [
+      "Upto 50 users",
+      "Unlimited projects",
+      "Multiple organizations",
+      "200 GB storage",
+      "Priority support",
     ],
     featured: true,
+    href: "mailto:hello+scale@managee.xyz",
     callToAction: "Request access",
   },
   {
-    name: "Team",
-    id: "tier-team",
-    href: "",
-    priceMonthly: "$99",
-    description: "A plan that scales with your rapidly growing business.",
-    features: ["Upto 50 users", "50 GB storage", "Priority support"],
+    name: "Solo",
+    id: "tier-solo",
+    priceMonthly: "$5",
+    description: "The perfect plan if you're working solo",
+    features: ["Single user", "10 projects", "5 GB storage", "Email support"],
     featured: false,
-    callToAction: "Coming soon",
+    href: "mailto:hello@managee.xyz",
+    callToAction: "Request access",
   },
 ];
 
@@ -155,16 +170,15 @@ export default async function Home() {
             Pricing
           </h2>
           <p className="text-hero mt-2 text-4xl font-bold tracking-tighter text-gray-900 dark:text-gray-50 sm:text-5xl">
-            Free during beta
+            From Solo to Scale
           </p>
         </div>
         <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-600 dark:text-gray-300">
-          This will be a paid service once it&apos;s out of beta, but you can
-          use the service for free during the beta period. Note that prices are
-          subject to change and are not guaranteed to stay the same after the
-          beta.
+          This project is still under development and is currently in beta, the
+          pricing is subject to change.
         </p>
-        <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-center gap-y-6 sm:mt-20 sm:gap-y-0 lg:max-w-4xl lg:grid-cols-2">
+
+        <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-center gap-y-6 sm:mt-20 sm:gap-y-0 lg:max-w-4xl lg:grid-cols-3">
           {tiers.map((tier, tierIdx) => (
             <div
               key={tier.id}
@@ -187,7 +201,7 @@ export default async function Home() {
                 {tier.name}
               </h3>
               <p className="mt-4 flex items-baseline gap-x-2">
-                <span className="text-hero text-5xl font-bold tracking-tighter text-gray-900 dark:text-gray-50">
+                <span className="text-hero text-5xl tracking-tighter text-gray-900 dark:text-gray-50">
                   {tier.priceMonthly}
                 </span>
                 <span className="text-base text-gray-500 dark:text-gray-400">
