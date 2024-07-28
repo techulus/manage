@@ -78,7 +78,7 @@ export default async function ProjectDocuments({ params }: Props) {
             <DropdownMenuTrigger asChild>
               <Button>New</Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
+            <DropdownMenuContent>
               <DropdownMenuItem>
                 <Link
                   className="w-full"

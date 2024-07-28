@@ -114,7 +114,7 @@ export default async function ActivityDetails({ params }: Props) {
       columns: {
         id: true,
       },
-      limit: 20,
+      limit: 50,
     })
     .execute();
 

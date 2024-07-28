@@ -270,7 +270,7 @@ export const TaskItem = ({
                           Move to...
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-56">
+                      <DropdownMenuContent>
                         {taskLists
                           .filter((x) => x.id != task.taskListId)
                           .map((list) => (
@@ -307,7 +307,7 @@ export const TaskItem = ({
                           Copy to...
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-56">
+                      <DropdownMenuContent>
                         {taskLists
                           .filter((x) => x.id != task.taskListId)
                           .map((list) => (
