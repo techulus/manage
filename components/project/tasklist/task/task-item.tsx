@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  copyTaskToTaskList,
   deleteTask,
+  moveTaskToTaskList,
   updateTask,
 } from "@/app/(dashboard)/console/projects/[projectId]/tasklists/actions";
 import { Button } from "@/components/ui/button";
@@ -12,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Task, TaskWithDetails, User } from "@/drizzle/types";
+import { Task, TaskList, TaskWithDetails, User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -30,10 +32,12 @@ export const TaskItem = ({
   task,
   projectId,
   users,
+  taskLists,
 }: {
   task: TaskWithDetails;
   projectId: number;
   users: User[];
+  taskLists?: TaskList[];
 }) => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -251,42 +255,88 @@ export const TaskItem = ({
                 </dd>
               </div>
             </dl>
-            <dl>
-              <div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt className="text-sm font-medium leading-6">Actions</dt>
-                <dd className="mt-1 flex items-start space-x-2 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-primary"
-                      >
-                        Move to...
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56">
-                      <DropdownMenuItem>Document</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+            {taskLists?.length ? (
+              <dl>
+                <div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                  <dt className="text-sm font-medium leading-6">Actions</dt>
+                  <dd className="mt-1 flex items-start space-x-2 text-sm leading-6 sm:col-span-2 sm:mt-0">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-primary"
+                        >
+                          Move to...
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-56">
+                        {taskLists
+                          .filter((x) => x.id != task.taskListId)
+                          .map((list) => (
+                            <DropdownMenuItem key={list.id} className="w-full">
+                              <form
+                                className="w-full"
+                                action={() =>
+                                  moveTaskToTaskList(
+                                    task.id,
+                                    list.id,
+                                    projectId
+                                  )
+                                }
+                              >
+                                <button
+                                  type="submit"
+                                  className="w-full text-left"
+                                >
+                                  {list.name}
+                                </button>
+                              </form>
+                            </DropdownMenuItem>
+                          ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
 
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-primary"
-                      >
-                        Copy to...
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56">
-                      <DropdownMenuItem>Document</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </dd>
-              </div>
-            </dl>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-primary"
+                        >
+                          Copy to...
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-56">
+                        {taskLists
+                          .filter((x) => x.id != task.taskListId)
+                          .map((list) => (
+                            <DropdownMenuItem key={list.id} className="w-full">
+                              <form
+                                className="w-full"
+                                action={() =>
+                                  copyTaskToTaskList(
+                                    task.id,
+                                    list.id,
+                                    projectId
+                                  )
+                                }
+                              >
+                                <button
+                                  type="submit"
+                                  className="w-full text-left"
+                                >
+                                  {list.name}
+                                </button>
+                              </form>
+                            </DropdownMenuItem>
+                          ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </dd>
+                </div>
+              </dl>
+            ) : null}
           </CardContent>
         </>
       ) : (

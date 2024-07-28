@@ -366,3 +366,81 @@ export async function forkTaskList(taskListId: number, projectId: number) {
 
   revalidatePath(`/console/projects/${projectId}/tasklists`);
 }
+
+export async function getActiveTaskLists(projectId: number) {
+  const db = await database();
+  return db.query.taskList
+    .findMany({
+      where: and(
+        eq(taskList.projectId, projectId),
+        eq(taskList.status, "active")
+      ),
+    })
+    .execute();
+}
+
+export async function copyTaskToTaskList(
+  taskId: number,
+  taskListId: number,
+  projectId: number
+) {
+  const { userId } = await getOwner();
+  const db = await database();
+
+  const taskDetails = await db.query.task
+    .findFirst({
+      where: eq(task.id, taskId),
+    })
+    .execute();
+
+  if (!taskDetails) {
+    throw new Error("Task not found");
+  }
+
+  const lastPosition = await db.query.task
+    .findFirst({
+      where: eq(task.taskListId, +taskListId),
+      orderBy: [desc(task.position)],
+    })
+    .execute();
+
+  const position = lastPosition?.position
+    ? lastPosition?.position + POSITION_INCREMENT
+    : 1;
+
+  await db
+    .insert(task)
+    .values({
+      name: taskDetails.name,
+      description: taskDetails.description,
+      dueDate: taskDetails.dueDate,
+      status: "todo",
+      taskListId: +taskListId,
+      position,
+      createdByUser: userId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .run();
+
+  revalidatePath(`/console/projects/${projectId}/tasklists`);
+}
+
+export async function moveTaskToTaskList(
+  taskId: number,
+  taskListId: number,
+  projectId: number
+) {
+  const db = await database();
+
+  await db
+    .update(task)
+    .set({
+      taskListId: +taskListId,
+      updatedAt: new Date(),
+    })
+    .where(eq(task.id, taskId))
+    .run();
+
+  revalidatePath(`/console/projects/${projectId}/tasklists`);
+}

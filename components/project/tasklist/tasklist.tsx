@@ -1,7 +1,10 @@
 "use client";
 
-import { repositionTask } from "@/app/(dashboard)/console/projects/[projectId]/tasklists/actions";
-import { TaskListWithTasks, User } from "@/drizzle/types";
+import {
+  getActiveTaskLists,
+  repositionTask,
+} from "@/app/(dashboard)/console/projects/[projectId]/tasklists/actions";
+import { TaskList, TaskListWithTasks, User } from "@/drizzle/types";
 import {
   closestCenter,
   DndContext,
@@ -47,6 +50,16 @@ export const TaskListItem = ({
     () => taskList.tasks.filter((task) => task.status === "todo"),
     [taskList.tasks]
   );
+
+  const getTasklists = useCallback(
+    () => getActiveTaskLists(projectId),
+    [projectId]
+  );
+
+  const [taskLists, setTaskLists] = useState<TaskList[]>([]);
+  useEffect(() => {
+    getTasklists().then((data) => setTaskLists(data));
+  }, [getTasklists]);
 
   const [localTodoItems, setLocalTodoItems] = useState(todoItems);
   useEffect(() => {
@@ -122,6 +135,7 @@ export const TaskListItem = ({
                 task={task}
                 projectId={+projectId}
                 users={users}
+                taskLists={taskLists}
               />
             ))}
           </SortableContext>

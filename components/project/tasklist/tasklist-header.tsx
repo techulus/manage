@@ -33,7 +33,7 @@ export const TaskListHeader = ({
     totalCount != null && doneCount != null ? doneCount / totalCount : null;
 
   return (
-    <div className="group relative flex items-center gap-x-4 rounded-tl-lg rounded-tr-lg border-b border-gray-900/5 bg-white p-3 py-4 dark:bg-black">
+    <div className="group relative flex items-center gap-x-4 rounded-tl-lg rounded-tr-lg bg-white p-3 pb-5 dark:bg-black">
       <Link
         href={`/console/projects/${taskList.projectId}/tasklists/${taskList.id}`}
         className="text-sm font-medium"
