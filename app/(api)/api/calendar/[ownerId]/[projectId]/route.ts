@@ -1,5 +1,5 @@
 import { calendarEvent, project, task, taskList } from "@/drizzle/schema";
-import { getDatabaseForOwner } from "@/lib/utils/useDatabase";
+import { getDatabaseForOwner } from "@/lib/utils/turso";
 import { and, desc, eq, lte } from "drizzle-orm";
 import ical, { ICalCalendarMethod } from "ical-generator";
 

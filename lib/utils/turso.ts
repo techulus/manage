@@ -10,6 +10,18 @@ export function getDatabaseNameForOwner(ownerId: string) {
   return ownerId.replace(/-/g, "").replace(/_/g, "-").toLowerCase();
 }
 
+export function getDatabaseForOwner(ownerId: string) {
+  const databaseName = getDatabaseNameForOwner(ownerId);
+  const databaseUrl = `libsql://${databaseName}-${tursoOrganizationName}.turso.io`;
+
+  const client = createClient({
+    url: databaseUrl,
+    authToken: process.env.DATABASE_AUTH_TOKEN ?? "",
+  });
+
+  return drizzle(client, { schema });
+}
+
 export async function createDatabaseAndMigrate(ownerId: string) {
   const name = getDatabaseNameForOwner(ownerId);
   const database = await fetch(

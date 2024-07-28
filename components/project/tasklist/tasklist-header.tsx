@@ -33,16 +33,7 @@ export const TaskListHeader = ({
     totalCount != null && doneCount != null ? doneCount / totalCount : null;
 
   return (
-    <div className="group relative flex items-center gap-x-4 rounded-tl-lg rounded-tr-lg border-b border-gray-900/5 bg-white p-3 pt-4 dark:bg-black">
-      {completedPercent != null ? (
-        <div
-          className={cn(
-            "absolute left-0 top-0 z-0 h-2 rounded-tl-lg bg-primary opacity-70 transition-all",
-            completedPercent === 1 ? "rounded-tr-lg" : null
-          )}
-          style={{ width: `${completedPercent * 100}%` }}
-        />
-      ) : null}
+    <div className="group relative flex items-center gap-x-4 rounded-tl-lg rounded-tr-lg border-b border-gray-900/5 bg-white p-3 py-4 dark:bg-black">
       <Link
         href={`/console/projects/${taskList.projectId}/tasklists/${taskList.id}`}
         className="text-sm font-medium"
@@ -65,6 +56,16 @@ export const TaskListHeader = ({
           <Badge variant="outline" className="ml-2" suppressHydrationWarning>
             Due {taskList.dueDate.toLocaleDateString()}
           </Badge>
+        ) : null}
+
+        {completedPercent != null ? (
+          <div
+            className={cn(
+              "absolute bottom-0 left-0 z-0 h-2 rounded-r-lg bg-primary opacity-70 transition-all",
+              completedPercent === 1 ? "rounded-tr-lg" : null
+            )}
+            style={{ width: `${completedPercent * 100}%` }}
+          />
         ) : null}
       </Link>
 

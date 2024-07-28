@@ -5,9 +5,6 @@ import { lt } from "drizzle-orm";
 
 export const handleDormancy = task({
   id: "handle-dormancy",
-  retry: {
-    maxAttempts: 3,
-  },
   run: async () => {
     const admin = opsDb();
 
