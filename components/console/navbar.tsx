@@ -1,10 +1,10 @@
 "use client";
 
 import { useDetectSticky } from "@/lib/hooks/useDetectSticky";
-import { useTheme } from "@/lib/hooks/useTheme";
 import { cn } from "@/lib/utils";
 import { Organization } from "@/ops/types";
 import { Transition } from "@headlessui/react";
+import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -20,7 +20,7 @@ export default function NavBar({
   orgs: Organization[];
   activeOrg: Organization | undefined;
 }) {
-  const appearance = useTheme();
+  const { theme } = useTheme();
   const path = usePathname();
   const { projectId } = useParams();
 
@@ -78,7 +78,7 @@ export default function NavBar({
   );
   return (
     <>
-      {createToastWrapper(appearance)}
+      {createToastWrapper(theme)}
       <nav className="flex-shrink-0 bg-background text-black dark:bg-gray-950 dark:text-white">
         <div className="mx-auto px-4 lg:px-8">
           <div className="relative flex h-16 items-center justify-between">

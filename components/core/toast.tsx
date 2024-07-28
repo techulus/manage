@@ -7,7 +7,7 @@ const Toaster = dynamic(() =>
   import("react-hot-toast").then((mod) => mod.Toaster)
 );
 
-export function createToastWrapper(prefersColorScheme: string) {
+export function createToastWrapper(prefersColorScheme: string | undefined) {
   return (
     <Toaster
       position="top-center"

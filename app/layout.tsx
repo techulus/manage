@@ -1,3 +1,4 @@
+import { ThemeProvider } from "@/components/core/theme-provider";
 import { SITE_METADATA } from "@/data/marketing";
 import { cn } from "@/lib/utils";
 import { Analytics } from "@vercel/analytics/react";
@@ -227,7 +228,7 @@ export default function RootLayout({
           "rounded-tl-xl rounded-tr-xl md:rounded-none"
         )}
       >
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
       <Analytics />
     </html>
