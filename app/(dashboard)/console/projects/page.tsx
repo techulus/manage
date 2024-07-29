@@ -69,7 +69,7 @@ export default async function Projects({ searchParams }: Props) {
       </div>
 
       {archivedProjects.length > 0 && (
-        <div className="mx-auto mt-12 flex w-full max-w-5xl flex-grow items-center border-t border-muted py-4">
+        <div className="mx-auto mt-12 flex w-full max-w-5xl flex-grow items-center border-t border-muted p-4 md:py-4">
           <p className="text-sm text-muted-foreground">
             {archivedProjects.length} archived project(s)
           </p>
