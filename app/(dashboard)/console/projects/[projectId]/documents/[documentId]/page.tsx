@@ -55,32 +55,30 @@ export default async function DocumentDetails({ params }: Props) {
       </PageSection>
 
       <PageSection bottomMargin={false}>
-        <div className="flex h-12 flex-col justify-center bg-white dark:bg-gray-950 xl:rounded-lg">
-          <div className="flex justify-between py-3">
-            {/* Left buttons */}
-            <div className="isolate inline-flex sm:space-x-3">
-              <span className="inline-flex space-x-1"></span>
-            </div>
-
-            {/* Right buttons */}
-            <nav aria-label="Pagination">
-              <span className="isolate inline-flex">
-                <form
-                  action={async () => {
-                    "use server";
-                    await deleteDocument(
-                      documentId,
-                      projectId,
-                      documentDetails?.markdownContent,
-                      documentDetails?.folderId
-                    );
-                  }}
-                >
-                  <DeleteButton />
-                </form>
-              </span>
-            </nav>
+        <div className="flex justify-between p-1">
+          {/* Left buttons */}
+          <div className="isolate inline-flex sm:space-x-3">
+            <span className="inline-flex space-x-1"></span>
           </div>
+
+          {/* Right buttons */}
+          <nav aria-label="Pagination">
+            <span className="isolate inline-flex">
+              <form
+                action={async () => {
+                  "use server";
+                  await deleteDocument(
+                    documentId,
+                    projectId,
+                    documentDetails?.markdownContent,
+                    documentDetails?.folderId
+                  );
+                }}
+              >
+                <DeleteButton />
+              </form>
+            </span>
+          </nav>
         </div>
       </PageSection>
 
