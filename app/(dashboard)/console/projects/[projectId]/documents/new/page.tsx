@@ -1,4 +1,4 @@
-import { ContentBlock } from "@/components/core/content-block";
+import PageSection from "@/components/core/section";
 import { SaveButton } from "@/components/form/button";
 import DocumentForm from "@/components/form/document";
 import PageTitle from "@/components/layout/page-title";
@@ -19,9 +19,13 @@ export default async function CreateDocument({ params }: Props) {
   return (
     <>
       <PageTitle title="Create Document" backUrl={backUrl} />
-      <form action={createDocument} className="xl:-mt-8">
-        <input type="hidden" name="projectId" defaultValue={params.projectId} />
-        <ContentBlock>
+      <PageSection topInset>
+        <form action={createDocument}>
+          <input
+            type="hidden"
+            name="projectId"
+            defaultValue={params.projectId}
+          />
           <CardContent>
             <DocumentForm />
           </CardContent>
@@ -37,8 +41,8 @@ export default async function CreateDocument({ params }: Props) {
               <SaveButton />
             </div>
           </CardFooter>
-        </ContentBlock>
-      </form>
+        </form>
+      </PageSection>
     </>
   );
 }

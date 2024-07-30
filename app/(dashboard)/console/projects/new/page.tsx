@@ -1,4 +1,4 @@
-import { ContentBlock } from "@/components/core/content-block";
+import PageSection from "@/components/core/section";
 import { SaveButton } from "@/components/form/button";
 import SharedForm from "@/components/form/shared";
 import PageTitle from "@/components/layout/page-title";
@@ -11,8 +11,8 @@ export default async function CreateProject() {
   return (
     <>
       <PageTitle title="Create Project" backUrl="/console/projects" />
-      <form action={createProject} className="xl:-mt-8">
-        <ContentBlock>
+      <PageSection topInset>
+        <form action={createProject}>
           <CardContent>
             <SharedForm />
           </CardContent>
@@ -28,8 +28,8 @@ export default async function CreateProject() {
               <SaveButton />
             </div>
           </CardFooter>
-        </ContentBlock>
-      </form>
+        </form>
+      </PageSection>
     </>
   );
 }

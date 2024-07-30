@@ -22,7 +22,7 @@ export default function PageTitle({
   actions,
 }: PropsWithChildren<Props>) {
   return (
-    <div className="flex min-h-[130px] items-center justify-center border-b bg-gray-50 pb-4 pl-4 pr-6 pt-4 dark:bg-card dark:bg-gray-900 dark:text-white sm:pl-6 lg:pl-8 xl:min-h-[220px] xl:border-t-0">
+    <div className="flex min-h-[200px] items-center justify-center border-b bg-gray-50 pb-4 pl-4 pr-6 pt-4 dark:bg-card dark:bg-gray-900 dark:text-white sm:pl-6 lg:pl-8 xl:border-t-0">
       <div className="flex w-full max-w-5xl items-center justify-between">
         <div className="relative flex w-full flex-col">
           {backUrl ? (

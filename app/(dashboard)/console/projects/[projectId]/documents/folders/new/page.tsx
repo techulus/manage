@@ -1,4 +1,4 @@
-import { ContentBlock } from "@/components/core/content-block";
+import PageSection from "@/components/core/section";
 import { SaveButton } from "@/components/form/button";
 import SharedForm from "@/components/form/shared";
 import PageTitle from "@/components/layout/page-title";
@@ -18,9 +18,13 @@ export default async function CreateDocumentFolder({ params }: Props) {
   return (
     <>
       <PageTitle title="Create Folder" backUrl={backUrl} />
-      <form action={createDocumentFolder} className="xl:-mt-8">
-        <input type="hidden" name="projectId" defaultValue={params.projectId} />
-        <ContentBlock>
+      <PageSection topInset>
+        <form action={createDocumentFolder}>
+          <input
+            type="hidden"
+            name="projectId"
+            defaultValue={params.projectId}
+          />
           <CardContent>
             <SharedForm showDueDate={false} />
           </CardContent>
@@ -36,8 +40,8 @@ export default async function CreateDocumentFolder({ params }: Props) {
               <SaveButton />
             </div>
           </CardFooter>
-        </ContentBlock>
-      </form>
+        </form>
+      </PageSection>
     </>
   );
 }

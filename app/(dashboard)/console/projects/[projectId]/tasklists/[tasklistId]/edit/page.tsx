@@ -1,4 +1,4 @@
-import { ContentBlock } from "@/components/core/content-block";
+import PageSection from "@/components/core/section";
 import { SaveButton } from "@/components/form/button";
 import SharedForm from "@/components/form/shared";
 import PageTitle from "@/components/layout/page-title";
@@ -24,10 +24,14 @@ export default async function EditTaskList({ params }: Props) {
     <>
       <PageTitle title="Update Task list" backUrl={backUrl} />
 
-      <form action={updateTaskList} className="xl:-mt-8">
-        <input type="hidden" name="id" defaultValue={params.tasklistId} />
-        <input type="hidden" name="projectId" defaultValue={params.projectId} />
-        <ContentBlock>
+      <PageSection topInset>
+        <form action={updateTaskList}>
+          <input type="hidden" name="id" defaultValue={params.tasklistId} />
+          <input
+            type="hidden"
+            name="projectId"
+            defaultValue={params.projectId}
+          />
           <CardContent>
             <SharedForm item={tasklist} />
           </CardContent>
@@ -43,8 +47,8 @@ export default async function EditTaskList({ params }: Props) {
               <SaveButton />
             </div>
           </CardFooter>
-        </ContentBlock>
-      </form>
+        </form>
+      </PageSection>
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { ContentBlock } from "@/components/core/content-block";
+import PageSection from "@/components/core/section";
 import { SaveButton } from "@/components/form/button";
 import DocumentForm from "@/components/form/document";
 import PageTitle from "@/components/layout/page-title";
@@ -23,17 +23,21 @@ export default async function EditDocument({ params }: Props) {
     <>
       <PageTitle title="Update Document" backUrl={backUrl} />
 
-      <form action={updateDocument} className="xl:-mt-8">
-        <input type="hidden" name="id" defaultValue={params.documentId} />
-        <input type="hidden" name="projectId" defaultValue={params.projectId} />
-        {document.folderId && (
+      <PageSection topInset>
+        <form action={updateDocument}>
+          <input type="hidden" name="id" defaultValue={params.documentId} />
           <input
             type="hidden"
-            name="folderId"
-            defaultValue={document.folderId}
+            name="projectId"
+            defaultValue={params.projectId}
           />
-        )}
-        <ContentBlock>
+          {document.folderId && (
+            <input
+              type="hidden"
+              name="folderId"
+              defaultValue={document.folderId}
+            />
+          )}
           <CardContent>
             <DocumentForm item={document} />
           </CardContent>
@@ -49,8 +53,8 @@ export default async function EditDocument({ params }: Props) {
               <SaveButton />
             </div>
           </CardFooter>
-        </ContentBlock>
-      </form>
+        </form>
+      </PageSection>
     </>
   );
 }

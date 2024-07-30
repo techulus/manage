@@ -87,7 +87,7 @@ export default async function TaskLists({ params }: Props) {
         </div>
       </PageTitle>
 
-      <div className="mx-auto my-12 max-w-5xl px-4 lg:px-0 xl:-mt-8">
+      <div className="mx-auto -mt-8 max-w-5xl px-4">
         <TaskListItem
           key={list.id}
           taskList={list}

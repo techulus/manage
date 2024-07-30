@@ -82,7 +82,7 @@ export default async function TaskLists({ params, searchParams }: Props) {
         actionLink={`/console/projects/${projectId}/tasklists/new`}
       />
 
-      <div className="mx-auto my-12 max-w-5xl px-4 lg:px-0 xl:-mt-6">
+      <div className="mx-auto my-12 -mt-6 max-w-5xl px-4">
         <EmptyState
           show={!taskLists.length}
           label="task list"
@@ -108,7 +108,7 @@ export default async function TaskLists({ params, searchParams }: Props) {
         </ul>
 
         {archivedTaskLists.length > 0 && (
-          <div className="mt-12 flex w-full flex-grow items-center border-t border-muted py-4">
+          <div className="mt-12 flex w-full flex-grow items-center border-t border-muted p-4 md:py-4">
             <p className="text-sm text-muted-foreground">
               {archivedTaskLists.length} archived task list(s)
             </p>

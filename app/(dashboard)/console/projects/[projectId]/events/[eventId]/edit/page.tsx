@@ -1,4 +1,4 @@
-import { ContentBlock } from "@/components/core/content-block";
+import PageSection from "@/components/core/section";
 import { SaveButton } from "@/components/form/button";
 import EventForm from "@/components/form/event";
 import PageTitle from "@/components/layout/page-title";
@@ -57,10 +57,10 @@ export default async function EditEvent({ params }: Props) {
     <>
       <PageTitle title="Edit Event" backUrl={backUrl} />
 
-      <form action={updateEvent} className="xl:-mt-8">
-        <input type="hidden" name="id" defaultValue={eventId} />
-        <input type="hidden" name="projectId" defaultValue={projectId} />
-        <ContentBlock>
+      <PageSection topInset>
+        <form action={updateEvent}>
+          <input type="hidden" name="id" defaultValue={eventId} />
+          <input type="hidden" name="projectId" defaultValue={projectId} />
           <CardContent>
             <EventForm item={event} users={users} />
           </CardContent>
@@ -76,8 +76,8 @@ export default async function EditEvent({ params }: Props) {
               <SaveButton />
             </div>
           </CardFooter>
-        </ContentBlock>
-      </form>
+        </form>
+      </PageSection>
     </>
   );
 }

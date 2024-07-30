@@ -1,4 +1,4 @@
-import { ContentBlock } from "@/components/core/content-block";
+import PageSection from "@/components/core/section";
 import { SaveButton } from "@/components/form/button";
 import SharedForm from "@/components/form/shared";
 import PageTitle from "@/components/layout/page-title";
@@ -23,8 +23,8 @@ export default async function EditProject({ params }: Props) {
     <>
       <PageTitle title={project.name} backUrl="/console/projects" />
 
-      <form action={updateProject} className="xl:-mt-8">
-        <ContentBlock>
+      <PageSection topInset>
+        <form action={updateProject}>
           <CardContent>
             <input type="hidden" name="id" defaultValue={projectId} />
             <SharedForm item={project} />
@@ -41,8 +41,8 @@ export default async function EditProject({ params }: Props) {
               <SaveButton />
             </div>
           </CardFooter>
-        </ContentBlock>
-      </form>
+        </form>
+      </PageSection>
     </>
   );
 }

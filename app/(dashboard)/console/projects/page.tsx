@@ -1,4 +1,5 @@
 import EmptyState from "@/components/core/empty-state";
+import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { ProjecItem } from "@/components/project/project-item";
 import { buttonVariants } from "@/components/ui/button";
@@ -33,24 +34,23 @@ export default async function Projects({ searchParams }: Props) {
       />
 
       {projects.length ? (
-        <form
-          action="/console/projects"
-          className="mx-4 flex flex-1 justify-center py-4 lg:justify-end xl:m-0 xl:-mt-8 xl:pb-0 xl:pt-4"
-        >
-          <div className="mx-auto w-full max-w-5xl">
-            <label htmlFor="search" className="sr-only">
-              Search projects
-            </label>
-            <div className="relative text-gray-600  focus-within:text-gray-800 dark:text-gray-400 dark:focus-within:text-gray-200">
-              <Input
-                name="search"
-                placeholder="Search projects"
-                type="search"
-                className="h-12"
-              />
+        <PageSection topInset bottomMargin>
+          <form action="/console/projects">
+            <div className="mx-auto w-full max-w-5xl">
+              <label htmlFor="search" className="sr-only">
+                Search projects
+              </label>
+              <div className="relative text-gray-600 focus-within:text-gray-800 dark:text-gray-400 dark:focus-within:text-gray-200">
+                <Input
+                  name="search"
+                  placeholder="Search projects"
+                  type="search"
+                  className="h-12"
+                />
+              </div>
             </div>
-          </div>
-        </form>
+          </form>
+        </PageSection>
       ) : null}
 
       <div className="mx-auto mt-8 flex max-w-5xl flex-col">
