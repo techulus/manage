@@ -4,7 +4,7 @@ import { addComment } from "@/app/(dashboard)/console/projects/actions";
 import MarkdownEditor from "@/components/editor";
 import { ActionButton } from "@/components/form/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User } from "@/drizzle/types";
+import type { User } from "@/drizzle/types";
 import { usePathname } from "next/navigation";
 
 export default function CommentForm({
@@ -28,7 +28,7 @@ export default function CommentForm({
       <input value={type} type="hidden" name="type" />
 
       <div className="flex w-full flex-row space-x-4">
-        <div className="hidden w-[160px] md:block"></div>
+        <div className="hidden w-[160px] md:block" />
 
         {creator?.imageUrl ? (
           <Avatar>

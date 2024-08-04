@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { EventWithInvites } from "@/drizzle/types";
+import type { EventWithInvites } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -94,7 +94,7 @@ export default function EventsList({
                     }`
                   : null}
                 {event.repeatRule
-                  ? `, ` + rrulestr(event.repeatRule).toText()
+                  ? `, ${rrulestr(event.repeatRule).toText()}`
                   : null}
               </div>
 

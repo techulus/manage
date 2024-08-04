@@ -1,5 +1,5 @@
 import { logout, switchOrganization } from "@/app/(auth)/actions";
-import { Organization } from "@/ops/types";
+import type { Organization } from "@/ops/types";
 import { ChevronsUpDown, Plus, User } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";

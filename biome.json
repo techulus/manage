@@ -8,8 +8,14 @@
 		"rules": {
 			"recommended": true,
 			"style": {
-				"noNonNullAssertion": "info"
+				"noNonNullAssertion": "off"
+			},
+			"a11y": {
+				"noSvgWithoutTitle": "off"
 			}
 		}
+	},
+	"files": {
+		"ignore": [".next/**/*", "components/ui/**/*", ".trigger/**/*"]
 	}
 }

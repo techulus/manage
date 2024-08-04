@@ -4,7 +4,7 @@ import { updateTask } from "@/app/(dashboard)/console/projects/[projectId]/taskl
 import { MarkdownView } from "@/components/core/markdown-view";
 import MarkdownEditor from "@/components/editor";
 import { Button } from "@/components/ui/button";
-import { TaskWithDetails } from "@/drizzle/types";
+import type { TaskWithDetails } from "@/drizzle/types";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 

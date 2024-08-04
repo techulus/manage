@@ -25,9 +25,9 @@ export function getValidNumber(
   value: string,
   { max, min = 0, loop = false }: GetValidNumberConfig
 ) {
-  let numericValue = parseInt(value, 10);
+  let numericValue = Number.parseInt(value, 10);
 
-  if (!isNaN(numericValue)) {
+  if (!Number.isNaN(numericValue)) {
     if (!loop) {
       if (numericValue > max) numericValue = max;
       if (numericValue < min) numericValue = min;
@@ -66,8 +66,8 @@ export function getValidArrowNumber(
   value: string,
   { min, max, step }: GetValidArrowNumberConfig
 ) {
-  let numericValue = parseInt(value, 10);
-  if (!isNaN(numericValue)) {
+  let numericValue = Number.parseInt(value, 10);
+  if (!Number.isNaN(numericValue)) {
     numericValue += step;
     return getValidNumber(String(numericValue), { min, max, loop: true });
   }
@@ -88,24 +88,24 @@ export function getValidArrowMinuteOrSecond(value: string, step: number) {
 
 export function setMinutes(date: Date, value: string) {
   const minutes = getValidMinuteOrSecond(value);
-  date.setMinutes(parseInt(minutes, 10));
+  date.setMinutes(Number.parseInt(minutes, 10));
   return date;
 }
 
 export function setSeconds(date: Date, value: string) {
   const seconds = getValidMinuteOrSecond(value);
-  date.setSeconds(parseInt(seconds, 10));
+  date.setSeconds(Number.parseInt(seconds, 10));
   return date;
 }
 
 export function setHours(date: Date, value: string) {
   const hours = getValidHour(value);
-  date.setHours(parseInt(hours, 10));
+  date.setHours(Number.parseInt(hours, 10));
   return date;
 }
 
 export function set12Hours(date: Date, value: string, period: Period) {
-  const hours = parseInt(getValid12Hour(value), 10);
+  const hours = Number.parseInt(getValid12Hour(value), 10);
   const convertedHours = convert12HourTo24Hour(hours, period);
   date.setHours(convertedHours);
   return date;
@@ -144,9 +144,10 @@ export function getDateByType(date: Date, type: TimePickerType) {
       return getValidMinuteOrSecond(String(date.getSeconds()));
     case "hours":
       return getValidHour(String(date.getHours()));
-    case "12hours":
+    case "12hours": {
       const hours = display12HourValue(date.getHours());
       return getValid12Hour(String(hours));
+    }
     default:
       return "00";
   }
@@ -180,10 +181,9 @@ export function convert12HourTo24Hour(hour: number, period: Period) {
   if (period === "PM") {
     if (hour <= 11) {
       return hour + 12;
-    } else {
-      return hour;
     }
-  } else if (period === "AM") {
+      return hour;
+  }if (period === "AM") {
     if (hour === 12) return 0;
     return hour;
   }

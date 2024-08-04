@@ -12,435 +12,438 @@ import * as z from "zod";
 const POSITION_INCREMENT = 1000;
 
 const taskListSchema = z.object({
-  name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
-  }),
-  description: z
-    .string()
-    .nullable()
-    .transform((val) => (val?.trim()?.length ? val : null)),
-  dueDate: z
-    .string()
-    .nullable()
-    .transform((val) => (val?.trim()?.length ? new Date(val) : null)),
-  status: z.enum(["active", "archived"]),
+	name: z.string().min(2, {
+		message: "Name must be at least 2 characters.",
+	}),
+	description: z
+		.string()
+		.nullable()
+		.transform((val) => (val?.trim()?.length ? val : null)),
+	dueDate: z
+		.string()
+		.nullable()
+		.transform((val) => (val?.trim()?.length ? new Date(val) : null)),
+	status: z.enum(["active", "archived"]),
 });
 
 const taskSchema = z.object({
-  name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
-  }),
-  description: z
-    .string()
-    .nullable()
-    .transform((val) => (val?.trim()?.length ? val : null)),
-  dueDate: z
-    .string()
-    .nullable()
-    .transform((val) => (val?.trim()?.length ? new Date(val) : null)),
-  status: z.enum(["todo", "done"]),
+	name: z.string().min(2, {
+		message: "Name must be at least 2 characters.",
+	}),
+	description: z
+		.string()
+		.nullable()
+		.transform((val) => (val?.trim()?.length ? val : null)),
+	dueDate: z
+		.string()
+		.nullable()
+		.transform((val) => (val?.trim()?.length ? new Date(val) : null)),
+	status: z.enum(["todo", "done"]),
 });
 
 export async function createTaskList(payload: FormData) {
-  const { userId } = await getOwner();
-  const name = payload.get("name") as string;
-  const description = payload.get("description") as string;
-  const dueDate = payload.get("dueDate") as string;
-  const projectId = payload.get("projectId") as string;
+	const { userId } = await getOwner();
+	const name = payload.get("name") as string;
+	const description = payload.get("description") as string;
+	const dueDate = payload.get("dueDate") as string;
+	const projectId = payload.get("projectId") as string;
 
-  const data = taskListSchema.parse({
-    name,
-    description,
-    dueDate,
-    status: "active",
-  });
+	const data = taskListSchema.parse({
+		name,
+		description,
+		dueDate,
+		status: "active",
+	});
 
-  const db = await database();
-  const newTaskList = await db
-    .insert(taskList)
-    .values({
-      ...data,
-      projectId: +projectId,
-      createdByUser: userId,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })
-    .returning()
-    .get();
+	const db = await database();
+	const newTaskList = await db
+		.insert(taskList)
+		.values({
+			...data,
+			projectId: +projectId,
+			createdByUser: userId,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		})
+		.returning()
+		.get();
 
-  await logActivity({
-    action: "created",
-    type: "tasklist",
-    message: `Created task list ${name}`,
-    parentId: newTaskList.id,
-    projectId: +projectId,
-  });
+	await logActivity({
+		action: "created",
+		type: "tasklist",
+		message: `Created task list ${name}`,
+		parentId: newTaskList.id,
+		projectId: +projectId,
+	});
 
-  revalidatePath(`/console/projects/${projectId}/tasklists`);
-  redirect(`/console/projects/${projectId}/tasklists`);
+	revalidatePath(`/console/projects/${projectId}/tasklists`);
+	redirect(`/console/projects/${projectId}/tasklists`);
 }
 
 export async function updateTaskList(payload: FormData) {
-  const id = payload.get("id") as string;
-  const name = payload.get("name") as string;
-  const description = payload.get("description") as string;
-  const dueDate = payload.get("dueDate") as string;
-  const projectId = payload.get("projectId") as string;
+	const id = payload.get("id") as string;
+	const name = payload.get("name") as string;
+	const description = payload.get("description") as string;
+	const dueDate = payload.get("dueDate") as string;
+	const projectId = payload.get("projectId") as string;
 
-  const data = taskListSchema.parse({
-    name,
-    description,
-    dueDate,
-    status: "active",
-  });
+	const data = taskListSchema.parse({
+		name,
+		description,
+		dueDate,
+		status: "active",
+	});
 
-  const db = await database();
-  const currentTasklist = await db.query.taskList
-    .findFirst({
-      where: eq(taskList.id, +id),
-    })
-    .execute();
+	const db = await database();
+	const currentTasklist = await db.query.taskList
+		.findFirst({
+			where: eq(taskList.id, +id),
+		})
+		.execute();
 
-  await db
-    .update(taskList)
-    .set({
-      ...data,
-      updatedAt: new Date(),
-    })
-    .where(eq(taskList.id, +id))
-    .run();
+	await db
+		.update(taskList)
+		.set({
+			...data,
+			updatedAt: new Date(),
+		})
+		.where(eq(taskList.id, +id))
+		.run();
 
-  await logActivity({
-    action: "updated",
-    type: "tasklist",
-    message: `Updated task list ${name}, ${generateObjectDiffMessage(
-      currentTasklist,
-      data
-    )}`,
-    parentId: +id,
-    projectId: +projectId,
-  });
+	if (currentTasklist)
+		await logActivity({
+			action: "updated",
+			type: "tasklist",
+			message: `Updated task list ${name}, ${generateObjectDiffMessage(
+				currentTasklist,
+				data,
+			)}`,
+			parentId: +id,
+			projectId: +projectId,
+		});
 
-  revalidatePath(`/console/projects/${projectId}/tasklists`);
-  redirect(`/console/projects/${projectId}/tasklists`);
+	revalidatePath(`/console/projects/${projectId}/tasklists`);
+	redirect(`/console/projects/${projectId}/tasklists`);
 }
 
 export async function partialUpdateTaskList(
-  id: number,
-  data: { description: string } | { status: string }
+	id: number,
+	data: { description: string } | { status: string },
 ) {
-  const db = await database();
-  const currentTasklist = await db.query.taskList
-    .findFirst({
-      where: eq(taskList.id, +id),
-    })
-    .execute();
+	const db = await database();
+	const currentTasklist = await db.query.taskList
+		.findFirst({
+			where: eq(taskList.id, +id),
+		})
+		.execute();
 
-  const updated = await db
-    .update(taskList)
-    .set({
-      ...data,
-      updatedAt: new Date(),
-    })
-    .where(eq(taskList.id, +id))
-    .returning()
-    .get();
+	const updated = await db
+		.update(taskList)
+		.set({
+			...data,
+			updatedAt: new Date(),
+		})
+		.where(eq(taskList.id, +id))
+		.returning()
+		.get();
 
-  await logActivity({
-    action: "updated",
-    type: "tasklist",
-    message: `Updated task list ${updated.name}, ${generateObjectDiffMessage(
-      currentTasklist,
-      updated
-    )}`,
-    parentId: +id,
-    projectId: +updated.projectId,
-  });
+	if (currentTasklist)
+		await logActivity({
+			action: "updated",
+			type: "tasklist",
+			message: `Updated task list ${updated.name}, ${generateObjectDiffMessage(
+				currentTasklist,
+				updated,
+			)}`,
+			parentId: +id,
+			projectId: +updated.projectId,
+		});
 
-  revalidatePath(`/console/projects/${updated.projectId}/tasklists`);
+	revalidatePath(`/console/projects/${updated.projectId}/tasklists`);
 }
 
 export async function createTask({
-  userId,
-  taskListId,
-  projectId,
-  name,
-  description = "",
-  dueDate = "",
+	userId,
+	taskListId,
+	projectId,
+	name,
+	description = "",
+	dueDate = "",
 }: {
-  userId: string;
-  taskListId: number;
-  projectId: number;
-  name: string;
-  description?: string;
-  dueDate?: string;
+	userId: string;
+	taskListId: number;
+	projectId: number;
+	name: string;
+	description?: string;
+	dueDate?: string;
 }) {
-  const data = taskSchema.parse({
-    name,
-    description,
-    dueDate,
-    status: "todo",
-  });
+	const data = taskSchema.parse({
+		name,
+		description,
+		dueDate,
+		status: "todo",
+	});
 
-  const db = await database();
-  const lastPosition = await db.query.task
-    .findFirst({
-      where: eq(task.taskListId, +taskListId),
-      orderBy: [desc(task.position)],
-    })
-    .execute();
+	const db = await database();
+	const lastPosition = await db.query.task
+		.findFirst({
+			where: eq(task.taskListId, +taskListId),
+			orderBy: [desc(task.position)],
+		})
+		.execute();
 
-  const position = lastPosition?.position
-    ? lastPosition?.position + POSITION_INCREMENT
-    : 1;
+	const position = lastPosition?.position
+		? lastPosition?.position + POSITION_INCREMENT
+		: 1;
 
-  await db
-    .insert(task)
-    .values({
-      ...data,
-      position,
-      taskListId: +taskListId,
-      createdByUser: userId,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })
-    .run();
+	await db
+		.insert(task)
+		.values({
+			...data,
+			position,
+			taskListId: +taskListId,
+			createdByUser: userId,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		})
+		.run();
 
-  await logActivity({
-    action: "created",
-    type: "task",
-    message: `Created task ${name}`,
-    parentId: +taskListId,
-    projectId: +projectId,
-  });
+	await logActivity({
+		action: "created",
+		type: "task",
+		message: `Created task ${name}`,
+		parentId: +taskListId,
+		projectId: +projectId,
+	});
 
-  revalidatePath(`/console/projects/${projectId}/tasklists`);
+	revalidatePath(`/console/projects/${projectId}/tasklists`);
 }
 
 export async function updateTask(
-  id: number,
-  projectId: number,
-  data:
-    | { description: string }
-    | { status: string }
-    | { position: number }
-    | { name: string }
-    | { assignedToUser: string | null }
-    | { dueDate: Date | null }
+	id: number,
+	projectId: number,
+	data:
+		| { description: string }
+		| { status: string }
+		| { position: number }
+		| { name: string }
+		| { assignedToUser: string | null }
+		| { dueDate: Date | null },
 ) {
-  const db = await database();
-  const currentTask = await db.query.task
-    .findFirst({
-      where: eq(task.id, +id),
-    })
-    .execute();
+	const db = await database();
+	const currentTask = await db.query.task
+		.findFirst({
+			where: eq(task.id, +id),
+		})
+		.execute();
 
-  const taskDetails = await db
-    .update(task)
-    .set({
-      ...data,
-      updatedAt: new Date(),
-    })
-    .where(eq(task.id, +id))
-    .returning()
-    .get();
+	const taskDetails = await db
+		.update(task)
+		.set({
+			...data,
+			updatedAt: new Date(),
+		})
+		.where(eq(task.id, +id))
+		.returning()
+		.get();
 
-  await logActivity({
-    action: "updated",
-    type: "task",
-    message: `Updated task ${taskDetails.name}, ${generateObjectDiffMessage(
-      currentTask,
-      taskDetails
-    )}`,
-    parentId: +id,
-    projectId: +projectId,
-  });
+	if (currentTask)
+		await logActivity({
+			action: "updated",
+			type: "task",
+			message: `Updated task ${taskDetails.name}, ${generateObjectDiffMessage(
+				currentTask,
+				taskDetails,
+			)}`,
+			parentId: +id,
+			projectId: +projectId,
+		});
 
-  revalidatePath(`/console/projects/${projectId}/tasklists`);
+	revalidatePath(`/console/projects/${projectId}/tasklists`);
 }
 
 export async function deleteTask({
-  id,
-  projectId,
+	id,
+	projectId,
 }: {
-  id: number;
-  projectId: number;
+	id: number;
+	projectId: number;
 }) {
-  const db = await database();
-  const taskDetails = await db
-    .delete(task)
-    .where(eq(task.id, +id))
-    .returning()
-    .get();
+	const db = await database();
+	const taskDetails = await db
+		.delete(task)
+		.where(eq(task.id, +id))
+		.returning()
+		.get();
 
-  await logActivity({
-    action: "deleted",
-    type: "task",
-    message: `Deleted task ${taskDetails?.name}`,
-    parentId: +id,
-    projectId: +projectId,
-  });
+	await logActivity({
+		action: "deleted",
+		type: "task",
+		message: `Deleted task ${taskDetails?.name}`,
+		parentId: +id,
+		projectId: +projectId,
+	});
 
-  revalidatePath(`/console/projects/${projectId}/tasklists`);
+	revalidatePath(`/console/projects/${projectId}/tasklists`);
 }
 
 export async function repositionTask(
-  id: number,
-  projectId: number,
-  position: number
+	id: number,
+	projectId: number,
+	position: number,
 ) {
-  const db = await database();
-  const taskDetails = await db
-    .update(task)
-    .set({
-      position,
-      updatedAt: new Date(),
-    })
-    .where(eq(task.id, +id))
-    .returning()
-    .get();
+	const db = await database();
+	const taskDetails = await db
+		.update(task)
+		.set({
+			position,
+			updatedAt: new Date(),
+		})
+		.where(eq(task.id, +id))
+		.returning()
+		.get();
 
-  await logActivity({
-    action: "updated",
-    type: "task",
-    message: `Repositioned task ${taskDetails.name}`,
-    parentId: +id,
-    projectId: +projectId,
-  });
+	await logActivity({
+		action: "updated",
+		type: "task",
+		message: `Repositioned task ${taskDetails.name}`,
+		parentId: +id,
+		projectId: +projectId,
+	});
 
-  revalidatePath(`/console/projects/${projectId}/tasklists`);
+	revalidatePath(`/console/projects/${projectId}/tasklists`);
 }
 
 export async function forkTaskList(taskListId: number, projectId: number) {
-  const db = await database();
+	const db = await database();
 
-  const taskListDetails = await db.query.taskList
-    .findFirst({
-      where: eq(taskList.id, +taskListId),
-    })
-    .execute();
-  if (!taskListDetails) {
-    throw new Error("Task list not found");
-  }
+	const taskListDetails = await db.query.taskList
+		.findFirst({
+			where: eq(taskList.id, +taskListId),
+		})
+		.execute();
+	if (!taskListDetails) {
+		throw new Error("Task list not found");
+	}
 
-  await db
-    .update(taskList)
-    .set({
-      status: "archived",
-      updatedAt: new Date(),
-    })
-    .where(eq(taskList.id, +taskListId))
-    .run();
+	await db
+		.update(taskList)
+		.set({
+			status: "archived",
+			updatedAt: new Date(),
+		})
+		.where(eq(taskList.id, +taskListId))
+		.run();
 
-  const newTaskList = await db
-    .insert(taskList)
-    .values({
-      name: taskListDetails.name,
-      description: taskListDetails.description,
-      dueDate: taskListDetails.dueDate,
-      status: "active",
-      projectId: taskListDetails.projectId,
-      createdByUser: taskListDetails.createdByUser,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })
-    .returning()
-    .get();
+	const newTaskList = await db
+		.insert(taskList)
+		.values({
+			name: taskListDetails.name,
+			description: taskListDetails.description,
+			dueDate: taskListDetails.dueDate,
+			status: "active",
+			projectId: taskListDetails.projectId,
+			createdByUser: taskListDetails.createdByUser,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		})
+		.returning()
+		.get();
 
-  await db
-    .update(task)
-    .set({
-      taskListId: newTaskList.id,
-      updatedAt: new Date(),
-    })
-    .where(and(eq(task.taskListId, +taskListId), eq(task.status, "todo")))
-    .run();
+	await db
+		.update(task)
+		.set({
+			taskListId: newTaskList.id,
+			updatedAt: new Date(),
+		})
+		.where(and(eq(task.taskListId, +taskListId), eq(task.status, "todo")))
+		.run();
 
-  await logActivity({
-    action: "updated",
-    type: "tasklist",
-    message: `Forked task list ${taskListDetails.name}`,
-    parentId: +taskListId,
-    projectId: +projectId,
-  });
+	await logActivity({
+		action: "updated",
+		type: "tasklist",
+		message: `Forked task list ${taskListDetails.name}`,
+		parentId: +taskListId,
+		projectId: +projectId,
+	});
 
-  revalidatePath(`/console/projects/${projectId}/tasklists`);
+	revalidatePath(`/console/projects/${projectId}/tasklists`);
 }
 
 export async function getActiveTaskLists(projectId: number) {
-  const db = await database();
-  return db.query.taskList
-    .findMany({
-      where: and(
-        eq(taskList.projectId, projectId),
-        eq(taskList.status, "active")
-      ),
-    })
-    .execute();
+	const db = await database();
+	return db.query.taskList
+		.findMany({
+			where: and(
+				eq(taskList.projectId, projectId),
+				eq(taskList.status, "active"),
+			),
+		})
+		.execute();
 }
 
 export async function copyTaskToTaskList(
-  taskId: number,
-  taskListId: number,
-  projectId: number
+	taskId: number,
+	taskListId: number,
+	projectId: number,
 ) {
-  const { userId } = await getOwner();
-  const db = await database();
+	const { userId } = await getOwner();
+	const db = await database();
 
-  const taskDetails = await db.query.task
-    .findFirst({
-      where: eq(task.id, taskId),
-    })
-    .execute();
+	const taskDetails = await db.query.task
+		.findFirst({
+			where: eq(task.id, taskId),
+		})
+		.execute();
 
-  if (!taskDetails) {
-    throw new Error("Task not found");
-  }
+	if (!taskDetails) {
+		throw new Error("Task not found");
+	}
 
-  const lastPosition = await db.query.task
-    .findFirst({
-      where: eq(task.taskListId, +taskListId),
-      orderBy: [desc(task.position)],
-    })
-    .execute();
+	const lastPosition = await db.query.task
+		.findFirst({
+			where: eq(task.taskListId, +taskListId),
+			orderBy: [desc(task.position)],
+		})
+		.execute();
 
-  const position = lastPosition?.position
-    ? lastPosition?.position + POSITION_INCREMENT
-    : 1;
+	const position = lastPosition?.position
+		? lastPosition?.position + POSITION_INCREMENT
+		: 1;
 
-  await db
-    .insert(task)
-    .values({
-      name: taskDetails.name,
-      description: taskDetails.description,
-      dueDate: taskDetails.dueDate,
-      status: "todo",
-      taskListId: +taskListId,
-      position,
-      createdByUser: userId,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })
-    .run();
+	await db
+		.insert(task)
+		.values({
+			name: taskDetails.name,
+			description: taskDetails.description,
+			dueDate: taskDetails.dueDate,
+			status: "todo",
+			taskListId: +taskListId,
+			position,
+			createdByUser: userId,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		})
+		.run();
 
-  revalidatePath(`/console/projects/${projectId}/tasklists`);
+	revalidatePath(`/console/projects/${projectId}/tasklists`);
 }
 
 export async function moveTaskToTaskList(
-  taskId: number,
-  taskListId: number,
-  projectId: number
+	taskId: number,
+	taskListId: number,
+	projectId: number,
 ) {
-  const db = await database();
+	const db = await database();
 
-  await db
-    .update(task)
-    .set({
-      taskListId: +taskListId,
-      updatedAt: new Date(),
-    })
-    .where(eq(task.id, taskId))
-    .run();
+	await db
+		.update(task)
+		.set({
+			taskListId: +taskListId,
+			updatedAt: new Date(),
+		})
+		.where(eq(task.id, taskId))
+		.run();
 
-  revalidatePath(`/console/projects/${projectId}/tasklists`);
+	revalidatePath(`/console/projects/${projectId}/tasklists`);
 }

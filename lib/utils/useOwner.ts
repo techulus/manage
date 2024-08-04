@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { user } from "@/drizzle/schema";
-import { User } from "@/drizzle/types";
+import type { User } from "@/drizzle/types";
 import { opsDb } from "@/ops/database";
 import { organizationMembers } from "@/ops/schema";
 import dayjs from "dayjs";
@@ -8,7 +8,7 @@ import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { Organization } from "./../../ops/types";
+import type { Organization } from "./../../ops/types";
 import { database } from "./useDatabase";
 
 dayjs.extend(utc);

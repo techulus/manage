@@ -6,68 +6,68 @@ import { deleteFile } from "../blobStore";
 import { database } from "./useDatabase";
 
 interface Link {
-  text: string;
-  url: string;
+	text: string;
+	url: string;
 }
 
 interface Image {
-  alt: string;
-  url: string;
+	alt: string;
+	url: string;
 }
 
 interface Result {
-  links: Link[];
-  images: Image[];
+	links: Link[];
+	images: Image[];
 }
 
 export function convertMarkdownToPlainText(markdown: string | null) {
-  return markdown ? remark().use(strip).processSync(markdown).toString() : "";
+	return markdown ? remark().use(strip).processSync(markdown).toString() : "";
 }
 
 export function extractLinksAndImages(markdownText: string): Result {
-  // Regular expression for links
-  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-  // Regular expression for images
-  const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
+	// Regular expression for links
+	const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+	// Regular expression for images
+	const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
 
-  const links: Link[] = [];
-  const images: Image[] = [];
+	const links: Link[] = [];
+	const images: Image[] = [];
 
-  let match: RegExpExecArray | null;
+	while (true) {
+		const match = linkRegex.exec(markdownText);
+		if (!match) break;
+		links.push({ text: match[1], url: match[2] });
+	}
 
-  // Find all matches for links
-  while ((match = linkRegex.exec(markdownText)) !== null) {
-    links.push({ text: match[1], url: match[2] });
-  }
+	while (true) {
+		const match = imageRegex.exec(markdownText);
+		if (!match) break;
+		images.push({ alt: match[1], url: match[2] });
+	}
 
-  // Find all matches for images
-  while ((match = imageRegex.exec(markdownText)) !== null) {
-    images.push({ alt: match[1], url: match[2] });
-  }
-
-  return { links, images };
+	return { links, images };
 }
 
 export async function deleteFilesInMarkdown(content: string) {
-  const { links, images } = extractLinksAndImages(content);
+	const { links, images } = extractLinksAndImages(content);
 
-  for (const linkedFile of [...images, ...links]) {
-    if (!linkedFile.url.includes("/api/blob")) {
-      continue;
-    }
+	for (const linkedFile of [...images, ...links]) {
+		if (!linkedFile.url.includes("/api/blob")) {
+			continue;
+		}
 
-    const parts = linkedFile.url.split("/");
-    const fileId = parts[parts.length - 2];
-    try {
-      const db = await database();
-      const file = await db.query.blob.findFirst({
-        where: eq(blob.id, fileId),
-      });
-      if (file) {
-        await deleteFile(file.key);
-      }
-    } catch (error) {
-      console.error("Error deleting file", error);
-    }
-  }
+		const parts = linkedFile.url.split("/");
+		const fileId = parts[parts.length - 2];
+		try {
+			const db = await database();
+			const file = await db.query.blob.findFirst({
+				where: eq(blob.id, fileId),
+			});
+			if (file) {
+				await deleteFile(file.key);
+			}
+		} catch (error) {
+			console.error("Error deleting file", error);
+		}
+	}
 }

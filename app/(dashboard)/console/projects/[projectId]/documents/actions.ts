@@ -12,294 +12,297 @@ import { redirect } from "next/navigation";
 import * as z from "zod";
 
 const documentSchema = z.object({
-  name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
-  }),
-  markdownContent: z.string(),
-  status: z.enum(["active", "archived"]),
+	name: z.string().min(2, {
+		message: "Name must be at least 2 characters.",
+	}),
+	markdownContent: z.string(),
+	status: z.enum(["active", "archived"]),
 });
 
 const documentFolderSchema = z.object({
-  name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
-  }),
-  description: z.string(),
+	name: z.string().min(2, {
+		message: "Name must be at least 2 characters.",
+	}),
+	description: z.string(),
 });
 
 export async function createDocument(payload: FormData) {
-  const { userId } = await getOwner();
-  const name = payload.get("name") as string;
-  const markdownContent = payload.get("markdownContent") as string;
-  const projectId = payload.get("projectId") as string;
-  const folderId = (payload.get("folderId") as string) ?? null;
+	const { userId } = await getOwner();
+	const name = payload.get("name") as string;
+	const markdownContent = payload.get("markdownContent") as string;
+	const projectId = payload.get("projectId") as string;
+	const folderId = (payload.get("folderId") as string) ?? null;
 
-  const data = documentSchema.parse({
-    name,
-    markdownContent,
-    status: "active",
-  });
+	const data = documentSchema.parse({
+		name,
+		markdownContent,
+		status: "active",
+	});
 
-  const db = await database();
-  await db
-    .insert(document)
-    .values({
-      ...data,
-      projectId: +projectId,
-      folderId: folderId ? +folderId : null,
-      createdByUser: userId,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })
-    .run();
+	const db = await database();
+	await db
+		.insert(document)
+		.values({
+			...data,
+			projectId: +projectId,
+			folderId: folderId ? +folderId : null,
+			createdByUser: userId,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		})
+		.run();
 
-  await logActivity({
-    action: "created",
-    type: "document",
-    message: `Created document ${name}`,
-    parentId: +folderId,
-    projectId: +projectId,
-  });
+	await logActivity({
+		action: "created",
+		type: "document",
+		message: `Created document ${name}`,
+		parentId: +folderId,
+		projectId: +projectId,
+	});
 
-  revalidatePath(`/console/projects/${projectId}`);
+	revalidatePath(`/console/projects/${projectId}`);
 
-  if (folderId) {
-    revalidatePath(
-      `/console/projects/${projectId}/documents/folders/${folderId}`
-    );
-    redirect(`/console/projects/${projectId}/documents/folders/${folderId}`);
-  } else {
-    redirect(`/console/projects/${projectId}/documents`);
-  }
+	if (folderId) {
+		revalidatePath(
+			`/console/projects/${projectId}/documents/folders/${folderId}`,
+		);
+		redirect(`/console/projects/${projectId}/documents/folders/${folderId}`);
+	} else {
+		redirect(`/console/projects/${projectId}/documents`);
+	}
 }
 
 export async function updateDocument(payload: FormData) {
-  const name = payload.get("name") as string;
-  const markdownContent = payload.get("markdownContent") as string;
-  const id = payload.get("id") as string;
-  const projectId = payload.get("projectId") as string;
-  const folderId = (payload.get("folderId") as string) ?? null;
+	const name = payload.get("name") as string;
+	const markdownContent = payload.get("markdownContent") as string;
+	const id = payload.get("id") as string;
+	const projectId = payload.get("projectId") as string;
+	const folderId = (payload.get("folderId") as string) ?? null;
 
-  const data = documentSchema.parse({
-    name,
-    markdownContent,
-    status: "active",
-  });
+	const data = documentSchema.parse({
+		name,
+		markdownContent,
+		status: "active",
+	});
 
-  const db = await database();
-  const currentDocument = await db.query.document
-    .findFirst({ where: eq(document.id, +id) })
-    .execute();
+	const db = await database();
+	const currentDocument = await db.query.document
+		.findFirst({ where: eq(document.id, +id) })
+		.execute();
 
-  const documentDetails = await db
-    .update(document)
-    .set({
-      ...data,
-      updatedAt: new Date(),
-    })
-    .where(eq(document.id, +id))
-    .returning()
-    .get();
+	const documentDetails = await db
+		.update(document)
+		.set({
+			...data,
+			updatedAt: new Date(),
+		})
+		.where(eq(document.id, +id))
+		.returning()
+		.get();
 
-  await logActivity({
-    action: "updated",
-    type: "document",
-    message: `Updated document ${
-      documentDetails.name
-    }, ${generateObjectDiffMessage(currentDocument, data)}`,
-    parentId: +id,
-    projectId: +projectId,
-  });
+	if (currentDocument) {
+		await logActivity({
+			action: "updated",
+			type: "document",
+			message: `Updated document ${
+				documentDetails.name
+			}, ${generateObjectDiffMessage(currentDocument, data)}`,
+			parentId: +id,
+			projectId: +projectId,
+		});
+	}
 
-  revalidatePath(`/console/projects/${projectId}`);
+	revalidatePath(`/console/projects/${projectId}`);
 
-  if (folderId) {
-    revalidatePath(
-      `/console/projects/${projectId}/documents/folders/${folderId}`
-    );
-    redirect(`/console/projects/${projectId}/documents/folders/${folderId}`);
-  } else {
-    redirect(`/console/projects/${projectId}/documents/${id}`);
-  }
+	if (folderId) {
+		revalidatePath(
+			`/console/projects/${projectId}/documents/folders/${folderId}`,
+		);
+		redirect(`/console/projects/${projectId}/documents/folders/${folderId}`);
+	} else {
+		redirect(`/console/projects/${projectId}/documents/${id}`);
+	}
 }
 
 export async function createDocumentFolder(payload: FormData) {
-  const { userId } = await getOwner();
-  const name = payload.get("name") as string;
-  const description = payload.get("description") as string;
-  const projectId = payload.get("projectId") as string;
+	const { userId } = await getOwner();
+	const name = payload.get("name") as string;
+	const description = payload.get("description") as string;
+	const projectId = payload.get("projectId") as string;
 
-  const data = documentFolderSchema.parse({
-    name,
-    description,
-  });
+	const data = documentFolderSchema.parse({
+		name,
+		description,
+	});
 
-  const db = await database();
-  await db
-    .insert(documentFolder)
-    .values({
-      ...data,
-      projectId: +projectId,
-      createdByUser: userId,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })
-    .run();
+	const db = await database();
+	await db
+		.insert(documentFolder)
+		.values({
+			...data,
+			projectId: +projectId,
+			createdByUser: userId,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		})
+		.run();
 
-  await logActivity({
-    action: "created",
-    type: "folder",
-    message: `Created document folder ${name}`,
-    parentId: +projectId,
-    projectId: +projectId,
-  });
+	await logActivity({
+		action: "created",
+		type: "folder",
+		message: `Created document folder ${name}`,
+		parentId: +projectId,
+		projectId: +projectId,
+	});
 
-  revalidatePath(`/console/projects/${projectId}`);
-  revalidatePath(`/console/projects/${projectId}/documents`);
-  redirect(`/console/projects/${projectId}/documents`);
+	revalidatePath(`/console/projects/${projectId}`);
+	revalidatePath(`/console/projects/${projectId}/documents`);
+	redirect(`/console/projects/${projectId}/documents`);
 }
 
 export async function updateDocumentFolder(payload: FormData) {
-  const name = payload.get("name") as string;
-  const description = payload.get("description") as string;
-  const id = payload.get("id") as string;
-  const projectId = payload.get("projectId") as string;
+	const name = payload.get("name") as string;
+	const description = payload.get("description") as string;
+	const id = payload.get("id") as string;
+	const projectId = payload.get("projectId") as string;
 
-  const data = documentFolderSchema.parse({
-    name,
-    description,
-  });
+	const data = documentFolderSchema.parse({
+		name,
+		description,
+	});
 
-  const db = await database();
-  const currentFolder = await db.query.documentFolder
-    .findFirst({ where: eq(documentFolder.id, +id) })
-    .execute();
+	const db = await database();
+	const currentFolder = await db.query.documentFolder
+		.findFirst({ where: eq(documentFolder.id, +id) })
+		.execute();
 
-  const folderDetails = await db
-    .update(documentFolder)
-    .set({
-      ...data,
-      updatedAt: new Date(),
-    })
-    .where(eq(documentFolder.id, +id))
-    .returning()
-    .get();
+	const folderDetails = await db
+		.update(documentFolder)
+		.set({
+			...data,
+			updatedAt: new Date(),
+		})
+		.where(eq(documentFolder.id, +id))
+		.returning()
+		.get();
 
-  await logActivity({
-    action: "updated",
-    type: "folder",
-    message: `Updated document folder ${
-      folderDetails.name
-    }, ${generateObjectDiffMessage(currentFolder, data)}`,
-    parentId: +id,
-    projectId: +projectId,
-  });
+	if (currentFolder)
+		await logActivity({
+			action: "updated",
+			type: "folder",
+			message: `Updated document folder ${
+				folderDetails.name
+			}, ${generateObjectDiffMessage(currentFolder, data)}`,
+			parentId: +id,
+			projectId: +projectId,
+		});
 
-  revalidatePath(`/console/projects/${projectId}`);
-  revalidatePath(`/console/projects/${projectId}/documents/folders/${id}`);
-  redirect(`/console/projects/${projectId}/documents/folders/${id}`);
+	revalidatePath(`/console/projects/${projectId}`);
+	revalidatePath(`/console/projects/${projectId}/documents/folders/${id}`);
+	redirect(`/console/projects/${projectId}/documents/folders/${id}`);
 }
 
 export async function deleteDocumentFolder(payload: FormData) {
-  const id = payload.get("id") as string;
-  const projectId = payload.get("projectId") as string;
-  const currentPath = payload.get("currentPath") as string;
+	const id = payload.get("id") as string;
+	const projectId = payload.get("projectId") as string;
+	const currentPath = payload.get("currentPath") as string;
 
-  const db = await database();
-  const [folderDetails, ..._] = await Promise.all([
-    db
-      .delete(documentFolder)
-      .where(eq(documentFolder.id, +id))
-      .returning()
-      .get(),
-    db
-      .delete(comment)
-      .where(and(eq(comment.type, "folder"), eq(comment.parentId, +id)))
-      .run(),
-  ]);
+	const db = await database();
+	const [folderDetails, ..._] = await Promise.all([
+		db
+			.delete(documentFolder)
+			.where(eq(documentFolder.id, +id))
+			.returning()
+			.get(),
+		db
+			.delete(comment)
+			.where(and(eq(comment.type, "folder"), eq(comment.parentId, +id)))
+			.run(),
+	]);
 
-  await logActivity({
-    action: "deleted",
-    type: "folder",
-    message: `Deleted document folder ${folderDetails?.name}`,
-    parentId: +id,
-    projectId: +projectId,
-  });
+	await logActivity({
+		action: "deleted",
+		type: "folder",
+		message: `Deleted document folder ${folderDetails?.name}`,
+		parentId: +id,
+		projectId: +projectId,
+	});
 
-  revalidatePath(currentPath);
-  redirect(`/console/projects/${projectId}/documents`);
+	revalidatePath(currentPath);
+	redirect(`/console/projects/${projectId}/documents`);
 }
 
 export async function deleteDocument(
-  id: string,
-  projectId: string,
-  content: string | null,
-  folderId: number | null
+	id: string,
+	projectId: string,
+	content: string | null,
+	folderId: number | null,
 ) {
-  if (content) {
-    await deleteFilesInMarkdown(content);
-  }
+	if (content) {
+		await deleteFilesInMarkdown(content);
+	}
 
-  const db = await database();
-  const [documentDetails, ..._] = await Promise.all([
-    db.delete(document).where(eq(document.id, +id)).returning().get(),
-    db
-      .delete(comment)
-      .where(and(eq(comment.type, "document"), eq(comment.parentId, +id)))
-      .run(),
-  ]);
+	const db = await database();
+	const [documentDetails, ..._] = await Promise.all([
+		db.delete(document).where(eq(document.id, +id)).returning().get(),
+		db
+			.delete(comment)
+			.where(and(eq(comment.type, "document"), eq(comment.parentId, +id)))
+			.run(),
+	]);
 
-  await logActivity({
-    action: "deleted",
-    type: "document",
-    message: `Deleted document ${documentDetails?.name}`,
-    parentId: +id,
-    projectId: +projectId,
-  });
+	await logActivity({
+		action: "deleted",
+		type: "document",
+		message: `Deleted document ${documentDetails?.name}`,
+		parentId: +id,
+		projectId: +projectId,
+	});
 
-  if (folderId) {
-    revalidatePath(
-      `/console/projects/${projectId}/documents/folders/${folderId}`
-    );
-    revalidatePath(`/console/projects/${projectId}/documents/${id}`);
-    redirect(`/console/projects/${projectId}/documents/folders/${folderId}`);
-  }
+	if (folderId) {
+		revalidatePath(
+			`/console/projects/${projectId}/documents/folders/${folderId}`,
+		);
+		revalidatePath(`/console/projects/${projectId}/documents/${id}`);
+		redirect(`/console/projects/${projectId}/documents/folders/${folderId}`);
+	}
 
-  revalidatePath(`/console/projects/${projectId}`);
-  revalidatePath(`/console/projects/${projectId}/documents`);
-  revalidatePath(`/console/projects/${projectId}/documents/${id}`);
-  redirect(`/console/projects/${projectId}/documents`);
+	revalidatePath(`/console/projects/${projectId}`);
+	revalidatePath(`/console/projects/${projectId}/documents`);
+	revalidatePath(`/console/projects/${projectId}/documents/${id}`);
+	redirect(`/console/projects/${projectId}/documents`);
 }
 
 export async function reloadDocuments(
-  projectId: string | number,
-  folderId: string | number | null
+	projectId: string | number,
+	folderId: string | number | null,
 ) {
-  if (folderId) {
-    revalidatePath(
-      `/console/projects/${projectId}/documents/folders/${folderId}`
-    );
-    redirect(`/console/projects/${projectId}/documents/folders/${folderId}`);
-  }
+	if (folderId) {
+		revalidatePath(
+			`/console/projects/${projectId}/documents/folders/${folderId}`,
+		);
+		redirect(`/console/projects/${projectId}/documents/folders/${folderId}`);
+	}
 
-  revalidatePath(`/console/projects/${projectId}`);
-  redirect(`/console/projects/${projectId}`);
+	revalidatePath(`/console/projects/${projectId}`);
+	redirect(`/console/projects/${projectId}`);
 }
 
 export async function deleteBlob(file: { id: string; key: string }) {
-  await deleteFile(file.key);
+	await deleteFile(file.key);
 
-  const db = await database();
-  const blobDetails = await db
-    .delete(blob)
-    .where(eq(blob.id, file.id))
-    .returning()
-    .get();
+	const db = await database();
+	const blobDetails = await db
+		.delete(blob)
+		.where(eq(blob.id, file.id))
+		.returning()
+		.get();
 
-  await logActivity({
-    action: "deleted",
-    type: "blob",
-    message: `Deleted file ${blobDetails?.name}`,
-    parentId: +file.id,
-    projectId: +file.id,
-  });
+	await logActivity({
+		action: "deleted",
+		type: "blob",
+		message: `Deleted file ${blobDetails?.name}`,
+		parentId: +file.id,
+		projectId: +file.id,
+	});
 }

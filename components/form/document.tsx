@@ -1,7 +1,7 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { Document } from "@/drizzle/types";
+import type { Document } from "@/drizzle/types";
 import MarkdownEditor from "../editor";
 
 export default function DocumentForm({ item }: { item?: Document | null }) {

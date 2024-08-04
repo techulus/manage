@@ -4,7 +4,7 @@ import {
   reloadDocuments,
 } from "@/app/(dashboard)/console/projects/[projectId]/documents/actions";
 import { DeleteButton } from "@/components/form/button";
-import { BlobWithCreater } from "@/drizzle/types";
+import type { BlobWithCreater } from "@/drizzle/types";
 import { getFileUrl } from "@/lib/blobStore";
 import Link from "next/link";
 import { CreatorDetails } from "../shared/creator-details";

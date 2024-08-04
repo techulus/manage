@@ -1,4 +1,4 @@
-import { DocumentFolderWithDocuments } from "@/drizzle/types";
+import type { DocumentFolderWithDocuments } from "@/drizzle/types";
 import Link from "next/link";
 import { CreatorDetails } from "../shared/creator-details";
 

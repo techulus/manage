@@ -1,5 +1,5 @@
 import { calendarEvent, document, project, taskList } from "@/drizzle/schema";
-import { ProjectWithCreator, ProjectWithData } from "@/drizzle/types";
+import type { ProjectWithCreator, ProjectWithData } from "@/drizzle/types";
 import dayjs from "dayjs";
 import { and, between, eq, isNotNull, isNull, like, or } from "drizzle-orm";
 import { database } from "./useDatabase";

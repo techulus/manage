@@ -1,7 +1,7 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { EventWithInvites, User } from "@/drizzle/types";
+import type { EventWithInvites, User } from "@/drizzle/types";
 import { Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import { RRule, rrulestr } from "rrule";

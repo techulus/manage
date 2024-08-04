@@ -1,4 +1,4 @@
-import { DocumentWithCreator } from "@/drizzle/types";
+import type { DocumentWithCreator } from "@/drizzle/types";
 import { convertMarkdownToPlainText } from "@/lib/utils/useMarkdown";
 import Link from "next/link";
 import { CreatorDetails } from "../shared/creator-details";

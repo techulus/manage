@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User } from "@/drizzle/types";
+import type { User } from "@/drizzle/types";
 
 export const CreatorDetails = ({
   user,

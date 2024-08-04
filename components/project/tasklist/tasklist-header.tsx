@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { TaskList } from "@/drizzle/types";
+import type { TaskList } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { CircleEllipsisIcon } from "lucide-react";
 import Link from "next/link";

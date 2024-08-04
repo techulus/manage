@@ -58,7 +58,7 @@ export default async function DocumentDetails({ params }: Props) {
         <div className="flex justify-between p-1">
           {/* Left buttons */}
           <div className="isolate inline-flex sm:space-x-3">
-            <span className="inline-flex space-x-1"></span>
+            <span className="inline-flex space-x-1" />
           </div>
 
           {/* Right buttons */}
