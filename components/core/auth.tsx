@@ -25,10 +25,11 @@ export const OrgSwitcher = ({
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="flex w-full items-center justify-between"
+          size="sm"
+          className="flex w-full items-center justify-between px-2 py-1 focus:outline-none"
         >
           <span className="truncate">{activeOrg?.name ?? "Personal"}</span>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="ml-1 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
@@ -100,7 +101,7 @@ export const UserButton = () => {
           size="icon"
           className="overflow-hidden rounded-full"
         >
-          <User className="h-5 w-5" />
+          <User className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

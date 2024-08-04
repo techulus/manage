@@ -2,7 +2,6 @@
 
 import { createToastWrapper } from "@/components/core/toast";
 import { ActionButton } from "@/components/form/button";
-import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,16 +14,36 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn } from "next-auth/webauthn";
+import Image from "next/image";
+import Link from "next/link";
 import toast from "react-hot-toast";
+import logo from "../../../public/images/logo.png";
 import { login } from "../actions";
 
 export default function SignInForm() {
   return (
     <div className="m-6 flex h-full items-center justify-center">
-      <Header />
       {createToastWrapper("dark")}
 
       <Card className="w-full max-w-md">
+        <div className="flex p-6 lg:flex-1">
+          <Image
+            src={logo}
+            alt="Manage"
+            width={32}
+            height={32}
+            className="-mt-2 mr-2 rounded-md"
+          />
+
+          <Link href="/" className="-m-1.5 p-1.5" prefetch={false}>
+            <p className="relative tracking-tight">
+              Manage
+              <sup className="absolute left-[calc(100%+.1rem)] top-0 text-xs">
+                [beta]
+              </sup>
+            </p>
+          </Link>
+        </div>
         <CardHeader>
           <CardTitle className="text-hero text-4xl">Get Started</CardTitle>
           <CardDescription>
