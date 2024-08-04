@@ -28,14 +28,6 @@ export const user = sqliteTable("User", {
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
 });
 
-export const userRelations = relations(user, ({ many }) => ({
-  projects: many(project),
-  documents: many(document),
-  taskLists: many(taskList),
-  events: many(calendarEvent),
-  eventInvites: many(eventInvite),
-}));
-
 export const project = sqliteTable("Project", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
@@ -148,23 +140,6 @@ export const task = sqliteTable("Task", {
     .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
 });
 
-export const taskRelations = relations(task, ({ one }) => ({
-  creator: one(user, {
-    fields: [task.createdByUser],
-    references: [user.id],
-    relationName: "creator",
-  }),
-  assignee: one(user, {
-    fields: [task.assignedToUser],
-    references: [user.id],
-    relationName: "assignee",
-  }),
-  taskList: one(taskList, {
-    fields: [task.taskListId],
-    references: [taskList.id],
-  }),
-}));
-
 export const taskList = sqliteTable("TaskList", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
@@ -180,18 +155,6 @@ export const taskList = sqliteTable("TaskList", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
 });
-
-export const taskListRelations = relations(taskList, ({ many, one }) => ({
-  creator: one(user, {
-    fields: [taskList.createdByUser],
-    references: [user.id],
-  }),
-  project: one(project, {
-    fields: [taskList.projectId],
-    references: [project.id],
-  }),
-  tasks: many(task),
-}));
 
 export const blob = sqliteTable("Blob", {
   id: text("id").notNull().primaryKey(),
@@ -213,17 +176,6 @@ export const blob = sqliteTable("Blob", {
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
 });
 
-export const blobsRelations = relations(blob, ({ one }) => ({
-  creator: one(user, {
-    fields: [blob.createdByUser],
-    references: [user.id],
-  }),
-  folder: one(documentFolder, {
-    fields: [blob.documentFolderId],
-    references: [documentFolder.id],
-  }),
-}));
-
 export const calendarEvent = sqliteTable("Event", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
@@ -242,21 +194,6 @@ export const calendarEvent = sqliteTable("Event", {
     .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
 });
 
-export const calendarEventRelations = relations(
-  calendarEvent,
-  ({ one, many }) => ({
-    creator: one(user, {
-      fields: [calendarEvent.createdByUser],
-      references: [user.id],
-    }),
-    project: one(project, {
-      fields: [calendarEvent.projectId],
-      references: [project.id],
-    }),
-    invites: many(eventInvite),
-  })
-);
-
 export const eventInvite = sqliteTable("CalendarEventInvite", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
   eventId: integer("eventId")
@@ -274,17 +211,6 @@ export const eventInvite = sqliteTable("CalendarEventInvite", {
     .default(sql`(unixepoch())`),
 });
 
-export const eventInviteRelations = relations(eventInvite, ({ one }) => ({
-  event: one(calendarEvent, {
-    fields: [eventInvite.eventId],
-    references: [calendarEvent.id],
-  }),
-  user: one(user, {
-    fields: [eventInvite.userId],
-    references: [user.id],
-  }),
-}));
-
 export const comment = sqliteTable("Comment", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
   content: text("content").notNull(),
@@ -296,13 +222,6 @@ export const comment = sqliteTable("Comment", {
   type: text("type").notNull(),
   parentId: integer("parentId").notNull(),
 });
-
-export const commentRelations = relations(comment, ({ one }) => ({
-  creator: one(user, {
-    fields: [comment.createdByUser],
-    references: [user.id],
-  }),
-}));
 
 export const activity = sqliteTable("Activity", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
@@ -318,14 +237,3 @@ export const activity = sqliteTable("Activity", {
     .references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
 });
-
-export const activityRelations = relations(activity, ({ one }) => ({
-  actor: one(user, {
-    fields: [activity.userId],
-    references: [user.id],
-  }),
-  project: one(project, {
-    fields: [activity.projectId],
-    references: [project.id],
-  }),
-}));
