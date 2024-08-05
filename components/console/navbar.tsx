@@ -20,62 +20,55 @@ export default function NavBar({
 	orgs: Organization[];
 	activeOrg: Organization | undefined;
 }) {
-	const { theme } = useTheme();
+	const { systemTheme: theme } = useTheme();
 	const path = usePathname();
 	const { projectId } = useParams();
+	const orgSlug = activeOrg?.slug ?? "personal";
 
 	const [isSticky, ref] = useDetectSticky();
 
-	const tabs = useMemo(
-		() =>
-			projectId
-				? [
-						{
-							name: "Overview",
-							href: `/console/projects/${projectId}`,
-							current: path === `/console/projects/${projectId}`,
-						},
-						{
-							name: "Task Lists",
-							href: `/console/projects/${projectId}/tasklists`,
-							current: path.startsWith(
-								`/console/projects/${projectId}/tasklists`,
-							),
-						},
-						{
-							name: "Docs & Files",
-							href: `/console/projects/${projectId}/documents`,
-							current: path.startsWith(
-								`/console/projects/${projectId}/documents`,
-							),
-						},
-						{
-							name: "Events",
-							href: `/console/projects/${projectId}/events`,
-							current: path.startsWith(`/console/projects/${projectId}/events`),
-						},
-						{
-							name: "Activity",
-							href: `/console/projects/${projectId}/activity`,
-							current: path.startsWith(
-								`/console/projects/${projectId}/activity`,
-							),
-						},
-					]
-				: [
-						{
-							name: "Projects",
-							href: "/console/projects",
-							current: path.startsWith("/console/projects"),
-						},
-						{
-							name: "Settings",
-							href: "/console/settings",
-							current: path === "/console/settings",
-						},
-					],
-		[path, projectId],
-	);
+	const tabs = useMemo(() => {
+		return projectId
+			? [
+					{
+						name: "Overview",
+						href: `/${orgSlug}/projects/${projectId}`,
+						current: path.endsWith(`/projects/${projectId}`),
+					},
+					{
+						name: "Task Lists",
+						href: `/${orgSlug}/projects/${projectId}/tasklists`,
+						current: path.endsWith(`/projects/${projectId}/tasklists`),
+					},
+					{
+						name: "Docs & Files",
+						href: `/${orgSlug}/projects/${projectId}/documents`,
+						current: path.endsWith(`/projects/${projectId}/documents`),
+					},
+					{
+						name: "Events",
+						href: `/${orgSlug}/projects/${projectId}/events`,
+						current: path.endsWith(`/projects/${projectId}/events`),
+					},
+					{
+						name: "Activity",
+						href: `/${orgSlug}/projects/${projectId}/activity`,
+						current: path.endsWith(`/projects/${projectId}/activity`),
+					},
+				]
+			: [
+					{
+						name: "Projects",
+						href: "./projects",
+						current: path.endsWith("/projects"),
+					},
+					{
+						name: "Settings",
+						href: "./settings",
+						current: path.endsWith("/settings"),
+					},
+				];
+	}, [path, projectId, orgSlug]);
 	return (
 		<>
 			{createToastWrapper(theme)}
@@ -83,7 +76,7 @@ export default function NavBar({
 				<div className="mx-auto px-4 lg:px-8">
 					<div className="relative flex h-16 items-center justify-between">
 						<div className="ml-1 flex items-center justify-center">
-							<Link href="/console/projects" prefetch={false}>
+							<Link href={`/${orgSlug}/projects`} prefetch={false}>
 								<div className="lg:px-0">
 									<Image
 										src={logo}
@@ -114,7 +107,7 @@ export default function NavBar({
 						</div>
 
 						<div className="ml-2 flex justify-center">
-							<UserButton />
+							<UserButton orgSlug={orgSlug} />
 						</div>
 					</div>
 				</div>

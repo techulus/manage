@@ -5,7 +5,7 @@ import {
 	deleteTask,
 	moveTaskToTaskList,
 	updateTask,
-} from "@/app/(dashboard)/console/projects/[projectId]/tasklists/actions";
+} from "@/app/(dashboard)/[tenant]/projects/[projectId]/tasklists/actions";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,

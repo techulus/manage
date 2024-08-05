@@ -3,7 +3,7 @@
 import {
 	getActiveTaskLists,
 	repositionTask,
-} from "@/app/(dashboard)/console/projects/[projectId]/tasklists/actions";
+} from "@/app/(dashboard)/[tenant]/projects/[projectId]/tasklists/actions";
 import type { TaskList, TaskListWithTasks, User } from "@/drizzle/types";
 import {
 	DndContext,
@@ -30,6 +30,7 @@ export const TaskListItem = ({
 	userId,
 	projectId,
 	users,
+	orgSlug,
 	createTask,
 	partialUpdateTaskList,
 	hideHeader = false,
@@ -39,6 +40,7 @@ export const TaskListItem = ({
 	userId: string;
 	projectId: number;
 	users: User[];
+	orgSlug: string;
 	createTask: (data: {
 		name: string;
 		userId: string;
@@ -115,6 +117,7 @@ export const TaskListItem = ({
 					taskList={taskList}
 					totalCount={taskList.tasks.length}
 					doneCount={doneItems.length}
+					orgSlug={orgSlug}
 					partialUpdateTaskList={partialUpdateTaskList}
 				/>
 			) : null}
@@ -127,6 +130,7 @@ export const TaskListItem = ({
 
 			<div className="flex flex-col justify-center">
 				<DndContext
+					id="tasklist-dnd"
 					sensors={sensors}
 					collisionDetection={closestCenter}
 					onDragEnd={handleDragEnd}

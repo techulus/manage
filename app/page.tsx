@@ -105,7 +105,7 @@ export default async function Home() {
 						</p>
 						<div className="mt-10 flex flex-col items-center justify-center gap-y-6 md:flex-row md:gap-x-6 md:gap-y-0">
 							{/* <Link
-                href="/console/projects"
+                href="/start"
                 prefetch={false}
               >
                 Get started
@@ -224,7 +224,6 @@ export default async function Home() {
 							</ul>
 							<a
 								href={tier.href}
-								aria-describedby={tier.id}
 								className={cn(
 									buttonVariants({
 										variant: tier.featured ? "default" : "outline",

@@ -11,11 +11,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			apiKey: process.env.RESEND_API_KEY,
 			from: "account@email.managee.xyz",
 		}),
-		Passkey,
+		// Passkey,
 	],
 	pages: {
 		signIn: "/sign-in",
-		newUser: "/console/start",
+		newUser: "/start",
 	},
 	experimental: { enableWebAuthn: true },
 });

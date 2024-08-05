@@ -12,12 +12,14 @@ export default function EventsCalendar({
 	events,
 	selectedDate = new Date().toISOString(),
 	compact = false,
+	orgSlug,
 }: {
 	projectId: string;
 	userId: string;
 	events: EventWithInvites[];
 	selectedDate?: string;
 	compact?: boolean;
+	orgSlug: string;
 }) {
 	const router = useRouter();
 
@@ -30,7 +32,7 @@ export default function EventsCalendar({
 					name="date"
 					onSelect={(date) => {
 						router.push(
-							`/console/projects/${projectId}/events?date=${date.toISOString()}`,
+							`/${orgSlug}/projects/${projectId}/events?date=${date.toISOString()}`,
 						);
 					}}
 				/>
@@ -42,12 +44,13 @@ export default function EventsCalendar({
 				selected={new Date(selectedDate)}
 				onDayClick={(date) => {
 					router.push(
-						`/console/projects/${projectId}/events?date=${date.toISOString()}`,
+						`/${orgSlug}/projects/${projectId}/events?date=${date.toISOString()}`,
 					);
 				}}
 			/>
 
 			<EventsList
+				orgSlug={orgSlug}
 				events={events}
 				projectId={projectId}
 				userId={userId}

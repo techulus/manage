@@ -15,7 +15,7 @@ export type BlobUploadResult = {
 };
 
 export async function PUT(request: NextRequest) {
-	const { ownerId, userId } = await getOwner();
+	const { ownerId, userId, orgSlug } = await getOwner();
 	const body = await request.blob();
 	const extension = mime.extension(body.type);
 	const folder = request.nextUrl.searchParams.get("folder") ?? null;
@@ -59,12 +59,12 @@ export async function PUT(request: NextRequest) {
 				.run();
 
 			revalidatePath(
-				`/console/projects/${projectId}/documents/folders/${folder}`,
+				`/${orgSlug}/projects/${projectId}/documents/folders/${folder}`,
 			);
 
 			return NextResponse.json<BlobUploadResult>({
 				message: "ok",
-				url: `${getAppBaseUrl()}/console/projects/${projectId}/documents/folders/${folder}`,
+				url: `${getAppBaseUrl()}/${orgSlug}/projects/${projectId}/documents/folders/${folder}`,
 			});
 		}
 
@@ -94,7 +94,7 @@ export async function PUT(request: NextRequest) {
 
 		if (folder) {
 			revalidatePath(
-				`/console/projects/${projectId}/documents/folders/${folder}`,
+				`/${orgSlug}/projects/${projectId}/documents/folders/${folder}`,
 			);
 		}
 
