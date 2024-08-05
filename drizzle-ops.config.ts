@@ -12,7 +12,7 @@ if (!process.env.DATABASE_AUTH_TOKEN) {
 
 export default {
 	schema: "./ops/schema.ts",
-	out: "./ops/migrations",
+	out: "./ops",
 	driver: "turso",
 	dialect: "sqlite",
 	dbCredentials: {
