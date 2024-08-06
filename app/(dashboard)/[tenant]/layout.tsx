@@ -9,15 +9,19 @@ export const dynamic = "force-dynamic"; // disable static generation for console
 
 export default async function ConsoleLayout({
 	children,
+	params,
 }: {
 	children: React.ReactNode;
+	params: {
+		tenant: string;
+	};
 }) {
 	const ready = await isDatabaseReady();
-	const { orgId } = await getOwner();
+	const { orgId, orgSlug } = await getOwner();
 	const orgs = await getOrgs();
 	const activatedOrg = orgs.find((org) => org.id === orgId);
 
-	if (!ready) {
+	if (!ready || params.tenant !== orgSlug) {
 		redirect("/start");
 	}
 

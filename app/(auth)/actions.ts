@@ -20,12 +20,15 @@ export async function switchOrganization(payload: FormData) {
 		cookies().set("activeOrgId", orgId ?? null, {
 			httpOnly: true,
 		});
-		cookies().set("activeOrgSlug", orgSlug ?? null, {
+		cookies().set("activeOrgSlug", orgSlug ?? "personal", {
 			httpOnly: true,
 		});
 		redirect(`/${orgSlug}/projects`);
 	} else {
 		cookies().delete("activeOrgId");
+		cookies().set("activeOrgSlug", "personal", {
+			httpOnly: true,
+		});
 		redirect("/personal/projects");
 	}
 }

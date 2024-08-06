@@ -32,7 +32,7 @@ export default auth(async (req) => {
 		);
 	}
 
-	const activeOrgSlug = req.cookies.get("activeOrgSlug")?.value;
+	const activeOrgSlug = req.cookies.get("activeOrgSlug")?.value ?? "personal";
 	const currentOrgSlug = req.nextUrl.pathname.split("/")?.[1];
 	if (currentOrgSlug !== activeOrgSlug) {
 		const org = await opsDb().query.organizations.findFirst({

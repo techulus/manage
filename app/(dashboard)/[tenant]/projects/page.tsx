@@ -77,7 +77,7 @@ export default async function Projects({ searchParams }: Props) {
 					</p>
 					{statuses.includes("archived") ? (
 						<Link
-							href={`/${orgSlug}/projects/projects`}
+							href={`/${orgSlug}/projects`}
 							className={buttonVariants({ variant: "link" })}
 							prefetch={false}
 						>
@@ -85,7 +85,7 @@ export default async function Projects({ searchParams }: Props) {
 						</Link>
 					) : (
 						<Link
-							href={`/${orgSlug}/projects/projects?status=active,archived`}
+							href={`/${orgSlug}/projects?status=active,archived`}
 							className={buttonVariants({ variant: "link" })}
 							prefetch={false}
 						>

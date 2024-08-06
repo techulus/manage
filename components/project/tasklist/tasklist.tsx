@@ -5,6 +5,7 @@ import {
 	repositionTask,
 } from "@/app/(dashboard)/[tenant]/projects/[projectId]/tasklists/actions";
 import type { TaskList, TaskListWithTasks, User } from "@/drizzle/types";
+import { cn } from "@/lib/utils";
 import {
 	DndContext,
 	type DragEndEvent,
@@ -111,7 +112,12 @@ export const TaskListItem = ({
 	);
 
 	return (
-		<div className="rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-black">
+		<div
+			className={cn(
+				"rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-black",
+				hideDone ? "max-h-96 lg:h-80 overflow-y-hidden" : "",
+			)}
+		>
 			{!hideHeader ? (
 				<TaskListHeader
 					taskList={taskList}
@@ -151,20 +157,22 @@ export const TaskListItem = ({
 					</SortableContext>
 				</DndContext>
 
-				<form
-					className="px-6 py-2"
-					action={async (formData: FormData) => {
-						const name = formData.get("name") as string;
-						await createTask({
-							name,
-							userId,
-							taskListId: taskList.id,
-							projectId,
-						});
-					}}
-				>
-					<InlineTaskForm />
-				</form>
+				{!hideDone ? (
+					<form
+						className="px-6 py-2"
+						action={async (formData: FormData) => {
+							const name = formData.get("name") as string;
+							await createTask({
+								name,
+								userId,
+								taskListId: taskList.id,
+								projectId,
+							});
+						}}
+					>
+						<InlineTaskForm />
+					</form>
+				) : null}
 
 				{!hideDone
 					? doneItems.map((task) => (
