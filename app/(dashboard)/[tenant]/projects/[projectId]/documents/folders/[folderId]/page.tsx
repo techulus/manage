@@ -133,12 +133,9 @@ export default async function FolderDetails({ params }: Props) {
 			<div className="mx-auto max-w-5xl space-y-8 px-4 lg:px-0">
 				<div className="flex flex-col space-y-4">
 					{folder.documents.length || folder.files.length ? (
-						<ul className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2">
+						<ul className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-4 lg:grid-cols-6">
 							{folder.documents.map((document) => (
-								<div
-									key={document.id}
-									className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800"
-								>
+								<div key={document.id}>
 									{/* @ts-ignore */}
 									<DocumentHeader document={document} />
 								</div>
@@ -146,10 +143,7 @@ export default async function FolderDetails({ params }: Props) {
 
 							{folder.files.length
 								? folder.files.map((file) => (
-										<div
-											key={file.key}
-											className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800"
-										>
+										<div key={file.key}>
 											<FileInfo
 												file={file}
 												projectId={+projectId}

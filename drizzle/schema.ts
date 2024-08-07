@@ -228,7 +228,6 @@ export const activity = sqliteTable("Activity", {
 	action: text("action").notNull(),
 	type: text("type").notNull(),
 	message: text("message"),
-	parentId: integer("parentId").notNull(),
 	projectId: integer("projectId")
 		.notNull()
 		.references(() => project.id, { onDelete: "cascade", onUpdate: "cascade" }),

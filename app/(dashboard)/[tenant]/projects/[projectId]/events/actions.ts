@@ -72,7 +72,6 @@ export async function createEvent(payload: FormData) {
 		action: "created",
 		type: "event",
 		message: `Created event ${name}`,
-		parentId: createdEvent.id,
 		projectId: +projectId,
 	});
 
@@ -163,7 +162,6 @@ export async function updateEvent(payload: FormData) {
 					allDay,
 				},
 			)}`,
-			parentId: id,
 			projectId: +projectId,
 		});
 
@@ -189,7 +187,6 @@ export async function deleteEvent(payload: FormData) {
 		action: "deleted",
 		type: "event",
 		message: `Deleted event ${eventDetails?.name}`,
-		parentId: id,
 		projectId: +projectId,
 	});
 

@@ -56,7 +56,6 @@ export async function createDocument(payload: FormData) {
 		action: "created",
 		type: "document",
 		message: `Created document ${name}`,
-		parentId: +folderId,
 		projectId: +projectId,
 	});
 
@@ -108,7 +107,6 @@ export async function updateDocument(payload: FormData) {
 			message: `Updated document ${
 				documentDetails.name
 			}, ${generateObjectDiffMessage(currentDocument, data)}`,
-			parentId: +id,
 			projectId: +projectId,
 		});
 	}
@@ -152,7 +150,6 @@ export async function createDocumentFolder(payload: FormData) {
 		action: "created",
 		type: "folder",
 		message: `Created document folder ${name}`,
-		parentId: +projectId,
 		projectId: +projectId,
 	});
 
@@ -195,7 +192,6 @@ export async function updateDocumentFolder(payload: FormData) {
 			message: `Updated document folder ${
 				folderDetails.name
 			}, ${generateObjectDiffMessage(currentFolder, data)}`,
-			parentId: +id,
 			projectId: +projectId,
 		});
 
@@ -227,7 +223,6 @@ export async function deleteDocumentFolder(payload: FormData) {
 		action: "deleted",
 		type: "folder",
 		message: `Deleted document folder ${folderDetails?.name}`,
-		parentId: +id,
 		projectId: +projectId,
 	});
 
@@ -260,7 +255,6 @@ export async function deleteDocument(
 		action: "deleted",
 		type: "document",
 		message: `Deleted document ${documentDetails?.name}`,
-		parentId: +id,
 		projectId: +projectId,
 	});
 
@@ -294,7 +288,10 @@ export async function reloadDocuments(
 	redirect(`/${orgSlug}/projects/${projectId}`);
 }
 
-export async function deleteBlob(file: { id: string; key: string }) {
+export async function deleteBlob(
+	file: { id: string; key: string },
+	projectId: string | number,
+) {
 	await deleteFile(file.key);
 
 	const db = await database();
@@ -308,7 +305,6 @@ export async function deleteBlob(file: { id: string; key: string }) {
 		action: "deleted",
 		type: "blob",
 		message: `Deleted file ${blobDetails?.name}`,
-		parentId: +file.id,
-		projectId: +file.id,
+		projectId: +projectId,
 	});
 }

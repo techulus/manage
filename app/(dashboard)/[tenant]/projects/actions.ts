@@ -54,7 +54,6 @@ export async function createProject(payload: FormData) {
 		action: "created",
 		type: "project",
 		message: `Created project ${name}`,
-		parentId: newProject.id,
 		projectId: newProject.id,
 	});
 
@@ -100,7 +99,6 @@ export async function updateProject(payload: FormData) {
 				currentProject,
 				data,
 			)}`,
-			parentId: +id,
 			projectId: +id,
 		});
 
@@ -127,7 +125,6 @@ export async function archiveProject(payload: FormData) {
 		action: "updated",
 		type: "project",
 		message: `Archived project ${projectDetails.name}`,
-		parentId: id,
 		projectId: id,
 	});
 
@@ -154,7 +151,6 @@ export async function unarchiveProject(payload: FormData) {
 		action: "updated",
 		type: "project",
 		message: `Unarchived project ${projectDetails.name}`,
-		parentId: id,
 		projectId: id,
 	});
 
@@ -201,7 +197,6 @@ export async function addComment(payload: FormData) {
 		action: "created",
 		type: "comment",
 		message: `Created comment: ${convertMarkdownToPlainText(content)}`,
-		parentId,
 		projectId,
 	});
 
@@ -220,7 +215,6 @@ export async function deleteComment(payload: FormData) {
 		action: "deleted",
 		type: "comment",
 		message: "Deleted comment",
-		parentId: id,
 		projectId,
 	});
 

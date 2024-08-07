@@ -38,17 +38,17 @@ export default function NavBar({
 					{
 						name: "Task Lists",
 						href: `/${orgSlug}/projects/${projectId}/tasklists`,
-						current: path.endsWith(`/projects/${projectId}/tasklists`),
+						current: path.includes(`/projects/${projectId}/tasklists`),
 					},
 					{
 						name: "Docs & Files",
 						href: `/${orgSlug}/projects/${projectId}/documents`,
-						current: path.endsWith(`/projects/${projectId}/documents`),
+						current: path.includes(`/projects/${projectId}/documents`),
 					},
 					{
 						name: "Events",
 						href: `/${orgSlug}/projects/${projectId}/events`,
-						current: path.endsWith(`/projects/${projectId}/events`),
+						current: path.includes(`/projects/${projectId}/events`),
 					},
 					{
 						name: "Activity",

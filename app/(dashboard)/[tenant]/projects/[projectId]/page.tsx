@@ -185,21 +185,15 @@ export default async function ProjectDetails({ params }: Props) {
 				</div>
 
 				{project.documents.length || project.documentFolders.length ? (
-					<ul className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2">
+					<ul className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-4 lg:grid-cols-6">
 						{project.documents.map((document) => (
-							<div
-								key={document.id}
-								className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800"
-							>
+							<div key={document.id}>
 								{/* @ts-ignore */}
 								<DocumentHeader document={document} />
 							</div>
 						))}
 						{project.documentFolders.map((folder) => (
-							<div
-								key={folder.id}
-								className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800"
-							>
+							<div key={folder.id}>
 								{/* @ts-ignore */}
 								<DocumentFolderHeader documentFolder={folder} />
 							</div>

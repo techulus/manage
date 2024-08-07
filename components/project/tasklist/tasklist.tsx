@@ -35,7 +35,7 @@ export const TaskListItem = ({
 	createTask,
 	partialUpdateTaskList,
 	hideHeader = false,
-	hideDone = false,
+	compact = false,
 }: {
 	taskList: TaskListWithTasks;
 	userId: string;
@@ -53,7 +53,7 @@ export const TaskListItem = ({
 		data: { status: string },
 	) => Promise<void>;
 	hideHeader?: boolean;
-	hideDone?: boolean;
+	compact?: boolean;
 }) => {
 	const todoItems = useMemo(
 		() => taskList.tasks.filter((task) => task.status === "todo"),
@@ -112,12 +112,7 @@ export const TaskListItem = ({
 	);
 
 	return (
-		<div
-			className={cn(
-				"rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-black",
-				hideDone ? "max-h-96 lg:h-80 overflow-y-hidden" : "",
-			)}
-		>
+		<div className="rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-black">
 			{!hideHeader ? (
 				<TaskListHeader
 					taskList={taskList}
@@ -134,7 +129,12 @@ export const TaskListItem = ({
 				</div>
 			) : null}
 
-			<div className="flex flex-col justify-center">
+			<div
+				className={cn(
+					"flex flex-col justify-center",
+					compact ? "max-h-96 overflow-y-auto" : "",
+				)}
+			>
 				<DndContext
 					id="tasklist-dnd"
 					sensors={sensors}
@@ -152,38 +152,35 @@ export const TaskListItem = ({
 								projectId={+projectId}
 								users={users}
 								taskLists={taskLists}
+								compact={compact}
 							/>
 						))}
 					</SortableContext>
 				</DndContext>
 
-				{!hideDone ? (
-					<form
-						className="px-6 py-2"
-						action={async (formData: FormData) => {
-							const name = formData.get("name") as string;
-							await createTask({
-								name,
-								userId,
-								taskListId: taskList.id,
-								projectId,
-							});
-						}}
-					>
-						<InlineTaskForm />
-					</form>
-				) : null}
+				<form
+					className="px-6 py-2"
+					action={async (formData: FormData) => {
+						const name = formData.get("name") as string;
+						await createTask({
+							name,
+							userId,
+							taskListId: taskList.id,
+							projectId,
+						});
+					}}
+				>
+					<InlineTaskForm />
+				</form>
 
-				{!hideDone
-					? doneItems.map((task) => (
-							<TaskItem
-								key={task.id}
-								task={task}
-								projectId={+projectId}
-								users={users}
-							/>
-						))
-					: null}
+				{doneItems.map((task) => (
+					<TaskItem
+						key={task.id}
+						task={task}
+						projectId={+projectId}
+						users={users}
+					/>
+				))}
 			</div>
 		</div>
 	);

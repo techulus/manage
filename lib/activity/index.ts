@@ -17,7 +17,6 @@ export async function logActivity({
 	action,
 	type,
 	message,
-	parentId,
 	projectId,
 }: {
 	action: "created" | "updated" | "deleted";
@@ -31,7 +30,6 @@ export async function logActivity({
 		| "event"
 		| "comment";
 	message: string;
-	parentId: number;
 	projectId: number;
 }) {
 	const db = await database();
@@ -42,7 +40,6 @@ export async function logActivity({
 			action,
 			type,
 			message,
-			parentId,
 			projectId,
 			userId,
 			createdAt: new Date(),

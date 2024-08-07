@@ -72,7 +72,6 @@ export async function createTaskList(payload: FormData) {
 		action: "created",
 		type: "tasklist",
 		message: `Created task list ${name}`,
-		parentId: newTaskList.id,
 		projectId: +projectId,
 	});
 
@@ -119,7 +118,6 @@ export async function updateTaskList(payload: FormData) {
 				currentTasklist,
 				data,
 			)}`,
-			parentId: +id,
 			projectId: +projectId,
 		});
 
@@ -157,7 +155,6 @@ export async function partialUpdateTaskList(
 				currentTasklist,
 				updated,
 			)}`,
-			parentId: +id,
 			projectId: +updated.projectId,
 		});
 
@@ -215,7 +212,6 @@ export async function createTask({
 		action: "created",
 		type: "task",
 		message: `Created task ${name}`,
-		parentId: +taskListId,
 		projectId: +projectId,
 	});
 
@@ -259,7 +255,6 @@ export async function updateTask(
 				currentTask,
 				taskDetails,
 			)}`,
-			parentId: +id,
 			projectId: +projectId,
 		});
 
@@ -285,7 +280,6 @@ export async function deleteTask({
 		action: "deleted",
 		type: "task",
 		message: `Deleted task ${taskDetails?.name}`,
-		parentId: +id,
 		projectId: +projectId,
 	});
 
@@ -313,7 +307,6 @@ export async function repositionTask(
 		action: "updated",
 		type: "task",
 		message: `Repositioned task ${taskDetails.name}`,
-		parentId: +id,
 		projectId: +projectId,
 	});
 
@@ -370,7 +363,6 @@ export async function forkTaskList(taskListId: number, projectId: number) {
 		action: "updated",
 		type: "tasklist",
 		message: `Forked task list ${taskListDetails.name}`,
-		parentId: +taskListId,
 		projectId: +projectId,
 	});
 

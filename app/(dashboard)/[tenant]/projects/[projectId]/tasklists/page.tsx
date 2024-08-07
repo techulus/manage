@@ -100,7 +100,7 @@ export default async function TaskLists({ params, searchParams }: Props) {
 							createTask={createTask}
 							partialUpdateTaskList={partialUpdateTaskList}
 							orgSlug={orgSlug}
-							hideDone
+							compact
 						/>
 					))}
 				</ul>

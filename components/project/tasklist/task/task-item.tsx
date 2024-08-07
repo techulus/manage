@@ -33,11 +33,13 @@ export const TaskItem = ({
 	projectId,
 	users,
 	taskLists,
+	compact = false,
 }: {
 	task: TaskWithDetails;
 	projectId: number;
 	users: User[];
 	taskLists?: TaskList[];
+	compact?: boolean;
 }) => {
 	const [detailsOpen, setDetailsOpen] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
@@ -383,7 +385,7 @@ export const TaskItem = ({
 						</div>
 					</button>
 
-					{task.status !== "done" ? (
+					{task.status !== "done" && !compact ? (
 						<div
 							className="cursor-move touch-none p-1 pr-3"
 							{...attributes}

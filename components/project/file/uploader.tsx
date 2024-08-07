@@ -6,59 +6,59 @@ import { useDropzone } from "react-dropzone";
 import toast from "react-hot-toast";
 
 export function FileUploader({
-  folderId,
-  projectId,
-  reloadDocuments,
+	folderId,
+	projectId,
+	reloadDocuments,
 }: {
-  folderId?: number;
-  projectId: number | string;
-  reloadDocuments: (projectId: string, folderId: string) => void;
+	folderId?: number;
+	projectId: number | string;
+	reloadDocuments: (projectId: string, folderId: string) => void;
 }) {
-  const [loading, setLoading] = useState(false);
-  const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
-      setLoading(true);
+	const [loading, setLoading] = useState(false);
+	const onDrop = useCallback(
+		(acceptedFiles: File[]) => {
+			setLoading(true);
 
-      const uploaders = acceptedFiles.map(async (file) => {
-        try {
-          return fetch(
-            folderId
-              ? `/api/blob?folder=${folderId}&name=${file.name}&projectId=${projectId}`
-              : `/api/blob?name=${file.name}&projectId=${projectId}`,
-            {
-              method: "put",
-              body: file,
-            }
-          )
-            .then((res) => res.json())
-            .then(() => reloadDocuments(String(projectId), String(folderId)));
-        } catch (e) {
-          console.error(e);
-          return null;
-        }
-      });
+			const uploaders = acceptedFiles.map(async (file) => {
+				try {
+					return fetch(
+						folderId
+							? `/api/blob?folder=${folderId}&name=${file.name}&projectId=${projectId}`
+							: `/api/blob?name=${file.name}&projectId=${projectId}`,
+						{
+							method: "put",
+							body: file,
+						},
+					)
+						.then((res) => res.json())
+						.then(() => reloadDocuments(String(projectId), String(folderId)));
+				} catch (e) {
+					console.error(e);
+					return null;
+				}
+			});
 
-      toast
-        .promise(Promise.all(uploaders), {
-          loading: "Uploading...",
-          success: "Uploaded!",
-          error: "Failed to upload file(s)",
-        })
-        .finally(() => setLoading(false));
-    },
-    [folderId, projectId, reloadDocuments]
-  );
+			toast
+				.promise(Promise.all(uploaders), {
+					loading: "Uploading...",
+					success: "Uploaded!",
+					error: "Failed to upload file(s)",
+				})
+				.finally(() => setLoading(false));
+		},
+		[folderId, projectId, reloadDocuments],
+	);
 
-  const { getRootProps, getInputProps } = useDropzone({ onDrop });
+	const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
-  return (
-    <div
-      {...getRootProps()}
-      className="flex items-center rounded-full border border-gray-100 bg-gray-50 px-3 py-1.5 dark:border-gray-800 dark:bg-gray-900"
-    >
-      <input {...getInputProps()} disabled={loading} />
-      <p className="text-sm">Drop files here!</p>
-      {loading && <Spinner className="ml-2" />}
-    </div>
-  );
+	return (
+		<div
+			{...getRootProps()}
+			className="flex items-center rounded-full border border-gray-100 bg-gray-50 px-3 py-1.5 dark:border-gray-800 dark:bg-gray-900"
+		>
+			<input {...getInputProps()} disabled={loading} />
+			<p className="text-sm">Drop files here!</p>
+			{loading && <Spinner className="ml-2 text-primary" />}
+		</div>
+	);
 }
