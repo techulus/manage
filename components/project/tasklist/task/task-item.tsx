@@ -367,7 +367,9 @@ export const TaskItem = ({
 							"text-md w-full py-1 text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
 							status === "done" ? "text-muted-foreground line-through" : "",
 						)}
-						onClick={() => setDetailsOpen(true)}
+						onClick={() => {
+							if (!compact) setDetailsOpen(true);
+						}}
 					>
 						<div
 							className={cn(
