@@ -2,14 +2,13 @@ import { ThemeProvider } from "@/components/core/theme-provider";
 import { SITE_METADATA } from "@/data/marketing";
 import { cn } from "@/lib/utils";
 import { Analytics } from "@vercel/analytics/react";
-import { GeistSans } from "geist/font/sans";
-import { Bricolage_Grotesque } from "next/font/google";
+import { Inter } from "next/font/google";
 
 import "./globals.css";
 
-const bricolageGrotesque = Bricolage_Grotesque({
+const inter = Inter({
 	subsets: ["latin"],
-	variable: "--font-bricolage-grotesque",
+	variable: "--font-inter",
 });
 
 export const metadata = {
@@ -27,8 +26,7 @@ export default function RootLayout({
 			lang="en"
 			className={cn(
 				"dark flex min-h-full min-w-full",
-				GeistSans.className,
-				bricolageGrotesque.variable,
+				inter.className,
 			)}
 			suppressHydrationWarning
 		>
