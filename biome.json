@@ -16,6 +16,6 @@
 		}
 	},
 	"files": {
-		"ignore": [".next/**/*", "components/ui/**/*", ".trigger/**/*"]
+		"ignore": [".next/**/*", "components/ui/**/*"]
 	}
 }

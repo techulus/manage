@@ -8,7 +8,6 @@ const publicAppPaths = [
 	"/sign-in",
 	"/terms",
 	"/webhooks",
-	"/api/trigger",
 	"/api/auth",
 	"/api/calendar",
 ];
