@@ -31,13 +31,11 @@ import TaskNotesForm from "./notes-form";
 export const TaskItem = ({
 	task,
 	projectId,
-	users,
 	taskLists,
 	compact = false,
 }: {
 	task: TaskWithDetails;
 	projectId: number;
-	users: User[];
 	taskLists?: TaskList[];
 	compact?: boolean;
 }) => {
@@ -198,7 +196,6 @@ export const TaskItem = ({
 										</>
 									) : (
 										<AssignToUser
-											users={users}
 											onUpdate={(userId) => {
 												toast.promise(
 													updateTask(id, projectId, {

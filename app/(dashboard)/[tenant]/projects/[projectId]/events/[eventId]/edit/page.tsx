@@ -6,7 +6,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import { calendarEvent } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
-import { allUser, getOwner } from "@/lib/utils/useOwner";
+import { getOwner } from "@/lib/utils/useOwner";
+import { allUsers } from "@/lib/utils/useUser";
 import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -23,7 +24,7 @@ export default async function EditEvent({ params }: Props) {
 	const { orgSlug } = await getOwner();
 	const { projectId, eventId } = params;
 
-	const users = await allUser();
+	const users = await allUsers();
 	const db = await database();
 	const event = await db.query.calendarEvent.findFirst({
 		where: eq(calendarEvent.id, +eventId),

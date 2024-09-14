@@ -97,7 +97,6 @@ export default async function TaskLists({ params }: Props) {
 					taskList={list}
 					projectId={+projectId}
 					userId={userId}
-					users={users}
 					createTask={createTask}
 					orgSlug={orgSlug}
 					partialUpdateTaskList={partialUpdateTaskList}

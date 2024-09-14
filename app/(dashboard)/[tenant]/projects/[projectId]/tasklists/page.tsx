@@ -2,10 +2,10 @@ import EmptyState from "@/components/core/empty-state";
 import PageTitle from "@/components/layout/page-title";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { buttonVariants } from "@/components/ui/button";
-import { task, taskList, user } from "@/drizzle/schema";
-import type { User } from "@/drizzle/types";
+import { task, taskList } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
+import { allUsers } from "@/lib/utils/useUser";
 import { and, asc, eq, or } from "drizzle-orm";
 import Link from "next/link";
 import { createTask, partialUpdateTaskList } from "./actions";
@@ -20,7 +20,7 @@ type Props = {
 };
 
 export default async function TaskLists({ params, searchParams }: Props) {
-	const { userId, orgId, orgSlug } = await getOwner();
+	const { userId, orgSlug } = await getOwner();
 	const { projectId } = params;
 
 	const filterByStatuses = searchParams.status?.split(",") ?? ["active"];
@@ -66,13 +66,7 @@ export default async function TaskLists({ params, searchParams }: Props) {
 		})
 		.execute();
 
-	const currentUser = await db.query.user.findFirst({
-		where: eq(user.id, userId),
-	});
-
-	const orgUsers = orgId ? await db.query.user.findMany() : [];
-
-	const users: User[] = orgId ? orgUsers : [currentUser!];
+	const users = await allUsers(true);
 
 	return (
 		<>
@@ -96,7 +90,6 @@ export default async function TaskLists({ params, searchParams }: Props) {
 							taskList={taskList}
 							projectId={+projectId}
 							userId={userId}
-							users={users}
 							createTask={createTask}
 							partialUpdateTaskList={partialUpdateTaskList}
 							orgSlug={orgSlug}

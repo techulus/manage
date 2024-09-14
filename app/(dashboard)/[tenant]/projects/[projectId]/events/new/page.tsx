@@ -4,7 +4,8 @@ import EventForm from "@/components/form/event";
 import PageTitle from "@/components/layout/page-title";
 import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
-import { allUser, getOwner } from "@/lib/utils/useOwner";
+import { getOwner } from "@/lib/utils/useOwner";
+import { allUsers } from "@/lib/utils/useUser";
 import Link from "next/link";
 import { createEvent } from "../actions";
 
@@ -18,7 +19,7 @@ export default async function CreateEvent({ params }: Props) {
 	const { orgSlug } = await getOwner();
 	const backUrl = `/${orgSlug}/projects/${params.projectId}/events`;
 
-	const users = await allUser();
+	const users = await allUsers();
 
 	return (
 		<>

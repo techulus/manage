@@ -30,7 +30,6 @@ export const TaskListItem = ({
 	taskList,
 	userId,
 	projectId,
-	users,
 	orgSlug,
 	createTask,
 	partialUpdateTaskList,
@@ -40,7 +39,6 @@ export const TaskListItem = ({
 	taskList: TaskListWithTasks;
 	userId: string;
 	projectId: number;
-	users: User[];
 	orgSlug: string;
 	createTask: (data: {
 		name: string;
@@ -150,7 +148,6 @@ export const TaskListItem = ({
 								key={task.id}
 								task={task}
 								projectId={+projectId}
-								users={users}
 								taskLists={taskLists}
 								compact={compact}
 							/>
@@ -174,12 +171,7 @@ export const TaskListItem = ({
 				</form>
 
 				{doneItems.map((task) => (
-					<TaskItem
-						key={task.id}
-						task={task}
-						projectId={+projectId}
-						users={users}
-					/>
+					<TaskItem key={task.id} task={task} projectId={+projectId} />
 				))}
 			</div>
 		</div>

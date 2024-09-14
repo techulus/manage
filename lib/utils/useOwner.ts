@@ -74,13 +74,6 @@ export async function getOwner(): Promise<Result> {
 	} as Result;
 }
 
-export async function allUser(): Promise<User[]> {
-	const db = await database();
-	const { userId } = await getOwner();
-	const users: User[] = (await db.query.user.findMany()) ?? [];
-	return users.filter((user) => user.id !== userId);
-}
-
 export function getTimezone() {
 	return cookies().get("userTimezone")?.value ?? dayjs.tz.guess();
 }
