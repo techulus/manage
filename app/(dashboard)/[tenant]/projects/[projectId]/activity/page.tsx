@@ -1,3 +1,4 @@
+import { MarkdownView } from "@/components/core/markdown-view";
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -61,17 +62,13 @@ async function ActivityItem({
 							</span>
 						</div>
 						<div className="min-w-0 flex-1">
-							<div className="text-sm">
+							<div className="text-sm text-primary">
 								<a href={item.actor.id} className="font-medium">
 									{item.actor.firstName}
 								</a>
 							</div>
 							<div className="flex w-full flex-col md:flex-row md:justify-between">
-								{item.message ? (
-									<div className="mt-1 max-w-md text-sm text-gray-700 dark:text-gray-400">
-										<p className="text-sm font-semibold">{item.message}</p>
-									</div>
-								) : null}
+								{item.message ? <MarkdownView content={item.message} /> : null}
 								<p className="mt-0.5 text-sm text-gray-500">
 									{item.createdAt.toLocaleTimeString()},{" "}
 									{item.createdAt.toDateString()}
