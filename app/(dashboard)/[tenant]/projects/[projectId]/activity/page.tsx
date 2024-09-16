@@ -68,7 +68,11 @@ async function ActivityItem({
 								</a>
 							</div>
 							<div className="flex w-full flex-col md:flex-row md:justify-between">
-								{item.message ? <MarkdownView content={item.message} /> : null}
+								<div className="max-w-xl">
+									{item.message ? (
+										<MarkdownView content={item.message} />
+									) : null}
+								</div>
 								<p className="mt-0.5 text-sm text-gray-500">
 									{item.createdAt.toLocaleTimeString()},{" "}
 									{item.createdAt.toDateString()}
