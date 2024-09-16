@@ -2,9 +2,10 @@ import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { activity } from "@/drizzle/schema";
+import type { ActivityWithActor } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { database } from "@/lib/utils/useDatabase";
-import { and, desc, eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { PencilIcon, PlusCircleIcon, TrashIcon } from "lucide-react";
 
 type Props = {
@@ -13,29 +14,12 @@ type Props = {
 	};
 };
 
-async function ActivityItem({ id, isLast }: { id: number; isLast: boolean }) {
-	const db = await database();
-	const activityItem = await db.query.activity
-		.findFirst({
-			where: and(eq(activity.id, id)),
-			with: {
-				actor: {
-					columns: {
-						id: true,
-						firstName: true,
-						imageUrl: true,
-					},
-				},
-			},
-		})
-		.execute();
-
-	if (!activityItem) {
-		return null;
-	}
-
+async function ActivityItem({
+	item,
+	isLast,
+}: { item: ActivityWithActor; isLast: boolean }) {
 	return (
-		<li key={activityItem.id}>
+		<li key={item.id}>
 			<div className={cn("relative pb-8", isLast ? "pb-2" : "")}>
 				{!isLast ? (
 					<span
@@ -46,29 +30,29 @@ async function ActivityItem({ id, isLast }: { id: number; isLast: boolean }) {
 				<div className="relative flex items-start space-x-3">
 					<>
 						<div className="relative">
-							{activityItem.actor?.imageUrl ? (
+							{item.actor?.imageUrl ? (
 								<Avatar className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-400 ring-8 ring-white dark:bg-black dark:ring-black">
-									<AvatarImage src={activityItem.actor.imageUrl} />
+									<AvatarImage src={item.actor.imageUrl} />
 									<AvatarFallback>
-										{activityItem.actor?.firstName ?? "User"}
+										{item.actor?.firstName ?? "User"}
 									</AvatarFallback>
 								</Avatar>
 							) : null}
 
 							<span className="absolute -bottom-0.5 -right-1 rounded-tl-md bg-white px-0.5 py-px dark:bg-black">
-								{activityItem.action === "created" ? (
+								{item.action === "created" ? (
 									<PlusCircleIcon
 										className="h-5 w-5 text-gray-400"
 										aria-hidden="true"
 									/>
 								) : null}
-								{activityItem.action === "updated" ? (
+								{item.action === "updated" ? (
 									<PencilIcon
 										className="h-5 w-5 text-gray-400"
 										aria-hidden="true"
 									/>
 								) : null}
-								{activityItem.action === "deleted" ? (
+								{item.action === "deleted" ? (
 									<TrashIcon
 										className="h-5 w-5 text-gray-400"
 										aria-hidden="true"
@@ -78,21 +62,19 @@ async function ActivityItem({ id, isLast }: { id: number; isLast: boolean }) {
 						</div>
 						<div className="min-w-0 flex-1">
 							<div className="text-sm">
-								<a href={activityItem.actor.id} className="font-medium">
-									{activityItem.actor.firstName}
+								<a href={item.actor.id} className="font-medium">
+									{item.actor.firstName}
 								</a>
 							</div>
 							<div className="flex w-full flex-col md:flex-row md:justify-between">
-								{activityItem.message ? (
+								{item.message ? (
 									<div className="mt-1 max-w-md text-sm text-gray-700 dark:text-gray-400">
-										<p className="text-sm font-semibold">
-											{activityItem.message}
-										</p>
+										<p className="text-sm font-semibold">{item.message}</p>
 									</div>
 								) : null}
 								<p className="mt-0.5 text-sm text-gray-500">
-									{activityItem.createdAt.toLocaleTimeString()},{" "}
-									{activityItem.createdAt.toDateString()}
+									{item.createdAt.toLocaleTimeString()},{" "}
+									{item.createdAt.toDateString()}
 								</p>
 							</div>
 						</div>
@@ -109,11 +91,17 @@ export default async function ActivityDetails({ params }: Props) {
 	const db = await database();
 	const activities = await db.query.activity
 		.findMany({
+			with: {
+				actor: {
+					columns: {
+						id: true,
+						firstName: true,
+						imageUrl: true,
+					},
+				},
+			},
 			where: eq(activity.projectId, +projectId),
 			orderBy: [desc(activity.createdAt)],
-			columns: {
-				id: true,
-			},
 			limit: 50,
 		})
 		.execute();
@@ -133,7 +121,7 @@ export default async function ActivityDetails({ params }: Props) {
 									// @ts-ignore
 									<ActivityItem
 										key={activityItem.id}
-										id={activityItem.id}
+										item={activityItem}
 										isLast={activityItemIdx === activities.length - 1}
 									/>
 								);
