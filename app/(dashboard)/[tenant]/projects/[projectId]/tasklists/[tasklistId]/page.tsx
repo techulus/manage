@@ -80,7 +80,7 @@ export default async function TaskLists({ params }: Props) {
 				<div className="flex space-x-2">
 					{totalCount != null && doneCount != null ? (
 						<Badge variant="outline">
-							{doneCount}/{totalCount} completed
+							{doneCount} of {totalCount}
 						</Badge>
 					) : null}
 					{list.dueDate ? (

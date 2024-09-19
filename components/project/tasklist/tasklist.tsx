@@ -4,7 +4,7 @@ import {
 	getActiveTaskLists,
 	repositionTask,
 } from "@/app/(dashboard)/[tenant]/projects/[projectId]/tasklists/actions";
-import type { TaskList, TaskListWithTasks, User } from "@/drizzle/types";
+import type { TaskList, TaskListWithTasks } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import {
 	DndContext,
@@ -130,7 +130,7 @@ export const TaskListItem = ({
 			<div
 				className={cn(
 					"flex flex-col justify-center",
-					compact ? "max-h-96 overflow-y-auto" : "",
+					// compact ? "max-h-96 overflow-y-auto" : "",
 				)}
 			>
 				<DndContext

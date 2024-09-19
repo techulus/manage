@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { TaskList } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import { CircleEllipsisIcon } from "lucide-react";
+import { CheckCircle, CircleEllipsisIcon } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
@@ -35,7 +35,7 @@ export const TaskListHeader = ({
 		totalCount != null && doneCount != null ? doneCount / totalCount : null;
 
 	return (
-		<div className="group relative flex items-center gap-x-4 rounded-tl-lg rounded-tr-lg bg-white p-3 pb-5 dark:bg-black">
+		<div className="group relative flex items-center gap-x-4 rounded-tl-lg rounded-tr-lg bg-white p-3 dark:bg-black">
 			<Link
 				href={`/${orgSlug}/projects/${taskList.projectId}/tasklists/${taskList.id}`}
 				className="text-sm font-medium"
@@ -50,20 +50,21 @@ export const TaskListHeader = ({
 				</div>
 
 				{totalCount != null && doneCount != null ? (
-					<Badge variant="outline">
-						{doneCount}/{totalCount} completed
-					</Badge>
-				) : null}
-				{taskList.dueDate ? (
-					<Badge variant="outline" className="ml-2" suppressHydrationWarning>
-						Due {taskList.dueDate.toLocaleDateString()}
-					</Badge>
+					<div className="flex flex-row items-center border rounded-lg py-1 px-2 space-x-2">
+						<CheckCircle className="w-4 h-4" />
+						<p className="block">
+							{doneCount} of {totalCount} done
+							{taskList.dueDate ? (
+								<span>, due {taskList.dueDate.toLocaleDateString()}</span>
+							) : null}
+						</p>
+					</div>
 				) : null}
 
 				{completedPercent != null ? (
 					<div
 						className={cn(
-							"absolute bottom-0 left-0 z-0 h-2 rounded-r-lg bg-primary opacity-70 transition-all",
+							"mt-2 bottom-0 left-0 z-0 h-2 rounded-lg bg-primary opacity-70 transition-all",
 							completedPercent === 1 ? "rounded-tr-lg" : null,
 						)}
 						style={{ width: `${completedPercent * 100}%` }}
