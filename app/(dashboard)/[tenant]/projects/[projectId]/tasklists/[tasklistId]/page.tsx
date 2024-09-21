@@ -1,12 +1,12 @@
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
-import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { task, taskList, user } from "@/drizzle/schema";
-import type { User } from "@/drizzle/types";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { and, asc, eq } from "drizzle-orm";
+import { CheckCircle, ClockIcon } from "lucide-react";
 import { notFound } from "next/navigation";
 import { createTask, partialUpdateTaskList } from "../actions";
 
@@ -18,7 +18,7 @@ type Props = {
 };
 
 export default async function TaskLists({ params }: Props) {
-	const { userId, orgId, orgSlug } = await getOwner();
+	const { userId, orgSlug } = await getOwner();
 	const { projectId, tasklistId } = params;
 
 	const db = await database();
@@ -62,12 +62,13 @@ export default async function TaskLists({ params }: Props) {
 		return notFound();
 	}
 
-	const orgUsers = orgId ? await db.query.user.findMany() : [];
-
-	const users: User[] = orgId ? orgUsers : [currentUser];
-
 	const totalCount = list.tasks.length;
 	const doneCount = list.tasks.filter((task) => task.status === "done").length;
+
+	const completedPercent =
+		totalCount != null && doneCount != null
+			? Math.round((doneCount / totalCount) * 100)
+			: null;
 
 	return (
 		<>
@@ -77,16 +78,37 @@ export default async function TaskLists({ params }: Props) {
 				actionLabel="Edit"
 				actionLink={`/${orgSlug}/projects/${projectId}/tasklists/${list.id}/edit`}
 			>
-				<div className="flex space-x-2">
+				<div className="flex flex-col pr-4 md:pr-0 space-y-2 md:flex-row md:space-y-0 md:space-x-2 text-gray-500 dark:text-gray-400">
 					{totalCount != null && doneCount != null ? (
-						<Badge variant="outline">
-							{doneCount} of {totalCount}
-						</Badge>
+						<div className="flex w-[280px] flex-row items-center border rounded-lg py-1 px-2 space-x-2">
+							<CheckCircle className="w-4 h-4" />
+							<p className="block">
+								{doneCount} of {totalCount}
+							</p>
+
+							{completedPercent != null ? (
+								<>
+									<Progress
+										className="h-3 max-w-[120px]"
+										value={completedPercent}
+									/>
+									<span className="ml-2">{completedPercent}%</span>
+								</>
+							) : null}
+						</div>
 					) : null}
+
 					{list.dueDate ? (
-						<Badge variant="outline" className="ml-2" suppressHydrationWarning>
-							Due {list.dueDate.toLocaleDateString()}
-						</Badge>
+						<div className="flex flex-row items-center border rounded-lg py-1 px-2 space-x-2">
+							<ClockIcon className="w-4 h-4" />
+							<p className="block">
+								{list.dueDate ? (
+									<span suppressHydrationWarning>
+										Due {list.dueDate.toLocaleDateString()}
+									</span>
+								) : null}
+							</p>
+						</div>
 					) : null}
 				</div>
 			</PageTitle>
