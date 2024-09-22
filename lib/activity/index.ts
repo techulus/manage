@@ -70,24 +70,24 @@ export function generateObjectDiffMessage(
 					typeof updated[key] === "string" &&
 					(updated[key] as string)?.length > 250
 				) {
-					message.push(`changed ${key}`);
+					message.push(`changed \`${key}\``);
 				} else if (updated[key] instanceof Date) {
 					message.push(
-						`changed ${key} from ${original[key]} to ${updated[
+						`changed \`${key}\` from \`${original[key]}\` to \`${updated[
 							key
-						]?.toLocaleString()}`,
+						]?.toLocaleString()}\``,
 					);
 				} else if (typeof updated[key] === "boolean") {
 					if (updated[key]) {
-						message.push(`enabled ${key}`);
+						message.push(`enabled \`${key}\``);
 					} else {
-						message.push(`disabled ${key}`);
+						message.push(`disabled \`${key}\``);
 					}
 				} else if (!updated[key]) {
-					message.push(`${key} removed`);
+					message.push(`\`${key}\` removed`);
 				} else {
 					message.push(
-						`changed ${key} from ${original[key] ?? "empty"} to ${updated[key]}`,
+						`changed \`${key}\` from \`${original[key] ?? "empty"}\` to \`${updated[key]}\``,
 					);
 				}
 			}

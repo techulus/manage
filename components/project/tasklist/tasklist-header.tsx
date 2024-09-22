@@ -102,30 +102,30 @@ export const TaskListHeader = ({
 							Edit
 						</Link>
 					</DropdownMenuItem>
-					partialUpdateTaskList ? (
-					<DropdownMenuItem className="w-full p-0">
-						<Button
-							variant="ghost"
-							className="w-full"
-							onClick={async () => {
-								if (!partialUpdateTaskList) return;
-								toast.promise(
-									partialUpdateTaskList(taskList.id, {
-										status:
-											taskList.status === "active" ? "archived" : "active",
-									}),
-									{
-										loading: "Updating task list...",
-										success: "Task list updated.",
-										error: "Failed to update task list.",
-									},
-								);
-							}}
-						>
-							{taskList.status === "active" ? "Archive" : "Unarchive"}
-						</Button>
-					</DropdownMenuItem>
-					) : null
+					{partialUpdateTaskList ? (
+						<DropdownMenuItem className="w-full p-0">
+							<Button
+								variant="ghost"
+								className="w-full"
+								onClick={async () => {
+									if (!partialUpdateTaskList) return;
+									toast.promise(
+										partialUpdateTaskList(taskList.id, {
+											status:
+												taskList.status === "active" ? "archived" : "active",
+										}),
+										{
+											loading: "Updating task list...",
+											success: "Task list updated.",
+											error: "Failed to update task list.",
+										},
+									);
+								}}
+							>
+								{taskList.status === "active" ? "Archive" : "Unarchive"}
+							</Button>
+						</DropdownMenuItem>
+					) : null}
 					<DropdownMenuItem className="w-full p-0">
 						<Button
 							variant="ghost"
