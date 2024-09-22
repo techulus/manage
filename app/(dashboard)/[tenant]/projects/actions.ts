@@ -1,11 +1,11 @@
 "use server";
 
-import { comment, project } from "@/drizzle/schema";
+import { activity, comment, project } from "@/drizzle/schema";
 import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { database } from "@/lib/utils/useDatabase";
 import { convertMarkdownToPlainText } from "@/lib/utils/useMarkdown";
 import { getOwner } from "@/lib/utils/useOwner";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
@@ -220,4 +220,28 @@ export async function deleteComment(payload: FormData) {
 
 	const currentPath = payload.get("currentPath") as string;
 	revalidatePath(currentPath);
+}
+
+export async function fetchActivities(projectId: string | number, offset = 0) {
+	const db = await database();
+
+	const activities = await db.query.activity
+		.findMany({
+			with: {
+				actor: {
+					columns: {
+						id: true,
+						firstName: true,
+						imageUrl: true,
+					},
+				},
+			},
+			where: eq(activity.projectId, +projectId),
+			orderBy: [desc(activity.createdAt)],
+			limit: 50,
+			offset,
+		})
+		.execute();
+
+	return activities;
 }
