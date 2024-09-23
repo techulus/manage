@@ -71,7 +71,7 @@ export const TaskListHeader = ({
 					) : null}
 
 					{taskList.dueDate ? (
-						<div className="flex flex-row items-center border rounded-lg py-1 px-2 space-x-2">
+						<div className="flex flex-row items-center border rounded-lg py-1 px-2 space-x-2 max-w-[180px]">
 							<ClockIcon className="w-4 h-4" />
 							<p className="block">
 								{taskList.dueDate ? (

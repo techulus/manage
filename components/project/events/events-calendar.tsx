@@ -2,6 +2,7 @@
 
 import { Calendar } from "@/components/ui/calendar";
 import type { EventWithInvites } from "@/drizzle/types";
+import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import { DateTimePicker } from "./date-time-picker";
 import EventsList from "./events-list";
@@ -32,7 +33,7 @@ export default function EventsCalendar({
 					name="date"
 					onSelect={(date) => {
 						router.push(
-							`/${orgSlug}/projects/${projectId}/events?date=${date.toISOString()}`,
+							`/${orgSlug}/projects/${projectId}/events?date=${dayjs(date).format("YYYY-MM-DD")}`,
 						);
 					}}
 				/>
@@ -44,7 +45,7 @@ export default function EventsCalendar({
 				selected={new Date(selectedDate)}
 				onDayClick={(date) => {
 					router.push(
-						`/${orgSlug}/projects/${projectId}/events?date=${date.toISOString()}`,
+						`/${orgSlug}/projects/${projectId}/events?date=${dayjs(date).format("YYYY-MM-DD")}`,
 					);
 				}}
 			/>

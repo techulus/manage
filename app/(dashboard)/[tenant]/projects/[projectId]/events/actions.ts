@@ -17,13 +17,9 @@ export async function createEvent(payload: FormData) {
 	const projectId = +(payload.get("projectId") as string);
 	const name = payload.get("name") as string;
 	const description = payload.get("description") as string;
-	const start = dayjs(payload.get("start") as string)
-		.utc()
-		.toDate();
+	const start = dayjs.utc(payload.get("start") as string).toDate();
 	const end = payload.get("end")
-		? dayjs(payload.get("end") as string)
-				.utc()
-				.toDate()
+		? dayjs.utc(payload.get("end") as string).toDate()
 		: null;
 	const allDay = (payload.get("allDay") as string) === "on";
 	const repeat = payload.get("repeat") as string;
@@ -86,13 +82,9 @@ export async function updateEvent(payload: FormData) {
 	const id = +(payload.get("id") as string);
 	const name = payload.get("name") as string;
 	const description = payload.get("description") as string;
-	const start = dayjs(payload.get("start") as string)
-		.utc()
-		.toDate();
+	const start = dayjs.utc(payload.get("start") as string).toDate();
 	const end = payload.get("end")
-		? dayjs(payload.get("end") as string)
-				.utc()
-				.toDate()
+		? dayjs.utc(payload.get("end") as string).toDate()
 		: null;
 	const allDay = (payload.get("allDay") as string) === "on";
 	const repeat = payload.get("repeat") as string;
