@@ -97,7 +97,7 @@ export default async function Home() {
 				</div>
 				<div className="mx-auto max-w-4xl py-32 sm:py-48 lg:py-56">
 					<div className="text-center">
-						<h1 className="text-hero bg-gradient-to-r from-green-500 to-yellow-700 bg-clip-text text-4xl font-bold tracking-tighter text-gray-900 text-transparent sm:text-6xl">
+						<h1 className="text-hero bg-gradient-to-r from-green-500 to-yellow-700 bg-clip-text text-4xl tracking-tighter text-gray-900 text-transparent sm:text-6xl">
 							{SITE_METADATA.TAGLINE}
 						</h1>
 						<p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
@@ -169,7 +169,7 @@ export default async function Home() {
 					<h2 className="text-base font-semibold leading-7 text-primary">
 						Pricing
 					</h2>
-					<p className="text-hero mt-2 text-4xl font-bold tracking-tighter text-gray-900 dark:text-gray-50 sm:text-5xl">
+					<p className="text-hero mt-2 text-4xl tracking-tighter text-gray-900 dark:text-gray-50 sm:text-5xl">
 						From Solo to Scale
 					</p>
 				</div>

@@ -306,7 +306,7 @@ export async function repositionTask(
 	await logActivity({
 		action: "updated",
 		type: "task",
-		message: `Repositioned task ${taskDetails.name}`,
+		message: `Repositioned task \`${taskDetails.name}\``,
 		projectId: +projectId,
 	});
 
