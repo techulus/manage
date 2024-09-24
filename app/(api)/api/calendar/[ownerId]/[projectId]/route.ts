@@ -1,5 +1,6 @@
 import { calendarEvent, project, task, taskList } from "@/drizzle/schema";
 import { getDatabaseForOwner } from "@/lib/utils/turso";
+import dayjs from "dayjs";
 import { and, desc, eq, lte } from "drizzle-orm";
 import ical, { ICalCalendarMethod } from "ical-generator";
 
@@ -49,8 +50,8 @@ export async function GET(
 	for (const event of events) {
 		calendar.createEvent({
 			id: event.id,
-			start: event.start,
-			end: event.end,
+			start: dayjs.utc(event.start).toISOString(),
+			end: dayjs.utc(event.end).toISOString(),
 			summary: event.name,
 			description: event.description,
 			allDay: event.allDay,
@@ -72,8 +73,8 @@ export async function GET(
 
 			calendar.createEvent({
 				id: task.id,
-				start: task.dueDate,
-				end: task.dueDate,
+				start: dayjs.utc(task.dueDate).toISOString(),
+				end: dayjs.utc(task.dueDate).toISOString(),
 				summary: `[${tasklist.name}] ${task.name}`,
 				description: task.description,
 				allDay: true,
