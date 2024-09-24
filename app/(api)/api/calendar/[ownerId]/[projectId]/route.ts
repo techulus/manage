@@ -50,8 +50,8 @@ export async function GET(
 	for (const event of events) {
 		calendar.createEvent({
 			id: event.id,
-			start: dayjs.utc(event.start).toISOString(),
-			end: dayjs.utc(event.end).toISOString(),
+			start: dayjs.utc(event.start).toDate(),
+			end: dayjs.utc(event.end).toDate(),
 			summary: event.name,
 			description: event.description,
 			allDay: event.allDay,
@@ -73,8 +73,8 @@ export async function GET(
 
 			calendar.createEvent({
 				id: task.id,
-				start: dayjs.utc(task.dueDate).toISOString(),
-				end: dayjs.utc(task.dueDate).toISOString(),
+				start: dayjs.utc(task.dueDate).toDate(),
+				end: dayjs.utc(task.dueDate).toDate(),
 				summary: `[${tasklist.name}] ${task.name}`,
 				description: task.description,
 				allDay: true,
