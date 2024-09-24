@@ -1,8 +1,13 @@
 import { calendarEvent, project, task, taskList } from "@/drizzle/schema";
 import { getDatabaseForOwner } from "@/lib/utils/turso";
 import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { and, desc, eq, lte } from "drizzle-orm";
 import ical, { ICalCalendarMethod } from "ical-generator";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
@@ -51,7 +56,7 @@ export async function GET(
 		calendar.createEvent({
 			id: event.id,
 			start: dayjs.utc(event.start).toDate(),
-			end: dayjs.utc(event.end).toDate(),
+			end: event.end ? dayjs.utc(event.end).toDate() : null,
 			summary: event.name,
 			description: event.description,
 			allDay: event.allDay,
