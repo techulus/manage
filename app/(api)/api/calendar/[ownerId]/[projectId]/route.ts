@@ -1,13 +1,11 @@
 import { calendarEvent, project, task, taskList } from "@/drizzle/schema";
 import { getDatabaseForOwner } from "@/lib/utils/turso";
 import dayjs from "dayjs";
-import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { and, desc, eq, lte } from "drizzle-orm";
 import ical, { ICalCalendarMethod } from "ical-generator";
 
 dayjs.extend(utc);
-dayjs.extend(timezone);
 
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
@@ -63,7 +61,6 @@ export async function GET(
 			created: event.createdAt,
 			lastModified: event.updatedAt,
 			repeating: event.repeatRule,
-			timezone: "UTC",
 		});
 	}
 
@@ -85,7 +82,6 @@ export async function GET(
 				allDay: true,
 				created: task.createdAt,
 				lastModified: task.updatedAt,
-				timezone: "UTC",
 			});
 		}
 	}

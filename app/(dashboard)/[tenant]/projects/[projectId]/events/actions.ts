@@ -30,8 +30,9 @@ export async function createEvent(payload: FormData) {
 	const repeatRule = repeat
 		? new RRule({
 				freq: repeat as unknown as Frequency,
-				dtstart: start,
-				until: end,
+				dtstart: dayjs.utc(start).startOf("day").toDate(),
+				until: end ? dayjs.utc(end).endOf("day").toDate() : null,
+				tzid: "UTC",
 			})
 		: undefined;
 
@@ -96,8 +97,9 @@ export async function updateEvent(payload: FormData) {
 	const repeatRule = repeat
 		? new RRule({
 				freq: repeat as unknown as Frequency,
-				dtstart: dayjs(start).startOf("day").toDate(),
-				until: end ? dayjs(end).endOf("day").toDate() : null,
+				dtstart: dayjs.utc(start).startOf("day").toDate(),
+				until: end ? dayjs.utc(end).endOf("day").toDate() : null,
+				tzid: "UTC",
 			})
 		: undefined;
 

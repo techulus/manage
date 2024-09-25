@@ -24,8 +24,8 @@ dayjs.extend(utc);
 const filterByRepeatRule = (event: EventWithInvites, date: Date) => {
 	if (event.repeatRule) {
 		const rrule = rrulestr(event.repeatRule);
-		const start = dayjs(date).startOf("day").toDate();
-		const end = dayjs(date).endOf("day").toDate();
+		const start = dayjs.utc(date).startOf("day").toDate();
+		const end = dayjs.utc(date).endOf("day").toDate();
 
 		return rrule.between(start, end, true).length > 0;
 	}
