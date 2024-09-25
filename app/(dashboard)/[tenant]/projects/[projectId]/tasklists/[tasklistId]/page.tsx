@@ -89,7 +89,7 @@ export default async function TaskLists({ params }: Props) {
 							{completedPercent != null ? (
 								<>
 									<Progress
-										className="h-3 max-w-[120px]"
+										className="h-3 max-w-[130px]"
 										value={completedPercent}
 									/>
 									<span className="ml-2">{completedPercent}%</span>
@@ -99,7 +99,7 @@ export default async function TaskLists({ params }: Props) {
 					) : null}
 
 					{list.dueDate ? (
-						<div className="flex flex-row items-center border rounded-lg py-1 px-2 space-x-2">
+						<div className="flex flex-row items-center border rounded-lg py-1 px-2 space-x-2 max-w-[160px]">
 							<ClockIcon className="w-4 h-4" />
 							<p className="block">
 								{list.dueDate ? (
