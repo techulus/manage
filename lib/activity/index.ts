@@ -1,6 +1,7 @@
 import { activity } from "@/drizzle/schema";
+import dayjs from "dayjs";
 import { database } from "../utils/useDatabase";
-import { getOwner } from "../utils/useOwner";
+import { getOwner, getTimezone } from "../utils/useOwner";
 
 type GenericObject = {
 	[key: string]:
@@ -47,6 +48,16 @@ export async function logActivity({
 		.run();
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+function toDateString(date: any) {
+	if (!date) {
+		return "-";
+	}
+
+	const tz = getTimezone();
+	return dayjs(date).tz(tz).format("YYYY-MM-DD HH:mm:ss");
+}
+
 export function generateObjectDiffMessage(
 	original: GenericObject,
 	updated: GenericObject,
@@ -73,9 +84,9 @@ export function generateObjectDiffMessage(
 					message.push(`changed \`${key}\``);
 				} else if (updated[key] instanceof Date) {
 					message.push(
-						`changed \`${key}\` from \`${original[key]}\` to \`${updated[
-							key
-						]?.toLocaleString()}\``,
+						`changed \`${key}\` from \`${toDateString(original[key])}\` to \`${toDateString(
+							updated[key],
+						)}\``,
 					);
 				} else if (typeof updated[key] === "boolean") {
 					if (updated[key]) {
