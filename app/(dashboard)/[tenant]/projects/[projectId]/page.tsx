@@ -9,14 +9,16 @@ import { DocumentHeader } from "@/components/project/document/document-header";
 import EventsCalendar from "@/components/project/events/events-calendar";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
 import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { getOwner } from "@/lib/utils/useOwner";
 import { getProjectById } from "@/lib/utils/useProjects";
-import {
-	CalendarPlusIcon,
-	FilePlus2Icon,
-	FolderPlusIcon,
-	ListPlusIcon,
-} from "lucide-react";
+import { CalendarPlusIcon, ListPlusIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { archiveProject, deleteProject, unarchiveProject } from "../actions";
@@ -111,24 +113,22 @@ export default async function ProjectDetails({ params }: Props) {
 				</div>
 			</PageSection>
 
-			<div className="mx-auto flex max-w-5xl flex-col space-y-4 p-4 lg:p-0 lg:pb-12">
-				<div className="flex flex-col justify-between lg:flex-row lg:items-center">
+			<div className="mx-auto flex max-w-5xl flex-col p-4 lg:p-0 lg:pb-12">
+				<div className="flex justify-between flex-row items-center mt-8">
 					<h2 className="text-2xl leading-7 tracking-tight">Task Lists</h2>
 
-					<div className="mt-4 flex space-x-4 lg:mt-0">
-						<Link
-							className="flex items-center"
-							href={`/${orgSlug}/projects/${projectId}/tasklists/new`}
-							prefetch={false}
-						>
-							<ListPlusIcon className="mr-1 h-5 w-5" /> Task list
-							<span className="sr-only">, document</span>
-						</Link>
-					</div>
+					<Link
+						className={buttonVariants({ size: "sm" })}
+						href={`/${orgSlug}/projects/${projectId}/tasklists/new`}
+						prefetch={false}
+					>
+						<ListPlusIcon className="mr-1 h-5 w-5" /> New
+						<span className="sr-only">, task list</span>
+					</Link>
 				</div>
 
 				{project.taskLists.length ? (
-					<ul className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2">
+					<ul className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2 mt-4">
 						{project.taskLists.map((taskList) => {
 							return (
 								<div
@@ -157,31 +157,40 @@ export default async function ProjectDetails({ params }: Props) {
 				/>
 			</div>
 
-			<div className="mx-auto flex max-w-5xl flex-col space-y-4 p-4 lg:p-0 lg:pb-12">
-				<div className="flex flex-col justify-between lg:flex-row lg:items-center">
+			<div className="mx-auto flex max-w-5xl flex-col space-y-4 mt-8 p-4 lg:p-0 lg:pb-12">
+				<div className="flex justify-between flex-row items-center">
 					<h2 className="text-2xl leading-7 tracking-tight">
 						Docs &amp; Files
 					</h2>
 
-					<div className="mt-4 flex space-x-4 lg:mt-0">
-						<Link
-							className="flex items-center"
-							href={`/${orgSlug}/projects/${projectId}/documents/new`}
-							prefetch={false}
-						>
-							<FilePlus2Icon className="mr-1 h-5 w-5" /> Document
-							<span className="sr-only">, document</span>
-						</Link>
-
-						<Link
-							className="flex items-center"
-							href={`/${orgSlug}/projects/${projectId}/documents/folders/new`}
-							prefetch={false}
-						>
-							<FolderPlusIcon className="mr-1 h-5 w-5" /> Folder
-							<span className="sr-only">, folder</span>
-						</Link>
-					</div>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button size="sm">
+								<PlusIcon className="mr-1 h-5 w-5" />
+								New
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent>
+							<DropdownMenuItem>
+								<Link
+									className="w-full"
+									href={`/${orgSlug}/projects/${projectId}/documents/new`}
+									prefetch={false}
+								>
+									Document
+								</Link>
+							</DropdownMenuItem>
+							<DropdownMenuItem>
+								<Link
+									className="w-full"
+									href={`/${orgSlug}/projects/${projectId}/documents/folders/new`}
+									prefetch={false}
+								>
+									Folder
+								</Link>
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 
 				{project.documents.length || project.documentFolders.length ? (
@@ -208,20 +217,18 @@ export default async function ProjectDetails({ params }: Props) {
 				/>
 			</div>
 
-			<div className="mx-auto flex max-w-5xl flex-col space-y-4 p-4 lg:p-0">
-				<div className="flex flex-col justify-between lg:flex-row lg:items-center">
+			<div className="mx-auto flex max-w-5xl flex-col mt-8 space-y-4 p-4 lg:p-0">
+				<div className="flex justify-between flex-row items-center">
 					<h2 className="text-2xl leading-7 tracking-tight">Events</h2>
 
-					<div className="mt-4 flex space-x-4 lg:mt-0">
-						<Link
-							className="flex items-center"
-							href={`/${orgSlug}/projects/${projectId}/events/new`}
-							prefetch={false}
-						>
-							<CalendarPlusIcon className="mr-1 h-5 w-5" /> Event
-							<span className="sr-only">, document</span>
-						</Link>
-					</div>
+					<Link
+						className={buttonVariants({ size: "sm" })}
+						href={`/${orgSlug}/projects/${projectId}/events/new`}
+						prefetch={false}
+					>
+						<CalendarPlusIcon className="mr-1 h-5 w-5" /> New
+						<span className="sr-only">, event</span>
+					</Link>
 				</div>
 
 				<div className="flex w-full rounded-lg border bg-white dark:bg-black">
