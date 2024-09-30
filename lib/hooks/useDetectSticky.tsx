@@ -1,28 +1,30 @@
 import { useEffect, useRef, useState } from "react";
 
 export const useDetectSticky = (
-  ref?: any,
-  observerSettings = { threshold: [1] }
+	// biome-ignore lint/suspicious/noExplicitAny: todo
+	ref?: any,
+	observerSettings = { threshold: [1] },
 ) => {
-  const [isSticky, setIsSticky] = useState(false);
-  const newRef = useRef();
-  ref ||= newRef;
+	const [isSticky, setIsSticky] = useState(false);
+	const newRef = useRef();
+	// biome-ignore lint/style/noParameterAssign: todo
+	ref ||= newRef;
 
-  // mount
-  useEffect(() => {
-    const cachedRef = ref.current,
-      observer = new IntersectionObserver(
-        ([e]) => setIsSticky(e.intersectionRatio < 1),
-        observerSettings
-      );
+	// mount
+	useEffect(() => {
+		const cachedRef = ref.current;
+		const observer = new IntersectionObserver(
+			([e]) => setIsSticky(e.intersectionRatio < 1),
+			observerSettings,
+		);
 
-    observer.observe(cachedRef);
+		observer.observe(cachedRef);
 
-    // unmount
-    return () => {
-      observer.unobserve(cachedRef);
-    };
-  }, [observerSettings, ref]);
+		// unmount
+		return () => {
+			observer.unobserve(cachedRef);
+		};
+	}, [observerSettings, ref]);
 
-  return [isSticky, ref, setIsSticky];
+	return [isSticky, ref, setIsSticky];
 };

@@ -1,69 +1,71 @@
 /* eslint-disable @next/next/no-img-element */
 import {
-  deleteBlob,
-  reloadDocuments,
-} from "@/app/(dashboard)/console/projects/[projectId]/documents/actions";
+	deleteBlob,
+	reloadDocuments,
+} from "@/app/(dashboard)/[tenant]/projects/[projectId]/documents/actions";
 import { DeleteButton } from "@/components/form/button";
-import { BlobWithCreater } from "@/drizzle/types";
+import { Badge } from "@/components/ui/badge";
+import {
+	ContextMenu,
+	ContextMenuContent,
+	ContextMenuItem,
+	ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import type { BlobWithCreater } from "@/drizzle/types";
 import { getFileUrl } from "@/lib/blobStore";
+import { File } from "lucide-react";
 import Link from "next/link";
-import { CreatorDetails } from "../shared/creator-details";
 
 export const FileInfo = ({
-  file,
-  projectId,
-  folderId,
+	file,
+	projectId,
+	folderId,
 }: {
-  file: BlobWithCreater;
-  projectId: number;
-  folderId: number | null;
+	file: BlobWithCreater;
+	projectId: number;
+	folderId: number | null;
 }) => {
-  const fileUrl = getFileUrl(file);
-  return (
-    <div className="relative flex h-[240px] gap-x-4 border-b border-gray-900/5 bg-gray-50 p-6 dark:bg-gray-900">
-      {file.contentType.includes("image") ? (
-        <div className="absolute left-0 top-0">
-          <img
-            src={fileUrl}
-            alt={file.name}
-            className="h-auto w-full opacity-30"
-          />
-        </div>
-      ) : null}
-
-      <span
-        className="absolute inset-0 top-0 z-0 bg-gradient-to-b from-gray-100 dark:from-black"
-        aria-hidden="true"
-      />
-
-      <Link
-        href={fileUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex w-full flex-col justify-between text-sm font-medium"
-        prefetch={false}
-      >
-        {/* <span className="absolute inset-0" aria-hidden="true" /> */}
-        <div className="z-10 flex-shrink space-y-2">
-          <div className="flex-shrink space-y-2">
-            <div className="text-xl font-medium leading-6">{file.name}</div>
-          </div>
-
-          <CreatorDetails user={file.creator} updatedAt={file.updatedAt} />
-        </div>
-      </Link>
-
-      <div className="absolute bottom-2 right-2 flex">
-        <form
-          action={async () => {
-            "use server";
-            await deleteBlob(file);
-            await reloadDocuments(+projectId, folderId);
-          }}
-        >
-          <DeleteButton action="Delete" />
-        </form>
-      </div>
-    </div>
-  );
+	const fileUrl = getFileUrl(file);
+	return (
+		<ContextMenu>
+			<ContextMenuTrigger>
+				<div className="flex items-center justify-center gap-x-2 rounded-md hover:bg-white dark:hover:bg-gray-800 p-1">
+					<Link
+						href={fileUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						prefetch={false}
+					>
+						<div className="relative">
+							<File
+								className="w-28 h-32 text-primary/60 -mt-2"
+								strokeWidth={1}
+								color="currentColor"
+							/>
+							<div className="text-md font-medium leading-6 truncate max-w-[120px] text-center">
+								{file.name}
+							</div>
+							<Badge className="absolute left-2 top-16 uppercase">
+								{file.contentType.split("/")?.[1] ?? "?"}
+							</Badge>
+						</div>
+					</Link>
+				</div>
+			</ContextMenuTrigger>
+			<ContextMenuContent>
+				<ContextMenuItem className="p-0">
+					<form
+						action={async () => {
+							"use server";
+							await deleteBlob(file, projectId);
+							await reloadDocuments(+projectId, folderId);
+						}}
+						className="w-full"
+					>
+						<DeleteButton action="Delete" compact className="w-full p-0" />
+					</form>
+				</ContextMenuItem>
+			</ContextMenuContent>
+		</ContextMenu>
+	);
 };

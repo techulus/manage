@@ -72,7 +72,6 @@
 
 .prose p,
 .prose pre {
-  margin: 12px 0;
   white-space: pre-wrap;
 }
 
@@ -146,8 +145,7 @@ textarea,
 }
 
 .text-hero {
-  font-family: var(--font-bricolage-grotesque);
-  font-weight: 600;
+  font-weight: 800;
 }
 
 .cl-avatarBox {

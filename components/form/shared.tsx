@@ -1,7 +1,7 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { DocumentFolder, Project, TaskList } from "@/drizzle/types";
+import type { DocumentFolder, Project, TaskList } from "@/drizzle/types";
 import MarkdownEditor from "../editor";
 import { DateTimePicker } from "../project/events/date-time-picker";
 

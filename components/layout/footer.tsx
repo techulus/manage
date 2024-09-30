@@ -1,6 +1,3 @@
-"use client";
-
-import { useTheme } from "@/lib/hooks/useTheme";
 import Link from "next/link";
 
 const navigation = {
@@ -11,8 +8,6 @@ const navigation = {
 };
 
 export function Footer() {
-  useTheme();
-
   return (
     <footer className="mt-28 border-t border-gray-200 dark:border-gray-800">
       <div className="mx-auto max-w-5xl overflow-hidden px-6 py-20 sm:py-24 lg:px-8">

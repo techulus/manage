@@ -1,7 +1,8 @@
 "use client";
 
 import { CheckIcon, TrashIcon } from "lucide-react";
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
 // @ts-ignore
 import { usePathname } from "next/navigation";
 import { useFormStatus } from "react-dom";

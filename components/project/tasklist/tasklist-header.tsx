@@ -1,130 +1,148 @@
 "use client";
 
-import { forkTaskList } from "@/app/(dashboard)/console/projects/[projectId]/tasklists/actions";
-import { Badge } from "@/components/ui/badge";
+import { forkTaskList } from "@/app/(dashboard)/[tenant]/projects/[projectId]/tasklists/actions";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { TaskList } from "@/drizzle/types";
-import { cn } from "@/lib/utils";
-import { CircleEllipsisIcon } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import type { TaskList } from "@/drizzle/types";
+import { CheckCircle, CircleEllipsisIcon, ClockIcon } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
 export const TaskListHeader = ({
-  taskList,
-  totalCount,
-  doneCount,
-  partialUpdateTaskList,
+	taskList,
+	totalCount,
+	doneCount,
+	orgSlug,
+	partialUpdateTaskList,
 }: {
-  taskList: TaskList;
-  totalCount?: number;
-  doneCount?: number;
-  partialUpdateTaskList?: (
-    id: number,
-    data: { status: string }
-  ) => Promise<void>;
+	taskList: TaskList;
+	totalCount?: number;
+	doneCount?: number;
+	orgSlug: string;
+	partialUpdateTaskList?: (
+		id: number,
+		data: { status: string },
+	) => Promise<void>;
 }) => {
-  const completedPercent =
-    totalCount != null && doneCount != null ? doneCount / totalCount : null;
+	const completedPercent =
+		totalCount != null && doneCount != null
+			? Math.round((doneCount / totalCount) * 100)
+			: null;
 
-  return (
-    <div className="group relative flex items-center gap-x-4 rounded-tl-lg rounded-tr-lg border-b border-gray-900/5 bg-white p-3 pt-4 dark:bg-black">
-      {completedPercent != null ? (
-        <div
-          className={cn(
-            "absolute left-0 top-0 z-0 h-2 rounded-tl-lg bg-primary opacity-70 transition-all",
-            completedPercent === 1 ? "rounded-tr-lg" : null
-          )}
-          style={{ width: `${completedPercent * 100}%` }}
-        />
-      ) : null}
-      <Link
-        href={`/console/projects/${taskList.projectId}/tasklists/${taskList.id}`}
-        className="text-sm font-medium"
-        prefetch={false}
-      >
-        <span className="absolute inset-0" aria-hidden="true" />
-        <div className="mb-2 flex">
-          <div className="text-xl font-bold leading-6 tracking-tight">
-            {taskList.name}
-            {taskList.status === "archived" ? " (Archived)" : null}
-          </div>
-        </div>
+	return (
+		<div className="group relative flex items-center gap-x-4 rounded-tl-lg rounded-tr-lg bg-white p-3 dark:bg-black">
+			<Link
+				href={`/${orgSlug}/projects/${taskList.projectId}/tasklists/${taskList.id}`}
+				className="text-sm font-medium flex-grow flex-auto"
+				prefetch={false}
+			>
+				<span className="absolute inset-0" aria-hidden="true" />
+				<div className="mb-2 flex">
+					<div className="text-xl leading-6">
+						{taskList.name}
+						{taskList.status === "archived" ? " (Archived)" : null}
+					</div>
+				</div>
 
-        {totalCount != null && doneCount != null ? (
-          <Badge variant="outline">
-            {doneCount}/{totalCount} completed
-          </Badge>
-        ) : null}
-        {taskList.dueDate ? (
-          <Badge variant="outline" className="ml-2" suppressHydrationWarning>
-            Due {taskList.dueDate.toLocaleDateString()}
-          </Badge>
-        ) : null}
-      </Link>
+				<div className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2 text-gray-500 dark:text-gray-400">
+					{totalCount != null && doneCount != null ? (
+						<div className="flex w-[260px] flex-row items-center border rounded-lg py-1 px-2 space-x-2">
+							<CheckCircle className="w-4 h-4" />
+							<p className="block">
+								{doneCount} of {totalCount}
+							</p>
 
-      <DropdownMenu>
-        <DropdownMenuTrigger className="absolute right-3 top-3">
-          <CircleEllipsisIcon className="h-6 w-6" />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem className="w-full p-0">
-            <Link
-              href={`/console/projects/${taskList.projectId}/tasklists/${taskList.id}/edit`}
-              className={buttonVariants({
-                variant: "ghost",
-                className: "w-full",
-              })}
-              prefetch={false}
-            >
-              Edit
-            </Link>
-          </DropdownMenuItem>
-          {partialUpdateTaskList ? (
-            <DropdownMenuItem className="w-full p-0">
-              <Button
-                variant="ghost"
-                className="w-full"
-                onClick={async () => {
-                  toast.promise(
-                    partialUpdateTaskList(taskList.id, {
-                      status:
-                        taskList.status === "active" ? "archived" : "active",
-                    }),
-                    {
-                      loading: "Updating task list...",
-                      success: "Task list updated.",
-                      error: "Failed to update task list.",
-                    }
-                  );
-                }}
-              >
-                {taskList.status === "active" ? "Archive" : "Unarchive"}
-              </Button>
-            </DropdownMenuItem>
-          ) : null}
-          <DropdownMenuItem className="w-full p-0">
-            <Button
-              variant="ghost"
-              className="w-full"
-              onClick={async () => {
-                toast.promise(forkTaskList(taskList.id, taskList.projectId), {
-                  loading: "Creating new task list...",
-                  success: "New task list created.",
-                  error: "Failed to create task list.",
-                });
-              }}
-            >
-              Fork
-            </Button>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
-  );
+							{completedPercent != null ? (
+								<>
+									<Progress
+										className="h-3 max-w-[120px]"
+										value={completedPercent}
+									/>
+									<span className="ml-2">{completedPercent}%</span>
+								</>
+							) : null}
+						</div>
+					) : null}
+
+					{taskList.dueDate ? (
+						<div className="flex flex-row items-center border rounded-lg py-1 px-2 space-x-2 max-w-[180px]">
+							<ClockIcon className="w-4 h-4" />
+							<p className="block">
+								{taskList.dueDate ? (
+									<span suppressHydrationWarning>
+										Due {taskList.dueDate.toLocaleDateString()}
+									</span>
+								) : null}
+							</p>
+						</div>
+					) : null}
+				</div>
+			</Link>
+
+			<DropdownMenu>
+				<DropdownMenuTrigger className="absolute right-3 top-3">
+					<CircleEllipsisIcon className="h-6 w-6" />
+				</DropdownMenuTrigger>
+				<DropdownMenuContent align="end">
+					<DropdownMenuItem className="w-full p-0">
+						<Link
+							href={`/${orgSlug}/projects/${taskList.projectId}/tasklists/${taskList.id}/edit`}
+							className={buttonVariants({
+								variant: "ghost",
+								className: "w-full",
+							})}
+							prefetch={false}
+						>
+							Edit
+						</Link>
+					</DropdownMenuItem>
+					{partialUpdateTaskList ? (
+						<DropdownMenuItem className="w-full p-0">
+							<Button
+								variant="ghost"
+								className="w-full"
+								onClick={async () => {
+									if (!partialUpdateTaskList) return;
+									toast.promise(
+										partialUpdateTaskList(taskList.id, {
+											status:
+												taskList.status === "active" ? "archived" : "active",
+										}),
+										{
+											loading: "Updating task list...",
+											success: "Task list updated.",
+											error: "Failed to update task list.",
+										},
+									);
+								}}
+							>
+								{taskList.status === "active" ? "Archive" : "Unarchive"}
+							</Button>
+						</DropdownMenuItem>
+					) : null}
+					<DropdownMenuItem className="w-full p-0">
+						<Button
+							variant="ghost"
+							className="w-full"
+							onClick={async () => {
+								toast.promise(forkTaskList(taskList.id, taskList.projectId), {
+									loading: "Creating new task list...",
+									success: "New task list created.",
+									error: "Failed to create task list.",
+								});
+							}}
+						>
+							Fork
+						</Button>
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</div>
+	);
 };
