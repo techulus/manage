@@ -115,7 +115,9 @@ export default async function ProjectDetails({ params }: Props) {
 
 			<div className="mx-auto flex max-w-5xl flex-col p-4 lg:p-0 lg:pb-12">
 				<div className="flex justify-between flex-row items-center mt-8">
-					<h2 className="text-2xl leading-7 tracking-tight">Task Lists</h2>
+					<h2 className="text-2xl font-bold leading-7 tracking-tight">
+						Task Lists
+					</h2>
 
 					<Link
 						className={buttonVariants({ size: "sm" })}
@@ -159,7 +161,7 @@ export default async function ProjectDetails({ params }: Props) {
 
 			<div className="mx-auto flex max-w-5xl flex-col space-y-4 mt-8 p-4 lg:p-0 lg:pb-12">
 				<div className="flex justify-between flex-row items-center">
-					<h2 className="text-2xl leading-7 tracking-tight">
+					<h2 className="text-2xl font-bold leading-7 tracking-tight">
 						Docs &amp; Files
 					</h2>
 
@@ -219,7 +221,9 @@ export default async function ProjectDetails({ params }: Props) {
 
 			<div className="mx-auto flex max-w-5xl flex-col mt-8 space-y-4 p-4 lg:p-0">
 				<div className="flex justify-between flex-row items-center">
-					<h2 className="text-2xl leading-7 tracking-tight">Events</h2>
+					<h2 className="text-2xl font-bold leading-7 tracking-tight">
+						Events
+					</h2>
 
 					<Link
 						className={buttonVariants({ size: "sm" })}
