@@ -58,6 +58,11 @@ export default function NavBar({
 				]
 			: [
 					{
+						name: "Today",
+						href: "./today",
+						current: path.endsWith("/today"),
+					},
+					{
 						name: "Projects",
 						href: "./projects",
 						current: path.endsWith("/projects"),
