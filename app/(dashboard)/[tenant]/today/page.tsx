@@ -1,3 +1,4 @@
+import { Greeting } from "@/components/core/greeting";
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { task } from "@/drizzle/schema";
@@ -13,12 +14,16 @@ export default async function Today() {
 
 	console.log({ tasks });
 
+	const summary = `You've got ${tasks.length} tasks due today.`;
+
 	return (
 		<>
 			<PageTitle title="Today" />
 
 			<PageSection topInset>
-				<h1 className="p-8">Hello</h1>
+				<p className="p-4 text-xl">
+					<Greeting />, {summary}
+				</p>
 			</PageSection>
 		</>
 	);
