@@ -11,24 +11,25 @@ export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
 export async function GET(
-	_: Request,
-	{ params }: { params: { projectId: string; ownerId: string } },
+    _: Request,
+    props: { params: Promise<{ projectId: string; ownerId: string }> }
 ) {
-	const { projectId, ownerId } = params;
+    const params = await props.params;
+    const { projectId, ownerId } = params;
 
-	const db = getDatabaseForOwner(ownerId);
+    const db = getDatabaseForOwner(ownerId);
 
-	const projectDetails = await db.query.project
+    const projectDetails = await db.query.project
 		.findFirst({
 			where: eq(project.id, +projectId),
 		})
 		.execute();
 
-	if (!projectDetails) {
+    if (!projectDetails) {
 		return new Response("Project not found", { status: 404 });
 	}
 
-	const [events, tasklists] = await Promise.all([
+    const [events, tasklists] = await Promise.all([
 		db.query.calendarEvent
 			.findMany({
 				where: and(eq(calendarEvent.projectId, +projectId)),
@@ -46,11 +47,11 @@ export async function GET(
 		}),
 	]);
 
-	const calendar = ical({ name: projectDetails.name });
+    const calendar = ical({ name: projectDetails.name });
 
-	calendar.method(ICalCalendarMethod.REQUEST);
+    calendar.method(ICalCalendarMethod.REQUEST);
 
-	for (const event of events) {
+    for (const event of events) {
 		calendar.createEvent({
 			id: event.id,
 			start: dayjs.utc(event.start).toDate(),
@@ -64,7 +65,7 @@ export async function GET(
 		});
 	}
 
-	for (const tasklist of tasklists) {
+    for (const tasklist of tasklists) {
 		if (tasklist.tasks?.length === 0) {
 			continue;
 		}
@@ -86,14 +87,14 @@ export async function GET(
 		}
 	}
 
-	const headers = new Headers();
-	headers.set("Content-Type", "text/calendar; charset=utf-8");
-	headers.set("Content-Disposition", "attachment; filename=calendar.ics");
-	headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
-	headers.set("Pragma", "no-cache");
-	headers.set("Expires", "0");
+    const headers = new Headers();
+    headers.set("Content-Type", "text/calendar; charset=utf-8");
+    headers.set("Content-Disposition", "attachment; filename=calendar.ics");
+    headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
+    headers.set("Pragma", "no-cache");
+    headers.set("Expires", "0");
 
-	return new Response(calendar.toString(), {
+    return new Response(calendar.toString(), {
 		headers,
 	});
 }

@@ -17,16 +17,16 @@ export async function switchOrganization(payload: FormData) {
 	const orgSlug = payload.get("slug") as string;
 
 	if (orgId) {
-		cookies().set("activeOrgId", orgId ?? null, {
+		(await cookies()).set("activeOrgId", orgId ?? null, {
 			httpOnly: true,
 		});
-		cookies().set("activeOrgSlug", orgSlug ?? "personal", {
+		(await cookies()).set("activeOrgSlug", orgSlug ?? "personal", {
 			httpOnly: true,
 		});
 		redirect(`/${orgSlug}/projects`);
 	} else {
-		cookies().delete("activeOrgId");
-		cookies().set("activeOrgSlug", "personal", {
+		(await cookies()).delete("activeOrgId");
+		(await cookies()).set("activeOrgSlug", "personal", {
 			httpOnly: true,
 		});
 		redirect("/personal/projects");
@@ -34,8 +34,8 @@ export async function switchOrganization(payload: FormData) {
 }
 
 export async function logout() {
-	cookies().delete("activeOrgId");
-	cookies().delete("activeOrgSlug");
+	(await cookies()).delete("activeOrgId");
+	(await cookies()).delete("activeOrgSlug");
 	await signOut();
 	redirect("/");
 }
@@ -50,7 +50,7 @@ export async function saveUserTimezone(timezone: string) {
 		})
 		.where(eq(users.id, userId));
 
-	cookies().set("userTimezone", timezone, {
+	(await cookies()).set("userTimezone", timezone, {
 		httpOnly: true,
 	});
 }

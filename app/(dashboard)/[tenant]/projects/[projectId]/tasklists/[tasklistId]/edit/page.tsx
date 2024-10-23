@@ -10,19 +10,20 @@ import Link from "next/link";
 import { updateTaskList } from "../../actions";
 
 type Props = {
-	params: {
+	params: Promise<{
 		projectId: string;
 		tasklistId: string;
-	};
+	}>;
 };
 
-export default async function EditTaskList({ params }: Props) {
-	const { orgSlug } = await getOwner();
-	const tasklist = await getTaskListById(params.tasklistId);
+export default async function EditTaskList(props: Props) {
+    const params = await props.params;
+    const { orgSlug } = await getOwner();
+    const tasklist = await getTaskListById(params.tasklistId);
 
-	const backUrl = `/${orgSlug}/projects/${params.projectId}/tasklists`;
+    const backUrl = `/${orgSlug}/projects/${params.projectId}/tasklists`;
 
-	return (
+    return (
 		<>
 			<PageTitle title="Update Task list" backUrl={backUrl} />
 
