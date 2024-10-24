@@ -10,12 +10,12 @@ import { Badge } from "../ui/badge";
 
 dayjs.extend(timezone);
 
-export const ProjecItem = ({
+export const ProjecItem = async ({
 	project: { id, name, description, creator, dueDate },
 }: {
 	project: ProjectWithCreator;
 }) => {
-	const timezone = getTimezone();
+	const timezone = await getTimezone();
 	return (
 		<div
 			key={id}
