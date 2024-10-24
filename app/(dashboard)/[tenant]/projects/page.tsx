@@ -16,16 +16,16 @@ interface Props {
 }
 
 export default async function Projects(props: Props) {
-    const searchParams = await props.searchParams;
-    const { orgSlug } = await getOwner();
-    const statuses = searchParams?.status?.split(",") ?? ["active"];
+	const searchParams = await props.searchParams;
+	const { orgSlug } = await getOwner();
+	const statuses = searchParams?.status?.split(",") ?? ["active"];
 
-    const { projects, archivedProjects } = await getProjectsForOwner({
+	const { projects, archivedProjects } = await getProjectsForOwner({
 		search: searchParams.search,
 		statuses,
 	});
 
-    return (
+	return (
 		<>
 			<PageTitle
 				title={
