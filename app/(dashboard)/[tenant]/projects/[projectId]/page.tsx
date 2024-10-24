@@ -24,22 +24,23 @@ import { notFound } from "next/navigation";
 import { archiveProject, deleteProject, unarchiveProject } from "../actions";
 
 type Props = {
-	params: {
+	params: Promise<{
 		projectId: string;
-	};
+	}>;
 };
 
-export default async function ProjectDetails({ params }: Props) {
-	const { projectId } = params;
+export default async function ProjectDetails(props: Props) {
+    const params = await props.params;
+    const { projectId } = params;
 
-	const project = await getProjectById(projectId, true);
-	const { userId, orgSlug } = await getOwner();
+    const project = await getProjectById(projectId, true);
+    const { userId, orgSlug } = await getOwner();
 
-	if (!project) {
+    if (!project) {
 		return notFound();
 	}
 
-	return (
+    return (
 		<>
 			<PageTitle
 				title={project.name}

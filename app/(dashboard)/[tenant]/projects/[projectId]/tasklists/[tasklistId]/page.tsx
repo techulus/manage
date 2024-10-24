@@ -11,18 +11,19 @@ import { notFound } from "next/navigation";
 import { createTask, partialUpdateTaskList } from "../actions";
 
 type Props = {
-	params: {
+	params: Promise<{
 		projectId: string;
 		tasklistId: string;
-	};
+	}>;
 };
 
-export default async function TaskLists({ params }: Props) {
-	const { userId, orgSlug } = await getOwner();
-	const { projectId, tasklistId } = params;
+export default async function TaskLists(props: Props) {
+    const params = await props.params;
+    const { userId, orgSlug } = await getOwner();
+    const { projectId, tasklistId } = params;
 
-	const db = await database();
-	const list = await db.query.taskList
+    const db = await database();
+    const list = await db.query.taskList
 		.findFirst({
 			where: and(
 				eq(taskList.projectId, +projectId),
@@ -50,27 +51,27 @@ export default async function TaskLists({ params }: Props) {
 		})
 		.execute();
 
-	if (!list) {
+    if (!list) {
 		return notFound();
 	}
 
-	const currentUser = await db.query.user.findFirst({
+    const currentUser = await db.query.user.findFirst({
 		where: eq(user.id, userId),
 	});
 
-	if (!currentUser) {
+    if (!currentUser) {
 		return notFound();
 	}
 
-	const totalCount = list.tasks.length;
-	const doneCount = list.tasks.filter((task) => task.status === "done").length;
+    const totalCount = list.tasks.length;
+    const doneCount = list.tasks.filter((task) => task.status === "done").length;
 
-	const completedPercent =
+    const completedPercent =
 		totalCount != null && doneCount != null
 			? Math.round((doneCount / totalCount) * 100)
 			: null;
 
-	return (
+    return (
 		<>
 			<PageTitle
 				title={list.name}

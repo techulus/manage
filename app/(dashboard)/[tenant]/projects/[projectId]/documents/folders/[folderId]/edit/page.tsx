@@ -12,21 +12,22 @@ import Link from "next/link";
 import { updateDocumentFolder } from "../../../actions";
 
 type Props = {
-	params: {
+	params: Promise<{
 		projectId: string;
 		folderId: string;
-	};
+	}>;
 };
 
-export default async function EditDocumentFolder({ params }: Props) {
-	const { orgSlug } = await getOwner();
-	const backUrl = `/${orgSlug}/projects/${params.projectId}/documents/folders/${params.folderId}`;
-	const db = await database();
-	const folder = await db.query.documentFolder.findFirst({
+export default async function EditDocumentFolder(props: Props) {
+    const params = await props.params;
+    const { orgSlug } = await getOwner();
+    const backUrl = `/${orgSlug}/projects/${params.projectId}/documents/folders/${params.folderId}`;
+    const db = await database();
+    const folder = await db.query.documentFolder.findFirst({
 		where: eq(documentFolder.id, +params.folderId),
 	});
 
-	return (
+    return (
 		<>
 			<PageTitle title="Update Folder" backUrl={backUrl} />
 

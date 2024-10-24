@@ -7,25 +7,30 @@ import { redirect } from "next/navigation";
 export const fetchCache = "force-no-store"; // disable cache for console pages
 export const dynamic = "force-dynamic"; // disable static generation for console pages
 
-export default async function ConsoleLayout({
-	children,
-	params,
-}: {
-	children: React.ReactNode;
-	params: {
-		tenant: string;
-	};
-}) {
-	const ready = await isDatabaseReady();
-	const { orgId, orgSlug } = await getOwner();
-	const orgs = await getOrgs();
-	const activatedOrg = orgs.find((org) => org.id === orgId);
+export default async function ConsoleLayout(
+    props: {
+        children: React.ReactNode;
+        params: Promise<{
+            tenant: string;
+        }>;
+    }
+) {
+    const params = await props.params;
 
-	if (!ready || params.tenant !== orgSlug) {
+    const {
+        children
+    } = props;
+
+    const ready = await isDatabaseReady();
+    const { orgId, orgSlug } = await getOwner();
+    const orgs = await getOrgs();
+    const activatedOrg = orgs.find((org) => org.id === orgId);
+
+    if (!ready || params.tenant !== orgSlug) {
 		redirect("/start");
 	}
 
-	return (
+    return (
 		<div className="relative flex min-h-full flex-col">
 			<NavBar orgs={orgs} activeOrg={activatedOrg} />
 

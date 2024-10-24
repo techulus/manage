@@ -24,18 +24,19 @@ import Link from "next/link";
 import { deleteDocumentFolder, reloadDocuments } from "../../actions";
 
 type Props = {
-	params: {
+	params: Promise<{
 		projectId: string;
 		folderId: number;
-	};
+	}>;
 };
 
-export default async function FolderDetails({ params }: Props) {
-	const { orgSlug } = await getOwner();
-	const { projectId, folderId } = params;
+export default async function FolderDetails(props: Props) {
+    const params = await props.params;
+    const { orgSlug } = await getOwner();
+    const { projectId, folderId } = params;
 
-	const db = await database();
-	const folder: FolderWithContents | undefined =
+    const db = await database();
+    const folder: FolderWithContents | undefined =
 		await db.query.documentFolder.findFirst({
 			where: eq(documentFolder.id, Number(folderId)),
 			with: {
@@ -62,11 +63,11 @@ export default async function FolderDetails({ params }: Props) {
 			},
 		});
 
-	if (!folder) {
+    if (!folder) {
 		return null;
 	}
 
-	return (
+    return (
 		<>
 			<PageTitle
 				title={folder?.name}

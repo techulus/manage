@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "next dev",
-		"dev:turbo": "next dev --turbo",
+		"dev:turbo": "next dev",
 		"prebuild": "npm run migrate:ops",
 		"build": "next build",
 		"start": "next start",
@@ -45,16 +45,17 @@
 		"dayjs": "^1.11.12",
 		"drizzle-orm": "^0.32.1",
 		"easymde": "^2.18.0",
+		"eslint-config-next": "15.0.0-rc.1",
 		"ical-generator": "^8.0.0",
 		"lucide-react": "^0.244.0",
 		"mime-types": "^2.1.35",
-		"next": "^14.2.5",
-		"next-auth": "beta",
+		"next": "15.0.1-canary.3",
+		"next-auth": "5.0.0-beta.25",
 		"next-themes": "^0.3.0",
 		"postcss": "8.4.23",
-		"react": "^18.3.1",
+		"react": "19.0.0-rc-45804af1-20241021",
 		"react-day-picker": "^8.10.1",
-		"react-dom": "^18.3.1",
+		"react-dom": "19.0.0-rc-45804af1-20241021",
 		"react-dropzone": "^14.2.3",
 		"react-hot-toast": "^2.4.1",
 		"react-markdown": "^8.0.7",
@@ -79,12 +80,18 @@
 		"@tailwindcss/typography": "^0.5.9",
 		"@types/mime-types": "^2.1.1",
 		"@types/node": "20.1.0",
-		"@types/react": "^18.2.55",
-		"@types/react-dom": "^18.2.19",
+		"@types/react": "18.3.11",
+		"@types/react-dom": "18.3.1",
 		"@types/uuid": "^9.0.2",
 		"dotenv": "^16.3.1",
 		"drizzle-kit": "^0.22.2",
 		"encoding": "^0.1.13"
 	},
-	"packageManager": "pnpm@9.6.0+sha512.38dc6fba8dba35b39340b9700112c2fe1e12f10b17134715a4aa98ccf7bb035e76fd981cf0bb384dfa98f8d6af5481c2bef2f4266a24bfa20c34eb7147ce0b5e"
+	"packageManager": "pnpm@9.6.0+sha512.38dc6fba8dba35b39340b9700112c2fe1e12f10b17134715a4aa98ccf7bb035e76fd981cf0bb384dfa98f8d6af5481c2bef2f4266a24bfa20c34eb7147ce0b5e",
+	"pnpm": {
+		"overrides": {
+			"@types/react": "18.3.11",
+			"@types/react-dom": "18.3.1"
+		}
+	}
 }

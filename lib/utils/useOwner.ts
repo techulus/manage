@@ -62,8 +62,10 @@ export async function getOwner(): Promise<Result> {
 
 	const userId = session.user.id;
 
-	const activeOrgId = cookies().get("activeOrgId")?.value;
-	const activeOrgSlug = cookies().get("activeOrgSlug")?.value ?? "personal";
+	const cookieStore = await cookies();
+
+	const activeOrgId = cookieStore.get("activeOrgId")?.value;
+	const activeOrgSlug = cookieStore.get("activeOrgSlug")?.value ?? "personal";
 	const ownerId = activeOrgId ?? userId;
 
 	return {
@@ -74,6 +76,7 @@ export async function getOwner(): Promise<Result> {
 	} as Result;
 }
 
-export function getTimezone() {
-	return cookies().get("userTimezone")?.value ?? dayjs.tz.guess();
+export async function getTimezone() {
+	const cookieStore = await cookies();
+	return cookieStore.get("userTimezone")?.value ?? dayjs.tz.guess();
 }
