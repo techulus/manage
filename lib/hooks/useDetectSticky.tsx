@@ -6,7 +6,7 @@ export const useDetectSticky = (
 	observerSettings = { threshold: [1] },
 ) => {
 	const [isSticky, setIsSticky] = useState(false);
-	const newRef = useRef();
+	const newRef = useRef(null);
 	// biome-ignore lint/style/noParameterAssign: todo
 	ref ||= newRef;
 

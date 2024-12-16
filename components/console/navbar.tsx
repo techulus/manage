@@ -126,17 +126,17 @@ export default function NavBar({
 				ref={ref}
 				aria-label="Tabs"
 			>
-				<Transition
-					show={isSticky}
-					className="absolute hidden self-center md:block"
-					enter="transition-all ease-in-out duration-300"
-					enterFrom="transform  translate-y-[-100%] opacity-0"
-					enterTo="transform  translate-y-0 opacity-100"
-					leave="transition-all ease-in-out duration-300"
-					leaveFrom="transform  translate-y-0 opacity-100"
-					leaveTo="transform  translate-y-[-100%] opacity-0"
-				>
-					<Link href="/" prefetch={false}>
+				<Transition show={isSticky}>
+					<Link
+						className={cn(
+							"absolute hidden self-center md:block",
+							"data-[enter]:data-[leave]:transition-all ease-in-out duration-300",
+							"data-[enterFrom]:data-[leaveTo]:transform translate-y-[-100%] opacity-0",
+							"data-[enterTo]:data-[leaveFrom]:transform translate-y-0 opacity-100",
+						)}
+						href="/"
+						prefetch={false}
+					>
 						<Image
 							className="rounded-md"
 							src={logo}
