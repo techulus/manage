@@ -39,13 +39,13 @@ export async function getUser(): Promise<User> {
 }
 
 export async function getOrgs(): Promise<[]> {
-	const accessToken = await getAccessTokenRSC(
-		logtoConfig,
-		"http://localhost:3001/api",
-	);
-	if (!accessToken) {
-		throw new Error("Access token not found");
-	}
+	// const accessToken = await getAccessTokenRSC(
+	// 	logtoConfig,
+	// 	"http://localhost:3001/api",
+	// );
+	// if (!accessToken) {
+	// 	throw new Error("Access token not found");
+	// }
 
 	// const response = await fetch("http://localhost:3002/api/organizations", {
 	// 	method: "GET",
