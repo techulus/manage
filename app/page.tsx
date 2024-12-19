@@ -1,9 +1,6 @@
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
-import { buttonVariants } from "@/components/ui/button";
 import { SITE_METADATA } from "@/data/marketing";
-import { cn } from "@/lib/utils";
-import { CheckIcon } from "lucide-react";
 import Link from "next/link";
 
 export const revalidate = 86400;

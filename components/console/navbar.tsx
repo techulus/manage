@@ -2,7 +2,6 @@
 
 import { useDetectSticky } from "@/lib/hooks/useDetectSticky";
 import { cn } from "@/lib/utils";
-import type { Organization } from "@/ops/types";
 import { Transition } from "@headlessui/react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -17,13 +16,13 @@ export default function NavBar({
 	orgs,
 	activeOrg,
 }: {
-	orgs: Organization[];
-	activeOrg: Organization | undefined;
+	orgs: [];
+	activeOrg: undefined;
 }) {
 	const { systemTheme: theme } = useTheme();
 	const path = usePathname();
 	const { projectId } = useParams();
-	const orgSlug = activeOrg?.slug ?? "personal";
+	const orgSlug = "personal";
 
 	const [isSticky, ref] = useDetectSticky();
 
@@ -73,7 +72,8 @@ export default function NavBar({
 						current: path.endsWith("/settings"),
 					},
 				];
-	}, [path, projectId, orgSlug]);
+	}, [path, projectId]);
+
 	return (
 		<>
 			{createToastWrapper(theme)}
@@ -108,7 +108,7 @@ export default function NavBar({
 								<path d="M16.88 3.549L7.12 20.451" />
 							</svg>
 
-							<OrgSwitcher orgs={orgs} activeOrg={activeOrg} />
+							{/* <OrgSwitcher orgs={orgs} activeOrg={activeOrg} /> */}
 						</div>
 
 						<div className="ml-2 flex justify-center">

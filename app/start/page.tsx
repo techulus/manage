@@ -1,20 +1,10 @@
-import {
-	createDatabaseAndMigrate,
-	isDatabaseCreatedForOwner,
-} from "@/lib/utils/turso";
+import { addUserToTenantDb } from "@/lib/ops/user";
 import { isDatabaseReady } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
-import { addUserToTenantDb, reportLastActive } from "@/ops/user";
 import { redirect } from "next/navigation";
 
 export default async function Start() {
-	const { ownerId, orgSlug } = await getOwner();
-
-	const isDatabaseCreated = await isDatabaseCreatedForOwner(ownerId);
-	if (isDatabaseCreated.error) {
-		console.log("Database not created, creating...");
-		await createDatabaseAndMigrate(ownerId);
-	}
+	const { orgSlug } = await getOwner();
 
 	const ready = await isDatabaseReady();
 
@@ -23,7 +13,6 @@ export default async function Start() {
 		redirect("/start");
 	}
 
-	await reportLastActive();
 	await addUserToTenantDb();
 	redirect(`/${orgSlug}/projects`);
 }

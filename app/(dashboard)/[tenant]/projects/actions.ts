@@ -39,7 +39,7 @@ export async function createProject(payload: FormData) {
 	});
 
 	const db = await database();
-	const newProject = await db
+	const newProject = db
 		.insert(project)
 		.values({
 			...data,
