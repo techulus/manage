@@ -1,14 +1,12 @@
-import { auth } from "@/auth";
+import { logtoConfig } from "@/app/logto";
 import { user } from "@/drizzle/schema";
 import type { User } from "@/drizzle/types";
-import { opsDb } from "@/ops/database";
-import { organizationMembers } from "@/ops/schema";
+import { getAccessTokenRSC, getLogtoContext } from "@logto/next/server-actions";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
-import type { Organization } from "./../../ops/types";
 import { database } from "./useDatabase";
 
 dayjs.extend(utc);
@@ -22,12 +20,11 @@ type Result = {
 };
 
 export async function getUser(): Promise<User> {
-	const session = await auth();
-	if (!session?.user?.id) {
+	const { claims } = await getLogtoContext(logtoConfig);
+	if (!claims?.sub) {
 		throw new Error("User not found");
 	}
-
-	const userId = session.user.id;
+	const userId = claims.sub;
 
 	const db = await database();
 	const userDetails = await db.query.user.findFirst({
@@ -41,26 +38,40 @@ export async function getUser(): Promise<User> {
 	return userDetails;
 }
 
-export async function getOrgs(): Promise<Organization[]> {
-	const { userId } = await getOwner();
+export async function getOrgs(): Promise<[]> {
+	const accessToken = await getAccessTokenRSC(
+		logtoConfig,
+		"http://localhost:3001/api",
+	);
+	if (!accessToken) {
+		throw new Error("Access token not found");
+	}
 
-	const memberships = await opsDb().query.organizationMembers.findMany({
-		where: eq(organizationMembers.userId, userId!),
-		with: {
-			organization: true,
-		},
-	});
+	// const response = await fetch("http://localhost:3002/api/organizations", {
+	// 	method: "GET",
+	// 	headers: {
+	// 		Authorization: `Bearer ${accessToken}`,
+	// 		"Content-Type": "application/json",
+	// 	},
+	// });
 
-	return memberships.map((membership) => membership.organization);
+	// if (!response.ok) {
+	// 	console.error("Failed to fetch organizations", response.status);
+	// 	throw new Error("Failed to fetch organizations");
+	// }
+
+	// const organizations = await response.json();
+	// console.log("organizations", organizations);
+
+	return [];
 }
 
 export async function getOwner(): Promise<Result> {
-	const session = await auth();
-	if (!session?.user?.id) {
+	const { claims } = await getLogtoContext(logtoConfig);
+	if (!claims?.sub) {
 		throw new Error("User not found");
 	}
-
-	const userId = session.user.id;
+	const userId = claims.sub;
 
 	const cookieStore = await cookies();
 

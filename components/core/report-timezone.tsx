@@ -1,6 +1,5 @@
 "use client";
 
-import { saveUserTimezone } from "@/app/(auth)/actions";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
@@ -10,12 +9,12 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 export function ReportTimezone() {
-  useEffect(() => {
-    const timeZone = dayjs.tz.guess();
-    if (timeZone) {
-      saveUserTimezone(timeZone);
-    }
-  }, []);
+	// useEffect(() => {
+	//   const timeZone = dayjs.tz.guess();
+	//   if (timeZone) {
+	//     saveUserTimezone(timeZone);
+	//   }
+	// }, []);
 
-  return null;
+	return null;
 }
