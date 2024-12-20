@@ -25,10 +25,37 @@ Manage is an open-source alternative to Basecamp, offering a streamlined project
 - [ ] Permissions
 - [ ] Billing
 
+## Development
+
+### Environment
+
+```
+# Logto for Auth
+LOGTO_ENDPOINT=
+LOGTO_APP_ID=""
+LOGTO_APP_SECRET=""
+LOGTO_BASE_URL=""
+LOGTO_COOKIE_SECRET=""
+LOGTO_M2M_APP_ID=""
+LOGTO_M2M_APP_SECRET=""
+
+# Any S3 compatible storage
+S3_BUCKET_ENDPOINT="
+S3_ACCESS_KEY_ID=""
+S3_SECRET_ACCESS_KEY=""
+S3_BUCKET_NAME=""
+```
+
+### Run using Docker
+
+```bash
+docker-compose up
+```
+
 ## Note on Performance
 
 > **Warning**
-> This app is using the unstable releases for Next.js and React.
+> This app is still in development. It's not ready for production use.
 > **Expect some bugs & performance hits when testing**.
 > If you see something broken, you can ping me [@arjunz](https://twitter.com/arjunz).
 
