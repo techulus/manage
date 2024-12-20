@@ -1,0 +1,43 @@
+services:
+  manage_app:
+    build: .
+    ports:
+      - 3000:3000
+  logto_app:
+    depends_on:
+      logto_postgres:
+        condition: service_healthy
+    image: svhd/logto:${TAG-latest}
+    entrypoint: ["sh", "-c", "npm run cli db seed -- --swe && npm start"]
+    ports:
+      - 3001:3001
+      - 3002:3002
+    environment:
+      - TRUST_PROXY_HEADER=1
+      - DB_URL=postgres://postgres:p0stgr3s@logto_postgres:5432/logto
+      # Mandatory for GitPod to map host env to the container, thus GitPod can dynamically configure the public URL of Logto;
+      # Or, you can leverage it for local testing.
+      - ENDPOINT
+      - ADMIN_ENDPOINT
+  logto_postgres:
+    image: postgres:17-alpine
+    user: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: p0stgr3s
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  minio:
+    image: quay.io/minio/minio
+    ports:
+      - 9000:9000
+      - 9001:9001
+    environment:
+      MINIO_ROOT_USER: ROOTUSER
+      MINIO_ROOT_PASSWORD: ROOTPASSWORD
+    volumes:
+      - ./blob-data:/data
+    command: server /data --console-address ":9001"

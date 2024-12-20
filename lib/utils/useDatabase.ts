@@ -1,13 +1,11 @@
 import path from "node:path";
-import { createClient } from "@libsql/client/web";
-import { type LibSQLDatabase, drizzle } from "drizzle-orm/libsql";
-import { migrate } from "drizzle-orm/libsql/migrator";
-import * as schema from "../../drizzle/schema";
+import Database from "better-sqlite3";
 import {
-	getDatabaseForOwner,
-	getDatabaseNameForOwner,
-	tursoOrganizationName,
-} from "./turso";
+	type BetterSQLite3Database,
+	drizzle,
+} from "drizzle-orm/better-sqlite3";
+import { migrate } from "drizzle-orm/better-sqlite3/migrator";
+import * as schema from "../../drizzle/schema";
 import { getOwner } from "./useOwner";
 
 export async function isDatabaseReady(): Promise<boolean> {
@@ -21,26 +19,27 @@ export async function isDatabaseReady(): Promise<boolean> {
 }
 
 export async function migrateDatabase(): Promise<void> {
-	const { ownerId } = await getOwner();
-	const db = getDatabaseForOwner(ownerId);
+	const db = await database();
 	const migrationsFolder = path.resolve(process.cwd(), "drizzle");
-	await migrate(db, { migrationsFolder: migrationsFolder });
+	migrate(db, { migrationsFolder: migrationsFolder });
 }
 
-export async function database(): Promise<LibSQLDatabase<typeof schema>> {
+export async function database(): Promise<
+	BetterSQLite3Database<typeof schema>
+> {
 	const { ownerId } = await getOwner();
 
 	if (!ownerId) {
 		throw new Error("Owner ID not found");
 	}
 
-	const databaseName = getDatabaseNameForOwner(ownerId);
-	const databaseUrl = `libsql://${databaseName}-${tursoOrganizationName}.turso.io`;
+	const sqlite = new Database(`sqlite/${ownerId}.db`);
+	return drizzle(sqlite, { schema });
+}
 
-	const client = createClient({
-		url: databaseUrl,
-		authToken: process.env.DATABASE_AUTH_TOKEN ?? "",
-	});
-
-	return drizzle(client, { schema });
+export async function getDatabaseForOwner(
+	ownerId: string,
+): Promise<BetterSQLite3Database<typeof schema>> {
+	const sqlite = new Database(`sqlite/${ownerId}.db`);
+	return drizzle(sqlite, { schema });
 }
