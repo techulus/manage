@@ -1,4 +1,5 @@
 import { logtoConfig } from "@/app/logto";
+import type { Organization } from "@/components/core/auth";
 import { user } from "@/drizzle/schema";
 import type { User } from "@/drizzle/types";
 import { getLogtoContext } from "@logto/next/server-actions";
@@ -38,9 +39,8 @@ export async function getUser(): Promise<User> {
 	return userDetails;
 }
 
-export async function getOrgs(): Promise<string[]> {
-	const { claims } = await getLogtoContext(logtoConfig);
-	return claims?.organizations ?? [];
+export async function getOrgs(): Promise<Organization[]> {
+	return [];
 }
 
 export async function getOwner(): Promise<Result> {

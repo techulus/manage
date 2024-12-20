@@ -12,7 +12,8 @@ import {
 	DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 
-type Organization = {
+// WIP, this should be changed
+export type Organization = {
 	id: string;
 	name: string;
 	slug: string;
@@ -23,7 +24,7 @@ export const OrgSwitcher = ({
 	activeOrg,
 }: {
 	orgs: Organization[];
-	activeOrg: Organization | undefined;
+	activeOrg: Organization | null;
 }) => {
 	return (
 		<DropdownMenu>

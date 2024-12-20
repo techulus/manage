@@ -1,4 +1,8 @@
 services:
+  manage_app:
+    build: .
+    ports:
+      - 3000:3000
   logto_app:
     depends_on:
       logto_postgres:

@@ -36,3 +36,10 @@ export async function database(): Promise<
 	const sqlite = new Database(`sqlite/${ownerId}.db`);
 	return drizzle(sqlite, { schema });
 }
+
+export async function getDatabaseForOwner(
+	ownerId: string,
+): Promise<BetterSQLite3Database<typeof schema>> {
+	const sqlite = new Database(`sqlite/${ownerId}.db`);
+	return drizzle(sqlite, { schema });
+}

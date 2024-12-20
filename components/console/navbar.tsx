@@ -9,15 +9,15 @@ import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useMemo } from "react";
 import logo from "../../public/images/logo.png";
-import { OrgSwitcher, UserButton } from "../core/auth";
+import { OrgSwitcher, type Organization, UserButton } from "../core/auth";
 import { createToastWrapper } from "../core/toast";
 
 export default function NavBar({
 	orgs,
 	activeOrg,
 }: {
-	orgs: [];
-	activeOrg: undefined;
+	orgs: Organization[];
+	activeOrg: Organization | null;
 }) {
 	const { systemTheme: theme } = useTheme();
 	const path = usePathname();
