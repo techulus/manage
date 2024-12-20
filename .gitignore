@@ -41,3 +41,6 @@ next-env.d.ts
 
 # database
 sqlite
+
+# blob
+blob-data
