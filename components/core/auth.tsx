@@ -2,7 +2,6 @@ import { logtoConfig } from "@/app/logto";
 import { signOut } from "@logto/next/server-actions";
 import { ChevronsUpDown, Plus, User } from "lucide-react";
 import Link from "next/link";
-import toast from "react-hot-toast";
 import { Button } from "../ui/button";
 import {
 	DropdownMenu,
@@ -13,10 +12,18 @@ import {
 	DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 
+type Organization = {
+	id: string;
+	name: string;
+	slug: string;
+};
+
 export const OrgSwitcher = ({
 	orgs,
+	activeOrg,
 }: {
-	orgs: [];
+	orgs: Organization[];
+	activeOrg: Organization | undefined;
 }) => {
 	return (
 		<DropdownMenu>
@@ -26,7 +33,7 @@ export const OrgSwitcher = ({
 					size="sm"
 					className="flex w-full items-center justify-between px-2 py-1 focus:outline-none"
 				>
-					{/* <span className="truncate">{activeOrg?.name ?? "Personal"}</span> */}
+					<span className="truncate">{activeOrg?.name ?? "Personal"}</span>
 					<ChevronsUpDown className="ml-1 h-4 w-4 shrink-0 opacity-50" />
 				</Button>
 			</DropdownMenuTrigger>
@@ -34,11 +41,11 @@ export const OrgSwitcher = ({
 				<DropdownMenuItem asChild>
 					<form
 					// action={(formData) =>
-					// toast.promise(switchOrganization(formData), {
-					// 	loading: "Switching to Personal...",
-					// 	success: "Switched to Personal!",
-					// 	error: "Failed to switch organization.",
-					// })
+					// 	toast.promise(switchOrganization(formData), {
+					// 		loading: "Switching to Personal...",
+					// 		success: "Switched to Personal!",
+					// 		error: "Failed to switch organization.",
+					// 	})
 					// }
 					>
 						<button type="submit" className="flex w-full">
@@ -46,17 +53,17 @@ export const OrgSwitcher = ({
 						</button>
 					</form>
 				</DropdownMenuItem>
-				{/* {orgs.map((org) => (
+				{orgs.map((org) => (
 					<DropdownMenuItem key={org.id} asChild>
 						<form
 							key={org.id}
-							action={(formData) =>
-								// toast.promise(switchOrganization(formData), {
-								// 	loading: `Switching to ${org.name}...`,
-								// 	success: `Switched to ${org.name}!`,
-								// 	error: "Failed to switch organization.",
-								// })
-							}
+							// action={(formData) =>
+							// 	toast.promise(switchOrganization(formData), {
+							// 		loading: `Switching to ${org.name}...`,
+							// 		success: `Switched to ${org.name}!`,
+							// 		error: "Failed to switch organization.",
+							// 	})
+							// }
 						>
 							<input type="hidden" name="id" value={org.id} />
 							<input type="hidden" name="slug" value={org.slug} />
@@ -69,9 +76,9 @@ export const OrgSwitcher = ({
 							</button>
 						</form>
 					</DropdownMenuItem>
-				))} */}
+				))}
 				<DropdownMenuSeparator />
-				{/* {activeOrg ? (
+				{activeOrg ? (
 					<DropdownMenuItem asChild>
 						<Link href="#" className="flex items-center justify-between">
 							Invite Members
@@ -85,7 +92,7 @@ export const OrgSwitcher = ({
 							<Plus className="ml-2 h-4 w-4" />
 						</Link>
 					</DropdownMenuItem>
-				)} */}
+				)}
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);

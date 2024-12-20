@@ -1,7 +1,7 @@
 import { logtoConfig } from "@/app/logto";
 import { user } from "@/drizzle/schema";
 import type { User } from "@/drizzle/types";
-import { getAccessTokenRSC, getLogtoContext } from "@logto/next/server-actions";
+import { getLogtoContext } from "@logto/next/server-actions";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
@@ -38,32 +38,9 @@ export async function getUser(): Promise<User> {
 	return userDetails;
 }
 
-export async function getOrgs(): Promise<[]> {
-	// const accessToken = await getAccessTokenRSC(
-	// 	logtoConfig,
-	// 	"http://localhost:3001/api",
-	// );
-	// if (!accessToken) {
-	// 	throw new Error("Access token not found");
-	// }
-
-	// const response = await fetch("http://localhost:3002/api/organizations", {
-	// 	method: "GET",
-	// 	headers: {
-	// 		Authorization: `Bearer ${accessToken}`,
-	// 		"Content-Type": "application/json",
-	// 	},
-	// });
-
-	// if (!response.ok) {
-	// 	console.error("Failed to fetch organizations", response.status);
-	// 	throw new Error("Failed to fetch organizations");
-	// }
-
-	// const organizations = await response.json();
-	// console.log("organizations", organizations);
-
-	return [];
+export async function getOrgs(): Promise<string[]> {
+	const { claims } = await getLogtoContext(logtoConfig);
+	return claims?.organizations ?? [];
 }
 
 export async function getOwner(): Promise<Result> {

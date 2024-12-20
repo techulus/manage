@@ -108,7 +108,7 @@ export default function NavBar({
 								<path d="M16.88 3.549L7.12 20.451" />
 							</svg>
 
-							{/* <OrgSwitcher orgs={orgs} activeOrg={activeOrg} /> */}
+							<OrgSwitcher orgs={orgs} activeOrg={activeOrg} />
 						</div>
 
 						<div className="ml-2 flex justify-center">
