@@ -1,6 +1,6 @@
 import { UserScope } from "@logto/next";
 
-export const logtoConfig = {
+export const logtoConfig = () => ({
 	endpoint: process.env.LOGTO_ENDPOINT!,
 	appId: process.env.LOGTO_APP_ID!,
 	appSecret: process.env.LOGTO_APP_SECRET!,
@@ -8,4 +8,4 @@ export const logtoConfig = {
 	cookieSecret: process.env.LOGTO_COOKIE_SECRET!,
 	cookieSecure: process.env.NODE_ENV === "production",
 	scopes: [UserScope.Organizations, UserScope.Email],
-};
+});

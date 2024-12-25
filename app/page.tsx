@@ -3,7 +3,8 @@ import { Header } from "@/components/layout/header";
 import { SITE_METADATA } from "@/data/marketing";
 import Link from "next/link";
 
-export const revalidate = 86400;
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
 
 async function getGitHubStars(): Promise<string | null> {
 	try {
