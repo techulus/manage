@@ -6,3 +6,10 @@ npm-debug.log
 README.md
 .next
 .git
+.env*
+.github
+blob-data
+sqlite
+.nvmrc
+biome.json
+components.json

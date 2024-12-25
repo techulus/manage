@@ -3,6 +3,9 @@ import { isDatabaseReady } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { redirect } from "next/navigation";
 
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
+
 export default async function Start() {
 	const { orgSlug } = await getOwner();
 

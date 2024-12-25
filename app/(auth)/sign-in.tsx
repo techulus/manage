@@ -12,7 +12,7 @@ const SignIn = ({ onSignIn }: Props) => {
 				onSignIn();
 			}}
 		>
-			Sign In
+			Console
 		</button>
 	);
 };
