@@ -1,5 +1,5 @@
 import { calendarEvent, project, task, taskList } from "@/drizzle/schema";
-import { getDatabaseForOwner } from "@/lib/utils/turso";
+import { getDatabaseForOwner } from "@/lib/utils/useDatabase";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { and, desc, eq, lte } from "drizzle-orm";
@@ -12,11 +12,12 @@ export const dynamic = "force-dynamic";
 
 export async function GET(
 	_: Request,
-	{ params }: { params: { projectId: string; ownerId: string } },
+	props: { params: Promise<{ projectId: string; ownerId: string }> },
 ) {
+	const params = await props.params;
 	const { projectId, ownerId } = params;
 
-	const db = getDatabaseForOwner(ownerId);
+	const db = await getDatabaseForOwner(ownerId);
 
 	const projectDetails = await db.query.project
 		.findFirst({

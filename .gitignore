@@ -28,9 +28,6 @@ yarn-error.log*
 .env
 .env*.local
 
-# vercel
-.vercel
-
 # typescript
 *.tsbuildinfo
 next-env.d.ts
@@ -38,3 +35,9 @@ next-env.d.ts
 # vscode
 .vscode
 .idea
+
+# database
+sqlite
+
+# blob
+blob-data

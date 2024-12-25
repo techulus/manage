@@ -9,15 +9,16 @@ import Link from "next/link";
 import { createDocument } from "../actions";
 
 type Props = {
-	params: {
+	params: Promise<{
 		projectId: string;
-	};
+	}>;
 };
 
-export default async function CreateDocument({ params }: Props) {
-	const { orgSlug } = await getOwner();
-	const backUrl = `/${orgSlug}/projects/${params.projectId}/documents`;
-	return (
+export default async function CreateDocument(props: Props) {
+    const params = await props.params;
+    const { orgSlug } = await getOwner();
+    const backUrl = `/${orgSlug}/projects/${params.projectId}/documents`;
+    return (
 		<>
 			<PageTitle title="Create Document" backUrl={backUrl} />
 			<PageSection topInset>

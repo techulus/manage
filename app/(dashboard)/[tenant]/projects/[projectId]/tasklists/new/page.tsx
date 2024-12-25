@@ -9,15 +9,16 @@ import Link from "next/link";
 import { createTaskList } from "../actions";
 
 type Props = {
-	params: {
+	params: Promise<{
 		projectId: string;
-	};
+	}>;
 };
 
-export default async function CreateTaskList({ params }: Props) {
-	const { orgSlug } = await getOwner();
-	const backUrl = `/${orgSlug}/projects/${params.projectId}/tasklists`;
-	return (
+export default async function CreateTaskList(props: Props) {
+    const params = await props.params;
+    const { orgSlug } = await getOwner();
+    const backUrl = `/${orgSlug}/projects/${params.projectId}/tasklists`;
+    return (
 		<>
 			<PageTitle title="Create task list" backUrl={backUrl} />
 

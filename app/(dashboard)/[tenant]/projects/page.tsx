@@ -9,13 +9,14 @@ import { getProjectsForOwner } from "@/lib/utils/useProjects";
 import Link from "next/link";
 
 interface Props {
-	searchParams: {
+	searchParams: Promise<{
 		search: string;
 		status?: string;
-	};
+	}>;
 }
 
-export default async function Projects({ searchParams }: Props) {
+export default async function Projects(props: Props) {
+	const searchParams = await props.searchParams;
 	const { orgSlug } = await getOwner();
 	const statuses = searchParams?.status?.split(",") ?? ["active"];
 

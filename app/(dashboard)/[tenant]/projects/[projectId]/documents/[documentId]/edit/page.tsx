@@ -10,18 +10,19 @@ import Link from "next/link";
 import { updateDocument } from "../../actions";
 
 type Props = {
-	params: {
+	params: Promise<{
 		projectId: string;
 		documentId: string;
-	};
+	}>;
 };
 
-export default async function EditDocument({ params }: Props) {
-	const { orgSlug } = await getOwner();
-	const document = await getDocumentById(params.documentId);
-	const backUrl = `/${orgSlug}/projects/${params.projectId}/documents/${document.id}`;
+export default async function EditDocument(props: Props) {
+    const params = await props.params;
+    const { orgSlug } = await getOwner();
+    const document = await getDocumentById(params.documentId);
+    const backUrl = `/${orgSlug}/projects/${params.projectId}/documents/${document.id}`;
 
-	return (
+    return (
 		<>
 			<PageTitle title="Update Document" backUrl={backUrl} />
 

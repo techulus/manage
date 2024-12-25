@@ -10,18 +10,19 @@ import Link from "next/link";
 import { createEvent } from "../actions";
 
 type Props = {
-	params: {
+	params: Promise<{
 		projectId: string;
-	};
+	}>;
 };
 
-export default async function CreateEvent({ params }: Props) {
-	const { orgSlug } = await getOwner();
-	const backUrl = `/${orgSlug}/projects/${params.projectId}/events`;
+export default async function CreateEvent(props: Props) {
+    const params = await props.params;
+    const { orgSlug } = await getOwner();
+    const backUrl = `/${orgSlug}/projects/${params.projectId}/events`;
 
-	const users = await allUsers();
+    const users = await allUsers();
 
-	return (
+    return (
 		<>
 			<PageTitle title="Create Event" backUrl={backUrl} />
 

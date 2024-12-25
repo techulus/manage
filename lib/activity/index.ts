@@ -54,8 +54,7 @@ function toDateString(date: any) {
 		return "-";
 	}
 
-	const tz = getTimezone();
-	return dayjs(date).tz(tz).format("YYYY-MM-DD HH:mm:ss");
+	return dayjs(date).format("YYYY-MM-DD HH:mm:ss");
 }
 
 export function generateObjectDiffMessage(

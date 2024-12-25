@@ -4,17 +4,18 @@ import { ActivityFeed } from "@/components/project/activity/activity-feed";
 import { fetchActivities } from "../../actions";
 
 type Props = {
-	params: {
+	params: Promise<{
 		projectId: string;
-	};
+	}>;
 };
 
-export default async function ActivityDetails({ params }: Props) {
-	const { projectId } = params;
+export default async function ActivityDetails(props: Props) {
+    const params = await props.params;
+    const { projectId } = params;
 
-	const activities = await fetchActivities(projectId);
+    const activities = await fetchActivities(projectId);
 
-	return (
+    return (
 		<>
 			<PageTitle title="Activity" />
 

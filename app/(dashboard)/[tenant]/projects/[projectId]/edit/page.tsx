@@ -10,18 +10,19 @@ import Link from "next/link";
 import { updateProject } from "../../actions";
 
 interface Props {
-	params: {
+	params: Promise<{
 		projectId: string;
-	};
+	}>;
 }
 
-export default async function EditProject({ params }: Props) {
-	const { projectId } = params;
+export default async function EditProject(props: Props) {
+    const params = await props.params;
+    const { projectId } = params;
 
-	const project = await getProjectById(projectId);
-	const { orgSlug } = await getOwner();
+    const project = await getProjectById(projectId);
+    const { orgSlug } = await getOwner();
 
-	return (
+    return (
 		<>
 			<PageTitle title={project.name} backUrl={`/${orgSlug}/projects`} />
 

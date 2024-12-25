@@ -2,7 +2,6 @@
 
 import { useDetectSticky } from "@/lib/hooks/useDetectSticky";
 import { cn } from "@/lib/utils";
-import type { Organization } from "@/ops/types";
 import { Transition } from "@headlessui/react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -10,7 +9,7 @@ import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useMemo } from "react";
 import logo from "../../public/images/logo.png";
-import { OrgSwitcher, UserButton } from "../core/auth";
+import { OrgSwitcher, type Organization, UserButton } from "../core/auth";
 import { createToastWrapper } from "../core/toast";
 
 export default function NavBar({
@@ -18,12 +17,12 @@ export default function NavBar({
 	activeOrg,
 }: {
 	orgs: Organization[];
-	activeOrg: Organization | undefined;
+	activeOrg: Organization | null;
 }) {
 	const { systemTheme: theme } = useTheme();
 	const path = usePathname();
 	const { projectId } = useParams();
-	const orgSlug = activeOrg?.slug ?? "personal";
+	const orgSlug = "personal";
 
 	const [isSticky, ref] = useDetectSticky();
 
@@ -58,6 +57,11 @@ export default function NavBar({
 				]
 			: [
 					{
+						name: "Today",
+						href: "./today",
+						current: path.endsWith("/today"),
+					},
+					{
 						name: "Projects",
 						href: "./projects",
 						current: path.endsWith("/projects"),
@@ -68,7 +72,8 @@ export default function NavBar({
 						current: path.endsWith("/settings"),
 					},
 				];
-	}, [path, projectId, orgSlug]);
+	}, [path, projectId]);
+
 	return (
 		<>
 			{createToastWrapper(theme)}
@@ -121,17 +126,17 @@ export default function NavBar({
 				ref={ref}
 				aria-label="Tabs"
 			>
-				<Transition
-					show={isSticky}
-					className="absolute hidden self-center md:block"
-					enter="transition-all ease-in-out duration-300"
-					enterFrom="transform  translate-y-[-100%] opacity-0"
-					enterTo="transform  translate-y-0 opacity-100"
-					leave="transition-all ease-in-out duration-300"
-					leaveFrom="transform  translate-y-0 opacity-100"
-					leaveTo="transform  translate-y-[-100%] opacity-0"
-				>
-					<Link href="/" prefetch={false}>
+				<Transition show={isSticky}>
+					<Link
+						className={cn(
+							"absolute hidden self-center md:block",
+							"data-[enter]:data-[leave]:transition-all ease-in-out duration-300",
+							"data-[enterFrom]:data-[leaveTo]:transform translate-y-[-100%] opacity-0",
+							"data-[enterTo]:data-[leaveFrom]:transform translate-y-0 opacity-100",
+						)}
+						href="/"
+						prefetch={false}
+					>
 						<Image
 							className="rounded-md"
 							src={logo}

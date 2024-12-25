@@ -1,14 +1,13 @@
-import { auth } from "@/auth";
+import { logtoConfig } from "@/app/logto";
+import type { Organization } from "@/components/core/auth";
 import { user } from "@/drizzle/schema";
 import type { User } from "@/drizzle/types";
-import { opsDb } from "@/ops/database";
-import { organizationMembers } from "@/ops/schema";
+import { getLogtoContext } from "@logto/next/server-actions";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
-import type { Organization } from "./../../ops/types";
 import { database } from "./useDatabase";
 
 dayjs.extend(utc);
@@ -22,12 +21,11 @@ type Result = {
 };
 
 export async function getUser(): Promise<User> {
-	const session = await auth();
-	if (!session?.user?.id) {
+	const { claims } = await getLogtoContext(logtoConfig);
+	if (!claims?.sub) {
 		throw new Error("User not found");
 	}
-
-	const userId = session.user.id;
+	const userId = claims.sub;
 
 	const db = await database();
 	const userDetails = await db.query.user.findFirst({
@@ -42,28 +40,20 @@ export async function getUser(): Promise<User> {
 }
 
 export async function getOrgs(): Promise<Organization[]> {
-	const { userId } = await getOwner();
-
-	const memberships = await opsDb().query.organizationMembers.findMany({
-		where: eq(organizationMembers.userId, userId!),
-		with: {
-			organization: true,
-		},
-	});
-
-	return memberships.map((membership) => membership.organization);
+	return [];
 }
 
 export async function getOwner(): Promise<Result> {
-	const session = await auth();
-	if (!session?.user?.id) {
+	const { claims } = await getLogtoContext(logtoConfig);
+	if (!claims?.sub) {
 		throw new Error("User not found");
 	}
+	const userId = claims.sub;
 
-	const userId = session.user.id;
+	const cookieStore = await cookies();
 
-	const activeOrgId = cookies().get("activeOrgId")?.value;
-	const activeOrgSlug = cookies().get("activeOrgSlug")?.value ?? "personal";
+	const activeOrgId = cookieStore.get("activeOrgId")?.value;
+	const activeOrgSlug = cookieStore.get("activeOrgSlug")?.value ?? "personal";
 	const ownerId = activeOrgId ?? userId;
 
 	return {
@@ -74,6 +64,7 @@ export async function getOwner(): Promise<Result> {
 	} as Result;
 }
 
-export function getTimezone() {
-	return cookies().get("userTimezone")?.value ?? dayjs.tz.guess();
+export async function getTimezone() {
+	const cookieStore = await cookies();
+	return cookieStore.get("userTimezone")?.value ?? dayjs.tz.guess();
 }

@@ -24,32 +24,34 @@ import { RssIcon } from "lucide-react";
 import Link from "next/link";
 
 type Props = {
-	params: {
+	params: Promise<{
 		projectId: string;
-	};
-	searchParams: {
+	}>;
+	searchParams: Promise<{
 		date: string;
-	};
+	}>;
 };
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-export default async function EventDetails({ params, searchParams }: Props) {
-	const { projectId } = params;
-	const { date } = searchParams;
-	const { userId, ownerId, orgSlug } = await getOwner();
+export default async function EventDetails(props: Props) {
+    const searchParams = await props.searchParams;
+    const params = await props.params;
+    const { projectId } = params;
+    const { date } = searchParams;
+    const { userId, ownerId, orgSlug } = await getOwner();
 
-	const timezone = getTimezone();
+    const timezone = await getTimezone();
 
-	const selectedDate = date ? dayjs(date).utc() : dayjs().utc();
-	const dayCommentId = `${projectId}${selectedDate.year()}${selectedDate.month()}${selectedDate.date()}`;
+    const selectedDate = date ? dayjs(date).utc() : dayjs().utc();
+    const dayCommentId = `${projectId}${selectedDate.year()}${selectedDate.month()}${selectedDate.date()}`;
 
-	const startOfDay = selectedDate.startOf("day").toDate();
-	const endOfDay = selectedDate.endOf("day").toDate();
+    const startOfDay = selectedDate.startOf("day").toDate();
+    const endOfDay = selectedDate.endOf("day").toDate();
 
-	const db = await database();
-	const events = await db.query.calendarEvent
+    const db = await database();
+    const events = await db.query.calendarEvent
 		.findMany({
 			where: and(
 				eq(calendarEvent.projectId, +projectId),
@@ -86,9 +88,9 @@ export default async function EventDetails({ params, searchParams }: Props) {
 		})
 		.execute();
 
-	const calendarSubscriptionUrl = `/api/calendar/${ownerId}/${projectId}/calendar.ics`;
+    const calendarSubscriptionUrl = `/api/calendar/${ownerId}/${projectId}/calendar.ics`;
 
-	return (
+    return (
 		<>
 			<PageTitle
 				title="Events"

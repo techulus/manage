@@ -1,8 +1,7 @@
-import { logout, switchOrganization } from "@/app/(auth)/actions";
-import type { Organization } from "@/ops/types";
+import { logtoConfig } from "@/app/logto";
+import { signOut } from "@logto/next/server-actions";
 import { ChevronsUpDown, Plus, User } from "lucide-react";
 import Link from "next/link";
-import toast from "react-hot-toast";
 import { Button } from "../ui/button";
 import {
 	DropdownMenu,
@@ -13,12 +12,19 @@ import {
 	DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 
+// WIP, this should be changed
+export type Organization = {
+	id: string;
+	name: string;
+	slug: string;
+};
+
 export const OrgSwitcher = ({
 	orgs,
 	activeOrg,
 }: {
 	orgs: Organization[];
-	activeOrg: Organization | undefined;
+	activeOrg: Organization | null;
 }) => {
 	return (
 		<DropdownMenu>
@@ -35,13 +41,13 @@ export const OrgSwitcher = ({
 			<DropdownMenuContent>
 				<DropdownMenuItem asChild>
 					<form
-						action={(formData) =>
-							toast.promise(switchOrganization(formData), {
-								loading: "Switching to Personal...",
-								success: "Switched to Personal!",
-								error: "Failed to switch organization.",
-							})
-						}
+					// action={(formData) =>
+					// 	toast.promise(switchOrganization(formData), {
+					// 		loading: "Switching to Personal...",
+					// 		success: "Switched to Personal!",
+					// 		error: "Failed to switch organization.",
+					// 	})
+					// }
 					>
 						<button type="submit" className="flex w-full">
 							Personal
@@ -52,13 +58,13 @@ export const OrgSwitcher = ({
 					<DropdownMenuItem key={org.id} asChild>
 						<form
 							key={org.id}
-							action={(formData) =>
-								toast.promise(switchOrganization(formData), {
-									loading: `Switching to ${org.name}...`,
-									success: `Switched to ${org.name}!`,
-									error: "Failed to switch organization.",
-								})
-							}
+							// action={(formData) =>
+							// 	toast.promise(switchOrganization(formData), {
+							// 		loading: `Switching to ${org.name}...`,
+							// 		success: `Switched to ${org.name}!`,
+							// 		error: "Failed to switch organization.",
+							// 	})
+							// }
 						>
 							<input type="hidden" name="id" value={org.id} />
 							<input type="hidden" name="slug" value={org.slug} />
@@ -128,7 +134,11 @@ export const UserButton = ({ orgSlug }: { orgSlug: string }) => {
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem>
-					<form action={logout}>
+					<form
+						action={async () => {
+							await signOut(logtoConfig, "/");
+						}}
+					>
 						<button type="submit">Sign Out</button>
 					</form>
 				</DropdownMenuItem>

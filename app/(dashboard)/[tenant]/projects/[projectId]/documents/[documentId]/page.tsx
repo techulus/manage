@@ -10,29 +10,30 @@ import { eq } from "drizzle-orm";
 import { deleteDocument } from "../actions";
 
 type Props = {
-	params: {
+	params: Promise<{
 		projectId: string;
 		documentId: string;
-	};
+	}>;
 };
 
-export default async function DocumentDetails({ params }: Props) {
-	const { projectId, documentId } = params;
+export default async function DocumentDetails(props: Props) {
+    const params = await props.params;
+    const { projectId, documentId } = params;
 
-	const { orgSlug } = await getOwner();
-	const db = await database();
-	const documentDetails = await db.query.document.findFirst({
+    const { orgSlug } = await getOwner();
+    const db = await database();
+    const documentDetails = await db.query.document.findFirst({
 		where: eq(document.id, +documentId),
 		with: {
 			folder: true,
 		},
 	});
 
-	if (!documentDetails) {
+    if (!documentDetails) {
 		return null;
 	}
 
-	return (
+    return (
 		<>
 			<PageTitle
 				title={documentDetails.name}

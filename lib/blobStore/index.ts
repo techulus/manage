@@ -7,26 +7,27 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-if (!process.env.R2_BUCKET_NAME) {
-	throw new Error("R2_BUCKET_NAME not set");
+if (!process.env.S3_BUCKET_NAME) {
+	throw new Error("S3_BUCKET_NAME not set");
 }
-if (!process.env.R2_BUCKET_ENDPOINT) {
-	throw new Error("R2_BUCKET_ENDPOINT not set");
+if (!process.env.S3_BUCKET_ENDPOINT) {
+	throw new Error("S3_BUCKET_ENDPOINT not set");
 }
-if (!process.env.R2_ACCESS_KEY_ID) {
-	throw new Error("R2_ACCESS_KEY_ID not set");
+if (!process.env.S3_ACCESS_KEY_ID) {
+	throw new Error("S3_ACCESS_KEY_ID not set");
 }
-if (!process.env.R2_SECRET_ACCESS_KEY) {
-	throw new Error("R2_SECRET_ACCESS_KEY not set");
+if (!process.env.S3_SECRET_ACCESS_KEY) {
+	throw new Error("S3_SECRET_ACCESS_KEY not set");
 }
 
 const blobStorage = new S3Client({
 	region: "auto",
-	endpoint: process.env.R2_BUCKET_ENDPOINT,
+	endpoint: process.env.S3_BUCKET_ENDPOINT,
 	credentials: {
-		accessKeyId: process.env.R2_ACCESS_KEY_ID,
-		secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+		accessKeyId: process.env.S3_ACCESS_KEY_ID,
+		secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
 	},
+	forcePathStyle: true,
 });
 
 const upload = async (
@@ -41,7 +42,7 @@ const upload = async (
 ) => {
 	const input = {
 		Body: content as unknown as Blob, // supress type error :(
-		Bucket: process.env.R2_BUCKET_NAME,
+		Bucket: process.env.S3_BUCKET_NAME,
 		Key: key,
 		Type: type,
 	};
@@ -52,7 +53,7 @@ const upload = async (
 
 const getUrl = async (key: string): Promise<string> => {
 	const command = new GetObjectCommand({
-		Bucket: process.env.R2_BUCKET_NAME,
+		Bucket: process.env.S3_BUCKET_NAME,
 		Key: key,
 	});
 
@@ -73,7 +74,7 @@ const getFileUrl = (file: ManageBlob): string => {
 
 const deleteFile = async (key: string) => {
 	const command = new DeleteObjectCommand({
-		Bucket: process.env.R2_BUCKET_NAME,
+		Bucket: process.env.S3_BUCKET_NAME,
 		Key: key,
 	});
 	await blobStorage.send(command);
