@@ -137,7 +137,7 @@ export const UserButton = ({ orgSlug }: { orgSlug: string }) => {
 					<form
 						action={async () => {
 							"use server";
-							await signOut(logtoConfig);
+							await signOut(logtoConfig());
 						}}
 					>
 						<button type="submit">Sign Out</button>

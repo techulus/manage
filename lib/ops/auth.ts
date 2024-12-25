@@ -5,7 +5,8 @@ const applicationSecret = process.env.LOGTO_M2M_APP_SECRET!;
 const tenantId = "default";
 
 export const fetchAccessToken = async () => {
-	return await fetch(`${logtoConfig.endpoint}oidc/token`, {
+	const { endpoint } = logtoConfig();
+	return await fetch(`${endpoint}oidc/token`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/x-www-form-urlencoded",
@@ -30,7 +31,8 @@ export const createOrganizationForUser = async (
 		throw new Error("Access token not found");
 	}
 
-	const response = await fetch(`${logtoConfig.endpoint}api/organizations`, {
+	const { endpoint } = logtoConfig();
+	const response = await fetch(`${endpoint}api/organizations`, {
 		method: "POST",
 		headers: {
 			Authorization: `Bearer ${access_token}`,
@@ -50,19 +52,16 @@ export const createOrganizationForUser = async (
 	console.log("organization", organization);
 
 	// Add user to organization
-	await fetch(
-		`${logtoConfig.endpoint}api/organizations/${organization.id}/users`,
-		{
-			method: "POST",
-			headers: {
-				Authorization: `Bearer ${access_token}`,
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				userIds: [userId],
-			}),
+	await fetch(`${endpoint}api/organizations/${organization.id}/users`, {
+		method: "POST",
+		headers: {
+			Authorization: `Bearer ${access_token}`,
+			"Content-Type": "application/json",
 		},
-	);
+		body: JSON.stringify({
+			userIds: [userId],
+		}),
+	});
 
 	return organization;
 };
@@ -73,7 +72,8 @@ export const getOrganizationsForUser = async (userId: string) => {
 		throw new Error("Access token not found");
 	}
 
-	const response = await fetch(`${logtoConfig.endpoint}api/organizations`, {
+	const { endpoint } = logtoConfig();
+	const response = await fetch(`${endpoint}api/organizations`, {
 		method: "GET",
 		headers: {
 			Authorization: `Bearer ${access_token}`,

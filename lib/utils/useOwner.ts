@@ -21,7 +21,7 @@ type Result = {
 };
 
 export async function getUser(): Promise<User> {
-	const { claims } = await getLogtoContext(logtoConfig);
+	const { claims } = await getLogtoContext(logtoConfig());
 	if (!claims?.sub) {
 		throw new Error("User not found");
 	}
@@ -44,7 +44,7 @@ export async function getOrgs(): Promise<Organization[]> {
 }
 
 export async function getOwner(): Promise<Result> {
-	const { claims } = await getLogtoContext(logtoConfig);
+	const { claims } = await getLogtoContext(logtoConfig());
 	if (!claims?.sub) {
 		throw new Error("User not found");
 	}
