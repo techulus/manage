@@ -8,7 +8,7 @@ const nextConfig = {
 			},
 		];
 	},
-	serverExternalPackages: ["@libsql"],
+	output: "standalone",
 };
 
 module.exports = nextConfig;
