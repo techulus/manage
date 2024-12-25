@@ -4,7 +4,7 @@ import { database } from "@/lib/utils/useDatabase";
 import { getLogtoContext } from "@logto/next/server-actions";
 
 export async function addUserToTenantDb() {
-	const { claims } = await getLogtoContext(logtoConfig());
+	const { claims } = await getLogtoContext(logtoConfig);
 	if (!claims?.sub) {
 		throw new Error("User not found");
 	}

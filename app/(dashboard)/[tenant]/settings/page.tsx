@@ -10,7 +10,7 @@ import { HardDrive, User2 } from "lucide-react";
 import { notFound } from "next/navigation";
 
 export default async function Settings() {
-	const { claims, userInfo } = await getLogtoContext(logtoConfig(), {
+	const { claims, userInfo } = await getLogtoContext(logtoConfig, {
 		fetchUserInfo: true,
 	});
 
