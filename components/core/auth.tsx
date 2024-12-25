@@ -136,7 +136,7 @@ export const UserButton = ({ orgSlug }: { orgSlug: string }) => {
 				<DropdownMenuItem>
 					<form
 						action={async () => {
-							await signOut(logtoConfig);
+							await signOut(logtoConfig, "/");
 						}}
 					>
 						<button type="submit">Sign Out</button>
