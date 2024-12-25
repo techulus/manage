@@ -5,7 +5,7 @@ const applicationSecret = process.env.LOGTO_M2M_APP_SECRET!;
 const tenantId = "default";
 
 export const fetchAccessToken = async () => {
-	const { endpoint } = logtoConfig();
+	const { endpoint } = logtoConfig;
 	return await fetch(`${endpoint}oidc/token`, {
 		method: "POST",
 		headers: {
@@ -31,7 +31,7 @@ export const createOrganizationForUser = async (
 		throw new Error("Access token not found");
 	}
 
-	const { endpoint } = logtoConfig();
+	const { endpoint } = logtoConfig;
 	const response = await fetch(`${endpoint}api/organizations`, {
 		method: "POST",
 		headers: {
@@ -72,7 +72,7 @@ export const getOrganizationsForUser = async (userId: string) => {
 		throw new Error("Access token not found");
 	}
 
-	const { endpoint } = logtoConfig();
+	const { endpoint } = logtoConfig;
 	const response = await fetch(`${endpoint}api/organizations`, {
 		method: "GET",
 		headers: {

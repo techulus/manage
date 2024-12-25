@@ -5,7 +5,7 @@ import Link from "next/link";
 import logo from "../../public/images/logo.png";
 
 export async function Header() {
-	const { isAuthenticated } = await getLogtoContext(logtoConfig());
+	const { isAuthenticated } = await getLogtoContext(logtoConfig);
 
 	return (
 		<header className="absolute inset-x-0 top-0 z-50 text-black dark:text-white">
@@ -41,7 +41,7 @@ export async function Header() {
 						type="button"
 						onClick={async () => {
 							"use server";
-							await signIn(logtoConfig());
+							await signIn(logtoConfig);
 						}}
 					>
 						Sign in
