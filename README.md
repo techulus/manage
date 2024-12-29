@@ -2,7 +2,7 @@
 
 ## Manage
 
-Manage is an open-source alternative to Basecamp, offering a streamlined project management experience. With its intuitive interface, customizable features, and emphasis on collaboration, Manage empowers teams to enhance productivity and achieve project success. Enjoy the benefits of open-source flexibility, data security, and a thriving community while managing your projects efficiently with Manage.
+Manage is an open-source project management app inspired by Basecamp. With its intuitive interface, customizable features, and emphasis on collaboration, Manage empowers teams to enhance productivity and achieve project success. Enjoy the benefits of open-source flexibility, data security, and a thriving community while managing your projects efficiently with Manage.
 
 > **Warning**
 > This app is a work in progress. I'm building this in public. You can follow the progress on Twitter [@arjunz](https://twitter.com/arjunz).
@@ -10,7 +10,7 @@ Manage is an open-source alternative to Basecamp, offering a streamlined project
 
 ## V1 Roadmap
 
-- [x] Users / teams management
+- [x] Users / teams management (Currently using LogTo)
 - [x] Basic Project management
 - [x] Task lists and tasks
 - [x] Documents - Creating and sharing markdown documents
@@ -18,8 +18,8 @@ Manage is an open-source alternative to Basecamp, offering a streamlined project
 - [x] Comments
 - [x] Events / Calendar
 - [ ] Activity logs
-- [ ] Discussions / Forums
 - [ ] Notifications
+- [ ] Discussions / Forums
 - [ ] Chat
 - [ ] Search
 - [ ] Permissions
