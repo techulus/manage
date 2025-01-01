@@ -170,9 +170,11 @@ export const TaskListItem = ({
 					<InlineTaskForm />
 				</form>
 
-				{doneItems.map((task) => (
-					<TaskItem key={task.id} task={task} projectId={+projectId} />
-				))}
+				{compact
+					? null
+					: doneItems.map((task) => (
+							<TaskItem key={task.id} task={task} projectId={+projectId} />
+						))}
 			</div>
 		</div>
 	);

@@ -20,18 +20,18 @@ type Props = {
 };
 
 export default async function TaskLists(props: Props) {
-    const searchParams = await props.searchParams;
-    const params = await props.params;
-    const { userId, orgSlug } = await getOwner();
-    const { projectId } = params;
+	const searchParams = await props.searchParams;
+	const params = await props.params;
+	const { userId, orgSlug } = await getOwner();
+	const { projectId } = params;
 
-    const filterByStatuses = searchParams.status?.split(",") ?? ["active"];
-    const statusFilter = filterByStatuses.map((status) =>
+	const filterByStatuses = searchParams.status?.split(",") ?? ["active"];
+	const statusFilter = filterByStatuses.map((status) =>
 		eq(taskList.status, status),
 	);
 
-    const db = await database();
-    const taskLists = await db.query.taskList
+	const db = await database();
+	const taskLists = await db.query.taskList
 		.findMany({
 			where: and(eq(taskList.projectId, +projectId), or(...statusFilter)),
 			with: {
@@ -56,7 +56,7 @@ export default async function TaskLists(props: Props) {
 		})
 		.execute();
 
-    const archivedTaskLists = await db.query.taskList
+	const archivedTaskLists = await db.query.taskList
 		.findMany({
 			columns: {
 				id: true,
@@ -68,9 +68,7 @@ export default async function TaskLists(props: Props) {
 		})
 		.execute();
 
-    const users = await allUsers(true);
-
-    return (
+	return (
 		<>
 			<PageTitle
 				title="Task Lists"
