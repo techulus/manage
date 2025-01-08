@@ -1,6 +1,7 @@
 "use client";
 
 import { addComment } from "@/app/(dashboard)/[tenant]/projects/actions";
+import { UserAvatar } from "@/components/core/user-avatar";
 import MarkdownEditor from "@/components/editor";
 import { ActionButton } from "@/components/form/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -30,12 +31,7 @@ export default function CommentForm({
 			<div className="flex w-full flex-row space-x-4">
 				<div className="hidden w-[160px] md:block" />
 
-				{creator?.imageUrl ? (
-					<Avatar>
-						<AvatarImage src={creator.imageUrl} />
-						<AvatarFallback>{creator?.firstName ?? "User"}</AvatarFallback>
-					</Avatar>
-				) : null}
+				{creator ? <UserAvatar user={creator} /> : null}
 
 				<div className="relative flex-grow">
 					<MarkdownEditor

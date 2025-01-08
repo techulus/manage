@@ -18,6 +18,7 @@ import {
 	setDateByType,
 } from "@/lib/utils/time";
 import { add, format } from "date-fns";
+import dayjs from "dayjs";
 import { Calendar as CalendarIcon, Clock } from "lucide-react";
 import * as React from "react";
 
@@ -220,13 +221,13 @@ export function DateTimePicker({
 		if (!newDay) return;
 
 		if (dateOnly) {
-			onSelect?.(newDay);
+			onSelect?.(dayjs(newDay).utc().startOf("day").toDate());
 			setDate(newDay);
 			return;
 		}
 
 		if (!date) {
-			setDate(newDay);
+			setDate(dayjs(newDay).utc().startOf("day").toDate());
 			return;
 		}
 
@@ -234,7 +235,7 @@ export function DateTimePicker({
 		const diffInDays = diff / (1000 * 60 * 60 * 24);
 		const newDateFull = add(date, { days: Math.ceil(diffInDays) });
 		setDate(newDateFull);
-		onSelect?.(newDay);
+		onSelect?.(dayjs(newDateFull).utc().toDate());
 	};
 
 	return (

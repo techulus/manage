@@ -3,13 +3,16 @@
 import { calendarEvent, eventInvite } from "@/drizzle/schema";
 import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { database } from "@/lib/utils/useDatabase";
-import { getOwner } from "@/lib/utils/useOwner";
+import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { type Frequency, RRule } from "rrule";
+
+dayjs.extend(timezone);
 dayjs.extend(utc);
 
 export async function createEvent(payload: FormData) {
@@ -17,21 +20,23 @@ export async function createEvent(payload: FormData) {
 	const projectId = +(payload.get("projectId") as string);
 	const name = payload.get("name") as string;
 	const description = payload.get("description") as string;
-	const start = dayjs.utc(payload.get("start") as string).toDate();
-	const end = payload.get("end")
-		? dayjs.utc(payload.get("end") as string).toDate()
-		: null;
+	const start = dayjs.utc(payload.get("start") as string);
 	const allDay = (payload.get("allDay") as string) === "on";
 	const repeat = payload.get("repeat") as string;
 	const invites = ((payload.get("invites") as string) ?? "")
 		.split(",")
 		.filter(Boolean);
 
+	let end = payload.get("end") ? dayjs.utc(payload.get("end") as string) : null;
+	if (allDay && end) {
+		end = end.endOf("day");
+	}
+
 	const repeatRule = repeat
 		? new RRule({
 				freq: repeat as unknown as Frequency,
-				dtstart: dayjs.utc(start).startOf("day").toDate(),
-				until: end ? dayjs.utc(end).endOf("day").toDate() : null,
+				dtstart: start.toDate(),
+				until: end ? end.toDate() : null,
 				tzid: "UTC",
 			})
 		: undefined;
@@ -42,8 +47,8 @@ export async function createEvent(payload: FormData) {
 		.values({
 			name,
 			description,
-			start,
-			end,
+			start: start.toDate(),
+			end: end?.toDate(),
 			allDay,
 			repeatRule: repeatRule?.toString(),
 			projectId,
@@ -72,9 +77,11 @@ export async function createEvent(payload: FormData) {
 		projectId: +projectId,
 	});
 
+	const timezone = await getTimezone();
+
 	revalidatePath(`/${orgSlug}/projects/${projectId}/events`);
 	redirect(
-		`/${orgSlug}/projects/${projectId}/events?date=${start.toISOString()}`,
+		`/${orgSlug}/projects/${projectId}/events?on=${start.tz(timezone).format("YYYY-MM-DD")}`,
 	);
 }
 
@@ -83,10 +90,7 @@ export async function updateEvent(payload: FormData) {
 	const id = +(payload.get("id") as string);
 	const name = payload.get("name") as string;
 	const description = payload.get("description") as string;
-	const start = dayjs.utc(payload.get("start") as string).toDate();
-	const end = payload.get("end")
-		? dayjs.utc(payload.get("end") as string).toDate()
-		: null;
+	const start = dayjs.utc(payload.get("start") as string);
 	const allDay = (payload.get("allDay") as string) === "on";
 	const repeat = payload.get("repeat") as string;
 	const projectId = payload.get("projectId") as string;
@@ -94,11 +98,16 @@ export async function updateEvent(payload: FormData) {
 		.split(",")
 		.filter(Boolean);
 
+	let end = payload.get("end") ? dayjs.utc(payload.get("end") as string) : null;
+	if (allDay && end) {
+		end = end.endOf("day");
+	}
+
 	const repeatRule = repeat
 		? new RRule({
 				freq: repeat as unknown as Frequency,
-				dtstart: dayjs.utc(start).startOf("day").toDate(),
-				until: end ? dayjs.utc(end).endOf("day").toDate() : null,
+				dtstart: start.toDate(),
+				until: end ? end.toDate() : null,
 				tzid: "UTC",
 			})
 		: undefined;
@@ -131,8 +140,8 @@ export async function updateEvent(payload: FormData) {
 		.set({
 			name,
 			description,
-			start,
-			end,
+			start: start.toDate(),
+			end: end?.toDate(),
 			allDay,
 			repeatRule: repeatRule?.toString(),
 			updatedAt: new Date(),
@@ -151,17 +160,19 @@ export async function updateEvent(payload: FormData) {
 				{
 					name,
 					description,
-					start,
-					end,
+					start: start.toDate(),
+					end: end?.toDate(),
 					allDay,
 				},
 			)}`,
 			projectId: +projectId,
 		});
 
+	const timezone = await getTimezone();
+
 	revalidatePath(`/${orgSlug}/projects/${projectId}/events`);
 	redirect(
-		`/${orgSlug}/projects/${projectId}/events?date=${start.toISOString()}`,
+		`/${orgSlug}/projects/${projectId}/events?on=${start.tz(timezone).format("YYYY-MM-DD")}`,
 	);
 }
 

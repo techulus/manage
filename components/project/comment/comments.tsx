@@ -1,5 +1,6 @@
 import { deleteComment } from "@/app/(dashboard)/[tenant]/projects/actions";
 import { MarkdownView } from "@/components/core/markdown-view";
+import { UserAvatar } from "@/components/core/user-avatar";
 import { DeleteButton } from "@/components/form/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -48,14 +49,7 @@ export async function Comments({
 						<div className="hidden w-[160px] text-xs text-gray-500 md:block">
 							{new Date(comment.createdAt).toLocaleString()}
 						</div>
-						{comment.creator.imageUrl ? (
-							<Avatar>
-								<AvatarImage src={comment.creator.imageUrl} />
-								<AvatarFallback>
-									{comment.creator?.firstName ?? "User"}
-								</AvatarFallback>
-							</Avatar>
-						) : null}
+						{comment.creator ? <UserAvatar user={comment.creator} /> : null}
 						<div>
 							<div className="font-semibold">
 								{comment.creator?.firstName ?? "User"}

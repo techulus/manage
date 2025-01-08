@@ -1,8 +1,8 @@
 import { deleteEvent } from "@/app/(dashboard)/[tenant]/projects/[projectId]/events/actions";
 import EmptyState from "@/components/core/empty-state";
 import { MarkdownView } from "@/components/core/markdown-view";
+import { UserAvatar } from "@/components/core/user-avatar";
 import { DeleteButton } from "@/components/form/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { buttonVariants } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -13,6 +13,7 @@ import {
 import type { EventWithInvites } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { CircleEllipsisIcon } from "lucide-react";
 import Link from "next/link";
@@ -20,6 +21,7 @@ import { rrulestr } from "rrule";
 import { Assignee } from "../shared/assigee";
 
 dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const filterByRepeatRule = (event: EventWithInvites, date: Date) => {
 	if (event.repeatRule) {
@@ -40,12 +42,14 @@ export default function EventsList({
 	events,
 	compact,
 	orgSlug,
+	timezone,
 }: {
 	date: string;
 	projectId: string;
 	userId: string;
 	orgSlug: string;
 	events: EventWithInvites[];
+	timezone: string;
 	compact?: boolean;
 }) {
 	const filteredEvents = events.filter((x) =>
@@ -71,14 +75,7 @@ export default function EventsList({
 					)}
 				>
 					<div className="flex space-x-4">
-						{event.creator.imageUrl ? (
-							<Avatar>
-								<AvatarImage src={event.creator.imageUrl} />
-								<AvatarFallback>
-									{event.creator?.firstName ?? "User"}
-								</AvatarFallback>
-							</Avatar>
-						) : null}
+						<UserAvatar user={event.creator} />
 						<div className="flex-grow">
 							<div className="text-lg font-semibold">{event.name}</div>
 							<div
@@ -86,13 +83,17 @@ export default function EventsList({
 								suppressHydrationWarning
 							>
 								{event.allDay
-									? dayjs(event.start).format("MMM D, YYYY")
-									: dayjs(event.start).format("MMM D, YYYY, h:mm A")}
+									? dayjs(event.start).tz(timezone).format("MMM D, YYYY")
+									: dayjs(event.start)
+											.tz(timezone)
+											.format("MMM D, YYYY, h:mm A")}
 								{event.end
 									? ` - ${
 											event.allDay
-												? dayjs(event.end).format("MMM D, YYYY")
-												: dayjs(event.end).format("MMM D, YYYY, h:mm A")
+												? dayjs(event.end).tz(timezone).format("MMM D, YYYY")
+												: dayjs(event.end)
+														.tz(timezone)
+														.format("MMM D, YYYY, h:mm A")
 										}`
 									: null}
 								{event.repeatRule

@@ -3,6 +3,7 @@
 import { fetchActivities } from "@/app/(dashboard)/[tenant]/projects/actions";
 import { Spinner } from "@/components/core/loaders";
 import { MarkdownView } from "@/components/core/markdown-view";
+import { UserAvatar } from "@/components/core/user-avatar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import type { ActivityWithActor } from "@/drizzle/types";
@@ -26,14 +27,7 @@ export function ActivityItem({
 				<div className="relative flex items-start space-x-3">
 					<>
 						<div className="relative">
-							{item.actor?.imageUrl ? (
-								<Avatar className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-400 ring-8 ring-white dark:bg-black dark:ring-black">
-									<AvatarImage src={item.actor.imageUrl} />
-									<AvatarFallback>
-										{item.actor?.firstName ?? "User"}
-									</AvatarFallback>
-								</Avatar>
-							) : null}
+							{item.actor ? <UserAvatar user={item.actor} /> : null}
 
 							<span className="absolute -bottom-0.5 -right-1 rounded-tl-md bg-white px-0.5 py-px dark:bg-black">
 								{item.action === "created" ? (

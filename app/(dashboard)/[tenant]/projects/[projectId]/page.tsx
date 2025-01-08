@@ -16,7 +16,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getOwner } from "@/lib/utils/useOwner";
+import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 import { getProjectById } from "@/lib/utils/useProjects";
 import { CalendarPlusIcon, ListPlusIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
@@ -30,17 +30,18 @@ type Props = {
 };
 
 export default async function ProjectDetails(props: Props) {
-    const params = await props.params;
-    const { projectId } = params;
+	const params = await props.params;
+	const { projectId } = params;
 
-    const project = await getProjectById(projectId, true);
-    const { userId, orgSlug } = await getOwner();
+	const project = await getProjectById(projectId, true);
+	const { userId, orgSlug } = await getOwner();
+	const timezone = await getTimezone();
 
-    if (!project) {
+	if (!project) {
 		return notFound();
 	}
 
-    return (
+	return (
 		<>
 			<PageTitle
 				title={project.name}
@@ -242,6 +243,7 @@ export default async function ProjectDetails(props: Props) {
 						userId={userId}
 						events={project.events}
 						orgSlug={orgSlug}
+						timezone={timezone}
 						compact
 					/>
 				</div>

@@ -15,8 +15,10 @@ import {
 	between,
 	desc,
 	eq,
+	gt,
 	gte,
 	isNotNull,
+	lt,
 	lte,
 	or,
 } from "drizzle-orm";
@@ -28,7 +30,7 @@ type Props = {
 		projectId: string;
 	}>;
 	searchParams: Promise<{
-		date: string;
+		on: string;
 	}>;
 };
 
@@ -36,22 +38,23 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 export default async function EventDetails(props: Props) {
-    const searchParams = await props.searchParams;
-    const params = await props.params;
-    const { projectId } = params;
-    const { date } = searchParams;
-    const { userId, ownerId, orgSlug } = await getOwner();
+	const searchParams = await props.searchParams;
+	const params = await props.params;
+	const { projectId } = params;
+	const { on } = searchParams;
+	const { userId, ownerId, orgSlug } = await getOwner();
 
-    const timezone = await getTimezone();
+	const timezone = await getTimezone();
 
-    const selectedDate = date ? dayjs(date).utc() : dayjs().utc();
-    const dayCommentId = `${projectId}${selectedDate.year()}${selectedDate.month()}${selectedDate.date()}`;
+	// Convert the selected date to the user's timezone and then to UTC for the database
+	const selectedDate = on ? dayjs.tz(on, timezone).utc() : dayjs().utc();
+	const dayCommentId = `${projectId}${selectedDate.year()}${selectedDate.month()}${selectedDate.date()}`;
 
-    const startOfDay = selectedDate.startOf("day").toDate();
-    const endOfDay = selectedDate.endOf("day").toDate();
+	const startOfDay = selectedDate.startOf("day").toDate();
+	const endOfDay = selectedDate.endOf("day").toDate();
 
-    const db = await database();
-    const events = await db.query.calendarEvent
+	const db = await database();
+	const events = await db.query.calendarEvent
 		.findMany({
 			where: and(
 				eq(calendarEvent.projectId, +projectId),
@@ -59,8 +62,8 @@ export default async function EventDetails(props: Props) {
 					between(calendarEvent.start, startOfDay, endOfDay),
 					between(calendarEvent.end, startOfDay, endOfDay),
 					and(
-						lte(calendarEvent.start, startOfDay),
-						gte(calendarEvent.end, endOfDay),
+						lt(calendarEvent.start, startOfDay),
+						gt(calendarEvent.end, endOfDay),
 					),
 					isNotNull(calendarEvent.repeatRule),
 				),
@@ -88,9 +91,9 @@ export default async function EventDetails(props: Props) {
 		})
 		.execute();
 
-    const calendarSubscriptionUrl = `/api/calendar/${ownerId}/${projectId}/calendar.ics`;
+	const calendarSubscriptionUrl = `/api/calendar/${ownerId}/${projectId}/calendar.ics`;
 
-    return (
+	return (
 		<>
 			<PageTitle
 				title="Events"
@@ -127,6 +130,7 @@ export default async function EventDetails(props: Props) {
 						events={events}
 						orgSlug={orgSlug}
 						selectedDate={selectedDate.toISOString()}
+						timezone={timezone}
 					/>
 				</div>
 			</PageSection>
