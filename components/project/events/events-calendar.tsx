@@ -28,21 +28,8 @@ export default function EventsCalendar({
 
 	return (
 		<div className="flex w-full flex-col md:flex-row md:space-x-2">
-			<div className="p-3 md:hidden">
-				<DateTimePicker
-					dateOnly
-					defaultValue={selectedDate}
-					name="date"
-					onSelect={(date) => {
-						router.push(
-							`/${orgSlug}/projects/${projectId}/events?on=${dayjs(date).format("YYYY-MM-DD")}`,
-						);
-					}}
-				/>
-			</div>
-
 			<Calendar
-				className="hidden md:block"
+				className="block mx-auto pb-10 md:pb-3 md:mx-0"
 				mode="single"
 				selected={new Date(selectedDate)}
 				onDayClick={(date) => {

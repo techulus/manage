@@ -43,9 +43,11 @@ export async function GET(
 		}),
 	]);
 
-	const calendar = ical({ name: projectDetails.name });
-
-	calendar.method(ICalCalendarMethod.REQUEST);
+	const calendar = ical({
+		name: projectDetails.name,
+		method: ICalCalendarMethod.PUBLISH,
+		timezone: { name: "UTC" },
+	});
 
 	for (const event of events) {
 		calendar.createEvent({
