@@ -60,6 +60,7 @@ export async function GET(
 			created: event.createdAt,
 			lastModified: event.updatedAt,
 			repeating: event.repeatRule,
+			timezone: "UTC",
 		});
 	}
 
@@ -81,6 +82,7 @@ export async function GET(
 				allDay: true,
 				created: task.createdAt,
 				lastModified: task.updatedAt,
+				timezone: "UTC",
 			});
 		}
 	}
