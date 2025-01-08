@@ -31,15 +31,18 @@ export function AssignToUser({
 	const [value, setValue] = useState("");
 
 	useEffect(() => {
-		allUsers(true).then((users) => {
-			setUsers(users);
-		});
+		allUsers(true)
+			.then((users) => {
+				setUsers(users);
+			})
+			.catch((error) => {
+				console.error(error);
+			});
 	}, []);
 
 	const assignedTo = useMemo(() => {
-		return value
-			? users.find((user) => user.id === value)?.firstName
-			: "Select user...";
+		const user = users.find((user) => user.id === value);
+		return value ? user?.firstName ?? user?.email ?? "-" : "Select user...";
 	}, [value, users]);
 
 	if (!isAssigning) {

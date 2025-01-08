@@ -11,8 +11,9 @@ export default function EventsCalendar({
 	projectId,
 	userId,
 	events,
-	selectedDate = new Date().toISOString(),
+	selectedDate = dayjs().format("YYYY-MM-DD"),
 	compact = false,
+	timezone,
 	orgSlug,
 }: {
 	projectId: string;
@@ -20,6 +21,7 @@ export default function EventsCalendar({
 	events: EventWithInvites[];
 	selectedDate?: string;
 	compact?: boolean;
+	timezone: string;
 	orgSlug: string;
 }) {
 	const router = useRouter();
@@ -33,7 +35,7 @@ export default function EventsCalendar({
 					name="date"
 					onSelect={(date) => {
 						router.push(
-							`/${orgSlug}/projects/${projectId}/events?date=${dayjs(date).format("YYYY-MM-DD")}`,
+							`/${orgSlug}/projects/${projectId}/events?on=${dayjs(date).format("YYYY-MM-DD")}`,
 						);
 					}}
 				/>
@@ -45,7 +47,7 @@ export default function EventsCalendar({
 				selected={new Date(selectedDate)}
 				onDayClick={(date) => {
 					router.push(
-						`/${orgSlug}/projects/${projectId}/events?date=${dayjs(date).format("YYYY-MM-DD")}`,
+						`/${orgSlug}/projects/${projectId}/events?on=${dayjs(date).format("YYYY-MM-DD")}`,
 					);
 				}}
 			/>
@@ -57,6 +59,7 @@ export default function EventsCalendar({
 				userId={userId}
 				date={selectedDate}
 				compact={compact}
+				timezone={timezone}
 			/>
 		</div>
 	);

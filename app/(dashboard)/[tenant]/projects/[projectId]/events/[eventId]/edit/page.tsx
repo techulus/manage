@@ -21,13 +21,13 @@ type Props = {
 };
 
 export default async function EditEvent(props: Props) {
-    const params = await props.params;
-    const { orgSlug } = await getOwner();
-    const { projectId, eventId } = params;
+	const params = await props.params;
+	const { orgSlug } = await getOwner();
+	const { projectId, eventId } = params;
 
-    const users = await allUsers();
-    const db = await database();
-    const event = await db.query.calendarEvent.findFirst({
+	const users = await allUsers();
+	const db = await database();
+	const event = await db.query.calendarEvent.findFirst({
 		where: eq(calendarEvent.id, +eventId),
 		with: {
 			creator: {
@@ -50,13 +50,13 @@ export default async function EditEvent(props: Props) {
 		},
 	});
 
-    if (!event) {
+	if (!event) {
 		return notFound();
 	}
 
-    const backUrl = `/${orgSlug}/projects/${projectId}/events?date=${event.start.toISOString()}`;
+	const backUrl = `/${orgSlug}/projects/${projectId}/events`;
 
-    return (
+	return (
 		<>
 			<PageTitle title="Edit Event" backUrl={backUrl} />
 
