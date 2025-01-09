@@ -1,5 +1,4 @@
 import { logtoConfig } from "@/app/logto";
-import type { Organization } from "@/components/core/auth";
 import { user } from "@/drizzle/schema";
 import type { User } from "@/drizzle/types";
 import { getLogtoContext } from "@logto/next/server-actions";
@@ -8,6 +7,7 @@ import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
+import { type Organization, getOrganizationsForUser } from "../ops/auth";
 import { database } from "./useDatabase";
 
 dayjs.extend(utc);
@@ -39,8 +39,10 @@ export async function getUser(): Promise<User> {
 	return userDetails;
 }
 
-export async function getOrgs(): Promise<Organization[]> {
-	return [];
+export async function getOrganizations(): Promise<Organization[]> {
+	const { userId } = await getOwner();
+	const organizations = await getOrganizationsForUser(userId);
+	return organizations;
 }
 
 export async function getOwner(): Promise<Result> {

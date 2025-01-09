@@ -1,4 +1,5 @@
 import { logtoConfig } from "@/app/logto";
+import type { Organization } from "@/lib/ops/auth";
 import { signOut } from "@logto/next/server-actions";
 import { ChevronsUpDown, Plus, User } from "lucide-react";
 import Link from "next/link";
@@ -11,13 +12,6 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-
-// WIP, this should be changed
-export type Organization = {
-	id: string;
-	name: string;
-	slug: string;
-};
 
 export const OrgSwitcher = ({
 	orgs,
@@ -67,7 +61,11 @@ export const OrgSwitcher = ({
 							// }
 						>
 							<input type="hidden" name="id" value={org.id} />
-							<input type="hidden" name="slug" value={org.slug} />
+							<input
+								type="hidden"
+								name="slug"
+								value={String(org.customData?.slug)}
+							/>
 							<button
 								type="submit"
 								className="flex w-full"

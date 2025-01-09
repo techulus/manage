@@ -31,6 +31,7 @@
 		"@radix-ui/react-separator": "^1.1.0",
 		"@radix-ui/react-slot": "^1.1.0",
 		"@radix-ui/react-switch": "^1.1.0",
+		"@touch4it/ical-timezones": "^1.9.0",
 		"autoprefixer": "10.4.14",
 		"better-sqlite3": "^11.7.0",
 		"class-variance-authority": "^0.6.1",
