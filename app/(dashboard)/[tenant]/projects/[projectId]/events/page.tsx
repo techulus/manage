@@ -44,8 +44,7 @@ export default async function EventDetails(props: Props) {
 
 	const timezone = await getTimezone();
 
-	// Convert the selected date to the user's timezone and then to UTC for the database
-	const selectedDate = dayjs(new Date(on));
+	const selectedDate = on ? dayjs(new Date(on)) : dayjs().tz(timezone);
 	const dayCommentId = `${projectId}${selectedDate.year()}${selectedDate.month()}${selectedDate.date()}`;
 
 	const startOfDay = selectedDate.startOf("day").toDate();
@@ -142,5 +141,5 @@ export default async function EventDetails(props: Props) {
 				/>
 			</div>
 		</>
-  );
+	);
 }
