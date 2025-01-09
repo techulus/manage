@@ -46,6 +46,30 @@ export const fetchAccessToken = async () => {
 		}).toString(),
 	});
 };
+
+export const getUser = async (userId: string) => {
+	const { access_token } = await fetchAccessToken().then((res) => res.json());
+	if (!access_token) {
+		throw new Error("Access token not found");
+	}
+
+	const { endpoint } = logtoConfig;
+	const response = await fetch(`${endpoint}api/users/${userId}`, {
+		method: "GET",
+		headers: {
+			Authorization: `Bearer ${access_token}`,
+			"Content-Type": "application/json",
+		},
+	});
+
+	if (!response.ok) {
+		console.error("Failed to fetch user", response.status);
+		throw new Error("Failed to fetch user");
+	}
+
+	return await response.json();
+};
+
 export const updateUser = async (
 	userId: string,
 	data: {
