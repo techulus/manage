@@ -1,16 +1,9 @@
 import { calendarEvent, project, task, taskList } from "@/drizzle/schema";
 import { getUser } from "@/lib/ops/auth";
 import { getDatabaseForOwner } from "@/lib/utils/useDatabase";
-import { getVtimezoneComponent } from "@touch4it/ical-timezones";
-import dayjs from "dayjs";
-import tz from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
 import { and, desc, eq, lte } from "drizzle-orm";
 import ical, { ICalCalendarMethod } from "ical-generator";
 import type { NextRequest } from "next/server";
-
-dayjs.extend(utc);
-dayjs.extend(tz);
 
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
@@ -67,20 +60,17 @@ export async function GET(
 	const calendar = ical({
 		name: projectDetails.name,
 		method: ICalCalendarMethod.PUBLISH,
-		timezone: timezone
-			? { name: timezone, generator: getVtimezoneComponent }
-			: null,
 	});
 
 	for (const event of events) {
 		calendar.createEvent({
 			id: event.id,
 			start: timezone
-				? dayjs.utc(event.start).tz(timezone).format("YYYY-MM-DDTHH:mm:ssZ")
+				? event.start.toLocaleString("en-US", { timeZone: timezone })
 				: event.start,
 			end: event.end
 				? timezone
-					? dayjs.utc(event.end).tz(timezone).format("YYYY-MM-DDTHH:mm:ssZ")
+					? event.end.toLocaleString("en-US", { timeZone: timezone })
 					: event.end
 				: null,
 			summary: event.name,
@@ -105,10 +95,10 @@ export async function GET(
 			calendar.createEvent({
 				id: task.id,
 				start: timezone
-					? dayjs.utc(task.dueDate).tz(timezone).format("YYYY-MM-DDTHH:mm:ssZ")
+					? task.dueDate.toLocaleString("en-US", { timeZone: timezone })
 					: task.dueDate,
 				end: timezone
-					? dayjs.utc(task.dueDate).tz(timezone).format("YYYY-MM-DDTHH:mm:ssZ")
+					? task.dueDate.toLocaleString("en-US", { timeZone: timezone })
 					: task.dueDate,
 				summary: `[${tasklist.name}] ${task.name}`,
 				description: task.description,
