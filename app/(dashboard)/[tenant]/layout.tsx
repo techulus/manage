@@ -1,7 +1,7 @@
 import NavBar from "@/components/console/navbar";
 import { ReportTimezone } from "@/components/core/report-timezone";
 import { isDatabaseReady } from "@/lib/utils/useDatabase";
-import { getOrgs, getOwner } from "@/lib/utils/useOwner";
+import { getOrganizations, getOwner } from "@/lib/utils/useOwner";
 import { redirect } from "next/navigation";
 
 export const fetchCache = "force-no-store"; // disable cache for console pages
@@ -19,8 +19,8 @@ export default async function ConsoleLayout(props: {
 
 	const ready = await isDatabaseReady();
 	const { orgId, orgSlug } = await getOwner();
-	const orgs = await getOrgs();
-	const activatedOrg = orgs.find((org) => org.id === orgId) ?? null;
+	const organizations = await getOrganizations();
+	const activatedOrg = organizations.find((org) => org.id === orgId) ?? null;
 
 	if (!ready || params.tenant !== orgSlug) {
 		redirect("/start");
@@ -28,7 +28,7 @@ export default async function ConsoleLayout(props: {
 
 	return (
 		<div className="relative flex min-h-full flex-col">
-			<NavBar orgs={orgs} activeOrg={activatedOrg} />
+			<NavBar orgs={organizations} activeOrg={activatedOrg} />
 
 			<div className="mx-auto w-full flex-grow lg:flex">
 				<div className="min-w-0 flex-1 xl:flex">

@@ -1,5 +1,6 @@
 import { calendarEvent, project, task, taskList } from "@/drizzle/schema";
 import { getDatabaseForOwner } from "@/lib/utils/useDatabase";
+import { getVtimezoneComponent } from "@touch4it/ical-timezones";
 import { and, desc, eq, lte } from "drizzle-orm";
 import ical, { ICalCalendarMethod } from "ical-generator";
 
@@ -46,7 +47,7 @@ export async function GET(
 	const calendar = ical({
 		name: projectDetails.name,
 		method: ICalCalendarMethod.PUBLISH,
-		timezone: { name: "UTC" },
+		timezone: { name: "Australia/Sydney", generator: getVtimezoneComponent },
 	});
 
 	for (const event of events) {
@@ -60,7 +61,7 @@ export async function GET(
 			created: event.createdAt,
 			lastModified: event.updatedAt,
 			repeating: event.repeatRule,
-			timezone: "UTC",
+			timezone: "Australia/Sydney",
 		});
 	}
 
@@ -82,7 +83,7 @@ export async function GET(
 				allDay: true,
 				created: task.createdAt,
 				lastModified: task.updatedAt,
-				timezone: "UTC",
+				timezone: "Australia/Sydney",
 			});
 		}
 	}

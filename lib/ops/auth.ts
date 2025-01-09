@@ -4,6 +4,31 @@ const applicationId = process.env.LOGTO_M2M_APP_ID!;
 const applicationSecret = process.env.LOGTO_M2M_APP_SECRET!;
 const tenantId = "default";
 
+/**
+ * Docs
+ * https://openapi.logto.io
+ */
+
+export interface Organization {
+	tenantId: string;
+	id: string;
+	name: string;
+	description: string;
+	customData: Record<string, string | number | boolean>;
+	isMfaRequired: boolean;
+	branding: {
+		logoUrl: string;
+		darkLogoUrl: string;
+		favicon: string;
+		darkFavicon: string;
+	};
+	createdAt: number;
+	organizationRoles: {
+		id: string;
+		name: string;
+	}[];
+}
+
 export const fetchAccessToken = async () => {
 	const { endpoint } = logtoConfig;
 	return await fetch(`${endpoint}oidc/token`, {
@@ -21,10 +46,13 @@ export const fetchAccessToken = async () => {
 		}).toString(),
 	});
 };
-
-export const createOrganizationForUser = async (
+export const updateUser = async (
 	userId: string,
-	name: string,
+	data: {
+		name?: string;
+		primaryEmail?: string;
+		customData?: Record<string, unknown>;
+	},
 ) => {
 	const { access_token } = await fetchAccessToken().then((res) => res.json());
 	if (!access_token) {
@@ -32,48 +60,33 @@ export const createOrganizationForUser = async (
 	}
 
 	const { endpoint } = logtoConfig;
-	const response = await fetch(`${endpoint}api/organizations`, {
-		method: "POST",
+	const response = await fetch(`${endpoint}api/users/${userId}`, {
+		method: "PATCH",
 		headers: {
 			Authorization: `Bearer ${access_token}`,
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify({
-			name,
-		}),
+		body: JSON.stringify(data),
 	});
 
 	if (!response.ok) {
-		console.error("Failed to create organization", response.status);
-		throw new Error("Failed to create organization");
+		console.error("Failed to update user", response.status);
+		throw new Error("Failed to update user");
 	}
 
-	const organization = await response.json();
-	console.log("organization", organization);
-
-	// Add user to organization
-	await fetch(`${endpoint}api/organizations/${organization.id}/users`, {
-		method: "POST",
-		headers: {
-			Authorization: `Bearer ${access_token}`,
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify({
-			userIds: [userId],
-		}),
-	});
-
-	return organization;
+	return await response.json();
 };
 
-export const getOrganizationsForUser = async (userId: string) => {
+export const getOrganizationsForUser = async (
+	userId: string,
+): Promise<Organization[]> => {
 	const { access_token } = await fetchAccessToken().then((res) => res.json());
 	if (!access_token) {
 		throw new Error("Access token not found");
 	}
 
 	const { endpoint } = logtoConfig;
-	const response = await fetch(`${endpoint}api/organizations`, {
+	const response = await fetch(`${endpoint}api/users/${userId}/organizations`, {
 		method: "GET",
 		headers: {
 			Authorization: `Bearer ${access_token}`,
@@ -85,9 +98,7 @@ export const getOrganizationsForUser = async (userId: string) => {
 		console.error("Failed to fetch organizations", response.status);
 		throw new Error("Failed to fetch organizations");
 	}
-
 	const organizations = await response.json();
-	console.log("organizations", organizations);
 
 	return organizations;
 };
