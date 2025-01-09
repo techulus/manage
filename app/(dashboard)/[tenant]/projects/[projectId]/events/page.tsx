@@ -16,10 +16,8 @@ import {
 	desc,
 	eq,
 	gt,
-	gte,
 	isNotNull,
 	lt,
-	lte,
 	or,
 } from "drizzle-orm";
 import { RssIcon } from "lucide-react";
@@ -47,7 +45,7 @@ export default async function EventDetails(props: Props) {
 	const timezone = await getTimezone();
 
 	// Convert the selected date to the user's timezone and then to UTC for the database
-	const selectedDate = on ? dayjs.tz(on, timezone).utc() : dayjs().utc();
+	const selectedDate = dayjs(new Date(on));
 	const dayCommentId = `${projectId}${selectedDate.year()}${selectedDate.month()}${selectedDate.date()}`;
 
 	const startOfDay = selectedDate.startOf("day").toDate();
@@ -91,7 +89,7 @@ export default async function EventDetails(props: Props) {
 		})
 		.execute();
 
-	const calendarSubscriptionUrl = `/api/calendar/${ownerId}/${projectId}/calendar.ics`;
+	const calendarSubscriptionUrl = `/api/calendar/${ownerId}/${projectId}/calendar.ics?userId=${userId}`;
 
 	return (
 		<>
@@ -144,5 +142,5 @@ export default async function EventDetails(props: Props) {
 				/>
 			</div>
 		</>
-	);
+  );
 }
