@@ -100,8 +100,8 @@ export async function GET(
 				end: timezone
 					? task.dueDate.toLocaleString("en-US", { timeZone: timezone })
 					: task.dueDate,
-				summary: `[${tasklist.name}] ${task.name}`,
-				description: task.description,
+				summary: `❏ [${tasklist.name}] ${task.name}`,
+				description: `${task.description}`,
 				allDay: true,
 				created: task.createdAt,
 				lastModified: task.updatedAt,

@@ -2,6 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import type { EventWithInvites, User } from "@/drizzle/types";
+import dayjs from "dayjs";
 import { Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import { RRule, rrulestr } from "rrule";
@@ -34,7 +35,7 @@ export default function EventForm({
 
 	const start = item?.start
 		? new Date(item.start)
-		: new Date(new Date().setHours(new Date().getHours() + 1));
+		: dayjs(new Date()).add(2, "hours").startOf("hour").toDate();
 
 	const end = item?.end ? new Date(item.end) : undefined;
 

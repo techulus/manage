@@ -1,8 +1,13 @@
 import { ThemeProvider } from "@/components/core/theme-provider";
 import { SITE_METADATA } from "@/data/marketing";
 import { cn } from "@/lib/utils";
+import { Archivo } from "next/font/google";
 
 import "./globals.css";
+
+const archivo = Archivo({
+	subsets: ["latin"],
+});
 
 export const metadata = {
 	title: SITE_METADATA.TITLE,
@@ -17,7 +22,7 @@ export default function RootLayout({
 	return (
 		<html
 			lang="en"
-			className={cn("dark flex min-h-full min-w-full")}
+			className={cn("dark flex min-h-full min-w-full", archivo.className)}
 			suppressHydrationWarning
 		>
 			<head>
