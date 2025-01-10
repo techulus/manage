@@ -53,7 +53,7 @@ export default function EventsList({
 	compact?: boolean;
 }) {
 	const filteredEvents = events.filter((x) =>
-		filterByRepeatRule(x, dayjs(date).toDate()),
+		filterByRepeatRule(x, new Date(date)),
 	);
 
 	return (
