@@ -118,8 +118,6 @@ export const updateUser = async (
 export const getOrganizationsForUser = async (
 	userId: string,
 ): Promise<Organization[]> => {
-	// is this slowing the app?
-	return [];
 	const { access_token } = await fetchAccessToken();
 	if (!access_token) {
 		throw new Error("Access token not found");

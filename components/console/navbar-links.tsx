@@ -11,11 +11,10 @@ import { useMemo } from "react";
 import logo from "../../public/images/logo.png";
 import { createToastWrapper } from "../core/toast";
 
-export default function NavBarLinks() {
+export default function NavBarLinks({ orgSlug }: { orgSlug: string }) {
 	const { systemTheme: theme } = useTheme();
 	const path = usePathname();
 	const { projectId } = useParams();
-	const orgSlug = "personal";
 
 	const [isSticky, ref] = useDetectSticky();
 
@@ -65,7 +64,7 @@ export default function NavBarLinks() {
 						current: path.endsWith("/settings"),
 					},
 				];
-	}, [path, projectId]);
+	}, [path, projectId, orgSlug]);
 
 	return (
 		<>

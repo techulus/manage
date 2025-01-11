@@ -1,7 +1,12 @@
 "use server";
 
+import { logtoConfig } from "@/app/logto";
+import { user } from "@/drizzle/schema";
 import { updateUser } from "@/lib/ops/auth";
+import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
+import { signOut } from "@logto/next/server-actions";
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
@@ -25,5 +30,19 @@ export async function updateUserData(payload: FormData) {
 		[key]: value,
 	});
 	revalidatePath(`/${orgSlug}/settings`);
+
+	const db = await database();
+	if (key === "name") {
+		const [firstName, lastName] = value.split(" ");
+		db.update(user)
+			.set({ firstName, lastName })
+			.where(eq(user.id, userId))
+			.run();
+	}
+
 	return { success: true };
+}
+
+export async function logout() {
+	await signOut(logtoConfig);
 }

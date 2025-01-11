@@ -1,4 +1,3 @@
-import type { Organization } from "@/lib/ops/auth";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "../../public/images/logo.png";
@@ -6,21 +5,19 @@ import { OrgSwitcher, UserButton } from "../core/auth";
 import NavBarLinks from "./navbar-links";
 
 export default function NavBar({
-	orgs,
-	activeOrg,
+	activeOrgId,
+	activeOrgSlug,
 }: {
-	orgs: Organization[];
-	activeOrg: Organization | null;
+	activeOrgId: string;
+	activeOrgSlug: string;
 }) {
-	const orgSlug = "personal";
-
 	return (
 		<>
 			<nav className="flex-shrink-0 bg-background text-black dark:bg-gray-950 dark:text-white">
 				<div className="mx-auto px-4 lg:px-8">
 					<div className="relative flex h-16 items-center justify-between">
 						<div className="ml-1 flex items-center justify-center">
-							<Link href={`/${orgSlug}/projects`} prefetch={false}>
+							<Link href={`/${activeOrgSlug}/projects`} prefetch={false}>
 								<div className="lg:px-0">
 									<Image
 										src={logo}
@@ -47,17 +44,17 @@ export default function NavBar({
 								<path d="M16.88 3.549L7.12 20.451" />
 							</svg>
 
-							<OrgSwitcher orgs={orgs} activeOrg={activeOrg} />
+							<OrgSwitcher activeOrgId={activeOrgId} />
 						</div>
 
 						<div className="ml-2 flex justify-center">
-							<UserButton orgSlug={orgSlug} />
+							<UserButton orgSlug={activeOrgSlug} />
 						</div>
 					</div>
 				</div>
 			</nav>
 
-			<NavBarLinks />
+			<NavBarLinks orgSlug={activeOrgSlug} />
 		</>
 	);
 }
