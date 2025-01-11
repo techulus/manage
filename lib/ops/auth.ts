@@ -1,28 +1,23 @@
 import { logtoConfig } from "@/app/logto";
+import type { UserInfoResponse } from "@logto/next/*";
 
 const applicationId = process.env.LOGTO_M2M_APP_ID!;
 const applicationSecret = process.env.LOGTO_M2M_APP_SECRET!;
 const tenantId = "default";
 
 /**
- * Docs
+ * Management API docs
  * https://openapi.logto.io
  */
+export interface UserCustomData {
+	timezone: string;
+}
 
-export interface User {
-	id: string;
-	username: string;
-	primaryEmail: string | null;
-	name: string | null;
-	avatar: string | null;
-	customData: {
-		timezone: string;
-	};
-	lastSignInAt: number;
-	createdAt: number;
-	updatedAt: number;
-	isSuspended: boolean;
-	hasPassword: boolean;
+export interface LogtoAccessToken {
+	access_token: string;
+	token_type: string;
+	expires_in: number;
+	scope: string;
 }
 
 export interface Organization {
@@ -47,7 +42,8 @@ export interface Organization {
 
 export const fetchAccessToken = async () => {
 	const { endpoint } = logtoConfig;
-	return await fetch(`${endpoint}oidc/token`, {
+
+	const token = await fetch(`${endpoint}oidc/token`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/x-www-form-urlencoded",
@@ -60,11 +56,13 @@ export const fetchAccessToken = async () => {
 			resource: `https://${tenantId}.logto.app/api`,
 			scope: "all",
 		}).toString(),
-	});
+	}).then((res) => res.json());
+
+	return token;
 };
 
-export const getUser = async (userId: string): Promise<User> => {
-	const { access_token } = await fetchAccessToken().then((res) => res.json());
+export const getUser = async (userId: string): Promise<UserInfoResponse> => {
+	const { access_token } = await fetchAccessToken();
 	if (!access_token) {
 		throw new Error("Access token not found");
 	}
@@ -94,7 +92,7 @@ export const updateUser = async (
 		customData?: Record<string, unknown>;
 	},
 ) => {
-	const { access_token } = await fetchAccessToken().then((res) => res.json());
+	const { access_token } = await fetchAccessToken();
 	if (!access_token) {
 		throw new Error("Access token not found");
 	}
@@ -120,7 +118,7 @@ export const updateUser = async (
 export const getOrganizationsForUser = async (
 	userId: string,
 ): Promise<Organization[]> => {
-	const { access_token } = await fetchAccessToken().then((res) => res.json());
+	const { access_token } = await fetchAccessToken();
 	if (!access_token) {
 		throw new Error("Access token not found");
 	}

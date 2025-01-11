@@ -50,19 +50,21 @@ export async function getOwner(): Promise<Result> {
 	if (!claims?.sub) {
 		throw new Error("User not found");
 	}
+
 	const userId = claims.sub;
+	const organizationIds = claims.organizations ?? [];
 
 	const cookieStore = await cookies();
 
-	const activeOrgId = cookieStore.get("activeOrgId")?.value;
-	const activeOrgSlug = cookieStore.get("activeOrgSlug")?.value ?? "personal";
-	const ownerId = activeOrgId ?? userId;
+	const activeOrgId = organizationIds.find(
+		(id) => id === cookieStore.get("activeOrgId")?.value,
+	);
 
 	return {
-		ownerId,
+		ownerId: activeOrgId ?? userId,
 		userId,
 		orgId: activeOrgId,
-		orgSlug: activeOrgSlug,
+		orgSlug: activeOrgId ?? userId,
 	} as Result;
 }
 

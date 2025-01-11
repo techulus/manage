@@ -1,5 +1,5 @@
 import { calendarEvent, project, task, taskList } from "@/drizzle/schema";
-import { getUser } from "@/lib/ops/auth";
+import { type UserCustomData, getUser } from "@/lib/ops/auth";
 import { getDatabaseForOwner } from "@/lib/utils/useDatabase";
 import { and, desc, eq, lte } from "drizzle-orm";
 import ical, { ICalCalendarMethod } from "ical-generator";
@@ -22,8 +22,8 @@ export async function GET(
 	const userId = searchParams.get("userId");
 	if (userId) {
 		const user = await getUser(userId);
-		if (user.customData?.timezone) {
-			timezone = user.customData.timezone;
+		if ((user.customData as UserCustomData)?.timezone) {
+			timezone = (user.customData as UserCustomData).timezone;
 		}
 	}
 

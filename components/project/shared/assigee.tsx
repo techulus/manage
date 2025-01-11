@@ -1,5 +1,4 @@
 import { UserAvatar } from "@/components/core/user-avatar";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 

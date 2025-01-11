@@ -1,8 +1,10 @@
-import { logtoConfig } from "@/app/logto";
+"use client";
+
+import { logout } from "@/app/(dashboard)/[tenant]/settings/actions";
 import type { Organization } from "@/lib/ops/auth";
-import { signOut } from "@logto/next/server-actions";
 import { ChevronsUpDown, Plus, User } from "lucide-react";
 import Link from "next/link";
+import { useMemo, useState } from "react";
 import { Button } from "../ui/button";
 import {
 	DropdownMenu,
@@ -14,12 +16,16 @@ import {
 } from "../ui/dropdown-menu";
 
 export const OrgSwitcher = ({
-	orgs,
-	activeOrg,
+	activeOrgId,
 }: {
-	orgs: Organization[];
-	activeOrg: Organization | null;
+	activeOrgId: string;
 }) => {
+	const [orgs, setOrgs] = useState<Organization[]>([]);
+	const activeOrg = useMemo(
+		() => orgs.find((org) => org.id === activeOrgId),
+		[orgs, activeOrgId],
+	);
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -132,12 +138,7 @@ export const UserButton = ({ orgSlug }: { orgSlug: string }) => {
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem>
-					<form
-						action={async () => {
-							"use server";
-							await signOut(logtoConfig);
-						}}
-					>
+					<form action={logout}>
 						<button type="submit">Sign Out</button>
 					</form>
 				</DropdownMenuItem>
