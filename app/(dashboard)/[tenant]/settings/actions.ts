@@ -2,6 +2,7 @@
 
 import { updateUser } from "@/lib/ops/auth";
 import { getOwner } from "@/lib/utils/useOwner";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
 export async function saveUserTimezone(timezone: string) {
@@ -14,4 +15,15 @@ export async function saveUserTimezone(timezone: string) {
 
 	const { userId } = await getOwner();
 	await updateUser(userId, { customData: { timezone } });
+}
+
+export async function updateUserData(payload: FormData) {
+	const { userId, orgSlug } = await getOwner();
+	const key = payload.get("key") as string;
+	const value = payload.get(key) as string;
+	await updateUser(userId, {
+		[key]: value,
+	});
+	revalidatePath(`/${orgSlug}/settings`);
+	return { success: true };
 }

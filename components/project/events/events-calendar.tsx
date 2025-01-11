@@ -28,7 +28,7 @@ export default function EventsCalendar({
 	return (
 		<div className="flex w-full flex-col md:flex-row md:space-x-2">
 			<Calendar
-				className="block mx-auto pb-10 md:pb-3 md:mx-0"
+				className="block mx-auto md:mx-0"
 				mode="single"
 				selected={new Date(selectedDate)}
 				onDayClick={(date) => {
