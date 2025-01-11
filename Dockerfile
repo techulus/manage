@@ -8,7 +8,8 @@ RUN apk add --no-cache \
     libstdc++ \
     gcc \
     musl-dev \
-    cmake
+    cmake \
+    curl
 
 # Stage 1: Install dependencies
 FROM base AS deps
