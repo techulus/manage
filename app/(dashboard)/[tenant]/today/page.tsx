@@ -55,41 +55,43 @@ export default async function Today() {
 				</p>
 			</PageSection>
 
-			<PageSection>
-				{overDue.length ? (
-					<>
-						<p className="flex items-center p-4 text-xl font-medium text-red-600">
-							<AlertTriangleIcon className="w-6 h-6 inline-block mr-1" />
-							Overdue
-						</p>
-						{overDue.map((task) => (
-							<TaskItem
-								key={task.id}
-								task={task}
-								projectId={+task.taskList.projectId}
-								compact
-							/>
-						))}
-					</>
-				) : null}
+			{overDue.length || dueToday.length ? (
+				<PageSection>
+					{overDue.length ? (
+						<>
+							<p className="flex items-center p-4 text-xl font-medium text-red-600">
+								<AlertTriangleIcon className="w-6 h-6 inline-block mr-1" />
+								Overdue
+							</p>
+							{overDue.map((task) => (
+								<TaskItem
+									key={task.id}
+									task={task}
+									projectId={+task.taskList.projectId}
+									compact
+								/>
+							))}
+						</>
+					) : null}
 
-				{dueToday.length ? (
-					<>
-						<p className="flex items-center p-4 text-xl font-medium text-orange-600">
-							<InfoIcon className="w-6 h-6 inline-block mr-1" />
-							Due Today
-						</p>
-						{dueToday.map((task) => (
-							<TaskItem
-								key={task.id}
-								task={task}
-								projectId={+task.taskList.projectId}
-								compact
-							/>
-						))}
-					</>
-				) : null}
-			</PageSection>
+					{dueToday.length ? (
+						<>
+							<p className="flex items-center p-4 text-xl font-medium text-orange-600">
+								<InfoIcon className="w-6 h-6 inline-block mr-1" />
+								Due Today
+							</p>
+							{dueToday.map((task) => (
+								<TaskItem
+									key={task.id}
+									task={task}
+									projectId={+task.taskList.projectId}
+									compact
+								/>
+							))}
+						</>
+					) : null}
+				</PageSection>
+			) : null}
 		</>
 	);
 }
