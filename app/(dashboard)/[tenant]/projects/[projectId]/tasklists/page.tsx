@@ -5,7 +5,6 @@ import { buttonVariants } from "@/components/ui/button";
 import { task, taskList } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
-import { allUsers } from "@/lib/utils/useUser";
 import { and, asc, eq, or } from "drizzle-orm";
 import Link from "next/link";
 import { createTask, partialUpdateTaskList } from "./actions";
