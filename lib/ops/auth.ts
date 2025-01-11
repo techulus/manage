@@ -58,14 +58,15 @@ export const fetchAccessToken = async () => {
 		}).toString(),
 	}).then((res) => res.json());
 
+	if (!token.access_token) {
+		throw new Error("Failed to fetch access token");
+	}
+
 	return token;
 };
 
 export const getUser = async (userId: string): Promise<UserInfoResponse> => {
 	const { access_token } = await fetchAccessToken();
-	if (!access_token) {
-		throw new Error("Access token not found");
-	}
 
 	const { endpoint } = logtoConfig;
 	const response = await fetch(`${endpoint}api/users/${userId}`, {
@@ -93,9 +94,6 @@ export const updateUser = async (
 	},
 ) => {
 	const { access_token } = await fetchAccessToken();
-	if (!access_token) {
-		throw new Error("Access token not found");
-	}
 
 	const { endpoint } = logtoConfig;
 	const response = await fetch(`${endpoint}api/users/${userId}`, {
@@ -119,9 +117,6 @@ export const getOrganizationsForUser = async (
 	userId: string,
 ): Promise<Organization[]> => {
 	const { access_token } = await fetchAccessToken();
-	if (!access_token) {
-		throw new Error("Access token not found");
-	}
 
 	const { endpoint } = logtoConfig;
 	const response = await fetch(`${endpoint}api/users/${userId}/organizations`, {

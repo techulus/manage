@@ -7,7 +7,6 @@ import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { type Organization, getOrganizationsForUser } from "../ops/auth";
 import { database } from "./useDatabase";
 
 dayjs.extend(utc);
@@ -37,12 +36,6 @@ export async function getUser(): Promise<User> {
 	}
 
 	return userDetails;
-}
-
-export async function getOrganizations(): Promise<Organization[]> {
-	const { userId } = await getOwner();
-	const organizations = await getOrganizationsForUser(userId);
-	return organizations;
 }
 
 export async function getOwner(): Promise<Result> {
