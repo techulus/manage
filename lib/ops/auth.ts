@@ -9,6 +9,22 @@ const tenantId = "default";
  * https://openapi.logto.io
  */
 
+export interface User {
+	id: string;
+	username: string;
+	primaryEmail: string | null;
+	name: string | null;
+	avatar: string | null;
+	customData: {
+		timezone: string;
+	};
+	lastSignInAt: number;
+	createdAt: number;
+	updatedAt: number;
+	isSuspended: boolean;
+	hasPassword: boolean;
+}
+
 export interface Organization {
 	tenantId: string;
 	id: string;
@@ -47,7 +63,7 @@ export const fetchAccessToken = async () => {
 	});
 };
 
-export const getUser = async (userId: string) => {
+export const getUser = async (userId: string): Promise<User> => {
 	const { access_token } = await fetchAccessToken().then((res) => res.json());
 	if (!access_token) {
 		throw new Error("Access token not found");
