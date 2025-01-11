@@ -4,7 +4,7 @@ import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { blob } from "@/drizzle/schema";
 import { bytesToMegabytes } from "@/lib/blobStore";
-import { getUser } from "@/lib/ops/auth";
+import type { UserCustomData } from "@/lib/ops/auth";
 import { database } from "@/lib/utils/useDatabase";
 import { getLogtoContext } from "@logto/next/server-actions";
 import { sql } from "drizzle-orm";
@@ -13,7 +13,7 @@ import { notFound } from "next/navigation";
 import { updateUserData } from "./actions";
 
 export default async function Settings() {
-	const { claims } = await getLogtoContext(logtoConfig, {
+	const { claims, userInfo } = await getLogtoContext(logtoConfig, {
 		fetchUserInfo: true,
 	});
 
@@ -23,7 +23,7 @@ export default async function Settings() {
 
 	const db = await database();
 
-	const [storage, user] = await Promise.all([
+	const [storage] = await Promise.all([
 		db
 			.select({
 				count: sql<number>`count(*)`,
@@ -31,7 +31,6 @@ export default async function Settings() {
 			})
 			.from(blob)
 			.get(),
-		getUser(claims.sub),
 	]);
 
 	return (
@@ -60,11 +59,11 @@ export default async function Settings() {
 				</dl>
 			</PageSection>
 
-			{user ? (
+			{userInfo ? (
 				<PageSection className="p-4">
 					<h2 className="flex items-center text-xl font-semibold leading-7 text-gray-900 dark:text-gray-200">
 						<User2 className="mr-2 inline-block h-6 w-6" />
-						Profile ({user.username})
+						Profile ({userInfo.username})
 					</h2>
 
 					<dl className="mt-6 space-y-6 divide-y divide-gray-100  text-sm leading-6 dark:divide-gray-800">
@@ -78,7 +77,7 @@ export default async function Settings() {
 										id={claims.sub}
 										name="name"
 										type="text"
-										value={user.name ?? "-"}
+										value={userInfo.name ?? "-"}
 										action={updateUserData}
 									/>
 								</div>
@@ -95,21 +94,21 @@ export default async function Settings() {
 										id={claims.sub}
 										name="primaryEmail"
 										type="text"
-										value={user.primaryEmail ?? "-"}
+										value={userInfo.email ?? "-"}
 										action={updateUserData}
 									/>
 								</div>
 							</dd>
 						</div>
 
-						{user.customData?.timezone ? (
+						{(userInfo.customData as UserCustomData)?.timezone ? (
 							<div className="pt-6 sm:flex">
 								<dt className="font-semibold text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
 									Timezone
 								</dt>
 								<dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
 									<div className="text-gray-900 dark:text-gray-200">
-										{user.customData?.timezone}
+										{(userInfo.customData as UserCustomData)?.timezone}
 									</div>
 								</dd>
 							</div>
