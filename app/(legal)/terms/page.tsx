@@ -1,8 +1,5 @@
 import { Header } from "@/components/layout/header";
 
-export const revalidate = 0;
-export const dynamic = "force-dynamic";
-
 export default function TermsAndConditions() {
 	return (
 		<div className="h-full dark:text-gray-100">
