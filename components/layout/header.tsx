@@ -1,12 +1,8 @@
-import { logtoConfig } from "@/app/logto";
-import { getLogtoContext, signIn } from "@logto/next/server-actions";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "../../public/images/logo.png";
 
 export async function Header() {
-	const { isAuthenticated } = await getLogtoContext(logtoConfig);
-
 	return (
 		<header className="absolute inset-x-0 top-0 z-50 text-black dark:text-white">
 			<nav
@@ -32,21 +28,9 @@ export async function Header() {
 					</Link>
 				</div>
 
-				{isAuthenticated ? (
-					<Link href="/start" prefetch={false}>
-						Console
-					</Link>
-				) : (
-					<button
-						type="button"
-						onClick={async () => {
-							"use server";
-							await signIn(logtoConfig);
-						}}
-					>
-						Sign in
-					</button>
-				)}
+				<Link href="/start" prefetch={false}>
+					Console
+				</Link>
 			</nav>
 		</header>
 	);
