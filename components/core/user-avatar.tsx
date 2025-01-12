@@ -13,7 +13,7 @@ export const UserAvatar = ({
 			<AvatarImage
 				src={
 					user.imageUrl ??
-					`https://api.dicebear.com/9.x/thumbs/svg?seed=${user.firstName}`
+					`https://api.dicebear.com/9.x/fun-emoji/svg?seed=${user.firstName}`
 				}
 			/>
 			<AvatarFallback>{user.firstName ?? "User"}</AvatarFallback>
