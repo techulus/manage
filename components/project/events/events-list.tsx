@@ -12,22 +12,22 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { EventWithInvites } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import dayjs from "dayjs";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
+import {
+	toDateString,
+	toDateTimeString,
+	toEndOfDay,
+	toStartOfDay,
+} from "@/lib/utils/date";
 import { CircleEllipsisIcon } from "lucide-react";
 import Link from "next/link";
 import { rrulestr } from "rrule";
 import { Assignee } from "../shared/assigee";
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
 const filterByRepeatRule = (event: EventWithInvites, date: Date) => {
 	if (event.repeatRule) {
 		const rrule = rrulestr(event.repeatRule);
-		const start = dayjs.utc(date).startOf("day").toDate();
-		const end = dayjs.utc(date).endOf("day").toDate();
+		const start = toStartOfDay(date);
+		const end = toEndOfDay(date);
 
 		return rrule.between(start, end, true).length > 0;
 	}
@@ -83,17 +83,13 @@ export default function EventsList({
 								suppressHydrationWarning
 							>
 								{event.allDay
-									? dayjs(event.start).tz(timezone).format("MMM D, YYYY")
-									: dayjs(event.start)
-											.tz(timezone)
-											.format("MMM D, YYYY, h:mm A")}
+									? toDateString(event.start, timezone)
+									: toDateTimeString(event.start, timezone)}
 								{event.end
 									? ` - ${
 											event.allDay
-												? dayjs(event.end).tz(timezone).format("MMM D, YYYY")
-												: dayjs(event.end)
-														.tz(timezone)
-														.format("MMM D, YYYY, h:mm A")
+												? toDateString(event.end, timezone)
+												: toDateTimeString(event.end, timezone)
 										}`
 									: null}
 								{event.repeatRule

@@ -3,8 +3,9 @@ import { CommentsSection } from "@/components/project/comment/comments-section";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { Progress } from "@/components/ui/progress";
 import { task, taskList, user } from "@/drizzle/schema";
+import { toDateStringWithDay } from "@/lib/utils/date";
 import { database } from "@/lib/utils/useDatabase";
-import { getOwner } from "@/lib/utils/useOwner";
+import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 import { and, asc, eq } from "drizzle-orm";
 import { CheckCircle, ClockIcon } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -18,12 +19,13 @@ type Props = {
 };
 
 export default async function TaskLists(props: Props) {
-    const params = await props.params;
-    const { userId, orgSlug } = await getOwner();
-    const { projectId, tasklistId } = params;
+	const params = await props.params;
+	const { userId, orgSlug } = await getOwner();
+	const { projectId, tasklistId } = params;
 
-    const db = await database();
-    const list = await db.query.taskList
+	const timezone = await getTimezone();
+	const db = await database();
+	const list = await db.query.taskList
 		.findFirst({
 			where: and(
 				eq(taskList.projectId, +projectId),
@@ -51,27 +53,27 @@ export default async function TaskLists(props: Props) {
 		})
 		.execute();
 
-    if (!list) {
+	if (!list) {
 		return notFound();
 	}
 
-    const currentUser = await db.query.user.findFirst({
+	const currentUser = await db.query.user.findFirst({
 		where: eq(user.id, userId),
 	});
 
-    if (!currentUser) {
+	if (!currentUser) {
 		return notFound();
 	}
 
-    const totalCount = list.tasks.length;
-    const doneCount = list.tasks.filter((task) => task.status === "done").length;
+	const totalCount = list.tasks.length;
+	const doneCount = list.tasks.filter((task) => task.status === "done").length;
 
-    const completedPercent =
+	const completedPercent =
 		totalCount != null && doneCount != null
 			? Math.round((doneCount / totalCount) * 100)
 			: null;
 
-    return (
+	return (
 		<>
 			<PageTitle
 				title={list.name}
@@ -100,12 +102,12 @@ export default async function TaskLists(props: Props) {
 					) : null}
 
 					{list.dueDate ? (
-						<div className="flex flex-row items-center border rounded-lg py-1 px-2 space-x-2 max-w-[160px]">
+						<div className="flex flex-row items-center border rounded-lg py-1 px-2 space-x-2">
 							<ClockIcon className="w-4 h-4" />
 							<p className="block">
 								{list.dueDate ? (
 									<span suppressHydrationWarning>
-										Due {list.dueDate.toLocaleDateString()}
+										Due {toDateStringWithDay(list.dueDate, timezone)}
 									</span>
 								) : null}
 							</p>
@@ -116,6 +118,7 @@ export default async function TaskLists(props: Props) {
 
 			<div className="mx-auto -mt-8 max-w-5xl px-4">
 				<TaskListItem
+					timezone={timezone}
 					key={list.id}
 					taskList={list}
 					projectId={+projectId}

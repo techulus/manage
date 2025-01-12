@@ -2,16 +2,9 @@ import { logtoConfig } from "@/app/logto";
 import { user } from "@/drizzle/schema";
 import type { User } from "@/drizzle/types";
 import { getLogtoContext } from "@logto/next/server-actions";
-import dayjs from "dayjs";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { type Organization, getOrganizationsForUser } from "../ops/auth";
 import { database } from "./useDatabase";
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 type Result = {
 	ownerId: string;
@@ -39,12 +32,6 @@ export async function getUser(): Promise<User> {
 	return userDetails;
 }
 
-export async function getOrganizations(): Promise<Organization[]> {
-	const { userId } = await getOwner();
-	const organizations = await getOrganizationsForUser(userId);
-	return organizations;
-}
-
 export async function getOwner(): Promise<Result> {
 	const { claims } = await getLogtoContext(logtoConfig);
 	if (!claims?.sub) {
@@ -70,5 +57,8 @@ export async function getOwner(): Promise<Result> {
 
 export async function getTimezone() {
 	const cookieStore = await cookies();
-	return cookieStore.get("userTimezone")?.value ?? dayjs.tz.guess();
+	return (
+		cookieStore.get("userTimezone")?.value ??
+		Intl.DateTimeFormat().resolvedOptions().timeZone
+	);
 }

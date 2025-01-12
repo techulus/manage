@@ -1,7 +1,7 @@
 import { activity } from "@/drizzle/schema";
-import dayjs from "dayjs";
+import { guessTimezone, toDateStringWithDay } from "../utils/date";
 import { database } from "../utils/useDatabase";
-import { getOwner, getTimezone } from "../utils/useOwner";
+import { getOwner } from "../utils/useOwner";
 
 type GenericObject = {
 	[key: string]:
@@ -54,7 +54,7 @@ function toDateString(date: any) {
 		return "-";
 	}
 
-	return dayjs(date).format("YYYY-MM-DD HH:mm:ss");
+	return toDateStringWithDay(date, guessTimezone);
 }
 
 export function generateObjectDiffMessage(

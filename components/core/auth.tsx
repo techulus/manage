@@ -4,7 +4,7 @@ import { logout } from "@/app/(dashboard)/[tenant]/settings/actions";
 import type { Organization } from "@/lib/ops/auth";
 import { ChevronsUpDown, Plus, User } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Button } from "../ui/button";
 import {
 	DropdownMenu,
@@ -14,6 +14,8 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { getUserOrganizations } from "@/lib/utils/useUser";
+import { Skeleton } from "../ui/skeleton";
 
 export const OrgSwitcher = ({
 	activeOrgId,
@@ -21,13 +23,32 @@ export const OrgSwitcher = ({
 	activeOrgId: string;
 }) => {
 	const [orgs, setOrgs] = useState<Organization[]>([]);
+	const [loading, setLoading] = useState(false);
+
 	const activeOrg = useMemo(
 		() => orgs.find((org) => org.id === activeOrgId),
 		[orgs, activeOrgId],
 	);
 
+	const fetchOrgs = useCallback(async () => {
+		setLoading(true);
+		await getUserOrganizations()
+			.then((data) => {
+				setOrgs(data);
+			})
+			.finally(() => {
+				setLoading(false);
+			});
+	}, []);
+
 	return (
-		<DropdownMenu>
+		<DropdownMenu
+			onOpenChange={(open) => {
+				if (open) {
+					fetchOrgs();
+				}
+			}}
+		>
 			<DropdownMenuTrigger asChild>
 				<Button
 					variant="ghost"
@@ -54,34 +75,41 @@ export const OrgSwitcher = ({
 						</button>
 					</form>
 				</DropdownMenuItem>
-				{orgs.map((org) => (
-					<DropdownMenuItem key={org.id} asChild>
-						<form
-							key={org.id}
-							// action={(formData) =>
-							// 	toast.promise(switchOrganization(formData), {
-							// 		loading: `Switching to ${org.name}...`,
-							// 		success: `Switched to ${org.name}!`,
-							// 		error: "Failed to switch organization.",
-							// 	})
-							// }
-						>
-							<input type="hidden" name="id" value={org.id} />
-							<input
-								type="hidden"
-								name="slug"
-								value={String(org.customData?.slug)}
-							/>
-							<button
-								type="submit"
-								className="flex w-full"
-								disabled={activeOrg?.id === org.id}
+				{loading ? (
+					<div className="space-y-2 pl-1.5">
+						<Skeleton className="h-5 w-[160px]" />
+						<Skeleton className="h-5 w-[160px]" />
+					</div>
+				) : (
+					orgs.map((org) => (
+						<DropdownMenuItem key={org.id} asChild>
+							<form
+								key={org.id}
+								// action={(formData) =>
+								// 	toast.promise(switchOrganization(formData), {
+								// 		loading: `Switching to ${org.name}...`,
+								// 		success: `Switched to ${org.name}!`,
+								// 		error: "Failed to switch organization.",
+								// 	})
+								// }
 							>
-								{org.name}
-							</button>
-						</form>
-					</DropdownMenuItem>
-				))}
+								<input type="hidden" name="id" value={org.id} />
+								<input
+									type="hidden"
+									name="slug"
+									value={String(org.customData?.slug)}
+								/>
+								<button
+									type="submit"
+									className="flex w-full"
+									disabled={activeOrg?.id === org.id}
+								>
+									{org.name}
+								</button>
+							</form>
+						</DropdownMenuItem>
+					))
+				)}
 				<DropdownMenuSeparator />
 				{activeOrg ? (
 					<DropdownMenuItem asChild>

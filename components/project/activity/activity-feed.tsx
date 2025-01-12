@@ -108,7 +108,7 @@ export function ActivityFeed({
 							<ActivityItem
 								key={activityItem.id}
 								item={activityItem}
-								isLast={activityItemIdx === activities.length - 1}
+								isLast={activityItemIdx === initialActivities.length - 1}
 							/>
 						))}
 					</ul>

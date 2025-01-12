@@ -10,6 +10,7 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { toStartOfDay } from "@/lib/utils/date";
 import {
 	type Period,
 	type TimePickerType,
@@ -18,7 +19,6 @@ import {
 	setDateByType,
 } from "@/lib/utils/time";
 import { add, format } from "date-fns";
-import dayjs from "dayjs";
 import { Calendar as CalendarIcon, Clock } from "lucide-react";
 import * as React from "react";
 
@@ -221,13 +221,13 @@ export function DateTimePicker({
 		if (!newDay) return;
 
 		if (dateOnly) {
-			onSelect?.(dayjs(newDay).utc().startOf("day").toDate());
+			onSelect?.(toStartOfDay(new Date(newDay)));
 			setDate(newDay);
 			return;
 		}
 
 		if (!date) {
-			setDate(dayjs(newDay).utc().startOf("day").toDate());
+			setDate(toStartOfDay(newDay));
 			return;
 		}
 
@@ -235,7 +235,7 @@ export function DateTimePicker({
 		const diffInDays = diff / (1000 * 60 * 60 * 24);
 		const newDateFull = add(date, { days: Math.ceil(diffInDays) });
 		setDate(newDateFull);
-		onSelect?.(dayjs(newDateFull).utc().toDate());
+		onSelect?.(new Date(newDateFull));
 	};
 
 	return (

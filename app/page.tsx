@@ -3,35 +3,7 @@ import { Header } from "@/components/layout/header";
 import { SITE_METADATA } from "@/data/marketing";
 import Link from "next/link";
 
-export const revalidate = 0;
-export const dynamic = "force-dynamic";
-
-async function getGitHubStars(): Promise<string | null> {
-	try {
-		const response = await fetch(
-			"https://api.github.com/repos/techulus/manage",
-			{
-				headers: {
-					Accept: "application/vnd.github+json",
-				},
-			},
-		);
-
-		if (!response?.ok) {
-			return null;
-		}
-
-		const json = await response.json();
-
-		return Number.parseInt(json.stargazers_count).toLocaleString();
-	} catch (error) {
-		return null;
-	}
-}
-
 export default async function Home() {
-	const stars = (await getGitHubStars()) ?? "-";
-
 	return (
 		<div className="h-full">
 			<Header />
@@ -85,7 +57,7 @@ export default async function Home() {
 								<div className="flex items-center">
 									<div className="h-4 w-4 border-y-8 border-l-0 border-r-8 border-solid border-muted border-y-transparent" />
 									<div className="flex h-10 items-center rounded-md border border-muted bg-muted px-4 font-medium">
-										{stars} stars on GitHub
+										Star on GitHub
 									</div>
 								</div>
 							</Link>

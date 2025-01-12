@@ -16,6 +16,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { toDateStringWithDay } from "@/lib/utils/date";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 import { getProjectById } from "@/lib/utils/useProjects";
 import { CalendarPlusIcon, ListPlusIcon, PlusIcon } from "lucide-react";
@@ -53,7 +54,7 @@ export default async function ProjectDetails(props: Props) {
 					<div className="flex space-x-2">
 						{project.dueDate ? (
 							<Badge variant="outline">
-								Due {project.dueDate.toLocaleDateString()}
+								Due {toDateStringWithDay(project.dueDate, timezone)}
 							</Badge>
 						) : null}
 						{project.status === "archived" ? (
@@ -141,6 +142,7 @@ export default async function ProjectDetails(props: Props) {
 								>
 									<TaskListHeader
 										orgSlug={orgSlug}
+										timezone={timezone}
 										taskList={taskList}
 										totalCount={taskList.tasks.length}
 										doneCount={
