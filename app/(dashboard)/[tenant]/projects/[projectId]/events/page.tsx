@@ -4,11 +4,13 @@ import { CommentsSection } from "@/components/project/comment/comments-section";
 import EventsCalendar from "@/components/project/events/events-calendar";
 import { buttonVariants } from "@/components/ui/button";
 import { calendarEvent } from "@/drizzle/schema";
+import {
+	toDateStringWithDay,
+	toEndOfDay,
+	toStartOfDay,
+} from "@/lib/utils/date";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
-import dayjs from "dayjs";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
 import {
 	and,
 	asc,
@@ -32,9 +34,6 @@ type Props = {
 	}>;
 };
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
 export default async function EventDetails(props: Props) {
 	const searchParams = await props.searchParams;
 	const params = await props.params;
@@ -44,11 +43,11 @@ export default async function EventDetails(props: Props) {
 
 	const timezone = await getTimezone();
 
-	const selectedDate = on ? dayjs(new Date(on)) : dayjs().tz(timezone);
-	const dayCommentId = `${projectId}${selectedDate.year()}${selectedDate.month()}${selectedDate.date()}`;
+	const selectedDate = on ? new Date(on) : new Date();
+	const dayCommentId = `${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDay()}`;
 
-	const startOfDay = selectedDate.startOf("day").toDate();
-	const endOfDay = selectedDate.endOf("day").toDate();
+	const startOfDay = toStartOfDay(selectedDate);
+	const endOfDay = toEndOfDay(selectedDate);
 
 	const db = await database();
 	const events = await db.query.calendarEvent
@@ -98,7 +97,7 @@ export default async function EventDetails(props: Props) {
 				actionLink={`/${orgSlug}/projects/${projectId}/events/new`}
 			>
 				<div className="font-medium text-gray-500">
-					{selectedDate.tz(timezone).format("dddd, MMMM D, YYYY")}
+					{toDateStringWithDay(selectedDate, timezone)}
 				</div>
 			</PageTitle>
 

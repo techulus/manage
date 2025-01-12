@@ -4,7 +4,7 @@ import PageTitle from "@/components/layout/page-title";
 import { ProjecItem } from "@/components/project/project-item";
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { getOwner } from "@/lib/utils/useOwner";
+import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 import { getProjectsForOwner } from "@/lib/utils/useProjects";
 import Link from "next/link";
 
@@ -19,6 +19,7 @@ export default async function Projects(props: Props) {
 	const searchParams = await props.searchParams;
 	const { orgSlug } = await getOwner();
 	const statuses = searchParams?.status?.split(",") ?? ["active"];
+	const timezone = await getTimezone();
 
 	const { projects, archivedProjects } = await getProjectsForOwner({
 		search: searchParams.search,
@@ -66,7 +67,11 @@ export default async function Projects(props: Props) {
 
 				<div className="grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:px-0">
 					{projects.map((project) => (
-						<ProjecItem key={project.id} project={project} />
+						<ProjecItem
+							key={project.id}
+							project={project}
+							timezone={timezone}
+						/>
 					))}
 				</div>
 			</div>

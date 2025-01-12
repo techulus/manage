@@ -37,7 +37,6 @@
 		"clsx": "^1.2.1",
 		"cmdk": "0.2.0",
 		"date-fns": "^2.30.0",
-		"dayjs": "^1.11.12",
 		"drizzle-orm": "^0.38.2",
 		"easymde": "^2.18.0",
 		"eslint-config-next": "15.1.0",

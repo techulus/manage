@@ -1,6 +1,5 @@
 "use client";
 
-import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 
 export function Greeting() {
@@ -8,7 +7,7 @@ export function Greeting() {
 
 	useEffect(() => {
 		const getCurrentGreeting = () => {
-			const currentHour = dayjs().hour();
+			const currentHour = new Date().getHours();
 			if (currentHour >= 5 && currentHour < 12) {
 				return "Good morning";
 			}

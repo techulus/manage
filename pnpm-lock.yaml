@@ -87,9 +87,6 @@ importers:
       date-fns:
         specifier: ^2.30.0
         version: 2.30.0
-      dayjs:
-        specifier: ^1.11.12
-        version: 1.11.12
       drizzle-orm:
         specifier: ^0.38.2
         version: 0.38.2(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.12)(@types/react@19.0.1)(better-sqlite3@11.7.0)(react@19.0.0)
@@ -7374,7 +7371,8 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.25.0
 
-  dayjs@1.11.12: {}
+  dayjs@1.11.12:
+    optional: true
 
   debug@3.2.7:
     dependencies:
