@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import type { Task, TaskList, TaskWithDetails, User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
+import { toDateStringWithDay } from "@/lib/utils/date";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { AlignJustifyIcon, FileIcon } from "lucide-react";
@@ -32,10 +33,12 @@ export const TaskItem = ({
 	task,
 	projectId,
 	taskLists,
+	timezone,
 	compact = false,
 }: {
 	task: TaskWithDetails;
 	projectId: number;
+	timezone: string;
 	taskLists?: TaskList[];
 	compact?: boolean;
 }) => {
@@ -215,7 +218,7 @@ export const TaskItem = ({
 								<dd className="mt-1 flex items-start text-sm leading-6 sm:col-span-2 sm:mt-0">
 									{task.dueDate ? (
 										<div className="flex w-full items-center justify-between">
-											<p>{task.dueDate.toLocaleDateString()}</p>
+											<p>{toDateStringWithDay(task.dueDate, timezone)}</p>
 											<button
 												type="button"
 												className="text-primary hover:text-red-500"

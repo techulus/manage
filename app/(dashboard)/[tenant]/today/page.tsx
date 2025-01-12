@@ -5,12 +5,14 @@ import { TaskItem } from "@/components/project/tasklist/task/task-item";
 import { task } from "@/drizzle/schema";
 import { isSameDate } from "@/lib/utils/date";
 import { database } from "@/lib/utils/useDatabase";
+import { getTimezone } from "@/lib/utils/useOwner";
 import { and, asc, lte, ne } from "drizzle-orm";
 import { AlertTriangleIcon, InfoIcon } from "lucide-react";
 
 export default async function Today() {
 	const db = await database();
 
+	const timezone = await getTimezone();
 	const tasks = await db.query.task.findMany({
 		where: and(lte(task.dueDate, new Date()), ne(task.status, "done")),
 		orderBy: [asc(task.position)],
@@ -68,6 +70,7 @@ export default async function Today() {
 									key={task.id}
 									task={task}
 									projectId={+task.taskList.projectId}
+									timezone={timezone}
 									compact
 								/>
 							))}
@@ -85,6 +88,7 @@ export default async function Today() {
 									key={task.id}
 									task={task}
 									projectId={+task.taskList.projectId}
+									timezone={timezone}
 									compact
 								/>
 							))}

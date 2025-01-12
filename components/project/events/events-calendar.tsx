@@ -38,7 +38,7 @@ export default function EventsCalendar({
 				selected={new Date(currentDate)}
 				onDayClick={(date) => {
 					router.push(
-						`/${orgSlug}/projects/${projectId}/events?on=${currentDate}`,
+						`/${orgSlug}/projects/${projectId}/events?on=${date.toISOString()}`,
 					);
 				}}
 			/>

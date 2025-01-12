@@ -33,6 +33,7 @@ export const TaskListItem = ({
 	orgSlug,
 	createTask,
 	partialUpdateTaskList,
+	timezone,
 	hideHeader = false,
 	compact = false,
 }: {
@@ -40,6 +41,7 @@ export const TaskListItem = ({
 	userId: string;
 	projectId: number;
 	orgSlug: string;
+	timezone: string;
 	createTask: (data: {
 		name: string;
 		userId: string;
@@ -118,6 +120,7 @@ export const TaskListItem = ({
 					doneCount={doneItems.length}
 					orgSlug={orgSlug}
 					partialUpdateTaskList={partialUpdateTaskList}
+					timezone={timezone}
 				/>
 			) : null}
 
@@ -145,6 +148,7 @@ export const TaskListItem = ({
 					>
 						{localTodoItems.map((task) => (
 							<TaskItem
+								timezone={timezone}
 								key={task.id}
 								task={task}
 								projectId={+projectId}
@@ -173,7 +177,12 @@ export const TaskListItem = ({
 				{compact
 					? null
 					: doneItems.map((task) => (
-							<TaskItem key={task.id} task={task} projectId={+projectId} />
+							<TaskItem
+								key={task.id}
+								task={task}
+								projectId={+projectId}
+								timezone={timezone}
+							/>
 						))}
 			</div>
 		</div>

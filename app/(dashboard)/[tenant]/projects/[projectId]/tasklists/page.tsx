@@ -4,7 +4,7 @@ import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { buttonVariants } from "@/components/ui/button";
 import { task, taskList } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
-import { getOwner } from "@/lib/utils/useOwner";
+import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 import { and, asc, eq, or } from "drizzle-orm";
 import Link from "next/link";
 import { createTask, partialUpdateTaskList } from "./actions";
@@ -24,6 +24,7 @@ export default async function TaskLists(props: Props) {
 	const { userId, orgSlug } = await getOwner();
 	const { projectId } = params;
 
+	const timezone = await getTimezone();
 	const filterByStatuses = searchParams.status?.split(",") ?? ["active"];
 	const statusFilter = filterByStatuses.map((status) =>
 		eq(taskList.status, status),
@@ -92,6 +93,7 @@ export default async function TaskLists(props: Props) {
 							createTask={createTask}
 							partialUpdateTaskList={partialUpdateTaskList}
 							orgSlug={orgSlug}
+							timezone={timezone}
 							compact
 						/>
 					))}

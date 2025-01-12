@@ -37,9 +37,9 @@ export function toDateTimeString(date: Date, timeZone: string) {
 export function toDateStringWithDay(date: Date, timeZone: string) {
 	return date.toLocaleDateString("en-US", {
 		timeZone,
-		weekday: "long",
+		weekday: "short",
 		year: "numeric",
-		month: "long",
+		month: "short",
 		day: "numeric",
 	});
 }
