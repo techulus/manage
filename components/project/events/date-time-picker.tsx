@@ -220,12 +220,6 @@ export function DateTimePicker({
 	const handleSelect = (newDay: Date | undefined) => {
 		if (!newDay) return;
 
-		if (dateOnly) {
-			onSelect?.(toStartOfDay(new Date(newDay)));
-			setDate(newDay);
-			return;
-		}
-
 		if (!date) {
 			setDate(toStartOfDay(newDay));
 			return;
@@ -235,7 +229,7 @@ export function DateTimePicker({
 		const diffInDays = diff / (1000 * 60 * 60 * 24);
 		const newDateFull = add(date, { days: Math.ceil(diffInDays) });
 		setDate(newDateFull);
-		onSelect?.(new Date(newDateFull));
+		onSelect?.(newDateFull);
 	};
 
 	return (

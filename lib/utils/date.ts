@@ -1,9 +1,17 @@
-export function toStartOfDay(date: Date) {
-	return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
-
 export function toTimeZone(date: Date, timeZone: string) {
 	return new Date(date.toLocaleString("en-US", { timeZone }));
+}
+
+export function toStartOfDay(date: Date) {
+	return new Date(
+		date.getFullYear(),
+		date.getMonth(),
+		date.getDate(),
+		0,
+		0,
+		0,
+		0,
+	);
 }
 
 export function toEndOfDay(date: Date) {
@@ -22,8 +30,8 @@ export function toDateString(date: Date, timeZone: string) {
 	return date.toLocaleDateString("en-US", {
 		timeZone,
 		year: "numeric",
-		month: "2-digit",
-		day: "2-digit",
+		month: "short",
+		day: "numeric",
 	});
 }
 
@@ -46,6 +54,15 @@ export function toDateStringWithDay(date: Date, timeZone: string) {
 		year: "numeric",
 		month: "short",
 		day: "numeric",
+	});
+}
+
+export function toMachineDateString(date: Date, timeZone: string) {
+	return date.toLocaleDateString("en-US", {
+		timeZone,
+		year: "numeric",
+		month: "2-digit",
+		day: "2-digit",
 	});
 }
 

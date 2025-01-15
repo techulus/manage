@@ -2,7 +2,7 @@
 
 import { Calendar } from "@/components/ui/calendar";
 import type { EventWithInvites } from "@/drizzle/types";
-import { toDateString } from "@/lib/utils/date";
+import { toMachineDateString } from "@/lib/utils/date";
 import { useRouter } from "next/navigation";
 import EventsList from "./events-list";
 
@@ -25,7 +25,7 @@ export default function EventsCalendar({
 }) {
 	const router = useRouter();
 
-	const currentDate = toDateString(
+	const currentDate = toMachineDateString(
 		selectedDate ? new Date(selectedDate) : new Date(),
 		timezone,
 	);
@@ -38,7 +38,7 @@ export default function EventsCalendar({
 				selected={new Date(currentDate)}
 				onDayClick={(date) => {
 					router.push(
-						`/${orgSlug}/projects/${projectId}/events?on=${date.toISOString()}`,
+						`/${orgSlug}/projects/${projectId}/events?on=${toMachineDateString(date, timezone)}`,
 					);
 				}}
 			/>

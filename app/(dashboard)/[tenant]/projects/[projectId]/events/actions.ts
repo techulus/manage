@@ -2,7 +2,7 @@
 
 import { calendarEvent, eventInvite } from "@/drizzle/schema";
 import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
-import { toEndOfDay } from "@/lib/utils/date";
+import { toEndOfDay, toMachineDateString } from "@/lib/utils/date";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 import { and, eq } from "drizzle-orm";
@@ -95,9 +95,11 @@ export async function createEvent(payload: FormData) {
 		projectId: +projectId,
 	});
 
+	const timezone = await getTimezone();
+
 	revalidatePath(`/${orgSlug}/projects/${projectId}/events`);
 	redirect(
-		`/${orgSlug}/projects/${projectId}/events?on=${start.toISOString()}`,
+		`/${orgSlug}/projects/${projectId}/events?on=${toMachineDateString(start, timezone)}`,
 	);
 }
 
@@ -163,9 +165,11 @@ export async function updateEvent(payload: FormData) {
 			projectId: +projectId,
 		});
 
+	const timezone = await getTimezone();
+
 	revalidatePath(`/${orgSlug}/projects/${projectId}/events`);
 	redirect(
-		`/${orgSlug}/projects/${projectId}/events?on=${start.toISOString()}`,
+		`/${orgSlug}/projects/${projectId}/events?on=${toMachineDateString(start, timezone)}`,
 	);
 }
 

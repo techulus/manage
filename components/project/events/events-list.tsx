@@ -13,7 +13,7 @@ import {
 import type { EventWithInvites } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import {
-	toDateString,
+	toDateStringWithDay,
 	toDateTimeString,
 	toEndOfDay,
 	toStartOfDay,
@@ -83,12 +83,12 @@ export default function EventsList({
 								suppressHydrationWarning
 							>
 								{event.allDay
-									? toDateString(event.start, timezone)
+									? toDateStringWithDay(event.start, timezone)
 									: toDateTimeString(event.start, timezone)}
 								{event.end
 									? ` - ${
 											event.allDay
-												? toDateString(event.end, timezone)
+												? toDateStringWithDay(event.end, timezone)
 												: toDateTimeString(event.end, timezone)
 										}`
 									: null}
