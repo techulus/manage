@@ -53,9 +53,8 @@ export default function NavBar({
 							<ProjectSwitcher projects={projects} />
 						</div>
 
-						<div className="ml-2 flex justify-center space-x-4">
+						<div className="ml-2 flex justify-center space-x-2">
 							<Notifications />
-
 							<UserButton orgSlug={activeOrgSlug} />
 						</div>
 					</div>

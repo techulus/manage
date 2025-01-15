@@ -63,7 +63,7 @@ function Notifications() {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-1">
+      <PopoverContent className="w-80 p-1" align="end">
         <div className="flex items-baseline justify-between gap-4 px-3 py-2">
           <div className="text-sm font-semibold">Notifications</div>
           {unreadCount > 0 && (
