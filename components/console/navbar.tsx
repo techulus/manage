@@ -42,7 +42,7 @@ export default function NavBar({
 								strokeWidth="1"
 								viewBox="0 0 24 24"
 								width="40"
-								className="ml-2 text-gray-300 dark:text-gray-700 xl:block"
+								className="ml-0.5 text-gray-300 dark:text-gray-700 xl:block"
 							>
 								<path d="M16.88 3.549L7.12 20.451" />
 							</svg>

@@ -3,7 +3,7 @@ import { ReportTimezone } from "@/components/core/report-timezone";
 import { project } from "@/drizzle/schema";
 import { database, isDatabaseReady } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
-import { eq, not } from "drizzle-orm";
+import { ne } from "drizzle-orm";
 import { redirect } from "next/navigation";
 
 export const fetchCache = "force-no-store"; // disable cache for console pages
@@ -31,7 +31,7 @@ export default async function ConsoleLayout(props: {
 
 	const db = await database();
 	const projects = await db.query.project.findMany({
-		where: not(eq(project.status, "archived")),
+		where: ne(project.status, "archived"),
 	});
 
 	return (

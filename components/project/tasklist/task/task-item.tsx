@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import type { Task, TaskList, TaskWithDetails, User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import { toDateStringWithDay } from "@/lib/utils/date";
+import { toDateStringWithDay, toEndOfDay } from "@/lib/utils/date";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { AlignJustifyIcon, CalendarClock, FileIcon } from "lucide-react";
@@ -238,10 +238,10 @@ export const TaskItem = ({
 										<DateTimePicker
 											dateOnly
 											name="dueDate"
-											onSelect={(date) => {
+											onSelect={(dueDate) => {
 												toast.promise(
 													updateTask(id, projectId, {
-														dueDate: date,
+														dueDate: toEndOfDay(dueDate),
 													}),
 													updateTaskToastOptions,
 												);
