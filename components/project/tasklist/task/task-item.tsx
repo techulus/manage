@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { toDateStringWithDay } from "@/lib/utils/date";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { AlignJustifyIcon, FileIcon } from "lucide-react";
+import { AlignJustifyIcon, CalendarClock, FileIcon } from "lucide-react";
 import { useReducer, useState } from "react";
 import toast from "react-hot-toast";
 import { Card, CardContent, CardHeader } from "../../../ui/card";
@@ -381,6 +381,12 @@ export const TaskItem = ({
 								<Assignee className="mr-2" user={task.assignee} imageOnly />
 							) : null}
 							{name}
+							{task.dueDate ? (
+								<div className="text-muted-foreground ml-2 text-sm">
+									<CalendarClock className="h-4 w-4 inline-block text-primary mr-1 -mt-1" />
+									{toDateStringWithDay(task.dueDate, timezone)}
+								</div>
+							) : null}
 							{task.description ? (
 								<FileIcon className="ml-2 h-4 w-4 text-primary" />
 							) : null}

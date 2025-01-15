@@ -2,6 +2,10 @@ export function toStartOfDay(date: Date) {
 	return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
+export function toTimeZone(date: Date, timeZone: string) {
+	return new Date(date.toLocaleString("en-US", { timeZone }));
+}
+
 export function toEndOfDay(date: Date) {
 	return new Date(
 		date.getFullYear(),
@@ -26,9 +30,10 @@ export function toDateString(date: Date, timeZone: string) {
 export function toDateTimeString(date: Date, timeZone: string) {
 	return date.toLocaleString("en-US", {
 		timeZone,
+		weekday: "short",
 		year: "numeric",
-		month: "2-digit",
-		day: "2-digit",
+		month: "short",
+		day: "numeric",
 		hour: "2-digit",
 		minute: "2-digit",
 	});

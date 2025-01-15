@@ -13,16 +13,20 @@ type Props = {
 	params: Promise<{
 		projectId: string;
 	}>;
+	searchParams: Promise<{
+		on: string;
+	}>;
 };
 
 export default async function CreateEvent(props: Props) {
-    const params = await props.params;
-    const { orgSlug } = await getOwner();
-    const backUrl = `/${orgSlug}/projects/${params.projectId}/events`;
+	const params = await props.params;
+	const searchParams = await props.searchParams;
+	const { orgSlug } = await getOwner();
+	const backUrl = `/${orgSlug}/projects/${params.projectId}/events`;
 
-    const users = await allUsers();
+	const users = await allUsers();
 
-    return (
+	return (
 		<>
 			<PageTitle title="Create Event" backUrl={backUrl} />
 
@@ -34,7 +38,7 @@ export default async function CreateEvent(props: Props) {
 						defaultValue={params.projectId}
 					/>
 					<CardContent>
-						<EventForm users={users} />
+						<EventForm users={users} on={searchParams.on} />
 					</CardContent>
 					<CardFooter>
 						<div className="ml-auto flex items-center justify-end gap-x-6">

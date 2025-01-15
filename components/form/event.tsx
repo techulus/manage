@@ -22,9 +22,11 @@ import { Switch } from "../ui/switch";
 
 export default function EventForm({
 	item,
+	on,
 	users,
 }: {
 	item?: EventWithInvites | null;
+	on?: string;
 	users: User[];
 }) {
 	const [allDay, setAllDay] = useState(item?.allDay ?? false);
@@ -32,11 +34,15 @@ export default function EventForm({
 		item?.invites?.map((invite) => invite.userId) ?? [],
 	);
 
-	const start = item?.start ? new Date(item.start) : new Date();
-
 	const end = item?.end ? new Date(item.end) : undefined;
-
 	const rrule = item?.repeatRule ? rrulestr(item.repeatRule) : null;
+
+	let start: Date;
+	start = item?.start ? new Date(item.start) : new Date();
+	if (on) {
+		const date = new Date(on);
+		start = new Date(date.setHours(start.getHours(), start.getMinutes()));
+	}
 
 	return (
 		<div className="my-2 space-y-4">

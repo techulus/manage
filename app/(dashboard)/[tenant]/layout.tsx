@@ -1,7 +1,9 @@
 import NavBar from "@/components/console/navbar";
 import { ReportTimezone } from "@/components/core/report-timezone";
-import { isDatabaseReady } from "@/lib/utils/useDatabase";
+import { project } from "@/drizzle/schema";
+import { database, isDatabaseReady } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
+import { eq, not } from "drizzle-orm";
 import { redirect } from "next/navigation";
 
 export const fetchCache = "force-no-store"; // disable cache for console pages
@@ -13,12 +15,12 @@ export default async function ConsoleLayout(props: {
 		tenant: string;
 	}>;
 }) {
-	const params = await props.params;
+	const { tenant } = await props.params;
 
 	const { children } = props;
 	const { orgId, orgSlug, userId } = await getOwner();
 
-	if (params.tenant !== orgSlug) {
+	if (tenant !== orgSlug) {
 		redirect("/start");
 	}
 
@@ -27,9 +29,18 @@ export default async function ConsoleLayout(props: {
 		redirect("/start");
 	}
 
+	const db = await database();
+	const projects = await db.query.project.findMany({
+		where: not(eq(project.status, "archived")),
+	});
+
 	return (
 		<div className="relative flex min-h-full flex-col">
-			<NavBar activeOrgId={orgId ?? userId} activeOrgSlug={orgSlug} />
+			<NavBar
+				activeOrgId={orgId ?? userId}
+				activeOrgSlug={orgSlug}
+				projects={projects}
+			/>
 
 			<div className="mx-auto w-full flex-grow lg:flex">
 				<div className="min-w-0 flex-1 xl:flex">
@@ -38,6 +49,7 @@ export default async function ConsoleLayout(props: {
 					</div>
 				</div>
 			</div>
+
 			<ReportTimezone />
 		</div>
 	);

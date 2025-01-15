@@ -17,5 +17,5 @@ export default async function Start() {
 	}
 
 	await addUserToTenantDb();
-	redirect(`/${orgSlug}/projects`);
+	redirect(`/${orgSlug}/today`);
 }

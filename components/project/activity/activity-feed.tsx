@@ -8,6 +8,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import type { ActivityWithActor } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
+import {
+	guessTimezone,
+	toDateStringWithDay,
+	toDateTimeString,
+} from "@/lib/utils/date";
 import { PencilIcon, PlusCircleIcon, TrashIcon } from "lucide-react";
 import { useCallback, useState } from "react";
 
@@ -66,8 +71,7 @@ export function ActivityItem({
 									className="mt-0.5 text-sm text-gray-500"
 									suppressHydrationWarning
 								>
-									{item.createdAt.toLocaleTimeString()},{" "}
-									{item.createdAt.toDateString()}
+									{toDateTimeString(item.createdAt, guessTimezone)}
 								</p>
 							</div>
 						</div>

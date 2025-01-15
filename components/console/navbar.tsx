@@ -1,15 +1,18 @@
+import type { Project } from "@/drizzle/types";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "../../public/images/logo.png";
-import { OrgSwitcher, UserButton } from "../core/auth";
+import { OrgSwitcher, ProjectSwitcher, UserButton } from "../core/auth";
 import NavBarLinks from "./navbar-links";
 
 export default function NavBar({
 	activeOrgId,
 	activeOrgSlug,
+	projects,
 }: {
 	activeOrgId: string;
 	activeOrgSlug: string;
+	projects: Project[];
 }) {
 	return (
 		<>
@@ -22,8 +25,8 @@ export default function NavBar({
 									<Image
 										src={logo}
 										alt="Manage"
-										width={40}
-										height={40}
+										width={30}
+										height={30}
 										className="rounded-md"
 									/>
 								</div>
@@ -45,6 +48,8 @@ export default function NavBar({
 							</svg>
 
 							<OrgSwitcher activeOrgId={activeOrgId} />
+
+							<ProjectSwitcher projects={projects} />
 						</div>
 
 						<div className="ml-2 flex justify-center">

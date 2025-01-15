@@ -3,7 +3,7 @@ import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { TaskItem } from "@/components/project/tasklist/task/task-item";
 import { task } from "@/drizzle/schema";
-import { isSameDate } from "@/lib/utils/date";
+import { isSameDate, toTimeZone } from "@/lib/utils/date";
 import { database } from "@/lib/utils/useDatabase";
 import { getTimezone } from "@/lib/utils/useOwner";
 import { and, asc, lte, ne } from "drizzle-orm";
@@ -13,8 +13,10 @@ export default async function Today() {
 	const db = await database();
 
 	const timezone = await getTimezone();
+	const today = toTimeZone(new Date(), timezone);
+
 	const tasks = await db.query.task.findMany({
-		where: and(lte(task.dueDate, new Date()), ne(task.status, "done")),
+		where: and(lte(task.dueDate, new Date(today)), ne(task.status, "done")),
 		orderBy: [asc(task.position)],
 		with: {
 			taskList: {

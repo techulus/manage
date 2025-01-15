@@ -1,9 +1,12 @@
 "use client";
 
 import { logout } from "@/app/(dashboard)/[tenant]/settings/actions";
+import type { Project } from "@/drizzle/types";
 import type { Organization } from "@/lib/ops/auth";
+import { getUserOrganizations } from "@/lib/utils/useUser";
 import { ChevronsUpDown, Plus, User } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { Button } from "../ui/button";
 import {
@@ -14,7 +17,6 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { getUserOrganizations } from "@/lib/utils/useUser";
 import { Skeleton } from "../ui/skeleton";
 
 export const OrgSwitcher = ({
@@ -53,7 +55,7 @@ export const OrgSwitcher = ({
 				<Button
 					variant="ghost"
 					size="sm"
-					className="flex w-full items-center justify-between px-2 py-1 focus:outline-none"
+					className="flex max-w-[140px] items-center justify-between px-2 py-1 focus:outline-none"
 				>
 					<span className="truncate">{activeOrg?.name ?? "Personal"}</span>
 					<ChevronsUpDown className="ml-1 h-4 w-4 shrink-0 opacity-50" />
@@ -172,5 +174,57 @@ export const UserButton = ({ orgSlug }: { orgSlug: string }) => {
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
+	);
+};
+
+export const ProjectSwitcher = ({
+	projects,
+}: {
+	projects: Project[];
+}) => {
+	const { tenant, projectId } = useParams();
+
+	if (!projectId) return null;
+
+	const activeProject = projects.find((project) => project.id === +projectId);
+
+	return (
+		<>
+			<svg
+				fill="none"
+				height="32"
+				shapeRendering="geometricPrecision"
+				stroke="currentColor"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				strokeWidth="1"
+				viewBox="0 0 24 24"
+				width="40"
+				className="ml-2 text-gray-300 dark:text-gray-700 xl:block"
+			>
+				<path d="M16.88 3.549L7.12 20.451" />
+			</svg>
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button
+						variant="ghost"
+						size="sm"
+						className="flex max-w-[140px] items-center justify-between px-2 py-1 focus:outline-none"
+					>
+						<span className="truncate">{activeProject?.name}</span>
+						<ChevronsUpDown className="ml-1 h-4 w-4 shrink-0 opacity-50" />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent>
+					{projects.map((project) => (
+						<DropdownMenuItem key={project.id} asChild>
+							<Link href={`/${tenant}/projects/${project.id}`}>
+								{project.name}
+							</Link>
+						</DropdownMenuItem>
+					))}
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</>
 	);
 };

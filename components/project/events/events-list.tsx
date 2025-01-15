@@ -62,7 +62,7 @@ export default function EventsList({
 				<EmptyState
 					show={!filteredEvents.length}
 					label="event"
-					createLink={`/${orgSlug}/projects/${projectId}/events/new`}
+					createLink={`/${orgSlug}/projects/${projectId}/events/new?on=${date}`}
 				/>
 			) : null}
 
