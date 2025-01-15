@@ -237,6 +237,18 @@ export const activity = sqliteTable("Activity", {
 	createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
 });
 
+export const notification = sqliteTable("Notification", {
+	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+	type: text("type"),
+	message: text("message").notNull(),
+	target: text("target").notNull(),
+	read: integer("read", { mode: "boolean" }).notNull().default(false),
+	createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+	userId: text("userId")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
+});
+
 export const userRelations = relations(user, ({ many }) => ({
 	projects: many(project),
 	documents: many(document),
@@ -326,5 +338,12 @@ export const activityRelations = relations(activity, ({ one }) => ({
 	project: one(project, {
 		fields: [activity.projectId],
 		references: [project.id],
+	}),
+}));
+
+export const notificationRelations = relations(notification, ({ one }) => ({
+	user: one(user, {
+		fields: [notification.userId],
+		references: [user.id],
 	}),
 }));
