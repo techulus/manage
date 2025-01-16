@@ -14,20 +14,21 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 
-export function DateTimePicker(props: {
+type Props = {
 	name: string;
-	defaultValue?: Date;
-	dateOnly?: boolean;
+	defaultValue?: Date | string;
 	onSelect?: (date: Date) => void;
-}) {
+};
+
+export function DateTimePicker(
+	props: Props & {
+		dateOnly?: boolean;
+	},
+) {
 	return props.dateOnly ? <DatePicker {...props} /> : <TimePicker {...props} />;
 }
 
-function TimePicker(props: {
-	name: string;
-	defaultValue?: Date;
-	onSelect?: (date: Date) => void;
-}) {
+function TimePicker(props: Props) {
 	const [date, setDate] = React.useState<Date | undefined>(
 		props.defaultValue ? new Date(props.defaultValue) : undefined,
 	);
@@ -163,11 +164,7 @@ function TimePicker(props: {
 	);
 }
 
-function DatePicker(props: {
-	name: string;
-	defaultValue?: Date;
-	onSelect?: (date: Date) => void;
-}) {
+function DatePicker(props: Props) {
 	const [date, setDate] = React.useState<Date | undefined>(
 		props.defaultValue ? new Date(props.defaultValue) : undefined,
 	);
