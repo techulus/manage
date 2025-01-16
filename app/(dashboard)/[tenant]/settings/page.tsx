@@ -66,7 +66,7 @@ export default async function Settings() {
 						Profile ({userInfo.username})
 					</h2>
 
-					<div className="p-4 flex items-center">
+					<div className="p-4 sm:flex items-center">
 						<p className="font-semibold text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
 							Name
 						</p>
@@ -79,10 +79,10 @@ export default async function Settings() {
 						/>
 					</div>
 
-					<div className="p-4 flex items-center">
-						<dt className="font-semibold text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
+					<div className="p-4 sm:flex items-center">
+						<p className="font-semibold text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
 							Email address
-						</dt>
+						</p>
 						<EditableValue
 							id={claims.sub}
 							name="primaryEmail"

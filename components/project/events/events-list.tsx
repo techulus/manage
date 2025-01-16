@@ -12,28 +12,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { EventWithInvites } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import {
-	toDateStringWithDay,
-	toDateTimeString,
-	toEndOfDay,
-	toStartOfDay,
-} from "@/lib/utils/date";
+import { toDateStringWithDay, toDateTimeString } from "@/lib/utils/date";
+import { filterByRepeatRule } from "@/lib/utils/useEvents";
 import { CircleEllipsisIcon } from "lucide-react";
 import Link from "next/link";
 import { rrulestr } from "rrule";
 import { Assignee } from "../shared/assigee";
-
-const filterByRepeatRule = (event: EventWithInvites, date: Date) => {
-	if (event.repeatRule) {
-		const rrule = rrulestr(event.repeatRule);
-		const start = toStartOfDay(date);
-		const end = toEndOfDay(date);
-
-		return rrule.between(start, end, true).length > 0;
-	}
-
-	return true;
-};
 
 export default function EventsList({
 	date,

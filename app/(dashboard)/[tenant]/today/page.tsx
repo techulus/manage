@@ -7,28 +7,48 @@ import {
 	toDateStringWithDay,
 	toDateTimeString,
 	toEndOfDay,
+	toStartOfDay,
 	toTimeZone,
 } from "@/lib/utils/date";
 import { database } from "@/lib/utils/useDatabase";
+import { filterByRepeatRule } from "@/lib/utils/useEvents";
 import { getTimezone } from "@/lib/utils/useOwner";
-import { and, asc, lte } from "drizzle-orm";
+import {
+	and,
+	asc,
+	between,
+	desc,
+	eq,
+	gt,
+	isNotNull,
+	lt,
+	lte,
+	ne,
+	or,
+} from "drizzle-orm";
 import { AlertTriangleIcon, CalendarClockIcon, InfoIcon } from "lucide-react";
+import Link from "next/link";
 import { rrulestr } from "rrule";
 
-export default async function Today() {
+export default async function Today(props: {
+	params: Promise<{
+		tenant: string;
+	}>;
+}) {
 	const db = await database();
 
 	const timezone = await getTimezone();
-	const today = toTimeZone(Date(), timezone);
+	const today = toTimeZone(new Date(), "UTC");
+	const startOfDay = toStartOfDay(today);
+	const endOfDay = toEndOfDay(today);
 
 	const [tasks, events] = await Promise.all([
 		db.query.task.findMany({
-			where: (task, { and, isNotNull, lte, ne }) =>
-				and(
-					lte(task.dueDate, toEndOfDay(today)),
-					ne(task.status, "done"),
-					isNotNull(task.dueDate),
-				),
+			where: and(
+				lte(task.dueDate, toEndOfDay(today)),
+				ne(task.status, "done"),
+				isNotNull(task.dueDate),
+			),
 			orderBy: [asc(task.position)],
 			columns: {
 				name: true,
@@ -38,12 +58,14 @@ export default async function Today() {
 			with: {
 				taskList: {
 					columns: {
+						id: true,
 						status: true,
 						name: true,
 					},
 					with: {
 						project: {
 							columns: {
+								id: true,
 								name: true,
 							},
 						},
@@ -52,8 +74,28 @@ export default async function Today() {
 			},
 		}),
 		db.query.calendarEvent.findMany({
-			where: and(lte(calendarEvent.start, today)),
-			orderBy: [asc(calendarEvent.start)],
+			where: and(
+				or(
+					between(calendarEvent.start, startOfDay, endOfDay),
+					between(calendarEvent.end, startOfDay, endOfDay),
+					and(
+						lt(calendarEvent.start, startOfDay),
+						gt(calendarEvent.end, endOfDay),
+					),
+					isNotNull(calendarEvent.repeatRule),
+					eq(calendarEvent.start, startOfDay),
+					eq(calendarEvent.end, endOfDay),
+				),
+			),
+			orderBy: [desc(calendarEvent.start), asc(calendarEvent.allDay)],
+			with: {
+				project: {
+					columns: {
+						id: true,
+						name: true,
+					},
+				},
+			},
 		}),
 	]);
 
@@ -65,7 +107,13 @@ export default async function Today() {
 		.filter((t) => t.taskList.status !== "archived")
 		.filter((t) => t.dueDate! < new Date());
 
-	const summary = ` You've got ${dueToday.length > 0 ? dueToday.length : "no"} tasks due today, ${overDue.length > 0 ? overDue.length : "no"} overdue tasks and ${events.length > 0 ? events.length : "no"} events today.`;
+	const filteredEvents = events.filter((event) =>
+		filterByRepeatRule(event, today),
+	);
+
+	const summary = ` You've got ${dueToday.length > 0 ? dueToday.length : "no"} task(s) due today, ${overDue.length > 0 ? overDue.length : "no"} overdue task(s) and ${events.length > 0 ? events.length : "no"} event(s) today.`;
+
+	const { tenant } = await props.params;
 
 	return (
 		<>
@@ -77,14 +125,18 @@ export default async function Today() {
 				</p>
 			</PageSection>
 
-			{events.length ? (
+			{filteredEvents.length ? (
 				<PageSection>
 					<p className="flex items-center p-4 text-xl font-medium text-primary">
 						<CalendarClockIcon className="w-6 h-6 inline-block mr-1" />
 						Events
 					</p>
 					{events.map((event) => (
-						<div key={event.id} className="px-4 py-2">
+						<Link
+							href={`/${tenant}/projects/${event.project.id}/events`}
+							key={event.id}
+							className="px-4 py-2"
+						>
 							<div className="flex flex-col md:flex-row md:items-center md:space-x-4">
 								<p>{event.name}</p>
 								<div
@@ -107,7 +159,7 @@ export default async function Today() {
 								</div>
 							</div>
 							<p className="text-sm">{event.description}</p>
-						</div>
+						</Link>
 					))}
 				</PageSection>
 			) : null}
@@ -121,7 +173,7 @@ export default async function Today() {
 								Overdue
 							</p>
 
-							{overDue.map((task) => TaskItem(task))}
+							{overDue.map((task) => TaskItem(tenant, task))}
 						</>
 					) : null}
 
@@ -131,7 +183,7 @@ export default async function Today() {
 								<InfoIcon className="w-6 h-6 inline-block mr-1" />
 								Due Today
 							</p>
-							{dueToday.map((task) => TaskItem(task))}
+							{dueToday.map((task) => TaskItem(tenant, task))}
 						</>
 					) : null}
 				</PageSection>
@@ -139,17 +191,29 @@ export default async function Today() {
 		</>
 	);
 }
-function TaskItem(task: {
-	name: string;
-	id: number;
-	taskList: { name: string; status: string; project: { name: string } };
-}) {
+function TaskItem(
+	tenant: string,
+	task: {
+		name: string;
+		id: number;
+		taskList: {
+			id: number;
+			name: string;
+			status: string;
+			project: { id: number; name: string };
+		};
+	},
+) {
 	return (
-		<div key={task.id} className="px-4 py-2">
+		<Link
+			href={`/${tenant}/projects/${task.taskList.project.id}/tasklists/${task.taskList.id}`}
+			key={task.id}
+			className="px-4 py-2"
+		>
 			<p className="text-sm text-gray-500 dark:text-gray-400">
 				{task.taskList.project.name} - {task.taskList.name}
 			</p>
 			<p>{task.name}</p>
-		</div>
+		</Link>
 	);
 }
