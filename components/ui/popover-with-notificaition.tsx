@@ -77,6 +77,11 @@ function Notifications() {
           aria-orientation="horizontal"
           className="-mx-1 my-1 h-px bg-border"
         ></div>
+
+        {!notifications.length ? (
+          <div className="text-center text-muted-foreground p-6 text-sm">No notifications</div>
+        ) : null}
+
         {notifications.map((notification) => (
           <div
             key={notification.id}
