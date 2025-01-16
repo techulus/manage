@@ -108,10 +108,10 @@ export default async function Today(props: {
 		.filter((t) => t.dueDate! < new Date());
 
 	const filteredEvents = events.filter((event) =>
-		filterByRepeatRule(event, today),
+		filterByRepeatRule(event, new Date(today)),
 	);
 
-	const summary = ` You've got ${dueToday.length > 0 ? dueToday.length : "no"} task(s) due today, ${overDue.length > 0 ? overDue.length : "no"} overdue task(s) and ${events.length > 0 ? events.length : "no"} event(s) today.`;
+	const summary = ` You've got ${dueToday.length > 0 ? dueToday.length : "no"} task(s) due today, ${overDue.length > 0 ? overDue.length : "no"} overdue task(s) and ${filteredEvents.length > 0 ? filteredEvents.length : "no"} event(s) today.`;
 
 	const { tenant } = await props.params;
 
@@ -131,7 +131,7 @@ export default async function Today(props: {
 						<CalendarClockIcon className="w-6 h-6 inline-block mr-1" />
 						Events
 					</p>
-					{events.map((event) => (
+					{filteredEvents.map((event) => (
 						<Link
 							href={`/${tenant}/projects/${event.project.id}/events`}
 							key={event.id}
