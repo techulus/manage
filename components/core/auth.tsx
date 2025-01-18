@@ -195,7 +195,7 @@ export const ProjectSwitcher = ({
 				strokeLinejoin="round"
 				strokeWidth="1"
 				viewBox="0 0 24 24"
-				width="40"
+				width="32"
 				className="text-gray-300 dark:text-gray-700 xl:block"
 			>
 				<path d="M16.88 3.549L7.12 20.451" />
