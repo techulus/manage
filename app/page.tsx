@@ -1,5 +1,7 @@
+import { FeaturesSection } from "@/components/feature-section";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
+import { buttonVariants } from "@/components/ui/button";
 import { SITE_METADATA } from "@/data/marketing";
 import Link from "next/link";
 
@@ -8,7 +10,7 @@ export default async function Home() {
 		<div className="h-full">
 			<Header />
 
-			<div className="relative isolate px-6 pt-14 lg:px-8">
+			<div className="relative isolate px-6 pt-12 lg:px-8">
 				<div
 					className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
 					aria-hidden="true"
@@ -30,12 +32,14 @@ export default async function Home() {
 							{SITE_METADATA.DESCRIPTION}
 						</p>
 						<div className="mt-10 flex flex-col items-center justify-center gap-y-6 md:flex-row md:gap-x-6 md:gap-y-0">
-							{/* <Link
-                href="/start"
-                prefetch={false}
-              >
-                Get started
-              </Link> */}
+							<Link
+								target="_blank"
+								href="/sign-in?demo=true"
+								prefetch={false}
+								className={buttonVariants({ variant: "outline" })}
+							>
+								Live Demo
+							</Link>
 
 							<Link
 								href="https://github.com/techulus/manage"
@@ -77,6 +81,8 @@ export default async function Home() {
 					/>
 				</div>
 			</div>
+
+			<FeaturesSection />
 
 			<Footer />
 		</div>

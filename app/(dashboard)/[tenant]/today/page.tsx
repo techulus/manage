@@ -8,7 +8,6 @@ import {
 	toDateTimeString,
 	toEndOfDay,
 	toStartOfDay,
-	toTimeZone,
 } from "@/lib/utils/date";
 import { database } from "@/lib/utils/useDatabase";
 import { filterByRepeatRule } from "@/lib/utils/useEvents";
