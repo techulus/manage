@@ -14,9 +14,9 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import type { Task, TaskList, TaskWithDetails, User } from "@/drizzle/types";
+import type { Task, TaskList, TaskWithDetails } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import { toDateStringWithDay, toEndOfDay } from "@/lib/utils/date";
+import { toDateStringWithDay, toStartOfDay } from "@/lib/utils/date";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { AlignJustifyIcon, CalendarClock, FileIcon } from "lucide-react";
@@ -241,7 +241,7 @@ export const TaskItem = ({
 											onSelect={(dueDate) => {
 												toast.promise(
 													updateTask(id, projectId, {
-														dueDate: toEndOfDay(dueDate),
+														dueDate: toStartOfDay(dueDate),
 													}),
 													updateTaskToastOptions,
 												);

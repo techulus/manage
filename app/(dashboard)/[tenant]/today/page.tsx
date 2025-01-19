@@ -38,14 +38,14 @@ export default async function Today(props: {
 	const db = await database();
 
 	const timezone = await getTimezone();
-	const today = toTimeZone(new Date(), "UTC");
+	const today = new Date();
 	const startOfDay = toStartOfDay(today);
 	const endOfDay = toEndOfDay(today);
 
 	const [tasks, events] = await Promise.all([
 		db.query.task.findMany({
 			where: and(
-				lte(task.dueDate, toEndOfDay(today)),
+				lte(task.dueDate, endOfDay),
 				ne(task.status, "done"),
 				isNotNull(task.dueDate),
 			),
@@ -105,7 +105,7 @@ export default async function Today(props: {
 
 	const overDue = tasks
 		.filter((t) => t.taskList.status !== "archived")
-		.filter((t) => t.dueDate! < new Date());
+		.filter((t) => t.dueDate! < toStartOfDay(new Date()));
 
 	const filteredEvents = events.filter((event) =>
 		filterByRepeatRule(event, new Date(today)),
