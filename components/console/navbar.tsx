@@ -3,14 +3,16 @@ import Image from "next/image";
 import Link from "next/link";
 import logo from "../../public/images/logo.png";
 import { OrgSwitcher, ProjectSwitcher, UserButton } from "../core/auth";
-import { Notifications } from "../ui/popover-with-notificaition";
 import NavBarLinks from "./navbar-links";
+import { Notifications } from "./notifications";
 
 export default function NavBar({
+	userId,
 	activeOrgId,
 	activeOrgSlug,
 	projects,
 }: {
+	userId: string;
 	activeOrgId: string;
 	activeOrgSlug: string;
 	projects: Project[];
@@ -54,7 +56,7 @@ export default function NavBar({
 						</div>
 
 						<div className="ml-2 flex justify-center space-x-2">
-							<Notifications />
+							<Notifications userId={userId} />
 							<UserButton orgSlug={activeOrgSlug} />
 						</div>
 					</div>

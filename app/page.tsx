@@ -1,4 +1,5 @@
-import { FeaturesSection } from "@/components/feature-section";
+import { CTA } from "@/components/landing-page/call-to-action";
+import { FeaturesSection } from "@/components/landing-page/feature-section";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { buttonVariants } from "@/components/ui/button";
@@ -23,8 +24,8 @@ export default async function Home() {
 						}}
 					/>
 				</div>
-				<div className="mx-auto max-w-4xl py-32 sm:py-48 lg:py-56">
-					<div className="text-center">
+				<div className="mx-auto max-w-7xl py-32 sm:py-48 lg:py-56">
+					<div>
 						<h1 className="text-hero bg-gradient-to-r from-green-500 to-yellow-700 bg-clip-text text-4xl tracking-tighter text-gray-900 text-transparent sm:text-6xl">
 							{SITE_METADATA.TAGLINE}
 						</h1>
@@ -83,6 +84,8 @@ export default async function Home() {
 			</div>
 
 			<FeaturesSection />
+
+			<CTA />
 
 			<Footer />
 		</div>

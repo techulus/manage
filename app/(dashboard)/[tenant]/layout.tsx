@@ -37,6 +37,7 @@ export default async function ConsoleLayout(props: {
 	return (
 		<div className="relative flex min-h-full flex-col">
 			<NavBar
+				userId={userId}
 				activeOrgId={orgId ?? userId}
 				activeOrgSlug={orgSlug}
 				projects={projects}
