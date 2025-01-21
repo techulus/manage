@@ -45,31 +45,6 @@ export default async function Today(props: {
 	const startOfDay = toUTC(startOfTodayInUserTZ, timezone);
 	const endOfDay = toUTC(endOfTodayInUserTZ, timezone);
 
-	const taskQueryOptions = {
-		columns: {
-			name: true,
-			dueDate: true,
-			id: true,
-		},
-		with: {
-			taskList: {
-				columns: {
-					id: true,
-					status: true,
-					name: true,
-				},
-				with: {
-					project: {
-						columns: {
-							id: true,
-							name: true,
-						},
-					},
-				},
-			},
-		},
-	};
-
 	const [tasksDueToday, overDueTasks, events] = await Promise.all([
 		db.query.task.findMany({
 			where: and(
@@ -78,7 +53,28 @@ export default async function Today(props: {
 				isNotNull(task.dueDate),
 			),
 			orderBy: [asc(task.position)],
-			...taskQueryOptions,
+			columns: {
+				name: true,
+				dueDate: true,
+				id: true,
+			},
+			with: {
+				taskList: {
+					columns: {
+						id: true,
+						status: true,
+						name: true,
+					},
+					with: {
+						project: {
+							columns: {
+								id: true,
+								name: true,
+							},
+						},
+					},
+				},
+			},
 		}),
 		db.query.task.findMany({
 			where: and(
@@ -87,7 +83,28 @@ export default async function Today(props: {
 				isNotNull(task.dueDate),
 			),
 			orderBy: [asc(task.position)],
-			...taskQueryOptions,
+			columns: {
+				name: true,
+				dueDate: true,
+				id: true,
+			},
+			with: {
+				taskList: {
+					columns: {
+						id: true,
+						status: true,
+						name: true,
+					},
+					with: {
+						project: {
+							columns: {
+								id: true,
+								name: true,
+							},
+						},
+					},
+				},
+			},
 		}),
 		db.query.calendarEvent.findMany({
 			where: and(
