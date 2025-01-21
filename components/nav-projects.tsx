@@ -45,6 +45,13 @@ export function NavProjects() {
 		<SidebarGroup className="group-data-[collapsible=icon]:hidden">
 			<SidebarGroupLabel className="font-bold">Projects</SidebarGroupLabel>
 			<SidebarMenu>
+				<SidebarMenuItem>
+					<SidebarMenuButton asChild>
+						<Link href={`/${tenant}/projects`}>
+							<span>Overview</span>
+						</Link>
+					</SidebarMenuButton>
+				</SidebarMenuItem>
 				{projects.map((item) => (
 					<SidebarMenuItem key={item.name}>
 						<SidebarMenuButton asChild>

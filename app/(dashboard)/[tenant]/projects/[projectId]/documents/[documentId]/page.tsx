@@ -17,23 +17,23 @@ type Props = {
 };
 
 export default async function DocumentDetails(props: Props) {
-    const params = await props.params;
-    const { projectId, documentId } = params;
+	const params = await props.params;
+	const { projectId, documentId } = params;
 
-    const { orgSlug } = await getOwner();
-    const db = await database();
-    const documentDetails = await db.query.document.findFirst({
+	const { orgSlug } = await getOwner();
+	const db = await database();
+	const documentDetails = await db.query.document.findFirst({
 		where: eq(document.id, +documentId),
 		with: {
 			folder: true,
 		},
 	});
 
-    if (!documentDetails) {
+	if (!documentDetails) {
 		return null;
 	}
 
-    return (
+	return (
 		<>
 			<PageTitle
 				title={documentDetails.name}
@@ -41,11 +41,6 @@ export default async function DocumentDetails(props: Props) {
 					documentDetails.folder
 						? `Documents / ${documentDetails.folder?.name}`
 						: "Document"
-				}
-				backUrl={
-					documentDetails.folderId
-						? `/${orgSlug}/projects/${projectId}/documents/folders/${documentDetails.folderId}`
-						: `/${orgSlug}/projects/${projectId}/documents`
 				}
 				actionLabel="Edit"
 				actionLink={`/${orgSlug}/projects/${projectId}/documents/${documentId}/edit`}

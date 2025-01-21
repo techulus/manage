@@ -19,17 +19,17 @@ type Props = {
 };
 
 export default async function EditDocumentFolder(props: Props) {
-    const params = await props.params;
-    const { orgSlug } = await getOwner();
-    const backUrl = `/${orgSlug}/projects/${params.projectId}/documents/folders/${params.folderId}`;
-    const db = await database();
-    const folder = await db.query.documentFolder.findFirst({
+	const params = await props.params;
+	const { orgSlug } = await getOwner();
+	const backUrl = `/${orgSlug}/projects/${params.projectId}/documents/folders/${params.folderId}`;
+	const db = await database();
+	const folder = await db.query.documentFolder.findFirst({
 		where: eq(documentFolder.id, +params.folderId),
 	});
 
-    return (
+	return (
 		<>
-			<PageTitle title="Update Folder" backUrl={backUrl} />
+			<PageTitle title="Update Folder" />
 
 			<PageSection topInset>
 				<form action={updateDocumentFolder}>

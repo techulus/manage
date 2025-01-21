@@ -15,12 +15,12 @@ type Props = {
 };
 
 export default async function CreateTaskList(props: Props) {
-    const params = await props.params;
-    const { orgSlug } = await getOwner();
-    const backUrl = `/${orgSlug}/projects/${params.projectId}/tasklists`;
-    return (
+	const params = await props.params;
+	const { orgSlug } = await getOwner();
+	const backUrl = `/${orgSlug}/projects/${params.projectId}/tasklists`;
+	return (
 		<>
-			<PageTitle title="Create task list" backUrl={backUrl} />
+			<PageTitle title="Create task list" />
 
 			<PageSection topInset>
 				<form action={createTaskList}>

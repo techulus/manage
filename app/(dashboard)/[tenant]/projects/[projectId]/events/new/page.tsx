@@ -28,7 +28,7 @@ export default async function CreateEvent(props: Props) {
 
 	return (
 		<>
-			<PageTitle title="Create Event" backUrl={backUrl} />
+			<PageTitle title="Create Event" />
 
 			<PageSection topInset>
 				<form action={createEvent}>

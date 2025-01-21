@@ -46,7 +46,6 @@ export default async function ProjectDetails(props: Props) {
 		<>
 			<PageTitle
 				title={project.name}
-				backUrl={`/${orgSlug}/projects`}
 				actionLabel="Edit"
 				actionLink={`/${orgSlug}/projects/${projectId}/edit`}
 			>

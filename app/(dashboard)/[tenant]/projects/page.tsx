@@ -32,7 +32,6 @@ export default async function Projects(props: Props) {
 				title={
 					searchParams.search ? `Search '${searchParams.search}'` : "Projects"
 				}
-				backUrl={searchParams.search ? `/${orgSlug}/projects` : undefined}
 				actionLabel="New"
 				actionLink={`/${orgSlug}/projects/new`}
 			/>

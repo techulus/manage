@@ -77,7 +77,6 @@ export default async function TaskLists(props: Props) {
 		<>
 			<PageTitle
 				title={list.name}
-				backUrl={`/${orgSlug}/projects/${projectId}/tasklists`}
 				actionLabel="Edit"
 				actionLink={`/${orgSlug}/projects/${projectId}/tasklists/${list.id}/edit`}
 			>

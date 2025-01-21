@@ -39,7 +39,7 @@ export default async function ConsoleLayout(props: {
 				}}
 			/>
 			<main className="relative mx-auto w-full flex-grow lg:flex">
-				<SidebarTrigger className="absolute top-[18px] left-2" />
+				<SidebarTrigger className="absolute top-[18px] left-4" />
 				<div className="min-w-0 flex-1 xl:flex">
 					<div className="min-h-screen bg-gray-50 dark:bg-gray-900 lg:min-w-0 lg:flex-1">
 						{children}

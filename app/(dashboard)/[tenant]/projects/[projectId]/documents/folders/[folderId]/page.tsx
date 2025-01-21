@@ -31,12 +31,12 @@ type Props = {
 };
 
 export default async function FolderDetails(props: Props) {
-    const params = await props.params;
-    const { orgSlug } = await getOwner();
-    const { projectId, folderId } = params;
+	const params = await props.params;
+	const { orgSlug } = await getOwner();
+	const { projectId, folderId } = params;
 
-    const db = await database();
-    const folder: FolderWithContents | undefined =
+	const db = await database();
+	const folder: FolderWithContents | undefined =
 		await db.query.documentFolder.findFirst({
 			where: eq(documentFolder.id, Number(folderId)),
 			with: {
@@ -63,16 +63,15 @@ export default async function FolderDetails(props: Props) {
 			},
 		});
 
-    if (!folder) {
+	if (!folder) {
 		return null;
 	}
 
-    return (
+	return (
 		<>
 			<PageTitle
 				title={folder?.name}
 				subTitle="Documents"
-				backUrl={`/${orgSlug}/projects/${projectId}/documents`}
 				actionLabel="Edit"
 				actionLink={`/${orgSlug}/projects/${projectId}/documents/folders/${folderId}/edit`}
 			/>

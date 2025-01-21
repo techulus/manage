@@ -15,12 +15,12 @@ type Props = {
 };
 
 export default async function CreateDocumentFolder(props: Props) {
-    const params = await props.params;
-    const { orgSlug } = await getOwner();
-    const backUrl = `/${orgSlug}/projects/${params.projectId}/documents`;
-    return (
+	const params = await props.params;
+	const { orgSlug } = await getOwner();
+	const backUrl = `/${orgSlug}/projects/${params.projectId}/documents`;
+	return (
 		<>
-			<PageTitle title="Create Folder" backUrl={backUrl} />
+			<PageTitle title="Create Folder" />
 			<PageSection topInset>
 				<form action={createDocumentFolder}>
 					<input

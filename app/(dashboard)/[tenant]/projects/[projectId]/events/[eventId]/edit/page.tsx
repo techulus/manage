@@ -58,7 +58,7 @@ export default async function EditEvent(props: Props) {
 
 	return (
 		<>
-			<PageTitle title="Edit Event" backUrl={backUrl} />
+			<PageTitle title="Edit Event" />
 
 			<PageSection topInset>
 				<form action={updateEvent}>
