@@ -3,7 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"dev": "TZ=America/New_York node server.js",
+		"dev": "TZ=UTC node server.js",
 		"build": "next build",
 		"start": "NODE_ENV=production node server.js",
 		"lint": "biome lint",
@@ -35,7 +35,8 @@
 		"class-variance-authority": "^0.6.1",
 		"clsx": "^1.2.1",
 		"cmdk": "0.2.0",
-		"date-fns": "^2.30.0",
+		"date-fns": "^4.1.0",
+		"date-fns-tz": "^3.2.0",
 		"drizzle-orm": "^0.38.3",
 		"easymde": "^2.18.0",
 		"eslint-config-next": "15.1.0",

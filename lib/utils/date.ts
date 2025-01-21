@@ -1,7 +1,12 @@
 import { endOfDay, startOfDay } from "date-fns";
+import { fromZonedTime, toZonedTime } from "date-fns-tz";
 
 export function toTimeZone(date: Date | string, timeZone: string) {
-	return new Date(date.toLocaleString("en-US", { timeZone }));
+	return toZonedTime(date, timeZone);
+}
+
+export function toUTC(date: Date, timeZone: string) {
+	return fromZonedTime(date, timeZone);
 }
 
 export function toStartOfDay(date: Date) {
@@ -50,14 +55,6 @@ export function toMachineDateString(date: Date, timeZone: string) {
 		month: "2-digit",
 		day: "2-digit",
 	});
-}
-
-export function isSameDate(a: Date, b: Date) {
-	return (
-		a.getFullYear() === b.getFullYear() &&
-		a.getMonth() === b.getMonth() &&
-		a.getDate() === b.getDate()
-	);
 }
 
 export const guessTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;

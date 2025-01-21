@@ -3,11 +3,12 @@ import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { calendarEvent, task } from "@/drizzle/schema";
 import {
-	isSameDate,
 	toDateStringWithDay,
 	toDateTimeString,
 	toEndOfDay,
 	toStartOfDay,
+	toTimeZone,
+	toUTC,
 } from "@/lib/utils/date";
 import { database } from "@/lib/utils/useDatabase";
 import { filterByRepeatRule } from "@/lib/utils/useEvents";
@@ -38,39 +39,55 @@ export default async function Today(props: {
 
 	const timezone = await getTimezone();
 	const today = new Date();
-	const startOfDay = toStartOfDay(today);
-	const endOfDay = toEndOfDay(today);
 
-	const [tasks, events] = await Promise.all([
-		db.query.task.findMany({
-			where: and(
-				lte(task.dueDate, endOfDay),
-				ne(task.status, "done"),
-				isNotNull(task.dueDate),
-			),
-			orderBy: [asc(task.position)],
-			columns: {
-				name: true,
-				dueDate: true,
-				id: true,
-			},
-			with: {
-				taskList: {
-					columns: {
-						id: true,
-						status: true,
-						name: true,
-					},
-					with: {
-						project: {
-							columns: {
-								id: true,
-								name: true,
-							},
+	const startOfTodayInUserTZ = toStartOfDay(toTimeZone(new Date(), timezone));
+	const endOfTodayInUserTZ = toEndOfDay(toTimeZone(new Date(), timezone));
+	const startOfDay = toUTC(startOfTodayInUserTZ, timezone);
+	const endOfDay = toUTC(endOfTodayInUserTZ, timezone);
+
+	const taskQueryOptions = {
+		columns: {
+			name: true,
+			dueDate: true,
+			id: true,
+		},
+		with: {
+			taskList: {
+				columns: {
+					id: true,
+					status: true,
+					name: true,
+				},
+				with: {
+					project: {
+						columns: {
+							id: true,
+							name: true,
 						},
 					},
 				},
 			},
+		},
+	};
+
+	const [tasksDueToday, overDueTasks, events] = await Promise.all([
+		db.query.task.findMany({
+			where: and(
+				between(task.dueDate, startOfDay, endOfDay),
+				ne(task.status, "done"),
+				isNotNull(task.dueDate),
+			),
+			orderBy: [asc(task.position)],
+			...taskQueryOptions,
+		}),
+		db.query.task.findMany({
+			where: and(
+				lt(task.dueDate, startOfDay),
+				ne(task.status, "done"),
+				isNotNull(task.dueDate),
+			),
+			orderBy: [asc(task.position)],
+			...taskQueryOptions,
 		}),
 		db.query.calendarEvent.findMany({
 			where: and(
@@ -98,13 +115,11 @@ export default async function Today(props: {
 		}),
 	]);
 
-	const dueToday = tasks
-		.filter((t) => t.taskList.status !== "archived")
-		.filter((t) => isSameDate(t.dueDate!, new Date()));
+	const dueToday = tasksDueToday.filter(
+		(t) => t.taskList.status !== "archived",
+	);
 
-	const overDue = tasks
-		.filter((t) => t.taskList.status !== "archived")
-		.filter((t) => t.dueDate! < toStartOfDay(new Date()));
+	const overDue = overDueTasks.filter((t) => t.taskList.status !== "archived");
 
 	const filteredEvents = events.filter((event) =>
 		filterByRepeatRule(event, new Date(today)),

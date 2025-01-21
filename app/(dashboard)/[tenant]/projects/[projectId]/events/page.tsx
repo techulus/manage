@@ -9,6 +9,7 @@ import {
 	toEndOfDay,
 	toStartOfDay,
 	toTimeZone,
+	toUTC,
 } from "@/lib/utils/date";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
@@ -44,11 +45,13 @@ export default async function EventDetails(props: Props) {
 
 	const timezone = await getTimezone();
 
-	const selectedDate = toTimeZone(on ? new Date(on) : new Date(), "UTC");
-	const dayCommentId = `${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDay()}`;
+	const selectedDate = on ? new Date(on) : new Date();
+	const startOfTodayInUserTZ = toStartOfDay(toTimeZone(selectedDate, timezone));
+	const endOfTodayInUserTZ = toEndOfDay(toTimeZone(selectedDate, timezone));
+	const startOfDay = toUTC(startOfTodayInUserTZ, timezone);
+	const endOfDay = toUTC(endOfTodayInUserTZ, timezone);
 
-	const startOfDay = toStartOfDay(selectedDate);
-	const endOfDay = toEndOfDay(selectedDate);
+	const dayCommentId = `${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDay()}`;
 
 	const db = await database();
 	const events = await db.query.calendarEvent
