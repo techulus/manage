@@ -1,7 +1,6 @@
 "use client";
 
 import { getUserNotifications } from "@/app/(dashboard)/[tenant]/settings/actions";
-import { socket } from "@/app/socket";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -57,36 +56,6 @@ function Notifications({ userId }: { userId: string }) {
 	const fetchNotifications = useCallback(async () => {
 		getUserNotifications().then(setNotifications);
 	}, []);
-
-	useEffect(() => {
-		if (socket.connected) {
-			onConnect();
-		}
-
-		function onConnect() {
-			console.log("WS: Connected to server");
-			if (userId) {
-				console.log("WS: Joining user", userId);
-				socket.emit("join", userId);
-			}
-		}
-
-		function onDisconnect() {
-			console.log("WS: Disconnected from server");
-		}
-
-		socket.on("connect", onConnect);
-		socket.on("disconnect", onDisconnect);
-
-		socket.on("message", (msg) => {
-			console.log("WS: Message received", msg);
-		});
-
-		return () => {
-			socket.off("connect", onConnect);
-			socket.off("disconnect", onDisconnect);
-		};
-	}, [userId]);
 
 	return (
 		<Popover onOpenChange={fetchNotifications}>
