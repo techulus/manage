@@ -26,10 +26,10 @@ export default async function Home() {
 				</div>
 				<div className="mx-auto max-w-7xl py-32 sm:py-48 lg:py-56">
 					<div>
-						<h1 className="text-hero bg-gradient-to-r from-green-500 to-yellow-700 bg-clip-text text-4xl tracking-tighter text-gray-900 text-transparent sm:text-6xl">
+						<h1 className="text-hero bg-gradient-to-r from-green-500 to-yellow-700 bg-clip-text text-4xl tracking-tighter text-gray-900 text-transparent sm:text-6xl whitespace-pre-line">
 							{SITE_METADATA.TAGLINE}
 						</h1>
-						<p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400">
+						<p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400 whitespace-pre-line">
 							{SITE_METADATA.DESCRIPTION}
 						</p>
 						<div className="mt-10 flex flex-col items-center justify-center gap-y-6 md:flex-row md:gap-x-6 md:gap-y-0">

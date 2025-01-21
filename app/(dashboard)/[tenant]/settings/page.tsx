@@ -35,6 +35,8 @@ export default async function Settings() {
 		getTimezone(),
 	]);
 
+	const isDemoUser = claims.username === "demo";
+
 	return (
 		<>
 			<PageTitle title="Settings" />
@@ -70,26 +72,30 @@ export default async function Settings() {
 						<p className="font-semibold text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
 							Name
 						</p>
-						<EditableValue
-							id={claims.sub}
-							name="name"
-							type="text"
-							value={userInfo.name ?? "-"}
-							action={updateUserData}
-						/>
+						{!isDemoUser ? (
+							<EditableValue
+								id={claims.sub}
+								name="name"
+								type="text"
+								value={userInfo.name ?? "-"}
+								action={updateUserData}
+							/>
+						) : null}
 					</div>
 
 					<div className="p-4 sm:flex items-center">
 						<p className="font-semibold text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
 							Email address
 						</p>
-						<EditableValue
-							id={claims.sub}
-							name="primaryEmail"
-							type="text"
-							value={userInfo.email ?? "-"}
-							action={updateUserData}
-						/>
+						{!isDemoUser ? (
+							<EditableValue
+								id={claims.sub}
+								name="primaryEmail"
+								type="text"
+								value={userInfo.email ?? "-"}
+								action={updateUserData}
+							/>
+						) : null}
 					</div>
 
 					{timezone ? (
