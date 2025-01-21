@@ -1,9 +1,8 @@
-import NavBar from "@/components/console/navbar";
+import { AppSidebar } from "@/components/app-sidebar";
 import { ReportTimezone } from "@/components/core/report-timezone";
-import { project } from "@/drizzle/schema";
-import { database, isDatabaseReady } from "@/lib/utils/useDatabase";
-import { getOwner } from "@/lib/utils/useOwner";
-import { ne } from "drizzle-orm";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { isDatabaseReady } from "@/lib/utils/useDatabase";
+import { getOwner, getUser } from "@/lib/utils/useOwner";
 import { redirect } from "next/navigation";
 
 export const fetchCache = "force-no-store"; // disable cache for console pages
@@ -18,7 +17,8 @@ export default async function ConsoleLayout(props: {
 	const { tenant } = await props.params;
 
 	const { children } = props;
-	const { orgId, orgSlug, userId } = await getOwner();
+	const { orgSlug } = await getOwner();
+	const user = await getUser();
 
 	if (tenant !== orgSlug) {
 		redirect("/start");
@@ -29,29 +29,25 @@ export default async function ConsoleLayout(props: {
 		redirect("/start");
 	}
 
-	const db = await database();
-	const projects = await db.query.project.findMany({
-		where: ne(project.status, "archived"),
-	});
-
 	return (
-		<div className="relative flex min-h-full flex-col">
-			<NavBar
-				userId={userId}
-				activeOrgId={orgId ?? userId}
-				activeOrgSlug={orgSlug}
-				projects={projects}
+		<SidebarProvider>
+			<AppSidebar
+				user={{
+					firstName: user.firstName ?? "",
+					email: user.email ?? "",
+					imageUrl: null,
+				}}
 			/>
-
-			<div className="mx-auto w-full flex-grow lg:flex">
+			<main className="relative mx-auto w-full flex-grow lg:flex">
+				<SidebarTrigger className="absolute top-[18px] left-2" />
 				<div className="min-w-0 flex-1 xl:flex">
 					<div className="min-h-screen bg-gray-50 dark:bg-gray-900 lg:min-w-0 lg:flex-1">
 						{children}
 					</div>
 				</div>
-			</div>
 
-			<ReportTimezone />
-		</div>
+				<ReportTimezone />
+			</main>
+		</SidebarProvider>
 	);
 }
