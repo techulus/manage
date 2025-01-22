@@ -23,7 +23,7 @@ import { getUserOrganizations } from "@/lib/utils/useUser";
 import { useParams } from "next/navigation";
 import { Skeleton } from "./ui/skeleton";
 
-export function TeamSwitcher() {
+export function WorkspaceSwitcher() {
 	const { isMobile } = useSidebar();
 	const { tenant: activeOrgId } = useParams();
 	const [orgs, setOrgs] = React.useState<Organization[]>([]);
@@ -86,9 +86,9 @@ export function TeamSwitcher() {
 							<DropdownMenuShortcut>⌘1</DropdownMenuShortcut>
 						</DropdownMenuItem>
 						{loading ? (
-							<div className="space-y-2 pl-1.5">
-								<Skeleton className="h-5 w-[160px]" />
-								<Skeleton className="h-5 w-[160px]" />
+							<div className="space-y-3 pl-1.5">
+								<Skeleton className="h-5 w-full" />
+								<Skeleton className="h-5 w-full" />
 							</div>
 						) : (
 							orgs.map((org, index) => (

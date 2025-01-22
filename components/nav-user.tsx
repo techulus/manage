@@ -41,11 +41,11 @@ export function NavUser({
 		email: string;
 	};
 }) {
-	const { isMobile } = useSidebar();
+	const { isMobile, setOpenMobile } = useSidebar();
 	const { tenant: orgSlug } = useParams();
 
 	return (
-		<SidebarMenu>
+		<SidebarMenu className="pb-4 md:pb-0">
 			<SidebarMenuItem>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
@@ -80,7 +80,7 @@ export function NavUser({
 						</DropdownMenuLabel>
 						<DropdownMenuSeparator />
 						<DropdownMenuGroup>
-							<DropdownMenuItem>
+							<DropdownMenuItem onClick={() => setOpenMobile(false)}>
 								<Settings />
 								<Link
 									href={`/${orgSlug}/settings`}
@@ -102,7 +102,7 @@ export function NavUser({
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem>
+						<DropdownMenuItem onClick={() => setOpenMobile(false)}>
 							<LogOut />
 							<form action={logout}>
 								<button type="submit">Sign Out</button>

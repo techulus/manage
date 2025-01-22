@@ -38,6 +38,14 @@ export function toDateTimeString(date: Date, timeZone: string) {
 	});
 }
 
+export function toTimeString(date: Date, timeZone: string) {
+	return date.toLocaleTimeString("en-US", {
+		timeZone,
+		hour: "2-digit",
+		minute: "2-digit",
+	});
+}
+
 export function toDateStringWithDay(date: Date, timeZone: string) {
 	return date.toLocaleDateString("en-US", {
 		timeZone,

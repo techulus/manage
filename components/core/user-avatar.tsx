@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { User } from "@/drizzle/types";
+import { cn } from "@/lib/utils";
 
 export const UserAvatar = ({
 	user,
@@ -9,7 +10,7 @@ export const UserAvatar = ({
 	className?: string;
 }) => {
 	return (
-		<Avatar className={className}>
+		<Avatar className={cn("h-8 w-8", className)}>
 			<AvatarImage
 				src={
 					user.imageUrl ??

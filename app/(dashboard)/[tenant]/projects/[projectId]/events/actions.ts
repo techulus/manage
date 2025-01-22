@@ -27,6 +27,9 @@ function handleEventPayload(payload: FormData): {
 	const invites = ((payload.get("invites") as string) ?? "")
 		.split(",")
 		.filter(Boolean);
+	const repeatUntil = payload.get("repeatUntil")
+		? new Date(payload.get("repeatUntil") as string)
+		: null;
 
 	let end = payload.get("end") ? new Date(payload.get("end") as string) : null;
 	if (allDay && end) {
@@ -37,7 +40,7 @@ function handleEventPayload(payload: FormData): {
 		? new RRule({
 				freq: repeat as unknown as Frequency,
 				dtstart: start,
-				until: end ?? null,
+				until: repeatUntil ? toEndOfDay(repeatUntil) : undefined,
 				tzid: "UTC",
 			})
 		: undefined;
@@ -59,6 +62,10 @@ export async function createEvent(payload: FormData) {
 
 	const { name, description, start, end, allDay, repeatRule, invites } =
 		handleEventPayload(payload);
+
+	// if (end && end > start) {
+	// 	throw new Error("End date must be after start date");
+	// }
 
 	const db = await database();
 	const createdEvent = db

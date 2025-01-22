@@ -3,7 +3,7 @@
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/nav-user";
-import { TeamSwitcher } from "@/components/team-switcher";
+import { WorkspaceSwitcher } from "@/components/team-switcher";
 import {
 	Sidebar,
 	SidebarContent,
@@ -25,7 +25,7 @@ export function AppSidebar({
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
-				<TeamSwitcher />
+				<WorkspaceSwitcher />
 			</SidebarHeader>
 			<SidebarContent>
 				<NavMain />

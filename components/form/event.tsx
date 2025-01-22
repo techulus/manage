@@ -3,7 +3,7 @@
 import { Input } from "@/components/ui/input";
 import type { EventWithInvites, User } from "@/drizzle/types";
 import { Trash2Icon } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { RRule, rrulestr } from "rrule";
 import MarkdownEditor from "../editor";
 import { DateTimePicker } from "../project/events/date-time-picker";
@@ -90,6 +90,9 @@ export default function EventForm({
 						All Day Event
 					</Label>
 				</div>
+			</div>
+
+			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 				<div className="flex flex-col space-y-2">
 					<Label htmlFor="repeat">Repeat</Label>
 					<Select
@@ -108,6 +111,10 @@ export default function EventForm({
 							<SelectItem value={String(RRule.YEARLY)}>Yearly</SelectItem>
 						</SelectContent>
 					</Select>
+				</div>
+				<div className="flex flex-col space-y-2">
+					<Label>Until</Label>
+					<DateTimePicker name="repeatUntil" dateOnly />
 				</div>
 			</div>
 

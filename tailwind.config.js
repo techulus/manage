@@ -1,4 +1,4 @@
-const { neutral, amber } = require("tailwindcss/colors");
+const { neutral } = require("tailwindcss/colors");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -20,7 +20,6 @@ module.exports = {
 		extend: {
 			colors: {
 				gray: neutral,
-				yellow: amber,
 				border: "hsl(var(--border))",
 				input: "hsl(var(--input))",
 				ring: "hsl(var(--ring))",

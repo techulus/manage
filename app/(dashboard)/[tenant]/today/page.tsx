@@ -2,16 +2,12 @@ import { Greeting } from "@/components/core/greeting";
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { calendarEvent, task } from "@/drizzle/schema";
-import {
-	toDateStringWithDay,
-	toDateTimeString,
-	toEndOfDay,
-	toStartOfDay,
-	toTimeZone,
-	toUTC,
-} from "@/lib/utils/date";
+import { toDateStringWithDay, toDateTimeString } from "@/lib/utils/date";
 import { database } from "@/lib/utils/useDatabase";
-import { filterByRepeatRule } from "@/lib/utils/useEvents";
+import {
+	filterByRepeatRule,
+	getStartEndDateRangeInUtc,
+} from "@/lib/utils/useEvents";
 import { getTimezone } from "@/lib/utils/useOwner";
 import {
 	and,
@@ -22,7 +18,6 @@ import {
 	gt,
 	isNotNull,
 	lt,
-	lte,
 	ne,
 	or,
 } from "drizzle-orm";
@@ -40,10 +35,7 @@ export default async function Today(props: {
 	const timezone = await getTimezone();
 	const today = new Date();
 
-	const startOfTodayInUserTZ = toStartOfDay(toTimeZone(new Date(), timezone));
-	const endOfTodayInUserTZ = toEndOfDay(toTimeZone(new Date(), timezone));
-	const startOfDay = toUTC(startOfTodayInUserTZ, timezone);
-	const endOfDay = toUTC(endOfTodayInUserTZ, timezone);
+	const { startOfDay, endOfDay } = getStartEndDateRangeInUtc(timezone, today);
 
 	const [tasksDueToday, overDueTasks, events] = await Promise.all([
 		db.query.task.findMany({
@@ -139,7 +131,7 @@ export default async function Today(props: {
 	const overDue = overDueTasks.filter((t) => t.taskList.status !== "archived");
 
 	const filteredEvents = events.filter((event) =>
-		filterByRepeatRule(event, new Date(today)),
+		filterByRepeatRule(event, new Date(today), timezone),
 	);
 
 	const summary = ` You've got ${dueToday.length > 0 ? dueToday.length : "no"} task(s) due today, ${overDue.length > 0 ? overDue.length : "no"} overdue task(s) and ${filteredEvents.length > 0 ? filteredEvents.length : "no"} event(s) today.`;

@@ -4,14 +4,9 @@ import { CommentsSection } from "@/components/project/comment/comments-section";
 import EventsCalendar from "@/components/project/events/events-calendar";
 import { buttonVariants } from "@/components/ui/button";
 import { calendarEvent } from "@/drizzle/schema";
-import {
-	toDateStringWithDay,
-	toEndOfDay,
-	toStartOfDay,
-	toTimeZone,
-	toUTC,
-} from "@/lib/utils/date";
+import { toDateStringWithDay } from "@/lib/utils/date";
 import { database } from "@/lib/utils/useDatabase";
+import { getStartEndDateRangeInUtc } from "@/lib/utils/useEvents";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 import {
 	and,
@@ -46,10 +41,10 @@ export default async function EventDetails(props: Props) {
 	const timezone = await getTimezone();
 
 	const selectedDate = on ? new Date(on) : new Date();
-	const startOfTodayInUserTZ = toStartOfDay(toTimeZone(selectedDate, timezone));
-	const endOfTodayInUserTZ = toEndOfDay(toTimeZone(selectedDate, timezone));
-	const startOfDay = toUTC(startOfTodayInUserTZ, timezone);
-	const endOfDay = toUTC(endOfTodayInUserTZ, timezone);
+	const { startOfDay, endOfDay } = getStartEndDateRangeInUtc(
+		timezone,
+		selectedDate,
+	);
 
 	const dayCommentId = `${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDay()}`;
 
