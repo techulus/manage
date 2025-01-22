@@ -45,7 +45,7 @@ export function NavUser({
 	const { tenant: orgSlug } = useParams();
 
 	return (
-		<SidebarMenu className="pb-4 md:pb-0">
+		<SidebarMenu className="pb-6 md:pb-0">
 			<SidebarMenuItem>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
