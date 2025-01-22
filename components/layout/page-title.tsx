@@ -45,7 +45,7 @@ export default function PageTitle({
 			{createToastWrapper(theme)}
 
 			<div
-				className={`fixed top-0 left-0 right-0 z-50 bg-gray-50 dark:bg-card dark:bg-gray-900 dark:text-white sm:hidden border-b transition-opacity duration-300 ${isSticky ? "opacity-100" : "opacity-0"}`}
+				className={`fixed top-0 left-0 right-0 z-40 bg-gray-50 dark:bg-card dark:bg-gray-900 dark:text-white sm:hidden border-b transition-opacity duration-300 ${isSticky ? "opacity-100" : "opacity-0"}`}
 			>
 				<div className="flex w-full max-w-5xl items-center justify-between p-2">
 					<h1 className="w-full text-md font-semibold text-center tracking-tight">
