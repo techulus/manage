@@ -1,6 +1,9 @@
 "use client";
 
-import { forkTaskList } from "@/app/(dashboard)/[tenant]/projects/[projectId]/tasklists/actions";
+import {
+	deleteTaskList,
+	forkTaskList,
+} from "@/app/(dashboard)/[tenant]/projects/[projectId]/tasklists/actions";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -142,6 +145,27 @@ export const TaskListHeader = ({
 							}}
 						>
 							Fork
+						</Button>
+					</DropdownMenuItem>
+					<DropdownMenuItem className="w-full p-0">
+						<Button
+							variant="destructive"
+							className="w-full"
+							onClick={async () => {
+								toast.promise(
+									deleteTaskList({
+										id: taskList.id,
+										projectId: taskList.projectId,
+									}),
+									{
+										loading: "Deleting task list...",
+										success: "Task list deleted.",
+										error: "Failed to delete task list.",
+									},
+								);
+							}}
+						>
+							Delete
 						</Button>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
