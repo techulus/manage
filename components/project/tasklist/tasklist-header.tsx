@@ -102,6 +102,7 @@ export const TaskListHeader = ({
 							className={buttonVariants({
 								variant: "ghost",
 								className: "w-full",
+								size: "sm",
 							})}
 							prefetch={false}
 						>
@@ -113,6 +114,7 @@ export const TaskListHeader = ({
 							<Button
 								variant="ghost"
 								className="w-full"
+								size="sm"
 								onClick={async () => {
 									if (!partialUpdateTaskList) return;
 									toast.promise(
@@ -136,6 +138,7 @@ export const TaskListHeader = ({
 						<Button
 							variant="ghost"
 							className="w-full"
+							size="sm"
 							onClick={async () => {
 								toast.promise(forkTaskList(taskList.id, taskList.projectId), {
 									loading: "Creating new task list...",
@@ -151,6 +154,7 @@ export const TaskListHeader = ({
 						<Button
 							variant="destructive"
 							className="w-full"
+							size="sm"
 							onClick={async () => {
 								toast.promise(
 									deleteTaskList({
