@@ -9,8 +9,22 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { type Frequency, RRule } from "rrule";
+import { ZodError, ZodIssueCode, z } from "zod";
+
+const eventInputSchema = z.object({
+	projectId: z.string(),
+	name: z.string(),
+	description: z.string().optional(),
+	start: z.string(),
+	end: z.string().optional(),
+	allDay: z.boolean(),
+	repeat: z.string().optional(),
+	repeatUntil: z.string().optional(),
+	invites: z.array(z.string()).optional(),
+});
 
 function handleEventPayload(payload: FormData): {
+	projectId: number;
 	name: string;
 	description: string;
 	start: Date;
@@ -19,53 +33,70 @@ function handleEventPayload(payload: FormData): {
 	repeatRule?: string;
 	invites: string[];
 } {
-	const name = payload.get("name") as string;
-	const description = payload.get("description") as string;
-	const start = new Date(payload.get("start") as string);
-	const allDay = (payload.get("allDay") as string) === "on";
-	const repeat = payload.get("repeat") as string;
-	const invites = ((payload.get("invites") as string) ?? "")
-		.split(",")
-		.filter(Boolean);
-	const repeatUntil = payload.get("repeatUntil")
-		? new Date(payload.get("repeatUntil") as string)
-		: null;
+	const data = eventInputSchema.parse({
+		projectId: payload.get("projectId"),
+		name: payload.get("name"),
+		description: payload.get("description"),
+		start: payload.get("start"),
+		end: payload.get("end"),
+		allDay: (payload.get("allDay") as string) === "on",
+		repeat: payload.get("repeat"),
+		repeatUntil: payload.get("repeatUntil"),
+		invites: ((payload.get("invites") as string) ?? "")
+			.split(",")
+			.filter(Boolean),
+	});
 
-	let end = payload.get("end") ? new Date(payload.get("end") as string) : null;
-	if (allDay && end) {
-		end = toEndOfDay(end);
+	const event = {
+		projectId: +data.projectId,
+		name: data.name,
+		description: data.description,
+		start: new Date(data.start),
+		end: data.end ? new Date(data.end) : null,
+		allDay: data.allDay,
+		invites: data.invites ?? [],
+		repeatRule: data.repeat
+			? new RRule({
+					freq: data.repeat as unknown as Frequency,
+					dtstart: new Date(data.start),
+					until: data.repeatUntil
+						? toEndOfDay(new Date(data.repeatUntil))
+						: undefined,
+					tzid: "UTC",
+				}).toString()
+			: undefined,
+	};
+
+	if (event.allDay && event.end) {
+		event.end = toEndOfDay(event.end);
 	}
 
-	const repeatRule = repeat
-		? new RRule({
-				freq: repeat as unknown as Frequency,
-				dtstart: start,
-				until: repeatUntil ? toEndOfDay(repeatUntil) : undefined,
-				tzid: "UTC",
-			})
-		: undefined;
+	if (event.end && event.end > event.start) {
+		throw new ZodError([
+			{
+				message: "End date must be after start date",
+				code: ZodIssueCode.custom,
+				path: ["end"],
+			},
+		]);
+	}
 
-	return {
+	return event;
+}
+
+export async function createEvent(payload: FormData) {
+	const { userId, orgSlug } = await getOwner();
+
+	const {
+		projectId,
 		name,
 		description,
 		start,
 		end,
 		allDay,
-		repeatRule: repeatRule?.toString(),
+		repeatRule,
 		invites,
-	};
-}
-
-export async function createEvent(payload: FormData) {
-	const { userId, orgSlug } = await getOwner();
-	const projectId = +(payload.get("projectId") as string);
-
-	const { name, description, start, end, allDay, repeatRule, invites } =
-		handleEventPayload(payload);
-
-	// if (end && end > start) {
-	// 	throw new Error("End date must be after start date");
-	// }
+	} = handleEventPayload(payload);
 
 	const db = await database();
 	const createdEvent = db
@@ -113,10 +144,17 @@ export async function createEvent(payload: FormData) {
 export async function updateEvent(payload: FormData) {
 	const { orgSlug } = await getOwner();
 	const id = +(payload.get("id") as string);
-	const projectId = +(payload.get("projectId") as string);
 
-	const { name, description, start, end, allDay, repeatRule, invites } =
-		handleEventPayload(payload);
+	const {
+		projectId,
+		name,
+		description,
+		start,
+		end,
+		allDay,
+		repeatRule,
+		invites,
+	} = handleEventPayload(payload);
 
 	const db = await database();
 	db.delete(eventInvite).where(eq(eventInvite.eventId, id)).run();

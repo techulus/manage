@@ -4,6 +4,7 @@ import {
 	deleteTaskList,
 	forkTaskList,
 } from "@/app/(dashboard)/[tenant]/projects/[projectId]/tasklists/actions";
+import { DeleteButton } from "@/components/form/button";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -151,26 +152,17 @@ export const TaskListHeader = ({
 						</Button>
 					</DropdownMenuItem>
 					<DropdownMenuItem className="w-full p-0">
-						<Button
-							variant="destructive"
-							className="w-full"
-							size="sm"
-							onClick={async () => {
-								toast.promise(
-									deleteTaskList({
-										id: taskList.id,
-										projectId: taskList.projectId,
-									}),
-									{
-										loading: "Deleting task list...",
-										success: "Task list deleted.",
-										error: "Failed to delete task list.",
-									},
-								);
-							}}
-						>
-							Delete
-						</Button>
+						<DropdownMenuItem className="w-full p-0">
+							<form action={deleteTaskList} className="w-full">
+								<input type="hidden" name="id" value={taskList.id} />
+								<input
+									type="hidden"
+									name="projectId"
+									value={taskList.projectId}
+								/>
+								<DeleteButton action="Delete" className="w-full" compact />
+							</form>
+						</DropdownMenuItem>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>

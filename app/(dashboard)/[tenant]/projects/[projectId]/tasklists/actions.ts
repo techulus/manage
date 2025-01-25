@@ -161,13 +161,10 @@ export async function partialUpdateTaskList(
 	revalidatePath(`/${orgSlug}/projects/${updated.projectId}/tasklists`);
 }
 
-export async function deleteTaskList({
-	id,
-	projectId,
-}: {
-	id: number;
-	projectId: number;
-}) {
+export async function deleteTaskList(payload: FormData) {
+	const id = payload.get("id") as string;
+	const projectId = payload.get("projectId") as string;
+
 	const { orgSlug } = await getOwner();
 	const db = await database();
 	const taskListDetails = db
