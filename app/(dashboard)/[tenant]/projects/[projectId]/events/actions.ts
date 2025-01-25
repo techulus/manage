@@ -26,7 +26,7 @@ const eventInputSchema = z.object({
 function handleEventPayload(payload: FormData): {
 	projectId: number;
 	name: string;
-	description: string;
+	description: string | undefined;
 	start: Date;
 	end: Date | null;
 	allDay: boolean;
