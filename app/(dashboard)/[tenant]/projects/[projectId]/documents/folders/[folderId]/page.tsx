@@ -74,6 +74,7 @@ export default async function FolderDetails(props: Props) {
 				subTitle="Documents"
 				actionLabel="Edit"
 				actionLink={`/${orgSlug}/projects/${projectId}/documents/folders/${folderId}/edit`}
+				actionType="edit"
 			/>
 
 			<PageSection topInset>

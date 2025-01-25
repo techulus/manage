@@ -19,7 +19,12 @@ import {
 import { toDateStringWithDay } from "@/lib/utils/date";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 import { getProjectById } from "@/lib/utils/useProjects";
-import { CalendarPlusIcon, ListPlusIcon, PlusIcon } from "lucide-react";
+import {
+	CalendarPlusIcon,
+	ListPlusIcon,
+	PencilIcon,
+	PlusIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { archiveProject, deleteProject, unarchiveProject } from "../actions";
@@ -48,6 +53,7 @@ export default async function ProjectDetails(props: Props) {
 				title={project.name}
 				actionLabel="Edit"
 				actionLink={`/${orgSlug}/projects/${projectId}/edit`}
+				actionType="edit"
 			>
 				{project.dueDate || project.status === "archived" ? (
 					<div className="flex space-x-2">

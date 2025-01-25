@@ -34,6 +34,7 @@ export default async function Projects(props: Props) {
 				}
 				actionLabel="New"
 				actionLink={`/${orgSlug}/projects/new`}
+				actionType="create"
 			/>
 
 			{projects.length ? (

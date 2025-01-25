@@ -96,6 +96,7 @@ export default async function EventDetails(props: Props) {
 				title="Events"
 				actionLabel="New"
 				actionLink={`/${orgSlug}/projects/${projectId}/events/new`}
+				actionType="create"
 			>
 				<div className="font-medium text-gray-500">
 					{toDateStringWithDay(selectedDate, timezone)}

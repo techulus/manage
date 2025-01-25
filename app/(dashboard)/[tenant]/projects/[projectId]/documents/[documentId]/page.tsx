@@ -44,6 +44,7 @@ export default async function DocumentDetails(props: Props) {
 				}
 				actionLabel="Edit"
 				actionLink={`/${orgSlug}/projects/${projectId}/documents/${documentId}/edit`}
+				actionType="edit"
 			/>
 
 			<PageSection topInset>

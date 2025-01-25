@@ -1,15 +1,19 @@
 "use client";
 
+import { PencilIcon, PlusIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { type JSX, type PropsWithChildren, useEffect, useState } from "react";
 import { createToastWrapper } from "../core/toast";
 import { buttonVariants } from "../ui/button";
 
+type ActionType = "edit" | "create";
+
 interface Props {
 	title: string;
 	subTitle?: string;
 	actionLink?: string;
+	actionType?: ActionType;
 	actionLabel?: string;
 	actions?: JSX.Element;
 }
@@ -19,6 +23,7 @@ export default function PageTitle({
 	subTitle,
 	actionLink,
 	actionLabel,
+	actionType,
 	children,
 	actions,
 }: PropsWithChildren<Props>) {
@@ -51,6 +56,23 @@ export default function PageTitle({
 					<h1 className="w-full text-md font-semibold text-center tracking-tight">
 						{title}
 					</h1>
+					{actionLink && actionType ? (
+						<Link
+							href={actionLink}
+							className={buttonVariants({
+								variant: "ghost",
+								size: "sm",
+								className: "absolute right-1",
+							})}
+							prefetch={false}
+						>
+							{actionType === "edit" ? (
+								<PencilIcon className="h-4 w-4" />
+							) : (
+								<PlusIcon className="h-4 w-4" />
+							)}
+						</Link>
+					) : null}
 				</div>
 			</div>
 
