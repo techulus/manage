@@ -1,7 +1,7 @@
 "use server";
 
 import { logtoConfig } from "@/app/logto";
-import { user } from "@/drizzle/schema";
+import { notification, user } from "@/drizzle/schema";
 import { updateUser } from "@/lib/ops/auth";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
@@ -41,6 +41,20 @@ export async function updateUserData(payload: FormData) {
 	}
 
 	return { success: true };
+}
+
+export async function getUserNotifications() {
+	const { userId } = await getOwner();
+
+	const db = await database();
+	const notifications = await db.query.notification.findMany({
+		where: eq(notification.userId, userId),
+		with: {
+			user: true,
+		},
+	});
+
+	return notifications;
 }
 
 export async function logout() {

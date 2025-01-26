@@ -13,27 +13,12 @@ import {
 import type { EventWithInvites } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import {
-	toDateString,
-	toDateTimeString,
-	toEndOfDay,
-	toStartOfDay,
-} from "@/lib/utils/date";
+	eventToHumanReadableString,
+	filterByRepeatRule,
+} from "@/lib/utils/useEvents";
 import { CircleEllipsisIcon } from "lucide-react";
 import Link from "next/link";
-import { rrulestr } from "rrule";
 import { Assignee } from "../shared/assigee";
-
-const filterByRepeatRule = (event: EventWithInvites, date: Date) => {
-	if (event.repeatRule) {
-		const rrule = rrulestr(event.repeatRule);
-		const start = toStartOfDay(date);
-		const end = toEndOfDay(date);
-
-		return rrule.between(start, end, true).length > 0;
-	}
-
-	return true;
-};
 
 export default function EventsList({
 	date,
@@ -53,7 +38,7 @@ export default function EventsList({
 	compact?: boolean;
 }) {
 	const filteredEvents = events.filter((x) =>
-		filterByRepeatRule(x, new Date(date)),
+		filterByRepeatRule(x, new Date(date), timezone),
 	);
 
 	return (
@@ -62,7 +47,7 @@ export default function EventsList({
 				<EmptyState
 					show={!filteredEvents.length}
 					label="event"
-					createLink={`/${orgSlug}/projects/${projectId}/events/new`}
+					createLink={`/${orgSlug}/projects/${projectId}/events/new?on=${date}`}
 				/>
 			) : null}
 
@@ -82,19 +67,7 @@ export default function EventsList({
 								className="pb-2 text-xs text-gray-500 dark:text-gray-400"
 								suppressHydrationWarning
 							>
-								{event.allDay
-									? toDateString(event.start, timezone)
-									: toDateTimeString(event.start, timezone)}
-								{event.end
-									? ` - ${
-											event.allDay
-												? toDateString(event.end, timezone)
-												: toDateTimeString(event.end, timezone)
-										}`
-									: null}
-								{event.repeatRule
-									? `, ${rrulestr(event.repeatRule).toText()}`
-									: null}
+								{eventToHumanReadableString(event, timezone)}
 							</div>
 
 							{event.invites.length ? (

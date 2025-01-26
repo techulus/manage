@@ -12,7 +12,7 @@ export default async function CreateProject() {
 	const { orgSlug } = await getOwner();
 	return (
 		<>
-			<PageTitle title="Create Project" backUrl={`/${orgSlug}/projects`} />
+			<PageTitle title="Create Project" />
 			<PageSection topInset>
 				<form action={createProject}>
 					<CardContent>

@@ -19,7 +19,12 @@ import {
 import { toDateStringWithDay } from "@/lib/utils/date";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 import { getProjectById } from "@/lib/utils/useProjects";
-import { CalendarPlusIcon, ListPlusIcon, PlusIcon } from "lucide-react";
+import {
+	CalendarPlusIcon,
+	ListPlusIcon,
+	PencilIcon,
+	PlusIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { archiveProject, deleteProject, unarchiveProject } from "../actions";
@@ -46,9 +51,9 @@ export default async function ProjectDetails(props: Props) {
 		<>
 			<PageTitle
 				title={project.name}
-				backUrl={`/${orgSlug}/projects`}
 				actionLabel="Edit"
 				actionLink={`/${orgSlug}/projects/${projectId}/edit`}
+				actionType="edit"
 			>
 				{project.dueDate || project.status === "archived" ? (
 					<div className="flex space-x-2">
@@ -116,7 +121,7 @@ export default async function ProjectDetails(props: Props) {
 				</div>
 			</PageSection>
 
-			<div className="mx-auto flex max-w-5xl flex-col p-4 lg:p-0 lg:pb-12">
+			<div className="mx-auto flex max-w-5xl flex-col p-4 xl:p-0 lg:pb-12">
 				<div className="flex justify-between flex-row items-center mt-8">
 					<h2 className="text-2xl font-bold leading-7 tracking-tight">
 						Task Lists
@@ -163,7 +168,7 @@ export default async function ProjectDetails(props: Props) {
 				/>
 			</div>
 
-			<div className="mx-auto flex max-w-5xl flex-col space-y-4 mt-8 p-4 lg:p-0 lg:pb-12">
+			<div className="mx-auto flex max-w-5xl flex-col space-y-4 mt-8 p-4 xl:p-0 lg:pb-12">
 				<div className="flex justify-between flex-row items-center">
 					<h2 className="text-2xl font-bold leading-7 tracking-tight">
 						Docs &amp; Files
@@ -223,7 +228,7 @@ export default async function ProjectDetails(props: Props) {
 				/>
 			</div>
 
-			<div className="mx-auto flex max-w-5xl flex-col mt-8 space-y-4 p-4 lg:p-0">
+			<div className="mx-auto flex max-w-5xl flex-col mt-8 space-y-4 p-4 xl:p-0">
 				<div className="flex justify-between flex-row items-center">
 					<h2 className="text-2xl font-bold leading-7 tracking-tight">
 						Events
@@ -251,7 +256,7 @@ export default async function ProjectDetails(props: Props) {
 				</div>
 			</div>
 
-			<div className="mx-auto max-w-5xl p-4 lg:p-0 lg:py-8">
+			<div className="mx-auto max-w-5xl p-4 xl:p-0 lg:py-8">
 				{/* @ts-ignore */}
 				<CommentsSection
 					type="project"

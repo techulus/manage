@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { User } from "@/drizzle/types";
+import { cn } from "@/lib/utils";
 
 export const UserAvatar = ({
 	user,
@@ -9,11 +10,11 @@ export const UserAvatar = ({
 	className?: string;
 }) => {
 	return (
-		<Avatar className={className}>
+		<Avatar className={cn("h-8 w-8", className)}>
 			<AvatarImage
 				src={
 					user.imageUrl ??
-					`https://api.dicebear.com/9.x/fun-emoji/svg?seed=${user.firstName}`
+					`https://api.dicebear.com/9.x/avataaars-neutral/svg?seed=${user.firstName}`
 				}
 			/>
 			<AvatarFallback>{user.firstName ?? "User"}</AvatarFallback>

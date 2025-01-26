@@ -77,9 +77,9 @@ export default async function TaskLists(props: Props) {
 		<>
 			<PageTitle
 				title={list.name}
-				backUrl={`/${orgSlug}/projects/${projectId}/tasklists`}
 				actionLabel="Edit"
 				actionLink={`/${orgSlug}/projects/${projectId}/tasklists/${list.id}/edit`}
+				actionType="edit"
 			>
 				<div className="flex flex-col pr-4 md:pr-0 space-y-2 md:flex-row md:space-y-0 md:space-x-2 text-gray-500 dark:text-gray-400">
 					{totalCount != null && doneCount != null ? (

@@ -1,3 +1,5 @@
+"use server";
+
 import { calendarEvent, document, project, taskList } from "@/drizzle/schema";
 import type { ProjectWithCreator, ProjectWithData } from "@/drizzle/types";
 import { and, between, eq, isNotNull, isNull, like, or } from "drizzle-orm";

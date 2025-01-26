@@ -14,12 +14,12 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import type { Task, TaskList, TaskWithDetails, User } from "@/drizzle/types";
+import type { Task, TaskList, TaskWithDetails } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import { toDateStringWithDay } from "@/lib/utils/date";
+import { toDateStringWithDay, toStartOfDay } from "@/lib/utils/date";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { AlignJustifyIcon, FileIcon } from "lucide-react";
+import { AlignJustifyIcon, CalendarClock, FileIcon } from "lucide-react";
 import { useReducer, useState } from "react";
 import toast from "react-hot-toast";
 import { Card, CardContent, CardHeader } from "../../../ui/card";
@@ -238,10 +238,10 @@ export const TaskItem = ({
 										<DateTimePicker
 											dateOnly
 											name="dueDate"
-											onSelect={(date) => {
+											onSelect={(dueDate) => {
 												toast.promise(
 													updateTask(id, projectId, {
-														dueDate: date,
+														dueDate: toStartOfDay(dueDate),
 													}),
 													updateTaskToastOptions,
 												);
@@ -381,8 +381,18 @@ export const TaskItem = ({
 								<Assignee className="mr-2" user={task.assignee} imageOnly />
 							) : null}
 							{name}
+							{task.dueDate ? (
+								<span className="text-muted-foreground ml-2 text-sm">
+									<CalendarClock className="h-4 w-4 inline-block text-primary mr-1 -mt-1" />
+									<span className="hidden md:inline">
+										{toDateStringWithDay(task.dueDate, timezone)}
+									</span>
+								</span>
+							) : null}
 							{task.description ? (
-								<FileIcon className="ml-2 h-4 w-4 text-primary" />
+								<span className="ml-2">
+									<FileIcon className="h-4 w-4 text-primary" />
+								</span>
 							) : null}
 						</div>
 					</button>

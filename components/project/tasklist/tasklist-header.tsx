@@ -1,6 +1,10 @@
 "use client";
 
-import { forkTaskList } from "@/app/(dashboard)/[tenant]/projects/[projectId]/tasklists/actions";
+import {
+	deleteTaskList,
+	forkTaskList,
+} from "@/app/(dashboard)/[tenant]/projects/[projectId]/tasklists/actions";
+import { DeleteButton } from "@/components/form/button";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -99,6 +103,7 @@ export const TaskListHeader = ({
 							className={buttonVariants({
 								variant: "ghost",
 								className: "w-full",
+								size: "sm",
 							})}
 							prefetch={false}
 						>
@@ -110,6 +115,7 @@ export const TaskListHeader = ({
 							<Button
 								variant="ghost"
 								className="w-full"
+								size="sm"
 								onClick={async () => {
 									if (!partialUpdateTaskList) return;
 									toast.promise(
@@ -133,6 +139,7 @@ export const TaskListHeader = ({
 						<Button
 							variant="ghost"
 							className="w-full"
+							size="sm"
 							onClick={async () => {
 								toast.promise(forkTaskList(taskList.id, taskList.projectId), {
 									loading: "Creating new task list...",
@@ -143,6 +150,19 @@ export const TaskListHeader = ({
 						>
 							Fork
 						</Button>
+					</DropdownMenuItem>
+					<DropdownMenuItem className="w-full p-0">
+						<DropdownMenuItem className="w-full p-0">
+							<form action={deleteTaskList} className="w-full">
+								<input type="hidden" name="id" value={taskList.id} />
+								<input
+									type="hidden"
+									name="projectId"
+									value={taskList.projectId}
+								/>
+								<DeleteButton action="Delete" className="w-full" compact />
+							</form>
+						</DropdownMenuItem>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>

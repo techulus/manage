@@ -161,6 +161,28 @@ export async function partialUpdateTaskList(
 	revalidatePath(`/${orgSlug}/projects/${updated.projectId}/tasklists`);
 }
 
+export async function deleteTaskList(payload: FormData) {
+	const id = payload.get("id") as string;
+	const projectId = payload.get("projectId") as string;
+
+	const { orgSlug } = await getOwner();
+	const db = await database();
+	const taskListDetails = db
+		.delete(taskList)
+		.where(eq(taskList.id, +id))
+		.returning()
+		.get();
+
+	await logActivity({
+		action: "deleted",
+		type: "tasklist",
+		message: `Deleted task list ${taskListDetails?.name}`,
+		projectId: +projectId,
+	});
+
+	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
+}
+
 export async function createTask({
 	userId,
 	taskListId,

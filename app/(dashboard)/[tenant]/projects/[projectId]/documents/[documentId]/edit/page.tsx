@@ -17,14 +17,14 @@ type Props = {
 };
 
 export default async function EditDocument(props: Props) {
-    const params = await props.params;
-    const { orgSlug } = await getOwner();
-    const document = await getDocumentById(params.documentId);
-    const backUrl = `/${orgSlug}/projects/${params.projectId}/documents/${document.id}`;
+	const params = await props.params;
+	const { orgSlug } = await getOwner();
+	const document = await getDocumentById(params.documentId);
+	const backUrl = `/${orgSlug}/projects/${params.projectId}/documents/${document.id}`;
 
-    return (
+	return (
 		<>
-			<PageTitle title="Update Document" backUrl={backUrl} />
+			<PageTitle title="Update Document" />
 
 			<PageSection topInset>
 				<form action={updateDocument}>

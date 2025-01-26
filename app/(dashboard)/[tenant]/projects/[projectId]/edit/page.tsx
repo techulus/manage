@@ -16,15 +16,15 @@ interface Props {
 }
 
 export default async function EditProject(props: Props) {
-    const params = await props.params;
-    const { projectId } = params;
+	const params = await props.params;
+	const { projectId } = params;
 
-    const project = await getProjectById(projectId);
-    const { orgSlug } = await getOwner();
+	const project = await getProjectById(projectId);
+	const { orgSlug } = await getOwner();
 
-    return (
+	return (
 		<>
-			<PageTitle title={project.name} backUrl={`/${orgSlug}/projects`} />
+			<PageTitle title={project.name} />
 
 			<PageSection topInset>
 				<form action={updateProject}>

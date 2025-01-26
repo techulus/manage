@@ -4,12 +4,9 @@ import { CommentsSection } from "@/components/project/comment/comments-section";
 import EventsCalendar from "@/components/project/events/events-calendar";
 import { buttonVariants } from "@/components/ui/button";
 import { calendarEvent } from "@/drizzle/schema";
-import {
-	toDateStringWithDay,
-	toEndOfDay,
-	toStartOfDay,
-} from "@/lib/utils/date";
+import { toDateStringWithDay } from "@/lib/utils/date";
 import { database } from "@/lib/utils/useDatabase";
+import { getStartEndDateRangeInUtc } from "@/lib/utils/useEvents";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 import {
 	and,
@@ -44,10 +41,12 @@ export default async function EventDetails(props: Props) {
 	const timezone = await getTimezone();
 
 	const selectedDate = on ? new Date(on) : new Date();
-	const dayCommentId = `${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDay()}`;
+	const { startOfDay, endOfDay } = getStartEndDateRangeInUtc(
+		timezone,
+		selectedDate,
+	);
 
-	const startOfDay = toStartOfDay(selectedDate);
-	const endOfDay = toEndOfDay(selectedDate);
+	const dayCommentId = `${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDay()}`;
 
 	const db = await database();
 	const events = await db.query.calendarEvent
@@ -62,6 +61,8 @@ export default async function EventDetails(props: Props) {
 						gt(calendarEvent.end, endOfDay),
 					),
 					isNotNull(calendarEvent.repeatRule),
+					eq(calendarEvent.start, startOfDay),
+					eq(calendarEvent.end, endOfDay),
 				),
 			),
 			orderBy: [desc(calendarEvent.start), asc(calendarEvent.allDay)],
@@ -95,6 +96,7 @@ export default async function EventDetails(props: Props) {
 				title="Events"
 				actionLabel="New"
 				actionLink={`/${orgSlug}/projects/${projectId}/events/new`}
+				actionType="create"
 			>
 				<div className="font-medium text-gray-500">
 					{toDateStringWithDay(selectedDate, timezone)}
