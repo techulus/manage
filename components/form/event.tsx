@@ -211,8 +211,11 @@ export default function EventForm({
 			<CardFooter>
 				<div className="ml-auto flex items-center justify-end gap-x-6">
 					<Button
+						type="button"
 						variant="ghost"
-						onClick={() => {
+						onClick={(evt) => {
+							evt.preventDefault();
+							evt.stopPropagation();
 							router.back();
 						}}
 					>
