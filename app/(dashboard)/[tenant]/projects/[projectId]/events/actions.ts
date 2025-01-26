@@ -5,11 +5,13 @@ import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { toEndOfDay, toMachineDateString } from "@/lib/utils/date";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
+import { isAfter } from "date-fns";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { type Frequency, RRule } from "rrule";
 import { ZodError, ZodIssueCode, z } from "zod";
+import { fromError } from "zod-validation-error";
 
 const eventInputSchema = z.object({
 	projectId: z.string(),
@@ -71,7 +73,7 @@ function handleEventPayload(payload: FormData): {
 		event.end = toEndOfDay(event.end);
 	}
 
-	if (event.end && event.end > event.start) {
+	if (event.end && isAfter(event.start, event.end)) {
 		throw new ZodError([
 			{
 				message: "End date must be after start date",
@@ -84,138 +86,150 @@ function handleEventPayload(payload: FormData): {
 	return event;
 }
 
-export async function createEvent(payload: FormData) {
+export async function createEvent(_: unknown, payload: FormData) {
 	const { userId, orgSlug } = await getOwner();
-
-	const {
-		projectId,
-		name,
-		description,
-		start,
-		end,
-		allDay,
-		repeatRule,
-		invites,
-	} = handleEventPayload(payload);
-
-	const db = await database();
-	const createdEvent = db
-		.insert(calendarEvent)
-		.values({
+	let redirectPath: string;
+	try {
+		const {
+			projectId,
 			name,
 			description,
 			start,
 			end,
 			allDay,
 			repeatRule,
-			projectId,
-			createdByUser: userId,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-		})
-		.returning()
-		.get();
+			invites,
+		} = handleEventPayload(payload);
 
-	for (const userId of invites) {
-		db.insert(eventInvite)
+		const db = await database();
+		const createdEvent = db
+			.insert(calendarEvent)
 			.values({
-				eventId: createdEvent.id,
-				userId,
-				status: "invited",
+				name,
+				description,
+				start,
+				end,
+				allDay,
+				repeatRule,
+				projectId,
+				createdByUser: userId,
+				createdAt: new Date(),
+				updatedAt: new Date(),
 			})
-			.run();
+			.returning()
+			.get();
+
+		for (const userId of invites) {
+			db.insert(eventInvite)
+				.values({
+					eventId: createdEvent.id,
+					userId,
+					status: "invited",
+				})
+				.run();
+		}
+
+		await logActivity({
+			action: "created",
+			type: "event",
+			message: `Created event ${name}`,
+			projectId: +projectId,
+		});
+
+		const timezone = await getTimezone();
+		redirectPath = `/${orgSlug}/projects/${projectId}/events?on=${toMachineDateString(start, timezone)}`;
+		revalidatePath(`/${orgSlug}/projects/${projectId}/events`);
+	} catch (error) {
+		console.error(error);
+		return {
+			message: "An error occurred while creating the event",
+		};
 	}
 
-	await logActivity({
-		action: "created",
-		type: "event",
-		message: `Created event ${name}`,
-		projectId: +projectId,
-	});
-
-	const timezone = await getTimezone();
-
-	revalidatePath(`/${orgSlug}/projects/${projectId}/events`);
-	redirect(
-		`/${orgSlug}/projects/${projectId}/events?on=${toMachineDateString(start, timezone)}`,
-	);
+	redirect(redirectPath);
 }
 
-export async function updateEvent(payload: FormData) {
-	const { orgSlug } = await getOwner();
-	const id = +(payload.get("id") as string);
+export async function updateEvent(_: unknown, payload: FormData) {
+	let redirectPath: string;
+	try {
+		const { orgSlug } = await getOwner();
+		const id = +(payload.get("id") as string);
 
-	const {
-		projectId,
-		name,
-		description,
-		start,
-		end,
-		allDay,
-		repeatRule,
-		invites,
-	} = handleEventPayload(payload);
-
-	const db = await database();
-	db.delete(eventInvite).where(eq(eventInvite.eventId, id)).run();
-
-	for (const userId of invites) {
-		db.insert(eventInvite)
-			.values({
-				eventId: id,
-				userId,
-				status: "invited",
-			})
-			.run();
-	}
-
-	const currentEvent = await db.query.calendarEvent
-		.findFirst({
-			where: and(
-				eq(calendarEvent.id, id),
-				eq(calendarEvent.projectId, +projectId),
-			),
-		})
-		.execute();
-
-	db.update(calendarEvent)
-		.set({
+		const {
+			projectId,
 			name,
 			description,
 			start,
 			end,
 			allDay,
-			repeatRule: repeatRule?.toString(),
-			updatedAt: new Date(),
-		})
-		.where(
-			and(eq(calendarEvent.id, id), eq(calendarEvent.projectId, +projectId)),
-		)
-		.run();
+			repeatRule,
+			invites,
+		} = handleEventPayload(payload);
 
-	if (currentEvent)
-		await logActivity({
-			action: "updated",
-			type: "event",
-			message: `Updated event ${name}, ${generateObjectDiffMessage(
-				currentEvent,
-				{
-					name,
-					description,
-					start,
-					end,
-					allDay,
-				},
-			)}`,
-			projectId: +projectId,
-		});
+		const db = await database();
+		db.delete(eventInvite).where(eq(eventInvite.eventId, id)).run();
 
-	const timezone = await getTimezone();
+		for (const userId of invites) {
+			db.insert(eventInvite)
+				.values({
+					eventId: id,
+					userId,
+					status: "invited",
+				})
+				.run();
+		}
 
-	revalidatePath(`/${orgSlug}/projects/${projectId}/events`);
-	redirect(
-		`/${orgSlug}/projects/${projectId}/events?on=${toMachineDateString(start, timezone)}`,
-	);
+		const currentEvent = await db.query.calendarEvent
+			.findFirst({
+				where: and(
+					eq(calendarEvent.id, id),
+					eq(calendarEvent.projectId, +projectId),
+				),
+			})
+			.execute();
+
+		db.update(calendarEvent)
+			.set({
+				name,
+				description,
+				start,
+				end,
+				allDay,
+				repeatRule: repeatRule?.toString(),
+				updatedAt: new Date(),
+			})
+			.where(
+				and(eq(calendarEvent.id, id), eq(calendarEvent.projectId, +projectId)),
+			)
+			.run();
+
+		if (currentEvent)
+			await logActivity({
+				action: "updated",
+				type: "event",
+				message: `Updated event ${name}, ${generateObjectDiffMessage(
+					currentEvent,
+					{
+						name,
+						description,
+						start,
+						end,
+						allDay,
+					},
+				)}`,
+				projectId: +projectId,
+			});
+
+		const timezone = await getTimezone();
+		revalidatePath(`/${orgSlug}/projects/${projectId}/events`);
+		redirectPath = `/${orgSlug}/projects/${projectId}/events?on=${toMachineDateString(start, timezone)}`;
+	} catch (error) {
+		return {
+			message: fromError(error).toString(),
+		};
+	}
+
+	redirect(redirectPath);
 }
 
 export async function deleteEvent(payload: FormData) {

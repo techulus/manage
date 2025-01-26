@@ -1,18 +1,6 @@
 "use client";
 
-import {
-	BadgeCheck,
-	Bell,
-	ChevronsUpDown,
-	CreditCard,
-	HelpCircle,
-	LogOut,
-	Settings,
-	Sparkles,
-} from "lucide-react";
-
 import { logout } from "@/app/(dashboard)/[tenant]/settings/actions";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -28,6 +16,7 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "@/components/ui/sidebar";
+import { ChevronsUpDown, HelpCircle, LogOut, Settings } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { UserAvatar } from "./core/user-avatar";
@@ -81,30 +70,33 @@ export function NavUser({
 						<DropdownMenuSeparator />
 						<DropdownMenuGroup>
 							<DropdownMenuItem onClick={() => setOpenMobile(false)}>
-								<Settings />
 								<Link
 									href={`/${orgSlug}/settings`}
 									prefetch={false}
-									className="w-full"
+									className="w-full flex items-center gap-2"
 								>
+									<Settings />
 									Settings
 								</Link>
 							</DropdownMenuItem>
 							<DropdownMenuItem>
-								<HelpCircle />
 								<Link
 									href="mailto:support@managee.xyz"
 									prefetch={false}
-									className="w-full"
+									className="w-full flex items-center gap-2"
 								>
+									<HelpCircle />
 									Support
 								</Link>
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem onClick={() => setOpenMobile(false)}>
-							<LogOut />
-							<form action={logout}>
+						<DropdownMenuItem
+							onClick={() => setOpenMobile(false)}
+							className="w-full"
+						>
+							<form action={logout} className="w-full flex items-center gap-2">
+								<LogOut />
 								<button type="submit">Sign Out</button>
 							</form>
 						</DropdownMenuItem>

@@ -382,13 +382,17 @@ export const TaskItem = ({
 							) : null}
 							{name}
 							{task.dueDate ? (
-								<div className="text-muted-foreground ml-2 text-sm">
+								<span className="text-muted-foreground ml-2 text-sm">
 									<CalendarClock className="h-4 w-4 inline-block text-primary mr-1 -mt-1" />
-									{toDateStringWithDay(task.dueDate, timezone)}
-								</div>
+									<span className="hidden md:inline">
+										{toDateStringWithDay(task.dueDate, timezone)}
+									</span>
+								</span>
 							) : null}
 							{task.description ? (
-								<FileIcon className="ml-2 h-4 w-4 text-primary" />
+								<span className="ml-2">
+									<FileIcon className="h-4 w-4 text-primary" />
+								</span>
 							) : null}
 						</div>
 					</button>
