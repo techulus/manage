@@ -14,8 +14,11 @@ import {
 import type * as React from "react";
 
 export function AppSidebar({
+	userId,
+	user,
 	...props
 }: React.ComponentProps<typeof Sidebar> & {
+	userId: string;
 	user: {
 		firstName: string;
 		imageUrl: string | null;
@@ -28,11 +31,11 @@ export function AppSidebar({
 				<WorkspaceSwitcher />
 			</SidebarHeader>
 			<SidebarContent>
-				<NavMain />
+				<NavMain userId={userId} />
 				<NavProjects />
 			</SidebarContent>
 			<SidebarFooter>
-				<NavUser user={props.user} />
+				<NavUser user={user} />
 			</SidebarFooter>
 			<SidebarRail />
 		</Sidebar>

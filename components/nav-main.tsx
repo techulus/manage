@@ -1,16 +1,6 @@
 "use client";
 
 import {
-	CalendarCheck,
-	ChevronRight,
-	File,
-	GaugeIcon,
-	ListChecksIcon,
-	type LucideIcon,
-	SettingsIcon,
-} from "lucide-react";
-
-import {
 	Collapsible,
 	CollapsibleContent,
 	CollapsibleTrigger,
@@ -29,6 +19,15 @@ import {
 import type { ProjectWithData } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { getProjectById } from "@/lib/utils/useProjects";
+import {
+	CalendarCheck,
+	ChevronRight,
+	File,
+	GaugeIcon,
+	ListChecksIcon,
+	type LucideIcon,
+	SettingsIcon,
+} from "lucide-react";
 import { CalendarHeartIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -47,7 +46,7 @@ type MainNavItem = {
 	}[];
 };
 
-export function NavMain() {
+export function NavMain({ userId }: { userId: string }) {
 	const { setOpenMobile } = useSidebar();
 	const { tenant, projectId } = useParams();
 	const pathname = usePathname();
@@ -166,9 +165,9 @@ export function NavMain() {
 	return (
 		<SidebarGroup>
 			<SidebarMenu>
-				<Notifications userId="1" />
+				<Notifications tenant={String(tenant)} userId={userId} />
 			</SidebarMenu>
-			<SidebarGroupLabel className="font-bold">Tools</SidebarGroupLabel>
+			<SidebarGroupLabel className="font-bold mt-4">Tools</SidebarGroupLabel>
 			<SidebarMenu>
 				{navItems.map((navItem) =>
 					navItem.items?.length ? (

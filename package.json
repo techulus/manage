@@ -3,9 +3,9 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"dev": "TZ=UTC node server.js",
+		"dev": "TZ=UTC next dev",
 		"build": "next build",
-		"start": "NODE_ENV=production node server.js",
+		"start": "next start",
 		"lint": "biome lint",
 		"generate:migrations": "drizzle-kit generate"
 	},
@@ -59,8 +59,6 @@
 		"remark-gfm": "^4.0.0",
 		"rrule": "^2.8.1",
 		"sharp": "^0.33.4",
-		"socket.io": "^4.8.1",
-		"socket.io-client": "^4.8.1",
 		"strip-markdown": "^6.0.0",
 		"tailwind-merge": "^1.14.0",
 		"tailwindcss": "3.3.2",

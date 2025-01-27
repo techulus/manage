@@ -17,7 +17,7 @@ export default async function ConsoleLayout(props: {
 	const { tenant } = await props.params;
 
 	const { children } = props;
-	const { orgSlug } = await getOwner();
+	const { orgSlug, userId } = await getOwner();
 	const user = await getUser();
 
 	if (tenant !== orgSlug) {
@@ -32,6 +32,7 @@ export default async function ConsoleLayout(props: {
 	return (
 		<SidebarProvider>
 			<AppSidebar
+				userId={userId}
 				user={{
 					firstName: user.firstName ?? "",
 					email: user.email ?? "",
