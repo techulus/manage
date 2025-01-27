@@ -33,6 +33,7 @@ import { CalendarHeartIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { Notifications } from "./core/notifications";
 
 type MainNavItem = {
 	title: string;
@@ -164,6 +165,9 @@ export function NavMain() {
 
 	return (
 		<SidebarGroup>
+			<SidebarMenu>
+				<Notifications userId="1" />
+			</SidebarMenu>
 			<SidebarGroupLabel className="font-bold">Tools</SidebarGroupLabel>
 			<SidebarMenu>
 				{navItems.map((navItem) =>

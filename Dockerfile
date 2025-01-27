@@ -38,6 +38,12 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+COPY --from=builder --chown=nextjs:nodejs /app/server.js ./server.js
+COPY --from=builder /app/package.json ./package.json
+
+RUN corepack enable pnpm && pnpm install --prod
+RUN pnpm install
+
 USER nextjs
 EXPOSE 3000
 ENV PORT=3000

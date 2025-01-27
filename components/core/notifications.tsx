@@ -1,16 +1,16 @@
 "use client";
 
 import { getUserNotifications } from "@/app/(dashboard)/[tenant]/settings/actions";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import type { NotificationWithUser } from "@/drizzle/types";
+import { socket } from "@/lib/utils/socket-client";
 import { Bell } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
 
 function Dot({ className }: { className?: string }) {
 	return (
@@ -29,6 +29,30 @@ function Dot({ className }: { className?: string }) {
 }
 
 function Notifications({ userId }: { userId: string }) {
+	const [isConnected, setIsConnected] = useState(false);
+
+	useEffect(() => {
+		if (socket.connected) {
+			onConnect();
+		}
+
+		function onConnect() {
+			setIsConnected(true);
+		}
+
+		function onDisconnect() {
+			setIsConnected(false);
+		}
+
+		socket.on("connect", onConnect);
+		socket.on("disconnect", onDisconnect);
+
+		return () => {
+			socket.off("connect", onConnect);
+			socket.off("disconnect", onDisconnect);
+		};
+	}, []);
+
 	const [notifications, setNotifications] = useState<NotificationWithUser[]>(
 		[],
 	);
@@ -60,21 +84,16 @@ function Notifications({ userId }: { userId: string }) {
 	return (
 		<Popover onOpenChange={fetchNotifications}>
 			<PopoverTrigger asChild>
-				<Button
-					size="icon"
-					variant="outline"
-					className="relative"
-					aria-label="Open notifications"
-				>
-					<Bell size={16} strokeWidth={2} aria-hidden="true" />
-					{unreadCount > 0 && (
-						<Badge className="absolute -top-2 left-full -translate-x-1/2 px-1 rounded-full h-5 min-w-[20px] flex items-center justify-center">
-							{unreadCount > 99 ? "99+" : unreadCount}
-						</Badge>
-					)}
-				</Button>
+				<SidebarMenuItem>
+					<SidebarMenuButton asChild>
+						<div className="relative flex cursor-pointer">
+							<Bell aria-hidden="true" />
+							<span>Notifications</span>
+						</div>
+					</SidebarMenuButton>
+				</SidebarMenuItem>
 			</PopoverTrigger>
-			<PopoverContent className="w-80 p-1" align="end">
+			<PopoverContent className="w-80 ml-4" align="end">
 				<div className="flex items-baseline justify-between gap-4 px-3 py-2">
 					<div className="text-sm font-semibold">Notifications</div>
 					{unreadCount > 0 && (
