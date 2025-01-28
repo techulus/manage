@@ -38,3 +38,13 @@ services:
     volumes:
       - ./blob-data:/data
     command: server /data --console-address ":9001"
+  
+  anycable:
+    image: anycable/anycable-go:latest
+    ports:
+      - 8080:8080
+    environment:
+      ANYCABLE_HOST: 0.0.0.0
+      ANYCABLE_BROADCAST_ADAPTER: http
+      ANYCABLE_SECRET: ${ANYCABLE_SECRET}
+      ANYCABLE_BROADCAST_KEY: ${ANYCABLE_BROADCAST_KEY}
