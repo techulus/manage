@@ -2,6 +2,7 @@
 
 import { task, taskList } from "@/drizzle/schema";
 import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
+import { broadcastEvent } from "@/lib/utils/cable-server";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { and, desc, eq } from "drizzle-orm";
@@ -42,7 +43,7 @@ const taskSchema = z.object({
 });
 
 export async function createTaskList(payload: FormData) {
-	const { userId, orgSlug } = await getOwner();
+	const { userId, orgSlug, ownerId } = await getOwner();
 	const name = payload.get("name") as string;
 	const description = payload.get("description") as string;
 	const dueDate = payload.get("dueDate") as string;
@@ -74,12 +75,14 @@ export async function createTaskList(payload: FormData) {
 		projectId: +projectId,
 	});
 
+	await broadcastEvent("update_sidebar", ownerId);
+
 	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
 	redirect(`/${orgSlug}/projects/${projectId}/tasklists`);
 }
 
 export async function updateTaskList(payload: FormData) {
-	const { orgSlug } = await getOwner();
+	const { orgSlug, ownerId } = await getOwner();
 	const id = payload.get("id") as string;
 	const name = payload.get("name") as string;
 	const description = payload.get("description") as string;
@@ -100,8 +103,7 @@ export async function updateTaskList(payload: FormData) {
 		})
 		.execute();
 
-	await db
-		.update(taskList)
+	db.update(taskList)
 		.set({
 			...data,
 			updatedAt: new Date(),
@@ -120,6 +122,8 @@ export async function updateTaskList(payload: FormData) {
 			projectId: +projectId,
 		});
 
+	await broadcastEvent("update_sidebar", ownerId);
+
 	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
 	redirect(`/${orgSlug}/projects/${projectId}/tasklists`);
 }
@@ -136,7 +140,7 @@ export async function partialUpdateTaskList(
 		})
 		.execute();
 
-	const updated = await db
+	const updated = db
 		.update(taskList)
 		.set({
 			...data,
@@ -164,7 +168,7 @@ export async function deleteTaskList(payload: FormData) {
 	const id = payload.get("id") as string;
 	const projectId = payload.get("projectId") as string;
 
-	const { orgSlug } = await getOwner();
+	const { orgSlug, ownerId } = await getOwner();
 	const db = await database();
 	const taskListDetails = db
 		.delete(taskList)
@@ -179,6 +183,7 @@ export async function deleteTaskList(payload: FormData) {
 		projectId: +projectId,
 	});
 
+	await broadcastEvent("update_sidebar", ownerId);
 	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
 }
 
@@ -217,8 +222,7 @@ export async function createTask({
 		? lastPosition?.position + POSITION_INCREMENT
 		: 1;
 
-	await db
-		.insert(task)
+	db.insert(task)
 		.values({
 			...data,
 			position,
@@ -335,7 +339,7 @@ export async function repositionTask(
 }
 
 export async function forkTaskList(taskListId: number, projectId: number) {
-	const { orgSlug } = await getOwner();
+	const { orgSlug, ownerId } = await getOwner();
 	const db = await database();
 
 	const taskListDetails = await db.query.taskList
@@ -347,8 +351,7 @@ export async function forkTaskList(taskListId: number, projectId: number) {
 		throw new Error("Task list not found");
 	}
 
-	await db
-		.update(taskList)
+	db.update(taskList)
 		.set({
 			status: "archived",
 			updatedAt: new Date(),
@@ -356,7 +359,7 @@ export async function forkTaskList(taskListId: number, projectId: number) {
 		.where(eq(taskList.id, +taskListId))
 		.run();
 
-	const newTaskList = await db
+	const newTaskList = db
 		.insert(taskList)
 		.values({
 			name: taskListDetails.name,
@@ -371,8 +374,7 @@ export async function forkTaskList(taskListId: number, projectId: number) {
 		.returning()
 		.get();
 
-	await db
-		.update(task)
+	db.update(task)
 		.set({
 			taskListId: newTaskList.id,
 			updatedAt: new Date(),
@@ -386,6 +388,8 @@ export async function forkTaskList(taskListId: number, projectId: number) {
 		message: `Forked task list ${taskListDetails.name}`,
 		projectId: +projectId,
 	});
+
+	await broadcastEvent("update_sidebar", ownerId);
 
 	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
 }

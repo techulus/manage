@@ -3,7 +3,7 @@
 import { logtoConfig } from "@/app/logto";
 import { notification, user } from "@/drizzle/schema";
 import { updateUser } from "@/lib/ops/auth";
-import { getStreamFor, getToken } from "@/lib/utils/cable-server";
+import { getStreamFor } from "@/lib/utils/cable-server";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { signOut } from "@logto/next/server-actions";
@@ -61,6 +61,11 @@ export async function getUserNotifications() {
 export async function getNotificationsStream() {
 	const { userId } = await getOwner();
 	return getStreamFor("notifications", userId);
+}
+
+export async function getSidebarStream() {
+	const { ownerId } = await getOwner();
+	return getStreamFor("update_sidebar", ownerId);
 }
 
 export async function logout() {

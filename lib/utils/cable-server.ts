@@ -7,7 +7,7 @@ const jwtTTL = "1h";
 const broadcastURL = process.env.ANYCABLE_BROADCAST_URL!;
 const broadcastKey = process.env.ANYCABLE_BROADCAST_KEY!;
 
-export type Event = "notifications";
+export type Event = "notifications" | "update_sidebar";
 
 export async function getToken(userId: string) {
 	if (!secret) {
@@ -19,22 +19,22 @@ export async function getToken(userId: string) {
 	return token;
 }
 
-export async function getStreamFor(room: Event, userId: string) {
+export async function getStreamFor(room: Event, actor: string) {
 	if (!secret) {
 		throw new Error("ANYCABLE_STREAMS_SECRET is not set");
 	}
 
 	const sign = signer(secret);
-	const signedStreamName = sign(`${room}/${userId}`);
+	const signedStreamName = sign(`${room}/${actor}`);
 
 	return signedStreamName;
 }
 
 export async function broadcastEvent(
 	room: Event,
-	userId: string,
-	message: Record<string, string | number>,
+	actor: string,
+	message: Record<string, string | number> | null = null,
 ) {
 	const broadcastTo = broadcaster(broadcastURL, broadcastKey);
-	await broadcastTo(`${room}/${userId}`, message);
+	await broadcastTo(`${room}/${actor}`, message);
 }
