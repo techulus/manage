@@ -56,8 +56,7 @@ export async function createTaskList(payload: FormData) {
 	});
 
 	const db = await database();
-	const newTaskList = await db
-		.insert(taskList)
+	db.insert(taskList)
 		.values({
 			...data,
 			projectId: +projectId,

@@ -46,7 +46,7 @@ type MainNavItem = {
 	}[];
 };
 
-export function NavMain({ userId }: { userId: string }) {
+export function NavMain() {
 	const { setOpenMobile } = useSidebar();
 	const { tenant, projectId } = useParams();
 	const pathname = usePathname();
@@ -165,7 +165,7 @@ export function NavMain({ userId }: { userId: string }) {
 	return (
 		<SidebarGroup>
 			<SidebarMenu>
-				<Notifications tenant={String(tenant)} userId={userId} />
+				<Notifications tenant={String(tenant)} />
 			</SidebarMenu>
 			<SidebarGroupLabel className="font-bold mt-4">Tools</SidebarGroupLabel>
 			<SidebarMenu>
