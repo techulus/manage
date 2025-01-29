@@ -10,36 +10,41 @@ import type { Channel } from "@anycable/web";
 import { Bell, Dot } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { SidebarMenuButton, SidebarMenuItem, useSidebar } from "../ui/sidebar";
 
 function Notifications({ tenant }: { tenant: string }) {
+	const [unreadCount, setUnreadCount] = useState<number>(0);
+
 	const cable = useCable();
 	const { setOpenMobile } = useSidebar();
 	const pathname = usePathname();
 
 	const isActive = pathname === `/${tenant}/notifications`;
 
+	const checkNotifications = useCallback(() => {
+		getUserNotifications().then((notifications) => {
+			setUnreadCount(notifications.filter((x) => !x.read).length);
+		});
+	}, []);
+
 	useEffect(() => {
 		if (!cable) return;
 
-		let channel: Channel | undefined;
+		checkNotifications();
 
+		let channel: Channel | undefined;
 		getNotificationsStream().then((stream) => {
 			channel = cable.streamFromSigned(stream);
 			channel.on("message", (_) => {
-				getUserNotifications().then((notifications) => {
-					setUnreadCount(notifications.filter((x) => !x.read).length);
-				});
+				checkNotifications();
 			});
 		});
 
 		return () => {
 			channel?.disconnect();
 		};
-	}, [cable]);
-
-	const [unreadCount, setUnreadCount] = useState<number>(0);
+	}, [cable, checkNotifications]);
 
 	return (
 		<SidebarMenuItem>
