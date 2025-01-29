@@ -1,6 +1,7 @@
 "use server";
 
-import { task, taskList } from "@/drizzle/schema";
+import { notificationType } from "@/data/notification";
+import { notification, task, taskList } from "@/drizzle/schema";
 import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { broadcastEvent } from "@/lib/utils/cable-server";
 import { database } from "@/lib/utils/useDatabase";
@@ -254,7 +255,7 @@ export async function updateTask(
 		| { assignedToUser: string | null }
 		| { dueDate: Date | null },
 ) {
-	const { orgSlug } = await getOwner();
+	const { orgSlug, userId } = await getOwner();
 	const db = await database();
 	const currentTask = await db.query.task
 		.findFirst({
@@ -262,7 +263,7 @@ export async function updateTask(
 		})
 		.execute();
 
-	const taskDetails = await db
+	const taskDetails = db
 		.update(task)
 		.set({
 			...data,
@@ -282,6 +283,20 @@ export async function updateTask(
 			)}`,
 			projectId: +projectId,
 		});
+
+	if ("assignedToUser" in data && data.assignedToUser) {
+		db.insert(notification)
+			.values({
+				type: notificationType.assign,
+				message: `You have been assigned to task ${taskDetails.name}`,
+				target: `/${orgSlug}/projects/${projectId}/tasklists/${taskDetails.taskListId}`,
+				fromUser: userId,
+				toUser: taskDetails.assignedToUser!,
+			})
+			.run();
+
+		await broadcastEvent("notifications", taskDetails.assignedToUser!);
+	}
 
 	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
 }

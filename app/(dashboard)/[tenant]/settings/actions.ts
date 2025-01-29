@@ -7,7 +7,7 @@ import { getStreamFor } from "@/lib/utils/cable-server";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { signOut } from "@logto/next/server-actions";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
@@ -49,10 +49,12 @@ export async function getUserNotifications() {
 
 	const db = await database();
 	const notifications = await db.query.notification.findMany({
-		where: eq(notification.userId, userId),
+		where: eq(notification.toUser, userId),
 		with: {
-			user: true,
+			toUser: true,
+			fromUser: true,
 		},
+		orderBy: desc(notification.createdAt),
 	});
 
 	return notifications;
