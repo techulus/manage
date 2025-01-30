@@ -5,7 +5,11 @@ import { toDateTimeString } from "@/lib/utils/date";
 import { getTimezone } from "@/lib/utils/useOwner";
 import { Dot } from "lucide-react";
 import Link from "next/link";
-import { getUserNotifications } from "../settings/actions";
+import {
+	getUserNotifications,
+	markAllNotificationsAsRead,
+} from "../settings/actions";
+import { Button } from "@/components/ui/button";
 
 export default async function Notifications() {
 	const notifications = await getUserNotifications();
@@ -13,7 +17,13 @@ export default async function Notifications() {
 
 	return (
 		<>
-			<PageTitle title="Notifications" />
+			<PageTitle title="Notifications">
+				<form action={markAllNotificationsAsRead}>
+					<Button type="submit" variant="outline" size="sm">
+						Mark all as read
+					</Button>
+				</form>
+			</PageTitle>
 
 			<PageSection topInset>
 				{!notifications.length ? (

@@ -3,7 +3,7 @@
 import { logtoConfig } from "@/app/logto";
 import { notification, user } from "@/drizzle/schema";
 import { updateUser } from "@/lib/ops/auth";
-import { getStreamFor } from "@/lib/utils/cable-server";
+import { broadcastEvent, getStreamFor } from "@/lib/utils/cable-server";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { signOut } from "@logto/next/server-actions";
@@ -58,6 +58,19 @@ export async function getUserNotifications() {
 	});
 
 	return notifications;
+}
+
+export async function markAllNotificationsAsRead() {
+	const { orgSlug, userId } = await getOwner();
+
+	const db = await database();
+	db.update(notification)
+		.set({ read: true })
+		.where(eq(notification.toUser, userId))
+		.run();
+
+	await broadcastEvent("notifications", userId);
+	revalidatePath(`/${orgSlug}/notifications`);
 }
 
 export async function getNotificationsStream() {

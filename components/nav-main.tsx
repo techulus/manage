@@ -192,7 +192,9 @@ export function NavMain() {
 			<SidebarMenu>
 				<Notifications tenant={String(tenant)} />
 			</SidebarMenu>
-			<SidebarGroupLabel className="font-bold mt-4">Tools</SidebarGroupLabel>
+			<SidebarGroupLabel className="font-bold mt-4 uppercase">
+				Tools
+			</SidebarGroupLabel>
 			<SidebarMenu>
 				{navItems.map((navItem) =>
 					navItem.items?.length ? (
