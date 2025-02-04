@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 
 export async function addUserToTenantDb() {
 	const db = await database();
-	const session = await auth.api.getSession({
+	const session = await auth().api.getSession({
 		headers: await headers(),
 	});
 

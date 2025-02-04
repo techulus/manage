@@ -1,7 +1,6 @@
 "use server";
 
 import { notification, user } from "@/drizzle/schema";
-import { auth } from "@/lib/auth";
 import { broadcastEvent, getStreamFor } from "@/lib/utils/cable-server";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";

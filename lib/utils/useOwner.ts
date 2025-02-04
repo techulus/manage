@@ -13,7 +13,7 @@ type Result = {
 };
 
 export async function getUser(): Promise<User> {
-	const session = await auth.api.getSession({
+	const session = await auth().api.getSession({
 		headers: await headers(),
 	});
 	if (!session) {
@@ -33,7 +33,7 @@ export async function getUser(): Promise<User> {
 }
 
 export async function getOwner(): Promise<Result> {
-	const session = await auth.api.getSession({
+	const session = await auth().api.getSession({
 		headers: await headers(),
 	});
 	if (!session) {

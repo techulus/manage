@@ -25,7 +25,6 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN mkdir /app/sqlite
 RUN corepack enable && corepack prepare pnpm@9.15.4 --activate && pnpm run build
 
 # Stage 3: Production server
