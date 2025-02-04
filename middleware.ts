@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
 	const session = await fetch(
-		`${request.nextUrl.origin}/api/auth/get-session`,
+		`${process.env.BETTER_AUTH_URL!}/api/auth/get-session`,
 		{
 			headers: {
 				cookie: request.headers.get("cookie") || "",
