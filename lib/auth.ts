@@ -4,6 +4,7 @@ import { nextCookies } from "better-auth/next-js";
 import Database from "better-sqlite3";
 import { Resend } from "resend";
 import { MagicLinkEmail } from "@/components/emails/magic-link";
+import { passkey } from "better-auth/plugins/passkey";
 
 export const auth = () =>
 	betterAuth({
@@ -22,6 +23,7 @@ export const auth = () =>
 					console.log("Email Result ->", error ?? data);
 				},
 			}),
+			passkey(),
 			organization(),
 			nextCookies(),
 		],
