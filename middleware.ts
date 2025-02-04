@@ -13,6 +13,10 @@ const publicAppPaths = [
 export async function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
+	console.log(
+		"fetch session",
+		`${process.env.BETTER_AUTH_URL!}/api/auth/get-session`,
+	);
 	const session = await fetch(
 		`${process.env.BETTER_AUTH_URL!}/api/auth/get-session`,
 		{
