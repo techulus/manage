@@ -1,30 +1,17 @@
-import { logtoConfig } from "@/app/logto";
-import { EditableValue } from "@/components/core/editable-text";
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { blob } from "@/drizzle/schema";
 import { bytesToMegabytes } from "@/lib/blobStore";
-import type { UserCustomData } from "@/lib/ops/auth";
 import { database } from "@/lib/utils/useDatabase";
-import { getTimezone } from "@/lib/utils/useOwner";
-import { getLogtoContext } from "@logto/next/server-actions";
+import { getTimezone, getUser } from "@/lib/utils/useOwner";
 import { sql } from "drizzle-orm";
 import { HardDrive, User2 } from "lucide-react";
-import { notFound } from "next/navigation";
-import { updateUserData } from "./actions";
 
 export default async function Settings() {
-	const { claims, userInfo } = await getLogtoContext(logtoConfig, {
-		fetchUserInfo: true,
-	});
-
-	if (!claims?.sub) {
-		return notFound();
-	}
-
 	const db = await database();
 
-	const [storage, timezone] = await Promise.all([
+	const [user, storage, timezone] = await Promise.all([
+		getUser(),
 		db
 			.select({
 				count: sql<number>`count(*)`,
@@ -34,8 +21,6 @@ export default async function Settings() {
 			.get(),
 		getTimezone(),
 	]);
-
-	const isDemoUser = claims.username === "demo";
 
 	return (
 		<>
@@ -61,41 +46,27 @@ export default async function Settings() {
 				</div>
 			</PageSection>
 
-			{userInfo ? (
+			{user ? (
 				<PageSection>
 					<h2 className="flex items-center text-xl font-semibold leading-7 text-gray-900 dark:text-gray-200 p-4">
 						<User2 className="mr-2 inline-block h-6 w-6" />
-						Profile ({userInfo.username})
+						Profile ({user.email})
 					</h2>
 
 					<div className="p-4 sm:flex items-center">
 						<p className="font-semibold text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
 							Name
 						</p>
-						{!isDemoUser ? (
-							<EditableValue
-								id={claims.sub}
-								name="name"
-								type="text"
-								value={userInfo.name ?? "-"}
-								action={updateUserData}
-							/>
-						) : null}
+						<p>
+							{user.firstName} {user.lastName}
+						</p>
 					</div>
 
 					<div className="p-4 sm:flex items-center">
 						<p className="font-semibold text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
 							Email address
 						</p>
-						{!isDemoUser ? (
-							<EditableValue
-								id={claims.sub}
-								name="primaryEmail"
-								type="text"
-								value={userInfo.email ?? "-"}
-								action={updateUserData}
-							/>
-						) : null}
+						<p>{user.email}</p>
 					</div>
 
 					{timezone ? (

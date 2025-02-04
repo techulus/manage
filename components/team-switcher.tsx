@@ -1,8 +1,5 @@
 "use client";
 
-import { ChevronsUpDown, Plus } from "lucide-react";
-import * as React from "react";
-
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -18,43 +15,19 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "@/components/ui/sidebar";
-import type { Organization } from "@/lib/ops/auth";
-import { getUserOrganizations } from "@/lib/utils/useUser";
-import { useParams } from "next/navigation";
-import { Skeleton } from "./ui/skeleton";
+import { authClient } from "@/lib/auth-client";
+import { ChevronsUpDown, Plus } from "lucide-react";
+import * as React from "react";
 
 export function WorkspaceSwitcher() {
 	const { isMobile } = useSidebar();
-	const { tenant: activeOrgId } = useParams();
-	const [orgs, setOrgs] = React.useState<Organization[]>([]);
-	const [loading, setLoading] = React.useState(false);
-
-	const activeOrg = React.useMemo(
-		() => orgs.find((org) => org.id === activeOrgId),
-		[orgs, activeOrgId],
-	);
-
-	const fetchOrgs = React.useCallback(async () => {
-		setLoading(true);
-		await getUserOrganizations()
-			.then((data) => {
-				setOrgs(data);
-			})
-			.finally(() => {
-				setLoading(false);
-			});
-	}, []);
+	const { data: organizations } = authClient.useListOrganizations();
+	const { data: activeOrganization } = authClient.useActiveOrganization();
 
 	return (
 		<SidebarMenu>
 			<SidebarMenuItem>
-				<DropdownMenu
-					onOpenChange={(open) => {
-						if (open) {
-							fetchOrgs();
-						}
-					}}
-				>
+				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<SidebarMenuButton
 							size="lg"
@@ -62,7 +35,7 @@ export function WorkspaceSwitcher() {
 						>
 							<div className="grid flex-1 text-left text-sm leading-tight">
 								<span className="truncate font-semibold">
-									{activeOrg?.name ?? "Personal"}
+									{activeOrganization?.name ?? "Personal"}
 								</span>
 								<span className="truncate text-xs">Hobby</span>
 							</div>
@@ -78,30 +51,24 @@ export function WorkspaceSwitcher() {
 						<DropdownMenuLabel className="text-xs text-muted-foreground">
 							Workspaces
 						</DropdownMenuLabel>
-						<DropdownMenuItem
-							// onClick={() => setActiveTeam(team)}
-							className="gap-2 p-2"
-						>
+						<DropdownMenuItem onClick={() => {}} className="gap-2 p-2">
 							Personal
 							<DropdownMenuShortcut>⌘1</DropdownMenuShortcut>
 						</DropdownMenuItem>
-						{loading ? (
-							<div className="space-y-3 pl-1.5">
-								<Skeleton className="h-5 w-full" />
-								<Skeleton className="h-5 w-full" />
-							</div>
-						) : (
-							orgs.map((org, index) => (
-								<DropdownMenuItem
-									key={org.id}
-									// onClick={() => setActiveTeam(team)}
-									className="gap-2 p-2"
-								>
-									{org.name}
-									<DropdownMenuShortcut>⌘{index + 2}</DropdownMenuShortcut>
-								</DropdownMenuItem>
-							))
-						)}
+						{(organizations ?? []).map((org, index) => (
+							<DropdownMenuItem
+								key={org.id}
+								onClick={() => {
+									authClient.organization.setActive({
+										organizationId: org.id,
+									});
+								}}
+								className="gap-2 p-2"
+							>
+								{org.name}
+								<DropdownMenuShortcut>⌘{index + 2}</DropdownMenuShortcut>
+							</DropdownMenuItem>
+						))}
 						<DropdownMenuSeparator />
 						<DropdownMenuItem className="gap-2 p-2">
 							<div className="flex size-6 items-center justify-center rounded-md border bg-background">

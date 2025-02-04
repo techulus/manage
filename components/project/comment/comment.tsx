@@ -4,7 +4,6 @@ import { addComment } from "@/app/(dashboard)/[tenant]/projects/actions";
 import { UserAvatar } from "@/components/core/user-avatar";
 import MarkdownEditor from "@/components/editor";
 import { ActionButton } from "@/components/form/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { User } from "@/drizzle/types";
 import { usePathname } from "next/navigation";
 

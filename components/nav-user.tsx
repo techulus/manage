@@ -1,6 +1,5 @@
 "use client";
 
-import { logout } from "@/app/(dashboard)/[tenant]/settings/actions";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -18,8 +17,9 @@ import {
 } from "@/components/ui/sidebar";
 import { ChevronsUpDown, HelpCircle, LogOut, Settings } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { UserAvatar } from "./core/user-avatar";
+import { signOut } from "@/lib/auth-client";
 
 export function NavUser({
 	user,
@@ -32,6 +32,7 @@ export function NavUser({
 }) {
 	const { isMobile, setOpenMobile } = useSidebar();
 	const { tenant: orgSlug } = useParams();
+	const router = useRouter();
 
 	return (
 		<SidebarMenu className="pb-8 md:pb-0">
@@ -95,10 +96,16 @@ export function NavUser({
 							onClick={() => setOpenMobile(false)}
 							className="w-full"
 						>
-							<form action={logout} className="w-full flex items-center gap-2">
-								<LogOut />
-								<button type="submit">Sign Out</button>
-							</form>
+							<LogOut />
+							<button
+								type="button"
+								onClick={() => {
+									signOut();
+									router.replace("/sign-in");
+								}}
+							>
+								Sign Out
+							</button>
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

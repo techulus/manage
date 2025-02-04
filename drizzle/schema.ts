@@ -23,6 +23,7 @@ export const user = sqliteTable("User", {
 	firstName: text("firstName"),
 	lastName: text("lastName"),
 	imageUrl: text("imageUrl"),
+	timeZone: text("timeZone"),
 	rawData: dbJson("rawData").notNull(),
 	createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
 	updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),

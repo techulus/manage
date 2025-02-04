@@ -1,9 +1,11 @@
-import { getLogtoContext } from "@logto/next/server-actions";
 import { type NextRequest, NextResponse } from "next/server";
-import { logtoConfig } from "./app/logto";
+import type { auth } from "./lib/auth";
+
+type Session = typeof auth.$Infer.Session;
 
 const publicAppPaths = [
 	"/sign-in",
+	"/sign-up",
 	"/terms",
 	"/webhooks",
 	"/api/auth",
@@ -11,12 +13,20 @@ const publicAppPaths = [
 	"/callback",
 ];
 
-export async function middleware(req: NextRequest) {
-	const { pathname } = req.nextUrl;
+export async function middleware(request: NextRequest) {
+	const { pathname } = request.nextUrl;
 
-	const { isAuthenticated } = await getLogtoContext(logtoConfig);
-	if (isAuthenticated && pathname === "/sign-in") {
-		return NextResponse.redirect(new URL("/start", req.nextUrl.href));
+	const session: Session = await fetch(
+		`${request.nextUrl.origin}/api/auth/get-session`,
+		{
+			headers: {
+				cookie: request.headers.get("cookie") || "",
+			},
+		},
+	).then((res) => res.json());
+
+	if (session && (pathname === "/sign-in" || pathname === "/sign-up")) {
+		return NextResponse.redirect(new URL("/start", request.nextUrl.href));
 	}
 
 	const isPublicAppPath = publicAppPaths.some((path) =>
@@ -26,11 +36,11 @@ export async function middleware(req: NextRequest) {
 		return NextResponse.next();
 	}
 
-	if (!isAuthenticated) {
+	if (!session) {
 		return NextResponse.redirect(
 			new URL(
-				`/sign-in?redirectTo=${encodeURIComponent(req.nextUrl.href)}`,
-				req.url,
+				`/sign-in?redirectTo=${encodeURIComponent(request.nextUrl.href)}`,
+				request.url,
 			),
 		);
 	}

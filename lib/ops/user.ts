@@ -1,24 +1,37 @@
-import { logtoConfig } from "@/app/logto";
 import { user } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
-import { getLogtoContext } from "@logto/next/server-actions";
+import { auth } from "../auth";
+import { headers } from "next/headers";
 
 export async function addUserToTenantDb() {
-	const { claims } = await getLogtoContext(logtoConfig);
-	if (!claims?.sub) {
-		throw new Error("User not found");
-	}
-	const id = claims.sub;
-
 	const db = await database();
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	});
+
+	if (!session) {
+		throw new Error("No session found");
+	}
+
 	db.insert(user)
 		.values({
-			id,
-			email: "",
-			rawData: "",
+			id: session.user.id,
+			email: session.user.email,
+			firstName: session.user.name.split(" ")[0],
+			lastName: session.user.name.split(" ")[1],
+			rawData: session.user,
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		})
-		.onConflictDoNothing()
+		.onConflictDoUpdate({
+			target: user.id,
+			set: {
+				email: session.user.email,
+				firstName: session.user.name.split(" ")[0],
+				lastName: session.user.name.split(" ")[1],
+				rawData: session.user,
+				updatedAt: new Date(),
+			},
+		})
 		.run();
 }
