@@ -4,9 +4,6 @@ set -e
 
 echo "Starting checks..."
 
-echo "Fix permissions..."
-chmod -R 777 /app/sqlite
-
 echo "Running auth database migrations..."
 for file in /app/better-auth_migrations/*.sql; do
     sqlite3 sqlite/auth.db < "$file"
