@@ -1,3 +1,4 @@
+import { getSessionCookie } from "better-auth";
 import { type NextRequest, NextResponse } from "next/server";
 
 const publicAppPaths = [
@@ -13,14 +14,7 @@ const publicAppPaths = [
 export async function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
-	const session = await fetch(
-		`${process.env.BETTER_AUTH_URL!}/api/auth/get-session`,
-		{
-			headers: {
-				cookie: request.headers.get("cookie") || "",
-			},
-		},
-	).then((res) => res.json());
+	const session = getSessionCookie(request);
 
 	if (session && (pathname === "/sign-in" || pathname === "/sign-up")) {
 		return NextResponse.redirect(new URL("/start", request.nextUrl.href));
