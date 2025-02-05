@@ -34,15 +34,6 @@ export default async function Home() {
 						</p>
 						<div className="mt-10 flex flex-col items-center justify-center gap-y-6 md:flex-row md:gap-x-6 md:gap-y-0">
 							<Link
-								target="_blank"
-								href="/sign-in?demo=true"
-								prefetch={false}
-								className={buttonVariants({ variant: "outline" })}
-							>
-								Live Demo
-							</Link>
-
-							<Link
 								href="https://github.com/techulus/manage"
 								target="_blank"
 								rel="noreferrer"

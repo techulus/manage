@@ -71,6 +71,7 @@ export default function SignInForm() {
 							disabled={loading}
 							onClick={async () => {
 								try {
+									if (!email) return;
 									setLoading(true);
 									await signIn.magicLink({ email, callbackURL: "/start" });
 									setHasSendEmail(true);

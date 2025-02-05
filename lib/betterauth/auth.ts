@@ -23,7 +23,10 @@ export const auth = () =>
 					console.log("Email Result ->", error ?? data);
 				},
 			}),
-			passkey(),
+			passkey({
+				rpID: "managee.xyz",
+				rpName: "Manage",
+			}),
 			organization(),
 			nextCookies(),
 		],
