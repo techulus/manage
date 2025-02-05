@@ -10,7 +10,6 @@ Manage is an open-source project management app inspired by Basecamp. With its i
 
 ## V1 Roadmap
 
-- [x] Users / teams management (Currently using LogTo)
 - [x] Basic Project management
 - [x] Task lists and tasks
 - [x] Documents - Creating and sharing markdown documents
@@ -19,8 +18,9 @@ Manage is an open-source project management app inspired by Basecamp. With its i
 - [x] Events / Calendar
 - [x] Activity logs
 - [ ] Notifications
-- [ ] Discussions / Forums
+- [ ] Users / teams management
 - [ ] Search
+- [ ] Admin panel
 - [ ] Permissions
 
 ## Development
@@ -28,20 +28,31 @@ Manage is an open-source project management app inspired by Basecamp. With its i
 ### Environment
 
 ```
-# Logto for Auth
-LOGTO_ENDPOINT=
-LOGTO_APP_ID=""
-LOGTO_APP_SECRET=""
-LOGTO_BASE_URL=""
-LOGTO_COOKIE_SECRET=""
-LOGTO_M2M_APP_ID=""
-LOGTO_M2M_APP_SECRET=""
+# Auth
+BETTER_AUTH_SECRET=
+BETTER_AUTH_URL=
+NEXT_PUBLIC_APP_URL=
 
 # Any S3 compatible storage
-S3_BUCKET_ENDPOINT="
+S3_ENDPOINT="
 S3_ACCESS_KEY_ID=""
 S3_SECRET_ACCESS_KEY=""
 S3_BUCKET_NAME=""
+
+# AnyCable for Websockets
+NEXT_PUBLIC_ANYCABLE_WEBSOCKET_URL=
+ANYCABLE_BROADCAST_URL=
+ANYCABLE_BROADCAST_KEY=
+ANYCABLE_SECRET=
+
+# Email
+RESEND_API_KEY=
+```
+
+### Generate BetterAuth Migrations
+
+```bash
+pnpx @better-auth/cli generate --config ./lib/betterauth/config.ts
 ```
 
 ### Run using Docker

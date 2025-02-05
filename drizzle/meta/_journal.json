@@ -64,6 +64,20 @@
       "when": 1736973604947,
       "tag": "0008_optimal_obadiah_stane",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1738101362408,
+      "tag": "0009_majestic_nightmare",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1738638510276,
+      "tag": "0010_dark_wolfpack",
+      "breakpoints": true
     }
   ]
 }

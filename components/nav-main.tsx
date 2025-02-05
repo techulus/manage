@@ -1,15 +1,6 @@
 "use client";
 
-import {
-	CalendarCheck,
-	ChevronRight,
-	File,
-	GaugeIcon,
-	ListChecksIcon,
-	type LucideIcon,
-	SettingsIcon,
-} from "lucide-react";
-
+import { getSidebarStream } from "@/app/(dashboard)/[tenant]/settings/actions";
 import {
 	Collapsible,
 	CollapsibleContent,
@@ -28,11 +19,23 @@ import {
 } from "@/components/ui/sidebar";
 import type { ProjectWithData } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
+import { useCable } from "@/lib/utils/cable-client";
 import { getProjectById } from "@/lib/utils/useProjects";
-import { CalendarHeartIcon } from "lucide-react";
+import type { Channel } from "@anycable/web";
+import {
+	CalendarCheck,
+	CalendarHeartIcon,
+	ChevronRight,
+	File,
+	GaugeIcon,
+	ListChecksIcon,
+	type LucideIcon,
+	SettingsIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Notifications } from "./core/notifications";
 
 type MainNavItem = {
 	title: string;
@@ -48,23 +51,45 @@ type MainNavItem = {
 
 export function NavMain() {
 	const { setOpenMobile } = useSidebar();
+	const cable = useCable();
 	const { tenant, projectId } = useParams();
 	const pathname = usePathname();
 
 	const [projectData, setProjectData] = useState<ProjectWithData | null>(null);
 
+	const updateProjectData = useCallback(() => {
+		getProjectById(String(projectId), true)
+			.then((data) => {
+				setProjectData(data);
+			})
+			.catch((error) => {
+				setProjectData(null);
+				console.error(error);
+			});
+	}, [projectId]);
+
 	useEffect(() => {
 		if (projectId) {
-			getProjectById(String(projectId), true)
-				.then((data) => {
-					setProjectData(data);
-				})
-				.catch((error) => {
-					setProjectData(null);
-					console.error(error);
-				});
+			updateProjectData();
 		}
-	}, [projectId]);
+	}, [updateProjectData, projectId]);
+
+	useEffect(() => {
+		if (!cable) return;
+
+		let channel: Channel | undefined;
+
+		getSidebarStream().then((stream) => {
+			channel = cable.streamFromSigned(stream);
+			channel.on("message", (_) => {
+				updateProjectData();
+			});
+		});
+
+		return () => {
+			channel?.disconnect();
+		};
+	}, [cable, updateProjectData]);
 
 	const navItems: MainNavItem[] = useMemo(() => {
 		const items: MainNavItem[] = [
@@ -164,7 +189,12 @@ export function NavMain() {
 
 	return (
 		<SidebarGroup>
-			<SidebarGroupLabel className="font-bold">Tools</SidebarGroupLabel>
+			<SidebarMenu>
+				<Notifications tenant={String(tenant)} />
+			</SidebarMenu>
+			<SidebarGroupLabel className="font-bold mt-4 uppercase">
+				Tools
+			</SidebarGroupLabel>
 			<SidebarMenu>
 				{navItems.map((navItem) =>
 					navItem.items?.length ? (

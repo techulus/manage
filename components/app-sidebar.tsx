@@ -3,7 +3,7 @@
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/nav-user";
-import { WorkspaceSwitcher } from "@/components/team-switcher";
+import { WorkspaceSwitcher } from "@/components/workspace-switcher";
 import {
 	Sidebar,
 	SidebarContent,
@@ -14,6 +14,7 @@ import {
 import type * as React from "react";
 
 export function AppSidebar({
+	user,
 	...props
 }: React.ComponentProps<typeof Sidebar> & {
 	user: {
@@ -32,7 +33,7 @@ export function AppSidebar({
 				<NavProjects />
 			</SidebarContent>
 			<SidebarFooter>
-				<NavUser user={props.user} />
+				<NavUser user={user} />
 			</SidebarFooter>
 			<SidebarRail />
 		</Sidebar>

@@ -1,6 +1,5 @@
 "use client";
 
-import { logout } from "@/app/(dashboard)/[tenant]/settings/actions";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -16,9 +15,10 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "@/components/ui/sidebar";
+import { signOut } from "@/lib/betterauth/auth-client";
 import { ChevronsUpDown, HelpCircle, LogOut, Settings } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { UserAvatar } from "./core/user-avatar";
 
 export function NavUser({
@@ -32,9 +32,10 @@ export function NavUser({
 }) {
 	const { isMobile, setOpenMobile } = useSidebar();
 	const { tenant: orgSlug } = useParams();
+	const router = useRouter();
 
 	return (
-		<SidebarMenu className="pb-6 md:pb-0">
+		<SidebarMenu className="pb-8 md:pb-0">
 			<SidebarMenuItem>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
@@ -95,10 +96,16 @@ export function NavUser({
 							onClick={() => setOpenMobile(false)}
 							className="w-full"
 						>
-							<form action={logout} className="w-full flex items-center gap-2">
-								<LogOut />
-								<button type="submit">Sign Out</button>
-							</form>
+							<LogOut />
+							<button
+								type="button"
+								onClick={() => {
+									signOut();
+									router.replace("/sign-in");
+								}}
+							>
+								Sign Out
+							</button>
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

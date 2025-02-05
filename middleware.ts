@@ -1,9 +1,9 @@
-import { getLogtoContext } from "@logto/next/server-actions";
+import { getSessionCookie } from "better-auth";
 import { type NextRequest, NextResponse } from "next/server";
-import { logtoConfig } from "./app/logto";
 
 const publicAppPaths = [
 	"/sign-in",
+	"/sign-up",
 	"/terms",
 	"/webhooks",
 	"/api/auth",
@@ -11,12 +11,13 @@ const publicAppPaths = [
 	"/callback",
 ];
 
-export async function middleware(req: NextRequest) {
-	const { pathname } = req.nextUrl;
+export async function middleware(request: NextRequest) {
+	const { pathname } = request.nextUrl;
 
-	const { isAuthenticated } = await getLogtoContext(logtoConfig);
-	if (isAuthenticated && pathname === "/sign-in") {
-		return NextResponse.redirect(new URL("/start", req.nextUrl.href));
+	const session = getSessionCookie(request);
+
+	if (session && (pathname === "/sign-in" || pathname === "/sign-up")) {
+		return NextResponse.redirect(new URL("/start", request.nextUrl.href));
 	}
 
 	const isPublicAppPath = publicAppPaths.some((path) =>
@@ -26,11 +27,11 @@ export async function middleware(req: NextRequest) {
 		return NextResponse.next();
 	}
 
-	if (!isAuthenticated) {
+	if (!session) {
 		return NextResponse.redirect(
 			new URL(
-				`/sign-in?redirectTo=${encodeURIComponent(req.nextUrl.href)}`,
-				req.url,
+				`/sign-in?redirectTo=${encodeURIComponent(request.nextUrl.href)}`,
+				request.url,
 			),
 		);
 	}

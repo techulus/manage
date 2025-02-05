@@ -2,6 +2,7 @@
 
 import { activity, comment, project } from "@/drizzle/schema";
 import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
+import { broadcastEvent } from "@/lib/utils/cable-server";
 import { database } from "@/lib/utils/useDatabase";
 import { convertMarkdownToPlainText } from "@/lib/utils/useMarkdown";
 import { getOwner } from "@/lib/utils/useOwner";
@@ -26,7 +27,7 @@ const projectSchema = z.object({
 });
 
 export async function createProject(payload: FormData) {
-	const { userId, orgSlug } = await getOwner();
+	const { userId, orgSlug, ownerId } = await getOwner();
 	const name = payload.get("name") as string;
 	const description = payload.get("description") as string;
 	const dueDate = payload.get("dueDate") as string;
@@ -57,12 +58,14 @@ export async function createProject(payload: FormData) {
 		projectId: newProject.id,
 	});
 
+	await broadcastEvent("update_sidebar", ownerId);
+
 	revalidatePath(`/${orgSlug}/projects`);
 	redirect(`/${orgSlug}/projects`);
 }
 
 export async function updateProject(payload: FormData) {
-	const { orgSlug } = await getOwner();
+	const { orgSlug, ownerId } = await getOwner();
 	const id = Number(payload.get("id"));
 	const name = payload.get("name") as string;
 	const description = payload.get("description") as string;
@@ -82,8 +85,7 @@ export async function updateProject(payload: FormData) {
 		})
 		.execute();
 
-	await db
-		.update(project)
+	db.update(project)
 		.set({
 			...data,
 			updatedAt: new Date(),
@@ -91,7 +93,7 @@ export async function updateProject(payload: FormData) {
 		.where(eq(project.id, id))
 		.run();
 
-	if (currentProject)
+	if (currentProject) {
 		await logActivity({
 			action: "updated",
 			type: "project",
@@ -101,17 +103,20 @@ export async function updateProject(payload: FormData) {
 			)}`,
 			projectId: +id,
 		});
+	}
+
+	await broadcastEvent("update_sidebar", ownerId);
 
 	revalidatePath(`/${orgSlug}/projects/${id}`);
 	redirect(`/${orgSlug}/projects/${id}`);
 }
 
 export async function archiveProject(payload: FormData) {
-	const { orgSlug } = await getOwner();
+	const { orgSlug, ownerId } = await getOwner();
 	const id = Number(payload.get("id"));
 
 	const db = await database();
-	const projectDetails = await db
+	const projectDetails = db
 		.update(project)
 		.set({
 			status: "archived",
@@ -128,16 +133,18 @@ export async function archiveProject(payload: FormData) {
 		projectId: id,
 	});
 
+	await broadcastEvent("update_sidebar", ownerId);
+
 	revalidatePath(`/${orgSlug}/projects`);
 	redirect(`/${orgSlug}/projects`);
 }
 
 export async function unarchiveProject(payload: FormData) {
-	const { orgSlug } = await getOwner();
+	const { orgSlug, ownerId } = await getOwner();
 	const id = Number(payload.get("id"));
 
 	const db = await database();
-	const projectDetails = await db
+	const projectDetails = db
 		.update(project)
 		.set({
 			status: "active",
@@ -154,13 +161,15 @@ export async function unarchiveProject(payload: FormData) {
 		projectId: id,
 	});
 
+	await broadcastEvent("update_sidebar", ownerId);
+
 	revalidatePath(`/${orgSlug}/projects`);
 	revalidatePath(`/${orgSlug}/projects/${id}`);
 	redirect(`/${orgSlug}/projects/${id}`);
 }
 
 export async function deleteProject(payload: FormData) {
-	const { orgSlug } = await getOwner();
+	const { orgSlug, ownerId } = await getOwner();
 	const db = await database();
 	const id = Number(payload.get("id"));
 
@@ -171,6 +180,8 @@ export async function deleteProject(payload: FormData) {
 			.where(and(eq(comment.parentId, id), eq(comment.type, "project")))
 			.run(),
 	]);
+
+	await broadcastEvent("update_sidebar", ownerId);
 
 	revalidatePath(`/${orgSlug}/projects`);
 	redirect(`/${orgSlug}/projects`);
@@ -209,7 +220,7 @@ export async function deleteComment(payload: FormData) {
 	const projectId = Number(payload.get("projectId"));
 
 	const db = await database();
-	await db.delete(comment).where(eq(comment.id, id)).run();
+	db.delete(comment).where(eq(comment.id, id)).run();
 
 	await logActivity({
 		action: "deleted",

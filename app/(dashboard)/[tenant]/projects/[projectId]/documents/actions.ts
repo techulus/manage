@@ -3,6 +3,7 @@
 import { blob, comment, document, documentFolder } from "@/drizzle/schema";
 import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { deleteFile } from "@/lib/blobStore";
+import { broadcastEvent } from "@/lib/utils/cable-server";
 import { database } from "@/lib/utils/useDatabase";
 import { deleteFilesInMarkdown } from "@/lib/utils/useMarkdown";
 import { getOwner } from "@/lib/utils/useOwner";
@@ -124,7 +125,7 @@ export async function updateDocument(payload: FormData) {
 }
 
 export async function createDocumentFolder(payload: FormData) {
-	const { userId, orgSlug } = await getOwner();
+	const { userId, orgSlug, ownerId } = await getOwner();
 	const name = payload.get("name") as string;
 	const description = payload.get("description") as string;
 	const projectId = payload.get("projectId") as string;
@@ -135,8 +136,7 @@ export async function createDocumentFolder(payload: FormData) {
 	});
 
 	const db = await database();
-	await db
-		.insert(documentFolder)
+	db.insert(documentFolder)
 		.values({
 			...data,
 			projectId: +projectId,
@@ -153,13 +153,15 @@ export async function createDocumentFolder(payload: FormData) {
 		projectId: +projectId,
 	});
 
+	await broadcastEvent("update_sidebar", ownerId);
+
 	revalidatePath(`/${orgSlug}/projects/${projectId}`);
 	revalidatePath(`/${orgSlug}/projects/${projectId}/documents`);
 	redirect(`/${orgSlug}/projects/${projectId}/documents`);
 }
 
 export async function updateDocumentFolder(payload: FormData) {
-	const { orgSlug } = await getOwner();
+	const { orgSlug, ownerId } = await getOwner();
 	const name = payload.get("name") as string;
 	const description = payload.get("description") as string;
 	const id = payload.get("id") as string;
@@ -175,7 +177,7 @@ export async function updateDocumentFolder(payload: FormData) {
 		.findFirst({ where: eq(documentFolder.id, +id) })
 		.execute();
 
-	const folderDetails = await db
+	const folderDetails = db
 		.update(documentFolder)
 		.set({
 			...data,
@@ -195,13 +197,15 @@ export async function updateDocumentFolder(payload: FormData) {
 			projectId: +projectId,
 		});
 
+	await broadcastEvent("update_sidebar", ownerId);
+
 	revalidatePath(`/${orgSlug}/projects/${projectId}`);
 	revalidatePath(`/${orgSlug}/projects/${projectId}/documents/folders/${id}`);
 	redirect(`/${orgSlug}/projects/${projectId}/documents/folders/${id}`);
 }
 
 export async function deleteDocumentFolder(payload: FormData) {
-	const { orgSlug } = await getOwner();
+	const { orgSlug, ownerId } = await getOwner();
 	const id = payload.get("id") as string;
 	const projectId = payload.get("projectId") as string;
 	const currentPath = payload.get("currentPath") as string;
@@ -225,6 +229,8 @@ export async function deleteDocumentFolder(payload: FormData) {
 		message: `Deleted document folder ${folderDetails?.name}`,
 		projectId: +projectId,
 	});
+
+	await broadcastEvent("update_sidebar", ownerId);
 
 	revalidatePath(currentPath);
 	redirect(`/${orgSlug}/projects/${projectId}/documents`);
@@ -295,7 +301,7 @@ export async function deleteBlob(
 	await deleteFile(file.key);
 
 	const db = await database();
-	const blobDetails = await db
+	const blobDetails = db
 		.delete(blob)
 		.where(eq(blob.id, file.id))
 		.returning()

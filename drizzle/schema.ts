@@ -23,6 +23,7 @@ export const user = sqliteTable("User", {
 	firstName: text("firstName"),
 	lastName: text("lastName"),
 	imageUrl: text("imageUrl"),
+	timeZone: text("timeZone"),
 	rawData: dbJson("rawData").notNull(),
 	createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
 	updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
@@ -241,10 +242,16 @@ export const notification = sqliteTable("Notification", {
 	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
 	type: text("type"),
 	message: text("message").notNull(),
-	target: text("target").notNull(),
+	target: text("target"),
 	read: integer("read", { mode: "boolean" }).notNull().default(false),
-	createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-	userId: text("userId")
+	createdAt: integer("createdAt", { mode: "timestamp" })
+		.notNull()
+		.default(sql`(unixepoch())`),
+	fromUser: text("fromUser").references(() => user.id, {
+		onDelete: "cascade",
+		onUpdate: "cascade",
+	}),
+	toUser: text("toUser")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
 });
@@ -342,8 +349,12 @@ export const activityRelations = relations(activity, ({ one }) => ({
 }));
 
 export const notificationRelations = relations(notification, ({ one }) => ({
-	user: one(user, {
-		fields: [notification.userId],
+	fromUser: one(user, {
+		fields: [notification.fromUser],
+		references: [user.id],
+	}),
+	toUser: one(user, {
+		fields: [notification.toUser],
 		references: [user.id],
 	}),
 }));
