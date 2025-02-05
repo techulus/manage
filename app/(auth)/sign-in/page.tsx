@@ -4,16 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signIn } from "@/lib/auth-client";
-import { useState } from "react";
+import { signIn } from "@/lib/betterauth/auth-client";
+import { FingerprintIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import logo from "../../../public/images/logo.png";
 
 export default function SignInForm() {
 	const [email, setEmail] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [hasSendEmail, setHasSendEmail] = useState(false);
+
+	const router = useRouter();
 
 	return (
 		<div className="m-6 flex h-full items-center justify-center">
@@ -80,6 +84,21 @@ export default function SignInForm() {
 							Sign-in with Magic Link
 						</Button>
 					)}
+
+					<Button
+						variant="secondary"
+						className="gap-2"
+						disabled={loading}
+						onClick={async () => {
+							setLoading(true);
+							await signIn.passkey();
+							router.push("/start");
+							setLoading(false);
+						}}
+					>
+						<FingerprintIcon size={16} />
+						Sign-in with Passkey
+					</Button>
 				</CardContent>
 			</Card>
 		</div>

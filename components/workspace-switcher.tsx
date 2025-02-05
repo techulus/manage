@@ -6,7 +6,6 @@ import {
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
-	DropdownMenuShortcut,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -15,14 +14,16 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "@/components/ui/sidebar";
-import { authClient } from "@/lib/auth-client";
-import { ChevronsUpDown, Plus } from "lucide-react";
-import * as React from "react";
+import { authClient } from "@/lib/betterauth/auth-client";
+import { ChevronsUpDown, CogIcon, Plus } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export function WorkspaceSwitcher() {
 	const { isMobile } = useSidebar();
 	const { data: organizations } = authClient.useListOrganizations();
 	const { data: activeOrganization } = authClient.useActiveOrganization();
+	const router = useRouter();
 
 	return (
 		<SidebarMenu>
@@ -51,32 +52,52 @@ export function WorkspaceSwitcher() {
 						<DropdownMenuLabel className="text-xs text-muted-foreground">
 							Workspaces
 						</DropdownMenuLabel>
-						<DropdownMenuItem onClick={() => {}} className="gap-2 p-2">
+						<DropdownMenuItem
+							onClick={async () => {
+								await authClient.organization.setActive({
+									organizationId: null,
+								});
+								router.push("/start");
+							}}
+							className="gap-2 p-2 cursor-pointer"
+						>
 							Personal
-							<DropdownMenuShortcut>⌘1</DropdownMenuShortcut>
 						</DropdownMenuItem>
-						{(organizations ?? []).map((org, index) => (
+						{(organizations ?? []).map((org) => (
 							<DropdownMenuItem
 								key={org.id}
-								onClick={() => {
-									authClient.organization.setActive({
-										organizationId: org.id,
-									});
-								}}
-								className="gap-2 p-2"
+								className="gap-2 p-2 cursor-pointer"
 							>
-								{org.name}
-								<DropdownMenuShortcut>⌘{index + 2}</DropdownMenuShortcut>
+								<button
+									type="button"
+									onClick={async () => {
+										await authClient.organization.setActive({
+											organizationId: org.id,
+										});
+										router.push("/start");
+									}}
+								>
+									{org.name}
+								</button>
+								<Link
+									href={`/workspace/${org.slug}/manage`}
+									className="font-medium text-muted-foreground ml-auto"
+								>
+									<CogIcon className="w-5 h-5" />
+								</Link>
 							</DropdownMenuItem>
 						))}
 						<DropdownMenuSeparator />
-						<DropdownMenuItem className="gap-2 p-2">
+						<DropdownMenuItem>
 							<div className="flex size-6 items-center justify-center rounded-md border bg-background">
 								<Plus className="size-4" />
 							</div>
-							<div className="font-medium text-muted-foreground">
+							<Link
+								href="/workspace/create"
+								className="font-medium text-muted-foreground"
+							>
 								Add workspace
-							</div>
+							</Link>
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

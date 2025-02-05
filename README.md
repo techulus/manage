@@ -20,6 +20,7 @@ Manage is an open-source project management app inspired by Basecamp. With its i
 - [ ] Notifications
 - [ ] Users / teams management
 - [ ] Search
+- [ ] Admin panel
 - [ ] Permissions
 
 ## Development
@@ -33,7 +34,7 @@ BETTER_AUTH_URL=
 NEXT_PUBLIC_APP_URL=
 
 # Any S3 compatible storage
-S3_BUCKET_ENDPOINT="
+S3_ENDPOINT="
 S3_ACCESS_KEY_ID=""
 S3_SECRET_ACCESS_KEY=""
 S3_BUCKET_NAME=""
@@ -46,6 +47,12 @@ ANYCABLE_SECRET=
 
 # Email
 RESEND_API_KEY=
+```
+
+### Generate BetterAuth Migrations
+
+```bash
+pnpx @better-auth/cli generate --config ./lib/betterauth/config.ts
 ```
 
 ### Run using Docker

@@ -12,7 +12,8 @@ RUN apk add --no-cache \
     gcc \
     musl-dev \
     cmake \
-    curl
+    curl \
+    sqlite
 
 # Stage 1: Install dependencies
 FROM base AS deps
@@ -40,6 +41,8 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/better-auth_migrations ./better-auth_migrations
+COPY --from=builder --chown=nextjs:nodejs /app/entrypoint.sh ./entrypoint.sh
 
 USER nextjs
 EXPOSE 3000
@@ -48,4 +51,4 @@ ENV PORT=3000
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
 ENV HOSTNAME="0.0.0.0"
-CMD ["node", "server.js"]
+CMD ["sh", "./entrypoint.sh"]

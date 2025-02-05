@@ -1,15 +1,25 @@
+import { user } from "@/drizzle/schema";
+import type { User } from "@/drizzle/types";
 import { eq } from "drizzle-orm";
 import { cookies, headers } from "next/headers";
+import { auth } from "../betterauth/auth";
 import { database } from "./useDatabase";
-import { auth } from "../auth";
-import type { User } from "@/drizzle/types";
-import { user } from "@/drizzle/schema";
+
+type Organization = {
+	id: string;
+	name: string;
+	slug: string;
+	logo: string;
+	createdAt: Date;
+	meta: Record<string, string | number>;
+};
 
 type Result = {
 	ownerId: string;
 	userId: string;
 	orgId: string | null;
 	orgSlug: string;
+	organizations: Organization[];
 };
 
 export async function getUser(): Promise<User> {
@@ -40,14 +50,19 @@ export async function getOwner(): Promise<Result> {
 		throw new Error("User not authenticated");
 	}
 	const userId = session.user.id;
-
 	const activeOrgId = session.session.activeOrganizationId;
+
+	const organizations = await auth().api.listOrganizations({
+		headers: await headers(),
+	});
+	const orgSlug = organizations.find((org) => org.id === activeOrgId)?.slug;
 
 	return {
 		ownerId: activeOrgId ?? userId,
 		userId,
 		orgId: activeOrgId,
-		orgSlug: activeOrgId ?? userId,
+		orgSlug: orgSlug ?? "me",
+		organizations,
 	} as Result;
 }
 

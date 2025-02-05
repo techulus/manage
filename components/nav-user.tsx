@@ -15,11 +15,11 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "@/components/ui/sidebar";
+import { signOut } from "@/lib/betterauth/auth-client";
 import { ChevronsUpDown, HelpCircle, LogOut, Settings } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { UserAvatar } from "./core/user-avatar";
-import { signOut } from "@/lib/auth-client";
 
 export function NavUser({
 	user,

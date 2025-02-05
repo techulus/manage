@@ -1,10 +1,10 @@
+import { MagicLinkEmail } from "@/components/emails/magic-link";
 import { betterAuth } from "better-auth";
-import { magicLink, organization } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
+import { magicLink, organization } from "better-auth/plugins";
+import { passkey } from "better-auth/plugins/passkey";
 import Database from "better-sqlite3";
 import { Resend } from "resend";
-import { MagicLinkEmail } from "@/components/emails/magic-link";
-import { passkey } from "better-auth/plugins/passkey";
 
 export const auth = () =>
 	betterAuth({
@@ -12,8 +12,8 @@ export const auth = () =>
 		plugins: [
 			magicLink({
 				sendMagicLink: async ({ email, url }) => {
-					const resend = new Resend(process.env.RESEND_API_KEY);
 					console.log("Send magic link", email, url);
+					const resend = new Resend(process.env.RESEND_API_KEY);
 					const { data, error } = await resend.emails.send({
 						from: "Manage <account@email.managee.xyz>",
 						to: [email],

@@ -1,6 +1,6 @@
-import { addUserToTenantDb } from "@/lib/ops/user";
 import { isDatabaseReady } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
+import { addUserToTenantDb } from "@/lib/utils/useUser";
 import { redirect } from "next/navigation";
 
 export const revalidate = 0;

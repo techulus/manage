@@ -19,11 +19,18 @@ export default async function ConsoleLayout(props: {
 	const { tenant } = await props.params;
 
 	const { children } = props;
-	const { orgSlug, userId } = await getOwner();
+	const { orgSlug, userId, organizations, orgId } = await getOwner();
 	const user = await getUser();
 
 	if (tenant !== orgSlug) {
 		redirect("/start");
+	}
+
+	if (orgId) {
+		const org = organizations.find((org) => org.id === orgId);
+		if (!org) {
+			redirect("/start");
+		}
 	}
 
 	const ready = await isDatabaseReady();
