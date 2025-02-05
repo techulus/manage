@@ -5,7 +5,6 @@ set -e
 echo "Starting checks..."
 
 echo "Fix permissions..."
-chown -R nextjs:nodejs /app/sqlite
 chmod -R 777 /app/sqlite
 
 echo "Running auth database migrations..."
