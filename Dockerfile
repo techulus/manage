@@ -44,6 +44,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/better-auth_migrations ./better-auth_migrations
 COPY --from=builder --chown=nextjs:nodejs /app/entrypoint.sh ./entrypoint.sh
 
+RUN chmod +x /app/entrypoint.sh
+
 USER nextjs
 EXPOSE 3000
 ENV PORT=3000
@@ -51,4 +53,6 @@ ENV PORT=3000
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
 ENV HOSTNAME="0.0.0.0"
-CMD ["sh", "./entrypoint.sh"]
+
+ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["node", "server.js"]

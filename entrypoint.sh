@@ -28,4 +28,4 @@ fi
 echo "S3 Endpoint is set."
 
 echo "Everything looks good, starting app..."
-exec node server.js
+exec "$@"
