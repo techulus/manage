@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/betterauth/auth-client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import slugify from "slugify";
 
 export default function CreateWorkspace() {
 	const [name, setName] = useState("");
@@ -38,7 +39,14 @@ export default function CreateWorkspace() {
 						<Label className="text-right">Slug</Label>
 						<Input
 							value={slug}
-							onChange={(evt) => setSlug(evt.target.value ?? "")}
+							onChange={(evt) =>
+								setSlug(
+									slugify(evt.target.value ?? "", {
+										lower: true,
+										trim: true,
+									}),
+								)
+							}
 							className="col-span-3"
 						/>
 					</div>
@@ -48,7 +56,10 @@ export default function CreateWorkspace() {
 						onClick={async () => {
 							await authClient.organization.create({
 								name,
-								slug,
+								slug: slugify(slug, {
+									lower: true,
+									trim: true,
+								}),
 							});
 							await authClient.organization.setActive({
 								organizationSlug: slug,

@@ -4,7 +4,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { CableProvider } from "@/lib/utils/cable-client";
 import { getToken } from "@/lib/utils/cable-server";
 import { isDatabaseReady } from "@/lib/utils/useDatabase";
-import { getOwner, getUser } from "@/lib/utils/useOwner";
+import { getOrganizations, getOwner, getUser } from "@/lib/utils/useOwner";
 import { redirect } from "next/navigation";
 
 export const fetchCache = "force-no-store"; // disable cache for console pages
@@ -19,7 +19,7 @@ export default async function ConsoleLayout(props: {
 	const { tenant } = await props.params;
 
 	const { children } = props;
-	const { orgSlug, userId, organizations, orgId } = await getOwner();
+	const { orgSlug, userId, orgId } = await getOwner();
 	const user = await getUser();
 
 	if (tenant !== orgSlug) {
@@ -27,6 +27,7 @@ export default async function ConsoleLayout(props: {
 	}
 
 	if (orgId) {
+		const organizations = await getOrganizations();
 		const org = organizations.find((org) => org.id === orgId);
 		if (!org) {
 			redirect("/start");

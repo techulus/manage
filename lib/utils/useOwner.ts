@@ -19,7 +19,6 @@ type Result = {
 	userId: string;
 	orgId: string | null;
 	orgSlug: string;
-	organizations: Organization[];
 };
 
 export async function getUser(): Promise<User> {
@@ -52,17 +51,20 @@ export async function getOwner(): Promise<Result> {
 	const userId = session.user.id;
 	const activeOrgId = session.session.activeOrganizationId;
 
-	const organizations = await auth().api.listOrganizations({
-		headers: await headers(),
-	});
-	const orgSlug = organizations.find((org) => org.id === activeOrgId)?.slug;
+	const organization = activeOrgId
+		? await auth().api.getFullOrganization({
+				headers: await headers(),
+				query: {
+					organizationId: activeOrgId,
+				},
+			})
+		: null;
 
 	return {
 		ownerId: activeOrgId ?? userId,
 		userId,
 		orgId: activeOrgId,
-		orgSlug: orgSlug ?? "me",
-		organizations,
+		orgSlug: organization?.slug ?? "me",
 	} as Result;
 }
 
@@ -72,4 +74,11 @@ export async function getTimezone() {
 		cookieStore.get("userTimezone")?.value ??
 		Intl.DateTimeFormat().resolvedOptions().timeZone
 	);
+}
+
+export async function getOrganizations(): Promise<Organization[]> {
+	const organizations = await auth().api.listOrganizations({
+		headers: await headers(),
+	});
+	return organizations as Organization[];
 }
