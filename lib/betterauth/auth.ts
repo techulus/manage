@@ -22,11 +22,16 @@ export const auth = () =>
 					});
 					console.log("Email Result ->", error ?? data);
 				},
+				disableSignUp: true,
 			}),
-			passkey({
-				rpID: "managee.xyz",
-				rpName: "Manage",
-			}),
+			passkey(
+				process.env.NODE_ENV === "production"
+					? {
+							rpID: "managee.xyz",
+							rpName: "Manage",
+						}
+					: undefined,
+			),
 			organization(),
 			nextCookies(),
 		],

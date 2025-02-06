@@ -1,26 +1,31 @@
 "use client";
 
+import { createToastWrapper } from "@/components/core/toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/betterauth/auth-client";
 import { FingerprintIcon } from "lucide-react";
+import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import logo from "../../../public/images/logo.png";
 
 export default function SignInForm() {
 	const [email, setEmail] = useState("");
-	const [loading, setLoading] = useState(false);
+	const [processing, setProcessing] = useState(false);
 	const [hasSendEmail, setHasSendEmail] = useState(false);
+	const { theme } = useTheme();
 
 	const router = useRouter();
 
 	return (
 		<div className="m-6 flex h-full items-center justify-center">
+			{createToastWrapper(theme)}
 			<Card className="w-full max-w-md">
 				<CardHeader>
 					<div className="flex lg:flex-1">
@@ -68,17 +73,36 @@ export default function SignInForm() {
 					) : (
 						<Button
 							className="gap-2"
-							disabled={loading}
+							disabled={processing}
 							onClick={async () => {
 								try {
 									if (!email) return;
-									setLoading(true);
-									await signIn.magicLink({ email, callbackURL: "/start" });
-									setHasSendEmail(true);
+									setProcessing(true);
+									toast
+										.promise(
+											signIn
+												.magicLink({ email, callbackURL: "/start" })
+												.then((result) => {
+													if (result?.error) {
+														throw new Error(result.error?.message);
+													}
+												}),
+											{
+												loading: "Sending magic link...",
+												success: "Magic link sent!",
+												error: "Failed to send magic link.",
+											},
+										)
+										.then(() => {
+											setHasSendEmail(true);
+										})
+										.finally(() => {
+											setProcessing(false);
+										});
 								} catch (error) {
 									console.error(error);
 								} finally {
-									setLoading(false);
+									setProcessing(false);
 								}
 							}}
 						>
@@ -89,12 +113,26 @@ export default function SignInForm() {
 					<Button
 						variant="secondary"
 						className="gap-2"
-						disabled={loading}
+						disabled={processing}
 						onClick={async () => {
-							setLoading(true);
-							await signIn.passkey();
-							router.push("/start");
-							setLoading(false);
+							setProcessing(true);
+							toast
+								.promise(
+									signIn.passkey().then((result) => {
+										if (result?.error) {
+											throw new Error(result.error?.message);
+										}
+									}),
+									{
+										loading: "Waiting for passkey...",
+										success: "Signed in with passkey!",
+										error: "Failed to receive passkey.",
+									},
+								)
+								.then(() => router.push("/start"))
+								.finally(() => {
+									setProcessing(false);
+								});
 						}}
 					>
 						<FingerprintIcon size={16} />
