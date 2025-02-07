@@ -14,17 +14,16 @@ const publicAppPaths = [
 export async function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
-	const session = getSessionCookie(request);
-
-	if (session && (pathname === "/sign-in" || pathname === "/sign-up")) {
-		return NextResponse.redirect(new URL("/start", request.nextUrl.href));
-	}
-
 	const isPublicAppPath = publicAppPaths.some((path) =>
 		pathname.startsWith(path),
 	);
 	if (isPublicAppPath || pathname === "/") {
 		return NextResponse.next();
+	}
+
+	const session = getSessionCookie(request);
+	if (session && (pathname === "/sign-in" || pathname === "/sign-up")) {
+		return NextResponse.redirect(new URL("/start", request.nextUrl.href));
 	}
 
 	if (!session) {

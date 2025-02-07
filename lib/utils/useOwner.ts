@@ -2,6 +2,7 @@ import { user } from "@/drizzle/schema";
 import type { User } from "@/drizzle/types";
 import { eq } from "drizzle-orm";
 import { cookies, headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { auth } from "../betterauth/auth";
 import { database } from "./useDatabase";
 
@@ -26,7 +27,7 @@ export async function getUser(): Promise<User> {
 		headers: await headers(),
 	});
 	if (!session) {
-		throw new Error("User not authenticated");
+		redirect("/sign-in");
 	}
 
 	const db = await database();
@@ -46,8 +47,9 @@ export async function getOwner(): Promise<Result> {
 		headers: await headers(),
 	});
 	if (!session) {
-		throw new Error("User not authenticated");
+		redirect("/sign-in");
 	}
+
 	const userId = session.user.id;
 	const activeOrgId = session.session.activeOrganizationId;
 

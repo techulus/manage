@@ -1,17 +1,43 @@
 import { CTA } from "@/components/landing-page/call-to-action";
 import { FeaturesSection } from "@/components/landing-page/feature-section";
+import Waitlist from "@/components/landing-page/waitlist";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
-import { buttonVariants } from "@/components/ui/button";
 import { SITE_METADATA } from "@/data/marketing";
-import Link from "next/link";
+import events from "@/public/screenshots/events.png";
+import files from "@/public/screenshots/files.png";
+import overviewDark from "@/public/screenshots/overview-dark.png";
+import overview from "@/public/screenshots/overview.png";
+import tasks from "@/public/screenshots/tasks.png";
+import Image from "next/image";
+
+const features = [
+	{
+		name: "task",
+		image: tasks,
+		title: "Everything you need to manage your tasks",
+		highlight: "manage",
+	},
+	{
+		name: "files",
+		image: files,
+		title: "Keep your files organized and accessible",
+		highlight: "organized",
+	},
+	{
+		name: "events",
+		image: events,
+		title: "Stay on top of important events",
+		highlight: "events",
+	},
+];
 
 export default async function Home() {
 	return (
 		<div className="h-full">
 			<Header />
 
-			<div className="relative isolate px-6 pt-12 lg:px-8">
+			<div className="relative isolate pt-14">
 				<div
 					className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
 					aria-hidden="true"
@@ -24,39 +50,33 @@ export default async function Home() {
 						}}
 					/>
 				</div>
-				<div className="mx-auto max-w-7xl py-32 sm:py-48 lg:py-56">
-					<div>
-						<h1 className="text-hero bg-gradient-to-r from-green-500 to-yellow-700 bg-clip-text text-4xl tracking-tighter text-gray-900 text-transparent sm:text-6xl whitespace-pre-line">
-							{SITE_METADATA.TAGLINE}
-						</h1>
-						<p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-400 whitespace-pre-line">
-							{SITE_METADATA.DESCRIPTION}
-						</p>
-						<div className="mt-10 flex flex-col items-center justify-center gap-y-6 md:flex-row md:gap-x-6 md:gap-y-0">
-							<Link
-								href="https://github.com/techulus/manage"
-								target="_blank"
-								rel="noreferrer"
-								className="flex"
-								prefetch={false}
-							>
-								<div className="flex h-10 w-10 items-center justify-center space-x-2 rounded-md border border-muted bg-muted">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										fill="currentColor"
-										viewBox="0 0 24 24"
-										className="h-5 w-5 text-foreground"
-									>
-										<path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-									</svg>
-								</div>
-								<div className="flex items-center">
-									<div className="h-4 w-4 border-y-8 border-l-0 border-r-8 border-solid border-muted border-y-transparent" />
-									<div className="flex h-10 items-center rounded-md border border-muted bg-muted px-4 font-medium">
-										Star on GitHub
-									</div>
-								</div>
-							</Link>
+				<div className="py-24 sm:py-32 lg:pb-40">
+					<div className="mx-auto max-w-7xl px-6 lg:px-8">
+						<div className="mx-auto max-w-2xl text-center">
+							<h1 className="text-hero bg-gradient-to-r from-green-500 to-yellow-700 bg-clip-text text-2xl tracking-tighter text-gray-900 text-transparent sm:text-6xl whitespace-pre-line">
+								{SITE_METADATA.TAGLINE}
+							</h1>
+							<p className="mt-6 p-3 text-lg leading-8 text-gray-600 dark:text-gray-400">
+								{SITE_METADATA.DESCRIPTION}
+							</p>
+							<div className="mt-10 flex items-center justify-center dark:bg-green-50 dark:rounded-md max-w-[600px] mx-auto">
+								<Waitlist />
+							</div>
+						</div>
+						<div className="mt-16 flow-root sm:mt-24">
+							<div className="relative mt-16 aspect-[2432/1442] h-[36rem] sm:h-auto sm:w-[calc(theme(maxWidth.7xl)-theme(spacing.16))]">
+								<div className="absolute -inset-2 rounded-[calc(theme(borderRadius.xl)+theme(spacing.2))] shadow-sm ring-1 ring-black/5 dark:ring-gray-50/10" />
+								<Image
+									alt="App screenshot"
+									src={overviewDark}
+									className="rounded-md shadow-2xl ring-1 ring-gray-900/10 hidden dark:block"
+								/>
+								<Image
+									alt="App screenshot"
+									src={overview}
+									className="rounded-md shadow-2xl ring-1 ring-gray-900/10 dark:hidden"
+								/>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -75,6 +95,35 @@ export default async function Home() {
 			</div>
 
 			<FeaturesSection />
+
+			<div className="overflow-hidden py-24 sm:py-32">
+				<div className="mx-auto max-w-7xl px-6 lg:px-8">
+					{features.map((feature) => (
+						<div key={feature.name} className="mb-24 last:mb-0">
+							<p className="max-w-2xl text-pretty text-5xl font-semibold tracking-tight text-gray-900 dark:text-gray-100 sm:text-balance sm:text-6xl">
+								{feature.title.split(feature.highlight).map((part, i, arr) => (
+									<span key={part}>
+										{part}
+										{i < arr.length - 1 && (
+											<span className="text-green-600 dark:text-green-400">
+												{feature.highlight}
+											</span>
+										)}
+									</span>
+								))}
+							</p>
+							<div className="relative mt-16 aspect-[2432/1442] h-[36rem] sm:h-auto sm:w-[calc(theme(maxWidth.7xl)-theme(spacing.16))]">
+								<div className="absolute -inset-2 rounded-[calc(theme(borderRadius.xl)+theme(spacing.2))] shadow-sm ring-1 ring-black/5 dark:ring-gray-50/10" />
+								<Image
+									alt={`${feature.name} screenshot`}
+									src={feature.image}
+									className="rounded-md shadow-2xl ring-1 ring-gray-900/10"
+								/>
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
 
 			<CTA />
 
