@@ -37,7 +37,7 @@ export default async function Home() {
 		<div className="h-full">
 			<Header />
 
-			<div className="relative isolate pt-14">
+			<div className="relative isolate pt-14 overflow-hidden">
 				<div
 					className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
 					aria-hidden="true"
@@ -92,40 +92,42 @@ export default async function Home() {
 						}}
 					/>
 				</div>
-			</div>
 
-			<FeaturesSection />
-
-			<div className="overflow-hidden py-24 sm:py-32">
-				<div className="mx-auto max-w-7xl px-6 lg:px-8">
-					{features.map((feature) => (
-						<div key={feature.name} className="mb-24 last:mb-0">
-							<p className="max-w-2xl text-pretty text-5xl font-semibold tracking-tight text-gray-900 dark:text-gray-100 sm:text-balance sm:text-6xl">
-								{feature.title.split(feature.highlight).map((part, i, arr) => (
-									<span key={part}>
-										{part}
-										{i < arr.length - 1 && (
-											<span className="text-green-600 dark:text-green-400">
-												{feature.highlight}
+				<div className="overflow-hidden py-24 sm:py-32">
+					<div className="mx-auto max-w-7xl px-6 lg:px-8">
+						{features.map((feature) => (
+							<div key={feature.name} className="mb-24 last:mb-0">
+								<p className="max-w-2xl text-pretty text-5xl font-semibold tracking-tight text-gray-900 dark:text-gray-100 sm:text-balance sm:text-6xl">
+									{feature.title
+										.split(feature.highlight)
+										.map((part, i, arr) => (
+											<span key={part}>
+												{part}
+												{i < arr.length - 1 && (
+													<span className="text-green-600 dark:text-green-400">
+														{feature.highlight}
+													</span>
+												)}
 											</span>
-										)}
-									</span>
-								))}
-							</p>
-							<div className="relative mt-16 aspect-[2432/1442] h-[36rem] sm:h-auto sm:w-[calc(theme(maxWidth.7xl)-theme(spacing.16))]">
-								<div className="absolute -inset-2 rounded-[calc(theme(borderRadius.xl)+theme(spacing.2))] shadow-sm ring-1 ring-black/5 dark:ring-gray-50/10" />
-								<Image
-									alt={`${feature.name} screenshot`}
-									src={feature.image}
-									className="rounded-md shadow-2xl ring-1 ring-gray-900/10"
-								/>
+										))}
+								</p>
+								<div className="relative mt-16 aspect-[2432/1442] h-[36rem] sm:h-auto sm:w-[calc(theme(maxWidth.7xl)-theme(spacing.16))]">
+									<div className="absolute -inset-2 rounded-[calc(theme(borderRadius.xl)+theme(spacing.2))] shadow-sm ring-1 ring-black/5 dark:ring-gray-50/10" />
+									<Image
+										alt={`${feature.name} screenshot`}
+										src={feature.image}
+										className="rounded-md shadow-2xl ring-1 ring-gray-900/10"
+									/>
+								</div>
 							</div>
-						</div>
-					))}
+						))}
+					</div>
 				</div>
-			</div>
 
-			<CTA />
+				<FeaturesSection />
+
+				<CTA />
+			</div>
 
 			<Footer />
 		</div>
