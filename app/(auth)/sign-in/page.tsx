@@ -1,6 +1,5 @@
 "use client";
 
-import { createToastWrapper } from "@/components/core/toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,7 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import logo from "../../../public/images/logo.png";
 
 export default function SignInForm() {
@@ -25,7 +24,6 @@ export default function SignInForm() {
 
 	return (
 		<div className="m-6 flex h-full items-center justify-center">
-			{createToastWrapper(theme)}
 			<Card className="w-full max-w-md">
 				<CardHeader>
 					<div className="flex lg:flex-1">
@@ -78,27 +76,25 @@ export default function SignInForm() {
 								try {
 									if (!email) return;
 									setProcessing(true);
-									toast
-										.promise(
-											signIn
-												.magicLink({ email, callbackURL: "/start" })
-												.then((result) => {
-													if (result?.error) {
-														throw new Error(result.error?.message);
-													}
-												}),
-											{
-												loading: "Sending magic link...",
-												success: "Magic link sent!",
-												error: "Failed to send magic link.",
-											},
-										)
-										.then(() => {
-											setHasSendEmail(true);
-										})
-										.finally(() => {
-											setProcessing(false);
-										});
+									toast.promise(
+										signIn
+											.magicLink({ email, callbackURL: "/start" })
+											.then((result) => {
+												if (result?.error) {
+													throw new Error(result.error?.message);
+												}
+
+												setHasSendEmail(true);
+											})
+											.finally(() => {
+												setProcessing(false);
+											}),
+										{
+											loading: "Sending magic link...",
+											success: "Magic link sent!",
+											error: "Failed to send magic link.",
+										},
+									);
 								} catch (error) {
 									console.error(error);
 								} finally {
@@ -116,23 +112,25 @@ export default function SignInForm() {
 						disabled={processing}
 						onClick={async () => {
 							setProcessing(true);
-							toast
-								.promise(
-									signIn.passkey().then((result) => {
+							toast.promise(
+								signIn
+									.passkey()
+									.then((result) => {
 										if (result?.error) {
 											throw new Error(result.error?.message);
 										}
+
+										router.push("/start");
+									})
+									.finally(() => {
+										setProcessing(false);
 									}),
-									{
-										loading: "Waiting for passkey...",
-										success: "Signed in with passkey!",
-										error: "Failed to receive passkey.",
-									},
-								)
-								.then(() => router.push("/start"))
-								.finally(() => {
-									setProcessing(false);
-								});
+								{
+									loading: "Waiting for passkey...",
+									success: "Signed in with passkey!",
+									error: "Failed to receive passkey.",
+								},
+							);
 						}}
 					>
 						<FingerprintIcon size={16} />

@@ -10,7 +10,7 @@ import { Trash2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { RRule, rrulestr } from "rrule";
-import { notifyError } from "../core/toast";
+import { toast } from "sonner";
 import MarkdownEditor from "../editor";
 import { DateTimePicker } from "../project/events/date-time-picker";
 import { Assignee } from "../project/shared/assigee";
@@ -62,7 +62,7 @@ export default function EventForm({
 
 	useEffect(() => {
 		if (state?.message) {
-			notifyError(state.message);
+			toast.error(state.message);
 		}
 	}, [state]);
 

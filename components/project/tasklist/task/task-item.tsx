@@ -21,7 +21,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { AlignJustifyIcon, CalendarClock, FileIcon } from "lucide-react";
 import { useReducer, useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader } from "../../../ui/card";
 import { Checkbox } from "../../../ui/checkbox";
 import { DateTimePicker } from "../../events/date-time-picker";

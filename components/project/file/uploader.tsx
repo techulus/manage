@@ -3,7 +3,7 @@
 import { Spinner } from "@/components/core/loaders";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 export function FileUploader({
 	folderId,
@@ -38,13 +38,14 @@ export function FileUploader({
 				}
 			});
 
-			toast
-				.promise(Promise.all(uploaders), {
+			toast.promise(
+				Promise.all(uploaders).finally(() => setLoading(false)),
+				{
 					loading: "Uploading...",
 					success: "Uploaded!",
 					error: "Failed to upload file(s)",
-				})
-				.finally(() => setLoading(false));
+				},
+			);
 		},
 		[folderId, projectId, reloadDocuments],
 	);

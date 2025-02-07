@@ -1,10 +1,8 @@
 "use client";
 
 import { PencilIcon, PlusIcon } from "lucide-react";
-import { useTheme } from "next-themes";
 import Link from "next/link";
 import { type JSX, type PropsWithChildren, useEffect, useState } from "react";
-import { createToastWrapper } from "../core/toast";
 import { buttonVariants } from "../ui/button";
 
 type ActionType = "edit" | "create";
@@ -27,8 +25,6 @@ export default function PageTitle({
 	children,
 	actions,
 }: PropsWithChildren<Props>) {
-	const { systemTheme: theme } = useTheme();
-
 	const [isSticky, setIsSticky] = useState(false);
 	useEffect(() => {
 		const handleScroll = () => {
@@ -47,8 +43,6 @@ export default function PageTitle({
 
 	return (
 		<>
-			{createToastWrapper(theme)}
-
 			<div
 				className={`fixed top-0 left-0 right-0 z-40 bg-gray-50 dark:bg-card dark:bg-gray-900 dark:text-white sm:hidden border-b transition-opacity duration-300 ${isSticky ? "opacity-100" : "opacity-0"}`}
 			>

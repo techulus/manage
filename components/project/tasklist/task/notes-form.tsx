@@ -6,7 +6,7 @@ import MarkdownEditor from "@/components/editor";
 import { Button } from "@/components/ui/button";
 import type { TaskWithDetails } from "@/drizzle/types";
 import { useState } from "react";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 
 export default function TaskNotesForm({ task }: { task: TaskWithDetails }) {
 	const [isEditing, setIsEditing] = useState(false);

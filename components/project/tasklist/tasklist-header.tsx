@@ -17,7 +17,7 @@ import type { TaskList } from "@/drizzle/types";
 import { toDateStringWithDay } from "@/lib/utils/date";
 import { CheckCircle, CircleEllipsisIcon, ClockIcon } from "lucide-react";
 import Link from "next/link";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 export const TaskListHeader = ({
 	taskList,
