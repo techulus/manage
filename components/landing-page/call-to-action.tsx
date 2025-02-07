@@ -3,7 +3,7 @@ import { buttonVariants } from "../ui/button";
 
 function CTA() {
 	return (
-		<div className="w-full">
+		<div className="w-full py-8">
 			<div className="mx-auto max-w-7xl px-6 sm:py-24 lg:px-8">
 				<h2 className="max-w-2xl text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
 					Boost your productivity. Start using 'Manage' today.
