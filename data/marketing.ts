@@ -1,6 +1,6 @@
 export const SITE_METADATA = {
 	TITLE: "Manage [beta]",
-	TAGLINE: "Manage Tasks, Documents,\nFiles, and Events with Ease",
+	TAGLINE: "Your Open-Source Gateway to Seamless Project Collaboration",
 	DESCRIPTION:
-		"Manage is an open-source project management app inspired by Basecamp.\nWith its intuitive interface, customizable features, and emphasis on collaboration, Manage empowers teams to enhance productivity and achieve project success.\nEnjoy the benefits of open-source flexibility, data security, and a thriving community while managing your projects efficiently with Manage.",
+		"Discover Manage, the open-source project management tool that redefines team collaboration. Inspired by Basecamp, Manage offers an intuitive interface and customizable features, empowering teams to boost productivity and achieve project success.",
 };

@@ -11,7 +11,12 @@ import { Bell, Dot } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { SidebarMenuButton, SidebarMenuItem, useSidebar } from "../ui/sidebar";
+
+type NotificationMessage = {
+	message?: string;
+};
 
 function Notifications({ tenant }: { tenant: string }) {
 	const [unreadCount, setUnreadCount] = useState<number>(0);
@@ -36,7 +41,14 @@ function Notifications({ tenant }: { tenant: string }) {
 		let channel: Channel | undefined;
 		getNotificationsStream().then((stream) => {
 			channel = cable.streamFromSigned(stream);
-			channel.on("message", (_) => {
+			// @ts-ignore
+			channel.on("message", (data: NotificationMessage) => {
+				if (data?.message) {
+					toast(data.message, {
+						icon: "🔔",
+						duration: 5000,
+					});
+				}
 				checkNotifications();
 			});
 		});

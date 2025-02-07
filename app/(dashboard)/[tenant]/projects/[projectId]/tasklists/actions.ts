@@ -288,14 +288,16 @@ export async function updateTask(
 		db.insert(notification)
 			.values({
 				type: notificationType.assign,
-				message: `You have been assigned to task ${taskDetails.name}`,
+				message: `You have been assigned to task "${taskDetails.name}"`,
 				target: `/${orgSlug}/projects/${projectId}/tasklists/${taskDetails.taskListId}`,
 				fromUser: userId,
 				toUser: taskDetails.assignedToUser!,
 			})
 			.run();
 
-		await broadcastEvent("notifications", taskDetails.assignedToUser!);
+		await broadcastEvent("notifications", taskDetails.assignedToUser!, {
+			message: `You have been assigned to task "${taskDetails.name}"`,
+		});
 	}
 
 	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
@@ -310,11 +312,7 @@ export async function deleteTask({
 }) {
 	const { orgSlug } = await getOwner();
 	const db = await database();
-	const taskDetails = await db
-		.delete(task)
-		.where(eq(task.id, +id))
-		.returning()
-		.get();
+	const taskDetails = db.delete(task).where(eq(task.id, +id)).returning().get();
 
 	await logActivity({
 		action: "deleted",
