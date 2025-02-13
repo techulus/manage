@@ -2,8 +2,8 @@ import { ThemeProvider } from "@/components/core/theme-provider";
 import { SITE_METADATA } from "@/data/marketing";
 import { cn } from "@/lib/utils";
 import { Archivo } from "next/font/google";
-
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 const archivo = Archivo({
 	subsets: ["latin"],
@@ -222,6 +222,7 @@ export default function RootLayout({
 				)}
 			>
 				<ThemeProvider>{children}</ThemeProvider>
+				<Toaster />
 			</body>
 		</html>
 	);

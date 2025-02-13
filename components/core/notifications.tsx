@@ -11,7 +11,7 @@ import { Bell, Dot } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { SidebarMenuButton, SidebarMenuItem, useSidebar } from "../ui/sidebar";
 
 type NotificationMessage = {
@@ -44,8 +44,7 @@ function Notifications({ tenant }: { tenant: string }) {
 			// @ts-ignore
 			channel.on("message", (data: NotificationMessage) => {
 				if (data?.message) {
-					toast(data.message, {
-						icon: "🔔",
+					toast.info(data.message, {
 						duration: 5000,
 					});
 				}

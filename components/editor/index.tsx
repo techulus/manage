@@ -1,7 +1,7 @@
 import type { BlobUploadResult } from "@/app/(api)/api/blob/route";
 import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState } from "react";
-import { notifyError } from "../core/toast";
+import { toast } from "sonner";
 
 const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
 	ssr: false,
@@ -39,7 +39,7 @@ export default function MarkdownEditor({
 				return onSuccess(result.url);
 			} catch (e) {
 				console.error(e);
-				notifyError("Failed to upload image");
+				toast.error("Failed to upload image");
 				onError("Failed to upload image");
 			}
 		},
