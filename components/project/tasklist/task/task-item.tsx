@@ -73,7 +73,7 @@ export const TaskItem = ({
 			className={cn(
 				"flex scale-100 rounded-lg shadow-none dark:bg-black",
 				detailsOpen
-					? "my-1 scale-[1.02] flex-col border-2 border-gray-200 bg-gray-50 shadow-md dark:border-gray-700"
+					? "my-1 scale-[1.03] flex-col border-2 border-gray-200 bg-gray-50 dark:border-gray-700"
 					: "flex-row items-center justify-center space-x-2 border-none",
 			)}
 			ref={setNodeRef}
@@ -141,7 +141,7 @@ export const TaskItem = ({
 
 											if (!isEditing) return;
 
-											await toast.promise(
+											toast.promise(
 												updateTask(id, projectId, { name }),
 												updateTaskToastOptions,
 											);
