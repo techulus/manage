@@ -22,7 +22,7 @@ export async function middleware(request: NextRequest) {
 	}
 
 	const session = getSessionCookie(request);
-	if (session && (pathname === "/sign-in" || pathname === "/sign-up")) {
+	if (session && pathname === "/sign-in") {
 		return NextResponse.redirect(new URL("/start", request.nextUrl.href));
 	}
 
