@@ -9,44 +9,43 @@ import { Button } from "../ui/button";
 import { SaveButton } from "./button";
 
 export default function InlineTaskForm() {
-  const { pending } = useFormStatus();
-  const [isCreating, setIsCreating] = useState(false);
+	const { pending } = useFormStatus();
+	const [isCreating, setIsCreating] = useState(false);
 
-  useEffect(() => {
-    if (!pending) {
-      setIsCreating(false);
-    }
-  }, [pending]);
+	useEffect(() => {
+		if (!pending) {
+			setIsCreating(false);
+		}
+	}, [pending]);
 
-  if (!isCreating) {
-    return (
-      <Button
-        variant="outline"
-        type="button"
-        onClick={(e) => {
-          e.preventDefault();
-          setIsCreating(true);
-        }}
-      >
-        Add task
-      </Button>
-    );
-  }
+	if (!isCreating) {
+		return (
+			<Button
+				type="button"
+				onClick={(e) => {
+					e.preventDefault();
+					setIsCreating(true);
+				}}
+			>
+				Add task
+			</Button>
+		);
+	}
 
-  return (
-    <div className="flex space-x-3">
-      <div className="max-w-xl flex-grow">
-        <Input type="text" name="name" defaultValue="" disabled={pending} />
-      </div>
-      <SaveButton />
-      <Button
-        type="button"
-        variant="ghost"
-        className="px-1 lg:px-2"
-        onClick={() => setIsCreating(false)}
-      >
-        <X className="h-5 w-5" />
-      </Button>
-    </div>
-  );
+	return (
+		<div className="flex space-x-3">
+			<div className="max-w-xl flex-grow">
+				<Input type="text" name="name" defaultValue="" disabled={pending} />
+			</div>
+			<SaveButton />
+			<Button
+				type="button"
+				variant="ghost"
+				className="px-1 lg:px-2"
+				onClick={() => setIsCreating(false)}
+			>
+				<X className="h-5 w-5" />
+			</Button>
+		</div>
+	);
 }
