@@ -53,7 +53,7 @@ export default function TaskNotesForm({ task }: { task: TaskWithDetails }) {
 			<Button
 				size="sm"
 				variant="outline"
-				className="mt-2 text-primary"
+				className="text-primary"
 				onClick={() => setIsEditing(true)}
 			>
 				Edit notes

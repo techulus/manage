@@ -73,7 +73,7 @@ export const TaskItem = ({
 			className={cn(
 				"flex scale-100 rounded-lg shadow-none dark:bg-black",
 				detailsOpen
-					? "my-1 scale-[1.03] flex-col border-2 border-gray-200 bg-gray-50 dark:border-gray-700"
+					? "my-1 flex-col border-2 border-gray-200 bg-gray-50 dark:border-gray-700"
 					: "flex-row items-center justify-center space-x-2 border-none",
 			)}
 			ref={setNodeRef}
@@ -129,49 +129,13 @@ export const TaskItem = ({
 					<CardContent className="pb-3">
 						<dl>
 							<div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-								<dt className="text-sm font-medium leading-6">Created By</dt>
-								<dd className="mt-1 flex text-sm leading-6 sm:col-span-2 sm:mt-0">
-									<span className="flex-grow">{task.creator?.firstName}</span>
-									<Button
-										size="sm"
-										variant="outline"
-										className="mr-2 text-primary"
-										onClick={async () => {
-											setIsEditing((val) => !val);
-
-											if (!isEditing) return;
-
-											toast.promise(
-												updateTask(id, projectId, { name }),
-												updateTaskToastOptions,
-											);
-										}}
-									>
-										{isEditing ? "Save" : "Edit"}
-									</Button>
-									<Button
-										size="sm"
-										variant="outline"
-										className="text-primary hover:text-red-500"
-										onClick={() => {
-											toast.promise(
-												deleteTask({
-													id,
-													projectId,
-												}),
-												{
-													loading: "Deleting...",
-													success: "Deleted!",
-													error: "Error while deleting, please try again.",
-												},
-											);
-										}}
-									>
-										Delete
-									</Button>
+								<dt className="text-sm font-medium leading-6">Notes</dt>
+								<dd className="mt-1 flex items-start text-sm leading-6 sm:col-span-2 sm:mt-0">
+									<TaskNotesForm task={task} />
 								</dd>
 							</div>
 						</dl>
+
 						<dl>
 							<div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
 								<dt className="text-sm font-medium leading-6">Assigned to</dt>
@@ -219,8 +183,9 @@ export const TaskItem = ({
 									{task.dueDate ? (
 										<div className="flex w-full items-center justify-between">
 											<p>{toDateStringWithDay(task.dueDate, timezone)}</p>
-											<button
-												type="button"
+											<Button
+												size="sm"
+												variant="outline"
 												className="text-primary hover:text-red-500"
 												onClick={() => {
 													toast.promise(
@@ -232,34 +197,75 @@ export const TaskItem = ({
 												}}
 											>
 												Remove
-											</button>
+											</Button>
 										</div>
 									) : (
-										<DateTimePicker
-											dateOnly
-											name="dueDate"
-											onSelect={(dueDate) => {
-												toast.promise(
-													updateTask(id, projectId, {
-														dueDate: toStartOfDay(dueDate),
-													}),
-													updateTaskToastOptions,
-												);
-											}}
-										/>
+										<div className="w-[220px]">
+											<DateTimePicker
+												dateOnly
+												name="dueDate"
+												onSelect={(dueDate) => {
+													toast.promise(
+														updateTask(id, projectId, {
+															dueDate: toStartOfDay(dueDate),
+														}),
+														updateTaskToastOptions,
+													);
+												}}
+											/>
+										</div>
 									)}
 								</dd>
 							</div>
 						</dl>
+
 						<dl>
 							<div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-								<dt className="text-sm font-medium leading-6">Notes</dt>
-								<dd className="mt-1 flex items-start text-sm leading-6 sm:col-span-2 sm:mt-0">
-									<TaskNotesForm task={task} />
+								<dt className="text-sm font-medium leading-6">Created By</dt>
+								<dd className="mt-1 flex text-sm leading-6 sm:col-span-2 sm:mt-0">
+									<span className="flex-grow">{task.creator?.firstName}</span>
+									<Button
+										size="sm"
+										variant="outline"
+										className="mr-2 text-primary"
+										onClick={async () => {
+											setIsEditing((val) => !val);
+
+											if (!isEditing) return;
+
+											toast.promise(
+												updateTask(id, projectId, { name }),
+												updateTaskToastOptions,
+											);
+										}}
+									>
+										{isEditing ? "Save" : "Edit"}
+									</Button>
+									<Button
+										size="sm"
+										variant="outline"
+										className="text-primary hover:text-red-500"
+										onClick={() => {
+											toast.promise(
+												deleteTask({
+													id,
+													projectId,
+												}),
+												{
+													loading: "Deleting...",
+													success: "Deleted!",
+													error: "Error while deleting, please try again.",
+												},
+											);
+										}}
+									>
+										Delete
+									</Button>
 								</dd>
 							</div>
 						</dl>
-						{taskLists?.length ? (
+
+						{taskLists?.filter((x) => x.id !== task.taskListId)?.length ? (
 							<dl>
 								<div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
 									<dt className="text-sm font-medium leading-6">Actions</dt>
@@ -281,13 +287,21 @@ export const TaskItem = ({
 														<DropdownMenuItem key={list.id} className="w-full">
 															<form
 																className="w-full"
-																action={() =>
-																	moveTaskToTaskList(
-																		task.id,
-																		list.id,
-																		projectId,
-																	)
-																}
+																action={() => {
+																	toast.promise(
+																		moveTaskToTaskList(
+																			task.id,
+																			list.id,
+																			projectId,
+																		),
+																		{
+																			loading: "Moving...",
+																			success: "Moved!",
+																			error:
+																				"Error while moving, please try again.",
+																		},
+																	);
+																}}
 															>
 																<button
 																	type="submit"
@@ -318,13 +332,21 @@ export const TaskItem = ({
 														<DropdownMenuItem key={list.id} className="w-full">
 															<form
 																className="w-full"
-																action={() =>
-																	copyTaskToTaskList(
-																		task.id,
-																		list.id,
-																		projectId,
-																	)
-																}
+																action={() => {
+																	toast.promise(
+																		copyTaskToTaskList(
+																			task.id,
+																			list.id,
+																			projectId,
+																		),
+																		{
+																			loading: "Copying...",
+																			success: "Copied!",
+																			error:
+																				"Error while copying, please try again.",
+																		},
+																	);
+																}}
 															>
 																<button
 																	type="submit"
