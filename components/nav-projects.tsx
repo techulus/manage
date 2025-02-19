@@ -83,7 +83,9 @@ export function NavProjects() {
 							<Link href={`/${tenant}/projects/${item.id}`}>
 								<span
 									className={cn(
-										+(projectId ?? 0) === item.id ? "font-semibold" : null,
+										+(projectId ?? 0) === item.id
+											? "font-semibold text-primary"
+											: null,
 									)}
 								>
 									{item.name}

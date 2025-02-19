@@ -213,7 +213,9 @@ export function NavMain() {
 											/>
 										)}
 										<span
-											className={cn(navItem.isActive ? "font-semibold" : null)}
+											className={cn(
+												navItem.isActive ? "font-semibold text-primary" : null,
+											)}
 										>
 											{navItem.title}
 										</span>
@@ -231,7 +233,9 @@ export function NavMain() {
 													<Link href={subItem.url}>
 														<span
 															className={cn(
-																subItem.isActive ? "font-semibold" : null,
+																subItem.isActive
+																	? "font-semibold text-primary"
+																	: null,
 															)}
 														>
 															{subItem.title}
@@ -258,7 +262,9 @@ export function NavMain() {
 										/>
 									)}
 									<span
-										className={cn(navItem.isActive ? "font-semibold" : null)}
+										className={cn(
+											navItem.isActive ? "font-semibold text-primary" : null,
+										)}
 									>
 										{navItem.title}
 									</span>
