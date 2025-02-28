@@ -3,7 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"dev": "TZ=UTC next dev",
+		"dev": "TZ=UTC next dev --turbopack",
 		"build": "next build",
 		"start": "next start",
 		"lint": "biome lint",
@@ -35,7 +35,7 @@
 		"@radix-ui/react-tooltip": "^1.1.6",
 		"@react-email/components": "^0.0.32",
 		"autoprefixer": "10.4.14",
-		"better-auth": "1.1.16",
+		"better-auth": "1.1.19",
 		"better-sqlite3": "^11.7.0",
 		"class-variance-authority": "^0.6.1",
 		"clsx": "^1.2.1",
@@ -44,11 +44,11 @@
 		"date-fns-tz": "^3.2.0",
 		"drizzle-orm": "^0.38.3",
 		"easymde": "^2.18.0",
-		"eslint-config-next": "15.1.0",
+		"eslint-config-next": "15.2.0",
 		"ical-generator": "^8.0.1",
 		"lucide-react": "^0.473.0",
 		"mime-types": "^2.1.35",
-		"next": "15.1.0",
+		"next": "15.2.0",
 		"next-themes": "^0.3.0",
 		"postcss": "8.4.23",
 		"react": "19.0.0",
@@ -81,8 +81,8 @@
 		"@types/better-sqlite3": "^7.6.12",
 		"@types/mime-types": "^2.1.4",
 		"@types/node": "20.1.0",
-		"@types/react": "19.0.1",
-		"@types/react-dom": "19.0.2",
+		"@types/react": "19.0.10",
+		"@types/react-dom": "19.0.4",
 		"@types/uuid": "^9.0.8",
 		"dotenv": "^16.4.5",
 		"drizzle-kit": "^0.30.1",
@@ -92,8 +92,8 @@
 	"packageManager": "pnpm@9.6.0+sha512.38dc6fba8dba35b39340b9700112c2fe1e12f10b17134715a4aa98ccf7bb035e76fd981cf0bb384dfa98f8d6af5481c2bef2f4266a24bfa20c34eb7147ce0b5e",
 	"pnpm": {
 		"overrides": {
-			"@types/react": "19.0.1",
-			"@types/react-dom": "19.0.2"
+			"@types/react": "19.0.10",
+			"@types/react-dom": "19.0.4"
 		}
 	}
 }

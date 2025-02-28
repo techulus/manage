@@ -35,6 +35,7 @@ export const auth = () =>
 			organization(),
 			nextCookies(),
 		],
+		baseURL: process.env.BETTER_AUTH_URL,
 		trustedOrigins: [process.env.BETTER_AUTH_URL!],
 		session: {
 			cookieCache: {
