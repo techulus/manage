@@ -1,5 +1,5 @@
-import { getSessionCookie } from "better-auth";
 import { type NextRequest, NextResponse } from "next/server";
+import { getSessionCookie } from "better-auth/cookies";
 
 const publicAppPaths = [
 	"/sign-in",
