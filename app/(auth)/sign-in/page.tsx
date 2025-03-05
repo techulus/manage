@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/betterauth/auth-client";
 import { FingerprintIcon } from "lucide-react";
-import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -18,7 +17,6 @@ export default function SignInForm() {
 	const [email, setEmail] = useState("");
 	const [processing, setProcessing] = useState(false);
 	const [hasSendEmail, setHasSendEmail] = useState(false);
-	const { theme } = useTheme();
 
 	const router = useRouter();
 
@@ -32,7 +30,7 @@ export default function SignInForm() {
 							alt="Manage"
 							width={32}
 							height={32}
-							className="-mt-2 mr-2 rounded-md"
+							className="-mt-2 mr-2"
 						/>
 
 						<Link href="/" className="-m-1.5 p-1.5" prefetch={false}>

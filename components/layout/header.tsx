@@ -16,7 +16,7 @@ export async function Header() {
 						alt="Manage"
 						width={32}
 						height={32}
-						className="-mt-2 mr-2 rounded-sm"
+						className="-mt-2 mr-2"
 					/>
 
 					<Link href="/" className="-m-1.5 p-1.5" prefetch={false}>
