@@ -33,7 +33,7 @@
 		"@radix-ui/react-tooltip": "^1.1.6",
 		"@react-email/components": "^0.0.32",
 		"@turbowire/serverless": "^0.1.0",
-		"@turbowire/web": "^0.1.0",
+		"@turbowire/web": "^0.2.0",
 		"autoprefixer": "10.4.14",
 		"better-auth": "1.2.1",
 		"better-sqlite3": "^11.7.0",

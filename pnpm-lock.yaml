@@ -82,8 +82,8 @@ importers:
         specifier: ^0.1.0
         version: 0.1.0
       '@turbowire/web':
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^0.2.0
+        version: 0.2.0
       autoprefixer:
         specifier: 10.4.14
         version: 10.4.14(postcss@8.4.23)
@@ -2596,8 +2596,8 @@ packages:
   '@turbowire/serverless@0.1.0':
     resolution: {integrity: sha512-TyVGo9kNtgJ6Ibin+CUED3oJAqIcSHorTLuPCQtlxGbDrVWHJdsSBInPxS55/W72jS2skiniatO+0avisPNB6A==}
 
-  '@turbowire/web@0.1.0':
-    resolution: {integrity: sha512-9rCcfCEOjDRAbaeQHlKqYex9xcn6HI6luBNa16hJjfPM+fJ8S4bYXOPzs5Rzk9wtUw8ooYO/j508Qr9FVAPMYw==}
+  '@turbowire/web@0.2.0':
+    resolution: {integrity: sha512-cQI/y/tue4lwLFJJfmha1MdEPmkqmi0XifVCLjG6EyUfUc1s21lkgJrJRkrHhr/x2rHTZvIWVcI3X8kguSWRag==}
 
   '@types/better-sqlite3@7.6.12':
     resolution: {integrity: sha512-fnQmj8lELIj7BSrZQAdBMHEHX8OZLYIHXqAKT1O7tDfLxaINzf00PMjw22r3N/xXh0w/sGHlO6SVaCQ2mj78lg==}
@@ -7826,7 +7826,7 @@ snapshots:
 
   '@turbowire/serverless@0.1.0': {}
 
-  '@turbowire/web@0.1.0': {}
+  '@turbowire/web@0.2.0': {}
 
   '@types/better-sqlite3@7.6.12':
     dependencies:

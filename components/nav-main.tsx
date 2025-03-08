@@ -73,18 +73,17 @@ export function NavMain() {
 	}, [updateProjectData, projectId]);
 
 	useEffect(() => {
-		let disconnectWire: (() => void) | undefined;
+		let wire: TurboWire | undefined;
 
 		getSidebarWire().then((signedWire) => {
-			const { disconnect } = new TurboWire(signedWire).connect(() => {
+			wire = new TurboWire(signedWire);
+			wire.connect(() => {
 				updateProjectData();
 			});
-
-			disconnectWire = disconnect;
 		});
 
 		return () => {
-			disconnectWire?.();
+			wire?.disconnect();
 		};
 	}, [updateProjectData]);
 

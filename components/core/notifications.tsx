@@ -30,10 +30,11 @@ function Notifications({ tenant }: { tenant: string }) {
 	useEffect(() => {
 		checkNotifications();
 
-		let disconnectWire: (() => void) | undefined;
+		let wire: TurboWire | undefined;
 
 		getNotificationsWire().then((signedWire) => {
-			const { disconnect } = new TurboWire(signedWire).connect((message) => {
+			wire = new TurboWire(signedWire);
+			wire.connect((message) => {
 				try {
 					const data = JSON.parse(message);
 					if (data?.message) {
@@ -44,12 +45,10 @@ function Notifications({ tenant }: { tenant: string }) {
 					console.error(error);
 				}
 			});
-
-			disconnectWire = disconnect;
 		});
 
 		return () => {
-			disconnectWire?.();
+			wire?.disconnect();
 		};
 	}, [checkNotifications]);
 
