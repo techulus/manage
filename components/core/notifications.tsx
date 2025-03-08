@@ -1,12 +1,11 @@
 "use client";
 
 import {
-	getNotificationsStream,
+	getNotificationsWire,
 	getUserNotifications,
 } from "@/app/(dashboard)/[tenant]/settings/actions";
 import { cn } from "@/lib/utils";
-import { useCable } from "@/lib/utils/cable-client";
-import type { Channel } from "@anycable/web";
+import { TurboWire } from "@turbowire/web";
 import { Bell, Dot } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -14,14 +13,9 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { SidebarMenuButton, SidebarMenuItem, useSidebar } from "../ui/sidebar";
 
-type NotificationMessage = {
-	message?: string;
-};
-
 function Notifications({ tenant }: { tenant: string }) {
 	const [unreadCount, setUnreadCount] = useState<number>(0);
 
-	const cable = useCable();
 	const { setOpenMobile } = useSidebar();
 	const pathname = usePathname();
 
@@ -34,28 +28,30 @@ function Notifications({ tenant }: { tenant: string }) {
 	}, []);
 
 	useEffect(() => {
-		if (!cable) return;
-
 		checkNotifications();
 
-		let channel: Channel | undefined;
-		getNotificationsStream().then((stream) => {
-			channel = cable.streamFromSigned(stream);
-			// @ts-ignore
-			channel.on("message", (data: NotificationMessage) => {
-				if (data?.message) {
-					toast.info(data.message, {
-						duration: 5000,
-					});
+		let disconnectWire: (() => void) | undefined;
+
+		getNotificationsWire().then((signedWire) => {
+			const { disconnect } = new TurboWire(signedWire).connect((message) => {
+				try {
+					const data = JSON.parse(message);
+					if (data?.message) {
+						toast.info(data.message);
+					}
+					checkNotifications();
+				} catch (error) {
+					console.error(error);
 				}
-				checkNotifications();
 			});
+
+			disconnectWire = disconnect;
 		});
 
 		return () => {
-			channel?.disconnect();
+			disconnectWire?.();
 		};
-	}, [cable, checkNotifications]);
+	}, [checkNotifications]);
 
 	return (
 		<SidebarMenuItem>

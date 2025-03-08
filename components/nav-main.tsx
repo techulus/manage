@@ -1,6 +1,6 @@
 "use client";
 
-import { getSidebarStream } from "@/app/(dashboard)/[tenant]/settings/actions";
+import { getSidebarWire } from "@/app/(dashboard)/[tenant]/settings/actions";
 import {
 	Collapsible,
 	CollapsibleContent,
@@ -19,9 +19,8 @@ import {
 } from "@/components/ui/sidebar";
 import type { ProjectWithData } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import { useCable } from "@/lib/utils/cable-client";
 import { getProjectById } from "@/lib/utils/useProjects";
-import type { Channel } from "@anycable/web";
+import { TurboWire } from "@turbowire/web";
 import {
 	CalendarCheck,
 	CalendarHeartIcon,
@@ -51,7 +50,6 @@ type MainNavItem = {
 
 export function NavMain() {
 	const { setOpenMobile } = useSidebar();
-	const cable = useCable();
 	const { tenant, projectId } = useParams();
 	const pathname = usePathname();
 
@@ -75,21 +73,20 @@ export function NavMain() {
 	}, [updateProjectData, projectId]);
 
 	useEffect(() => {
-		if (!cable) return;
+		let disconnectWire: (() => void) | undefined;
 
-		let channel: Channel | undefined;
-
-		getSidebarStream().then((stream) => {
-			channel = cable.streamFromSigned(stream);
-			channel.on("message", (_) => {
+		getSidebarWire().then((signedWire) => {
+			const { disconnect } = new TurboWire(signedWire).connect(() => {
 				updateProjectData();
 			});
+
+			disconnectWire = disconnect;
 		});
 
 		return () => {
-			channel?.disconnect();
+			disconnectWire?.();
 		};
-	}, [cable, updateProjectData]);
+	}, [updateProjectData]);
 
 	const navItems: MainNavItem[] = useMemo(() => {
 		const items: MainNavItem[] = [

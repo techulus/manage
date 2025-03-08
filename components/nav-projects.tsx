@@ -1,6 +1,6 @@
 "use client";
 
-import { getSidebarStream } from "@/app/(dashboard)/[tenant]/settings/actions";
+import { getSidebarWire } from "@/app/(dashboard)/[tenant]/settings/actions";
 import {
 	SidebarGroup,
 	SidebarGroupLabel,
@@ -11,9 +11,8 @@ import {
 } from "@/components/ui/sidebar";
 import type { ProjectWithCreator } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import { useCable } from "@/lib/utils/cable-client";
 import { getProjectsForOwner } from "@/lib/utils/useProjects";
-import type { Channel } from "@anycable/web";
+import { TurboWire } from "@turbowire/web";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -22,7 +21,6 @@ export function NavProjects() {
 	const { setOpenMobile } = useSidebar();
 	const { tenant, projectId } = useParams();
 	const [projects, setProjects] = useState<ProjectWithCreator[]>([]);
-	const cable = useCable();
 	const pathname = usePathname();
 
 	const getProjects = useCallback(() => {
@@ -42,21 +40,20 @@ export function NavProjects() {
 	}, [getProjects]);
 
 	useEffect(() => {
-		if (!cable) return;
+		let disconnectWire: (() => void) | undefined;
 
-		let channel: Channel | undefined;
-
-		getSidebarStream().then((stream) => {
-			channel = cable.streamFromSigned(stream);
-			channel.on("message", (_) => {
+		getSidebarWire().then((signedWire) => {
+			const { disconnect } = new TurboWire(signedWire).connect(() => {
 				getProjects();
 			});
+
+			disconnectWire = disconnect;
 		});
 
 		return () => {
-			channel?.disconnect();
+			disconnectWire?.();
 		};
-	}, [cable, getProjects]);
+	}, [getProjects]);
 
 	return (
 		<SidebarGroup className="group-data-[collapsible=icon]:hidden">

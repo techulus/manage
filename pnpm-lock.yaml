@@ -12,12 +12,6 @@ importers:
 
   .:
     dependencies:
-      '@anycable/serverless-js':
-        specifier: ^0.2.1
-        version: 0.2.1
-      '@anycable/web':
-        specifier: ^1.0.0
-        version: 1.0.0
       '@aws-sdk/client-s3':
         specifier: ^3.623.0
         version: 3.623.0(aws-crt@1.21.3)
@@ -84,6 +78,12 @@ importers:
       '@react-email/components':
         specifier: ^0.0.32
         version: 0.0.32(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@turbowire/serverless':
+        specifier: ^0.1.0
+        version: 0.1.0
+      '@turbowire/web':
+        specifier: ^0.1.0
+        version: 0.1.0
       autoprefixer:
         specifier: 10.4.14
         version: 10.4.14(postcss@8.4.23)
@@ -247,17 +247,6 @@ packages:
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
-
-  '@anycable/core@1.0.0':
-    resolution: {integrity: sha512-u5A8nR7dq8/vp5+HWLeYhbBJqQcXylUsQ3U0rOarQxI3bY67zEhxe22XnYA+Pcnj2yvd0WESDUZRHICAtXi7jA==}
-    engines: {node: '>=18.0.0'}
-
-  '@anycable/serverless-js@0.2.1':
-    resolution: {integrity: sha512-fdW4w0sR5dTW1ZXPgY5y2Oa/ewH4VMDd5YRA5PM3FZBEtw3C6RWOOrWA6xbbYPAOEzu63MbWAuZvhTJyksA0nA==}
-    engines: {node: '>=18.0.0', pnpm: '>=8.7.5'}
-
-  '@anycable/web@1.0.0':
-    resolution: {integrity: sha512-ehfM4D7eNHL7GXZISUTr1H4mQ5xKMfyx45mLTxFReT1sxNT+fIi2CiWz1SNB124q0GX/pqZfIHOf96YbsHAVUA==}
 
   '@aws-crypto/crc32@5.2.0':
     resolution: {integrity: sha512-nLbCWqQNgUiwwtFsen1AdzAtvuLRsQS8rYgMuxCrdKf9kOssamGLuPwyTY9wyYblNr9+1XM8v6zoDTPPSIeANg==}
@@ -2604,6 +2593,12 @@ packages:
     resolution: {integrity: sha512-UAiZMrFlgMdOIaJDPsKu5S7OecyMLr3GGALJTYkRgHmsHAA/8Ixm1qD09ELP2X7U1lqgrctEgvKj9GzMbczC+g==}
     engines: {node: '>= 14.0.0'}
 
+  '@turbowire/serverless@0.1.0':
+    resolution: {integrity: sha512-TyVGo9kNtgJ6Ibin+CUED3oJAqIcSHorTLuPCQtlxGbDrVWHJdsSBInPxS55/W72jS2skiniatO+0avisPNB6A==}
+
+  '@turbowire/web@0.1.0':
+    resolution: {integrity: sha512-9rCcfCEOjDRAbaeQHlKqYex9xcn6HI6luBNa16hJjfPM+fJ8S4bYXOPzs5Rzk9wtUw8ooYO/j508Qr9FVAPMYw==}
+
   '@types/better-sqlite3@7.6.12':
     resolution: {integrity: sha512-fnQmj8lELIj7BSrZQAdBMHEHX8OZLYIHXqAKT1O7tDfLxaINzf00PMjw22r3N/xXh0w/sGHlO6SVaCQ2mj78lg==}
 
@@ -3918,9 +3913,6 @@ packages:
     resolution: {integrity: sha512-rg9zJN+G4n2nfJl5MW3BMygZX56zKPNVEYYqq7adpmMh4Jn2QNEwhvQlFy6jPVdcod7txZtKHWnyZiA3a0zP7A==}
     hasBin: true
 
-  jose@4.15.9:
-    resolution: {integrity: sha512-1vUQX+IdDMVPj4k8kOxgUqlcK518yluMuGZwqlr44FS1ppZB/5GWh4rZG89erpOBOJjU/OBsnCVFfapsRz6nEA==}
-
   jose@5.9.6:
     resolution: {integrity: sha512-AMlnetc9+CV9asI19zHmrgS/WYsWUwCn2R7RzlbJWD7F9eWYUTGyBmU9o6PxngtLGOiDGPRu+Uc4fhKzbpteZQ==}
 
@@ -4236,10 +4228,6 @@ packages:
 
   mz@2.7.0:
     resolution: {integrity: sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q==}
-
-  nanoevents@9.1.0:
-    resolution: {integrity: sha512-Jd0fILWG44a9luj8v5kED4WI+zfkkgwKyRQKItTtlPfEsh7Lznfi1kr8/iZ+XAIss4Qq5GqRB0qtWbaz9ceO/A==}
-    engines: {node: ^18.0.0 || >=20.0.0}
 
   nanoid@3.3.7:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
@@ -5205,18 +5193,6 @@ packages:
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
-
-  '@anycable/core@1.0.0':
-    dependencies:
-      nanoevents: 9.1.0
-
-  '@anycable/serverless-js@0.2.1':
-    dependencies:
-      jose: 4.15.9
-
-  '@anycable/web@1.0.0':
-    dependencies:
-      '@anycable/core': 1.0.0
 
   '@aws-crypto/crc32@5.2.0':
     dependencies:
@@ -7848,6 +7824,10 @@ snapshots:
   '@touch4it/ical-timezones@1.9.0':
     optional: true
 
+  '@turbowire/serverless@0.1.0': {}
+
+  '@turbowire/web@0.1.0': {}
+
   '@types/better-sqlite3@7.6.12':
     dependencies:
       '@types/node': 20.1.0
@@ -9335,8 +9315,6 @@ snapshots:
   jiti@2.4.2:
     optional: true
 
-  jose@4.15.9: {}
-
   jose@5.9.6: {}
 
   js-beautify@1.15.1:
@@ -9858,8 +9836,6 @@ snapshots:
       any-promise: 1.3.0
       object-assign: 4.1.1
       thenify-all: 1.6.0
-
-  nanoevents@9.1.0: {}
 
   nanoid@3.3.7: {}
 

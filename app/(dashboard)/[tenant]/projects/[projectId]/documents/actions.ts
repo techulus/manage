@@ -3,7 +3,7 @@
 import { blob, comment, document, documentFolder } from "@/drizzle/schema";
 import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { deleteFile } from "@/lib/blobStore";
-import { broadcastEvent } from "@/lib/utils/cable-server";
+import { broadcastEvent } from "@/lib/utils/turbowire";
 import { database } from "@/lib/utils/useDatabase";
 import { deleteFilesInMarkdown } from "@/lib/utils/useMarkdown";
 import { getOwner } from "@/lib/utils/useOwner";

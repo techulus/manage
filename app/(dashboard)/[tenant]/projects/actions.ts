@@ -2,7 +2,7 @@
 
 import { activity, comment, project } from "@/drizzle/schema";
 import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
-import { broadcastEvent } from "@/lib/utils/cable-server";
+import { broadcastEvent } from "@/lib/utils/turbowire";
 import { database } from "@/lib/utils/useDatabase";
 import { convertMarkdownToPlainText } from "@/lib/utils/useMarkdown";
 import { getOwner } from "@/lib/utils/useOwner";

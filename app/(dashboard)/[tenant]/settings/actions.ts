@@ -1,7 +1,7 @@
 "use server";
 
 import { notification, user } from "@/drizzle/schema";
-import { broadcastEvent, getStreamFor } from "@/lib/utils/cable-server";
+import { broadcastEvent, getSignedWireUrl } from "@/lib/utils/turbowire";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { desc, eq } from "drizzle-orm";
@@ -51,12 +51,12 @@ export async function markAllNotificationsAsRead() {
 	revalidatePath(`/${orgSlug}/notifications`);
 }
 
-export async function getNotificationsStream() {
+export async function getNotificationsWire() {
 	const { userId } = await getOwner();
-	return getStreamFor("notifications", userId);
+	return getSignedWireUrl("notifications", userId);
 }
 
-export async function getSidebarStream() {
+export async function getSidebarWire() {
 	const { ownerId } = await getOwner();
-	return getStreamFor("update_sidebar", ownerId);
+	return getSignedWireUrl("update_sidebar", ownerId);
 }
