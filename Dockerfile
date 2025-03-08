@@ -1,6 +1,5 @@
 FROM node:lts-alpine AS base
 
-ARG NEXT_PUBLIC_ANYCABLE_WEBSOCKET_URL
 ARG NEXT_PUBLIC_APP_URL
 
 # Install build tools and dependencies

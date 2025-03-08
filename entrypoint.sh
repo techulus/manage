@@ -14,11 +14,11 @@ for file in /app/better-auth_migrations/*.sql; do
 done
 echo "Auth database migrations complete."
 
-echo "Checking AnyCable connection..."
-ANYCABLE_HEALTH_CHECK_URL=$(echo "${ANYCABLE_BROADCAST_URL}" | sed 's/_broadcast/health/')
-echo "Checking AnyCable connection at $ANYCABLE_HEALTH_CHECK_URL..."
-curl -fsS $ANYCABLE_HEALTH_CHECK_URL || exit 1
-echo "AnyCable connection is OK."
+echo "Checking TurboWire connection..."
+TURBOWIRE_HEALTH_CHECK_URL="https://${TURBOWIRE_DOMAIN}/health"
+echo "Checking TurboWire connection at $TURBOWIRE_HEALTH_CHECK_URL..."
+curl -fsS $TURBOWIRE_HEALTH_CHECK_URL || exit 1
+echo "TurboWire connection is OK."
 
 echo "Checking S3 Endpoint is set..."
 if [ -z "$S3_ENDPOINT" ]; then

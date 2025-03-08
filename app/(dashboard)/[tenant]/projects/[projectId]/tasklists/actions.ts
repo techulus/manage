@@ -3,7 +3,7 @@
 import { notificationType } from "@/data/notification";
 import { notification, task, taskList } from "@/drizzle/schema";
 import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
-import { broadcastEvent } from "@/lib/utils/cable-server";
+import { broadcastEvent } from "@/lib/utils/turbowire";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { and, desc, eq } from "drizzle-orm";
