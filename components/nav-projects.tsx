@@ -30,7 +30,14 @@ export function NavProjects() {
 	const [projects, setProjects] = useState<ProjectWithCreator[]>(() => {
 		try {
 			const cached = localStorage.getItem(localStorageKey);
-			return cached ? JSON.parse(cached) : [];
+			if (cached) {
+				const { data, ts } = JSON.parse(cached);
+				if (ts > Date.now() - 1000 * 60 * 60 * 24) {
+					return data;
+				}
+				localStorage.removeItem(localStorageKey);
+			}
+			return null;
 		} catch (error) {
 			console.error(error);
 			return [];
@@ -43,7 +50,13 @@ export function NavProjects() {
 		})
 			.then((data) => {
 				setProjects(data.projects);
-				localStorage.setItem(localStorageKey, JSON.stringify(data.projects));
+				localStorage.setItem(
+					localStorageKey,
+					JSON.stringify({
+						ts: Date.now(),
+						data: data.projects,
+					}),
+				);
 			})
 			.catch((error) => {
 				setProjects([]);
