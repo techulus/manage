@@ -53,18 +53,46 @@ export function NavMain() {
 	const { tenant, projectId } = useParams();
 	const pathname = usePathname();
 
-	const [projectData, setProjectData] = useState<ProjectWithData | null>(null);
+	const localStorageKey = useMemo(
+		() => `tenant-${tenant}-project-${projectId}-nav`,
+		[tenant, projectId],
+	);
+
+	const [projectData, setProjectData] = useState<ProjectWithData | null>(() => {
+		try {
+			const cached = localStorage.getItem(localStorageKey);
+			if (cached) {
+				const { data, ts } = JSON.parse(cached);
+				if (ts > Date.now() - 1000 * 60 * 60 * 24) {
+					return data;
+				}
+				localStorage.removeItem(localStorageKey);
+			}
+			return null;
+		} catch (error) {
+			console.error(error);
+			return null;
+		}
+	});
 
 	const updateProjectData = useCallback(() => {
 		getProjectById(String(projectId), true)
 			.then((data) => {
 				setProjectData(data);
+				localStorage.setItem(
+					localStorageKey,
+					JSON.stringify({
+						data,
+						ts: Date.now(),
+					}),
+				);
 			})
 			.catch((error) => {
 				setProjectData(null);
+				localStorage.removeItem(localStorageKey);
 				console.error(error);
 			});
-	}, [projectId]);
+	}, [projectId, localStorageKey]);
 
 	useEffect(() => {
 		if (projectId) {
