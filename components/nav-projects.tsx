@@ -15,13 +15,27 @@ import { getProjectsForOwner } from "@/lib/utils/useProjects";
 import { TurboWire } from "@turbowire/web";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export function NavProjects() {
 	const { setOpenMobile } = useSidebar();
 	const { tenant, projectId } = useParams();
-	const [projects, setProjects] = useState<ProjectWithCreator[]>([]);
 	const pathname = usePathname();
+
+	const localStorageKey = useMemo(
+		() => `tenant-${tenant}-projects-nav`,
+		[tenant],
+	);
+
+	const [projects, setProjects] = useState<ProjectWithCreator[]>(() => {
+		try {
+			const cached = localStorage.getItem(localStorageKey);
+			return cached ? JSON.parse(cached) : [];
+		} catch (error) {
+			console.error(error);
+			return [];
+		}
+	});
 
 	const getProjects = useCallback(() => {
 		getProjectsForOwner({
@@ -29,11 +43,14 @@ export function NavProjects() {
 		})
 			.then((data) => {
 				setProjects(data.projects);
+				localStorage.setItem(localStorageKey, JSON.stringify(data.projects));
 			})
 			.catch((error) => {
+				setProjects([]);
 				console.error(error);
+				localStorage.removeItem(localStorageKey);
 			});
-	}, []);
+	}, [localStorageKey]);
 
 	useEffect(() => {
 		getProjects();
