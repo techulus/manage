@@ -37,7 +37,7 @@ export function NavProjects() {
 				}
 				localStorage.removeItem(localStorageKey);
 			}
-			return null;
+			return [];
 		} catch (error) {
 			console.error(error);
 			return [];
