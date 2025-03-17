@@ -52,28 +52,32 @@ export function NavMain() {
 	const { setOpenMobile } = useSidebar();
 	const { tenant, projectId } = useParams();
 	const pathname = usePathname();
+	const [isHydrated, setIsHydrated] = useState(false);
 
 	const localStorageKey = useMemo(
 		() => `tenant-${tenant}-project-${projectId}-nav`,
 		[tenant, projectId],
 	);
 
-	const [projectData, setProjectData] = useState<ProjectWithData | null>(() => {
+	const [projectData, setProjectData] = useState<ProjectWithData | null>(null);
+
+	useEffect(() => {
 		try {
 			const cached = localStorage.getItem(localStorageKey);
 			if (cached) {
 				const { data, ts } = JSON.parse(cached);
 				if (ts > Date.now() - 1000 * 60 * 60 * 24) {
-					return data;
+					setProjectData(data);
+				} else {
+					localStorage.removeItem(localStorageKey);
 				}
-				localStorage.removeItem(localStorageKey);
 			}
-			return null;
 		} catch (error) {
 			console.error(error);
-			return null;
+		} finally {
+			setIsHydrated(true);
 		}
-	});
+	}, [localStorageKey]);
 
 	const updateProjectData = useCallback(() => {
 		getProjectById(String(projectId), true)
@@ -95,10 +99,10 @@ export function NavMain() {
 	}, [projectId, localStorageKey]);
 
 	useEffect(() => {
-		if (projectId) {
+		if (projectId && (!projectData || !isHydrated)) {
 			updateProjectData();
 		}
-	}, [updateProjectData, projectId]);
+	}, [updateProjectData, projectId, projectData, isHydrated]);
 
 	useEffect(() => {
 		let wire: TurboWire | undefined;
