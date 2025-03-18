@@ -21,28 +21,31 @@ export function NavProjects() {
 	const { setOpenMobile } = useSidebar();
 	const { tenant, projectId } = useParams();
 	const pathname = usePathname();
+	const [isHydrated, setIsHydrated] = useState(false);
 
 	const localStorageKey = useMemo(
 		() => `tenant-${tenant}-projects-nav`,
 		[tenant],
 	);
 
-	const [projects, setProjects] = useState<ProjectWithCreator[]>(() => {
+	const [projects, setProjects] = useState<ProjectWithCreator[]>([]);
+
+	useEffect(() => {
 		try {
 			const cached = localStorage.getItem(localStorageKey);
 			if (cached) {
 				const { data, ts } = JSON.parse(cached);
 				if (ts > Date.now() - 1000 * 60 * 60 * 24) {
-					return data;
+					setProjects(data);
 				}
 				localStorage.removeItem(localStorageKey);
 			}
-			return [];
 		} catch (error) {
 			console.error(error);
-			return [];
+		} finally {
+			setIsHydrated(true);
 		}
-	});
+	}, [localStorageKey]);
 
 	const getProjects = useCallback(() => {
 		getProjectsForOwner({
@@ -66,8 +69,10 @@ export function NavProjects() {
 	}, [localStorageKey]);
 
 	useEffect(() => {
-		getProjects();
-	}, [getProjects]);
+		if (projectId && (!projects || !isHydrated)) {
+			getProjects();
+		}
+	}, [getProjects, isHydrated, projects, projectId]);
 
 	useEffect(() => {
 		let wire: TurboWire | undefined;
