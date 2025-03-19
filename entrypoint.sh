@@ -4,10 +4,6 @@ set -e
 
 echo "Starting checks..."
 
-echo "Running auth database migrations..."
-bunx @better-auth/cli migrate --config ./lib/betterauth/config.ts --y
-echo "Auth database migrations complete."
-
 echo "Checking TurboWire connection..."
 TURBOWIRE_HEALTH_CHECK_URL="https://${TURBOWIRE_DOMAIN}/health"
 echo "Checking TurboWire connection at $TURBOWIRE_HEALTH_CHECK_URL..."
