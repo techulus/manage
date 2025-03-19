@@ -1,16 +1,33 @@
 import path from "node:path";
-import Database from "better-sqlite3";
-import {
-	type BetterSQLite3Database,
-	drizzle,
-} from "drizzle-orm/better-sqlite3";
-import { migrate } from "drizzle-orm/better-sqlite3/migrator";
+import { createClient } from "@libsql/client";
+import { type LibSQLDatabase, drizzle } from "drizzle-orm/libsql";
+import { migrate } from "drizzle-orm/libsql/migrator";
 import * as schema from "../../drizzle/schema";
 import { getOwner } from "./useOwner";
+import { addUserToTenantDb } from "./useUser";
 
 export async function isDatabaseReady(): Promise<boolean> {
 	try {
+		const { ownerId } = await getOwner();
+		const result = await fetch(
+			`https://api.turso.tech/v1/organizations/${process.env.TURSO_ORG}/databases`,
+			{
+				method: "POST",
+				body: JSON.stringify({
+					name: ownerId.toLowerCase(),
+					group: process.env.TURSO_GROUP,
+				}),
+				headers: {
+					Authorization: `Bearer ${process.env.TURSO_API_TOKEN}`,
+				},
+			},
+		).then((res) => res.json());
+		if (result?.error && !result.error?.includes("already exists")) {
+			console.error("Error creating Turso DB", result.error);
+			return false;
+		}
 		await migrateDatabase();
+		await addUserToTenantDb();
 		return true;
 	} catch (e) {
 		console.error("Database not ready", e);
@@ -24,24 +41,30 @@ export async function migrateDatabase(): Promise<void> {
 	migrate(db, { migrationsFolder: migrationsFolder });
 }
 
-export async function database(): Promise<
-	BetterSQLite3Database<typeof schema>
-> {
+export async function database(): Promise<LibSQLDatabase<typeof schema>> {
 	const { ownerId } = await getOwner();
 
 	if (!ownerId) {
 		throw new Error("Owner ID not found");
 	}
 
-	const sqlite = new Database(`sqlite/${ownerId}.db`);
-	return drizzle(sqlite, { schema });
+	return drizzle(
+		createClient({
+			url: `libsql://${ownerId}-${process.env.TURSO_ORG}.turso.io`.toLowerCase(),
+			authToken: process.env.TURSO_GROUP_TOKEN,
+		}),
+		{ schema },
+	);
 }
 
 export async function getDatabaseForOwner(
 	ownerId: string,
-): Promise<BetterSQLite3Database<typeof schema>> {
-	const sqlite = new Database(`sqlite/${ownerId}.db`, {
-		fileMustExist: true,
-	});
-	return drizzle(sqlite, { schema });
+): Promise<LibSQLDatabase<typeof schema>> {
+	return drizzle(
+		createClient({
+			url: `libsql://${ownerId}-${process.env.TURSO_ORG}.turso.io`.toLowerCase(),
+			authToken: process.env.TURSO_GROUP_TOKEN,
+		}),
+		{ schema },
+	);
 }
