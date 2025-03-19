@@ -1,4 +1,4 @@
-FROM oven/bun:latest AS base
+FROM oven/bun:slim AS base
 
 ARG NEXT_PUBLIC_APP_URL
 

@@ -4,7 +4,12 @@ import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
 import { magicLink, organization } from "better-auth/plugins";
 import { passkey } from "better-auth/plugins/passkey";
+import Redis from "ioredis";
 import { Resend } from "resend";
+
+const redis = process.env.REDIS_URL
+	? new Redis(process.env.REDIS_URL)
+	: undefined;
 
 export const auth = () =>
 	betterAuth({
@@ -43,10 +48,22 @@ export const auth = () =>
 		],
 		baseURL: process.env.BETTER_AUTH_URL,
 		trustedOrigins: [process.env.BETTER_AUTH_URL!],
-		session: {
-			cookieCache: {
-				enabled: true,
-				maxAge: 5 * 60,
-			},
-		},
+		secondaryStorage: redis
+			? {
+					get: async (key) => {
+						const value = await redis.get(key);
+						return value ? value : null;
+					},
+					set: async (key, value, ttl) => {
+						if (ttl) {
+							await redis.set(key, value, "EX", ttl);
+						} else {
+							await redis.set(key, value);
+						}
+					},
+					delete: async (key) => {
+						await redis.del(key);
+					},
+				}
+			: undefined,
 	});
