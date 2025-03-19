@@ -69,10 +69,10 @@ export function NavProjects() {
 	}, [localStorageKey]);
 
 	useEffect(() => {
-		if (projectId && (!projects || !isHydrated)) {
+		if (!projects || !isHydrated) {
 			getProjects();
 		}
-	}, [getProjects, isHydrated, projects, projectId]);
+	}, [getProjects, isHydrated, projects]);
 
 	useEffect(() => {
 		let wire: TurboWire | undefined;
