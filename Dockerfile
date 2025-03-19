@@ -9,10 +9,9 @@ RUN apk add --no-cache \
     g++ \
     libstdc++ \
     gcc \
-    musl-dev \
+    glibc-dev \
     cmake \
-    curl \
-    sqlite
+    curl
 
 # Stage 1: Install dependencies
 FROM base AS deps
@@ -40,7 +39,6 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/better-auth_migrations ./better-auth_migrations
 COPY --from=builder --chown=nextjs:nodejs /app/entrypoint.sh ./entrypoint.sh
 
 RUN chmod +x /app/entrypoint.sh
