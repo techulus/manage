@@ -14,8 +14,12 @@ export default async function ConsoleLayout(props: {
 		tenant: string;
 	}>;
 }) {
-	const { tenant } = await props.params;
+	const ready = await isDatabaseReady();
+	if (!ready) {
+		redirect("/start");
+	}
 
+	const { tenant } = await props.params;
 	const { children } = props;
 	const { orgSlug, orgId } = await getOwner();
 	const user = await getUser();
@@ -30,11 +34,6 @@ export default async function ConsoleLayout(props: {
 		if (!org) {
 			redirect("/start");
 		}
-	}
-
-	const ready = await isDatabaseReady();
-	if (!ready) {
-		redirect("/start");
 	}
 
 	return (

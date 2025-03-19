@@ -17,7 +17,7 @@ export async function GET(
 	const searchParams = request.nextUrl.searchParams;
 	const { projectId, ownerId } = params;
 
-	const db = await getDatabaseForOwner(ownerId);
+	const db = getDatabaseForOwner(ownerId);
 
 	let timezone: string | undefined | null = undefined;
 	const userId = searchParams.get("userId");

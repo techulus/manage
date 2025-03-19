@@ -9,4 +9,5 @@ module.exports = {
 		];
 	},
 	output: "standalone",
+	serverExternalPackages: ["@libsql/client", "@libsql/kysely-libsql"],
 };

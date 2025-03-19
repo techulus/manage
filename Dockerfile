@@ -1,31 +1,21 @@
-FROM node:lts-alpine AS base
+FROM oven/bun:latest AS base
 
 ARG NEXT_PUBLIC_APP_URL
 
-# Install build tools and dependencies
-RUN apk add --no-cache \
-    python3 \
-    make \
-    g++ \
-    libstdc++ \
-    gcc \
-    musl-dev \
-    cmake \
-    curl \
-    sqlite
+RUN apt-get update && apt-get install -y curl
 
 # Stage 1: Install dependencies
 FROM base AS deps
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
-RUN corepack enable && corepack prepare pnpm@9.15.4 --activate && pnpm install --frozen-lockfile
+COPY package.json bun.lock ./
+RUN bun install
 
 # Stage 2: Build the application
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN corepack enable && corepack prepare pnpm@9.15.4 --activate && pnpm run build
+RUN bun run build
 
 # Stage 3: Production server
 FROM base AS runner
@@ -40,8 +30,8 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/better-auth_migrations ./better-auth_migrations
 COPY --from=builder --chown=nextjs:nodejs /app/entrypoint.sh ./entrypoint.sh
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 RUN chmod +x /app/entrypoint.sh
 
@@ -54,4 +44,4 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 ENTRYPOINT ["/app/entrypoint.sh"]
-CMD ["node", "server.js"]
+CMD ["bun", "server.js"]
