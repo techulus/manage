@@ -1,8 +1,8 @@
-FROM oven/bun:latest AS base
+FROM oven/bun:alpine AS base
 
 ARG NEXT_PUBLIC_APP_URL
 
-RUN apt-get update && apt-get install -y curl
+RUN apk update && apk add --no-cache curl
 
 # Stage 1: Install dependencies
 FROM base AS deps
