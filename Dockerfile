@@ -9,7 +9,7 @@ RUN apk add --no-cache \
     g++ \
     libstdc++ \
     gcc \
-    glibc-dev \
+    gcompat \
     cmake \
     curl
 
