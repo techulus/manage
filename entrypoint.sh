@@ -5,7 +5,7 @@ set -e
 echo "Starting checks..."
 
 echo "Running auth database migrations..."
-npx @better-auth/cli migrate --config ./lib/betterauth/config.ts --y
+bunx @better-auth/cli migrate --config ./lib/betterauth/config.ts --y
 echo "Auth database migrations complete."
 
 echo "Checking TurboWire connection..."
