@@ -6,6 +6,10 @@ import * as schema from "../../drizzle/schema";
 import { getOwner } from "./useOwner";
 import { addUserToTenantDb } from "./useUser";
 
+function getDatabaseName(ownerId: string) {
+	return `${ownerId}-${process.env.TURSO_GROUP}`.toLowerCase();
+}
+
 export async function isDatabaseReady(): Promise<boolean> {
 	try {
 		const { ownerId } = await getOwner();
@@ -14,7 +18,7 @@ export async function isDatabaseReady(): Promise<boolean> {
 			{
 				method: "POST",
 				body: JSON.stringify({
-					name: ownerId.toLowerCase(),
+					name: getDatabaseName(ownerId),
 					group: process.env.TURSO_GROUP,
 				}),
 				headers: {
@@ -56,7 +60,7 @@ export function getDatabaseForOwner(
 ): LibSQLDatabase<typeof schema> {
 	return drizzle(
 		createClient({
-			url: `libsql://${ownerId}-${process.env.TURSO_GROUP}-${process.env.TURSO_ORG}.turso.io`.toLowerCase(),
+			url: `libsql://${getDatabaseName(ownerId)}-${process.env.TURSO_ORG}.turso.io`,
 			authToken: process.env.TURSO_GROUP_TOKEN,
 		}),
 		{ schema },
