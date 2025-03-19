@@ -48,18 +48,12 @@ export async function database(): Promise<LibSQLDatabase<typeof schema>> {
 		throw new Error("Owner ID not found");
 	}
 
-	return drizzle(
-		createClient({
-			url: `libsql://${ownerId}-${process.env.TURSO_ORG}.turso.io`.toLowerCase(),
-			authToken: process.env.TURSO_GROUP_TOKEN,
-		}),
-		{ schema },
-	);
+	return getDatabaseForOwner(ownerId);
 }
 
-export async function getDatabaseForOwner(
+export function getDatabaseForOwner(
 	ownerId: string,
-): Promise<LibSQLDatabase<typeof schema>> {
+): LibSQLDatabase<typeof schema> {
 	return drizzle(
 		createClient({
 			url: `libsql://${ownerId}-${process.env.TURSO_ORG}.turso.io`.toLowerCase(),
