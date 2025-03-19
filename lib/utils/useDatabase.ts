@@ -56,7 +56,7 @@ export function getDatabaseForOwner(
 ): LibSQLDatabase<typeof schema> {
 	return drizzle(
 		createClient({
-			url: `libsql://${ownerId}-${process.env.TURSO_ORG}.turso.io`.toLowerCase(),
+			url: `libsql://${ownerId}-${process.env.TURSO_GROUP}-${process.env.TURSO_ORG}.turso.io`.toLowerCase(),
 			authToken: process.env.TURSO_GROUP_TOKEN,
 		}),
 		{ schema },
