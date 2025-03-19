@@ -1,14 +1,20 @@
 import { MagicLinkEmail } from "@/components/emails/magic-link";
+import { LibsqlDialect } from "@libsql/kysely-libsql";
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
 import { magicLink, organization } from "better-auth/plugins";
 import { passkey } from "better-auth/plugins/passkey";
-import Database from "better-sqlite3";
 import { Resend } from "resend";
 
 export const auth = () =>
 	betterAuth({
-		database: new Database("./sqlite/auth.db"),
+		database: {
+			dialect: new LibsqlDialect({
+				url: `libsql://${process.env.TURSO_GROUP}-auth-${process.env.TURSO_ORG}.turso.io`,
+				authToken: process.env.TURSO_GROUP_TOKEN,
+			}),
+			type: "sqlite",
+		},
 		plugins: [
 			magicLink({
 				sendMagicLink: async ({ email, url }) => {

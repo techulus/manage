@@ -40,7 +40,7 @@ export async function createProject(payload: FormData) {
 	});
 
 	const db = await database();
-	const newProject = db
+	const newProject = await db
 		.insert(project)
 		.values({
 			...data,
@@ -116,7 +116,7 @@ export async function archiveProject(payload: FormData) {
 	const id = Number(payload.get("id"));
 
 	const db = await database();
-	const projectDetails = db
+	const projectDetails = await db
 		.update(project)
 		.set({
 			status: "archived",
@@ -144,7 +144,7 @@ export async function unarchiveProject(payload: FormData) {
 	const id = Number(payload.get("id"));
 
 	const db = await database();
-	const projectDetails = db
+	const projectDetails = await db
 		.update(project)
 		.set({
 			status: "active",

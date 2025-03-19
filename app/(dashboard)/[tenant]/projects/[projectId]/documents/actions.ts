@@ -177,7 +177,7 @@ export async function updateDocumentFolder(payload: FormData) {
 		.findFirst({ where: eq(documentFolder.id, +id) })
 		.execute();
 
-	const folderDetails = db
+	const folderDetails = await db
 		.update(documentFolder)
 		.set({
 			...data,
@@ -301,7 +301,7 @@ export async function deleteBlob(
 	await deleteFile(file.key);
 
 	const db = await database();
-	const blobDetails = db
+	const blobDetails = await db
 		.delete(blob)
 		.where(eq(blob.id, file.id))
 		.returning()

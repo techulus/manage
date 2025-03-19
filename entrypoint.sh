@@ -4,14 +4,8 @@ set -e
 
 echo "Starting checks..."
 
-echo "Fix permissions..."
-chown -R nextjs:nodejs /app/sqlite
-chmod -R 777 /app/sqlite
-
 echo "Running auth database migrations..."
-for file in /app/better-auth_migrations/*.sql; do
-    sqlite3 sqlite/auth.db < "$file"
-done
+npx @better-auth/cli migrate --config ./lib/betterauth/config.ts --y
 echo "Auth database migrations complete."
 
 echo "Checking TurboWire connection..."

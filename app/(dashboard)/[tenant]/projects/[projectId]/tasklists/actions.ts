@@ -141,7 +141,7 @@ export async function partialUpdateTaskList(
 		})
 		.execute();
 
-	const updated = db
+	const updated = await db
 		.update(taskList)
 		.set({
 			...data,
@@ -171,7 +171,7 @@ export async function deleteTaskList(payload: FormData) {
 
 	const { orgSlug, ownerId } = await getOwner();
 	const db = await database();
-	const taskListDetails = db
+	const taskListDetails = await db
 		.delete(taskList)
 		.where(eq(taskList.id, +id))
 		.returning()
@@ -263,7 +263,7 @@ export async function updateTask(
 		})
 		.execute();
 
-	const taskDetails = db
+	const taskDetails = await db
 		.update(task)
 		.set({
 			...data,
@@ -312,7 +312,11 @@ export async function deleteTask({
 }) {
 	const { orgSlug } = await getOwner();
 	const db = await database();
-	const taskDetails = db.delete(task).where(eq(task.id, +id)).returning().get();
+	const taskDetails = await db
+		.delete(task)
+		.where(eq(task.id, +id))
+		.returning()
+		.get();
 
 	await logActivity({
 		action: "deleted",
@@ -372,7 +376,7 @@ export async function forkTaskList(taskListId: number, projectId: number) {
 		.where(eq(taskList.id, +taskListId))
 		.run();
 
-	const newTaskList = db
+	const newTaskList = await db
 		.insert(taskList)
 		.values({
 			name: taskListDetails.name,
