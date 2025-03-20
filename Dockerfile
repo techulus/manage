@@ -1,8 +1,16 @@
-FROM oven/bun:slim AS base
+FROM oven/bun:alpine AS base
 
 ARG NEXT_PUBLIC_APP_URL
 
-RUN apt-get update && apt-get install -y curl
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    libstdc++ \
+    gcc \
+    musl-dev \
+    cmake \
+    curl
 
 # Stage 1: Install dependencies
 FROM base AS deps
