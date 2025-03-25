@@ -1,8 +1,8 @@
-import { MagicLinkEmail } from "@/components/emails/magic-link";
+import { OtpEmail } from "@/components/emails/otp-email";
 import { LibsqlDialect } from "@libsql/kysely-libsql";
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
-import { magicLink, organization } from "better-auth/plugins";
+import { emailOTP, organization } from "better-auth/plugins";
 import { passkey } from "better-auth/plugins/passkey";
 import Redis from "ioredis";
 import { Resend } from "resend";
@@ -21,15 +21,15 @@ export const auth = () =>
 			type: "sqlite",
 		},
 		plugins: [
-			magicLink({
-				sendMagicLink: async ({ email, url }) => {
-					console.log("Send magic link", email, url);
+			emailOTP({
+				async sendVerificationOTP({ email, otp, type }) {
+					console.log("Send otp email", email, otp, type);
 					const resend = new Resend(process.env.RESEND_API_KEY);
 					const { data, error } = await resend.emails.send({
 						from: "Manage <account@email.managee.xyz>",
 						to: [email],
-						subject: "Your Magic Link",
-						react: MagicLinkEmail({ url }),
+						subject: "Your Login Code",
+						react: OtpEmail({ otp }),
 					});
 					console.log("Email Result ->", error ?? data);
 				},

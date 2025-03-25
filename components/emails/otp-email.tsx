@@ -1,4 +1,3 @@
-import type * as React from "react";
 import {
 	Body,
 	Container,
@@ -10,29 +9,31 @@ import {
 	Preview,
 	Text,
 } from "@react-email/components";
+import type * as React from "react";
 
-interface Props {
-	url: string;
-}
-
-export const MagicLinkEmail = ({ url }: Props) => (
+export const OtpEmail = ({ otp }: { otp: string }) => (
 	<Html>
 		<Head />
-		<Preview>Log in with this magic link</Preview>
+		<Preview>Your login code for Manage</Preview>
 		<Body style={main}>
 			<Container style={container}>
-				<Heading style={h1}>Login to Manage</Heading>
-				<Link
-					href={url}
-					target="_blank"
+				<Heading style={h1}>Your Login Code</Heading>
+				<Text
 					style={{
-						...link,
-						display: "block",
-						marginBottom: "16px",
+						...text,
+						fontSize: "32px",
+						fontWeight: "bold",
+						textAlign: "center",
+						letterSpacing: "8px",
+						margin: "32px 0",
 					}}
 				>
-					Click here to log in with this magic link
-				</Link>
+					{otp}
+				</Text>
+				<Text style={text}>
+					Enter this code to log in to your Manage account. This code will
+					expire in 5 minutes.
+				</Text>
 				<Text
 					style={{
 						...text,
@@ -41,7 +42,7 @@ export const MagicLinkEmail = ({ url }: Props) => (
 						marginBottom: "16px",
 					}}
 				>
-					If you didn&apos;t try to login, you can safely ignore this email.
+					If you didn't try to login, you can safely ignore this email.
 				</Text>
 				<Img
 					src="https://managee.xyz/images/logo.png"

@@ -2,22 +2,27 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import {
+	InputOTP,
+	InputOTPGroup,
+	InputOTPSlot,
+} from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
-import { authClient, signIn } from "@/lib/betterauth/auth-client";
-import { FingerprintIcon } from "lucide-react";
+import { signIn } from "@/lib/betterauth/auth-client";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import logo from "../../../public/images/logo.png";
 
-export default function SignInForm() {
-	const [email, setEmail] = useState("");
+export default function VerifyOtpForm() {
+	const [otp, setOtp] = useState("");
 	const [processing, setProcessing] = useState(false);
 
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const email = searchParams.get("email");
 
 	return (
 		<div className="m-6 flex h-full items-center justify-center">
@@ -46,43 +51,48 @@ export default function SignInForm() {
 				</CardHeader>
 
 				<CardContent className="grid gap-4">
-					<Label htmlFor="email">Email</Label>
+					<Label>Login Code</Label>
 
-					<Input
-						id="email"
-						type="email"
-						placeholder="m@example.com"
-						required
-						onChange={(e) => {
-							setEmail(e.target.value);
+					<InputOTP
+						maxLength={6}
+						onChange={(value) => {
+							setOtp(value);
 						}}
-						value={email}
-					/>
+					>
+						<InputOTPGroup>
+							<InputOTPSlot index={0} />
+							<InputOTPSlot index={1} />
+							<InputOTPSlot index={2} />
+							<InputOTPSlot index={3} />
+							<InputOTPSlot index={4} />
+							<InputOTPSlot index={5} />
+						</InputOTPGroup>
+					</InputOTP>
 
 					<Button
 						className="gap-2"
 						disabled={processing}
 						onClick={async () => {
 							try {
-								if (!email) return;
+								if (!otp || !email) return;
 								setProcessing(true);
 								toast.promise(
-									authClient.emailOtp
-										.sendVerificationOtp({ email, type: "sign-in" })
+									signIn
+										.emailOtp({ email, otp })
 										.then((result) => {
 											if (result?.error) {
 												throw new Error(result.error?.message);
 											}
 
-											router.push(`/verify-otp?email=${email}`);
+											router.push("/start");
 										})
 										.finally(() => {
 											setProcessing(false);
 										}),
 									{
-										loading: "Sending your login code...",
-										success: "Login code sent!",
-										error: "Failed to send login code.",
+										loading: "Verifying your login code...",
+										success: "Login code verified!",
+										error: "Failed to verify login code.",
 									},
 								);
 							} catch (error) {
@@ -92,38 +102,7 @@ export default function SignInForm() {
 							}
 						}}
 					>
-						Sign-in with Email
-					</Button>
-
-					<Button
-						variant="secondary"
-						className="gap-2"
-						disabled={processing}
-						onClick={async () => {
-							setProcessing(true);
-							toast.promise(
-								signIn
-									.passkey()
-									.then((result) => {
-										if (result?.error) {
-											throw new Error(result.error?.message);
-										}
-
-										router.push("/start");
-									})
-									.finally(() => {
-										setProcessing(false);
-									}),
-								{
-									loading: "Waiting for passkey...",
-									success: "Signed in with passkey!",
-									error: "Failed to receive passkey.",
-								},
-							);
-						}}
-					>
-						<FingerprintIcon size={16} />
-						Sign-in with Passkey
+						Verify Login Code
 					</Button>
 				</CardContent>
 			</Card>

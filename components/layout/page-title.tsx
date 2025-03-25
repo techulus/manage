@@ -70,7 +70,7 @@ export default function PageTitle({
 				</div>
 			</div>
 
-			<div className="flex min-h-[240px] items-center justify-center border-b bg-gray-50 pb-4 pl-4 pr-6 pt-4 dark:bg-card dark:bg-gray-900 dark:text-white sm:pl-6 lg:pl-8 xl:border-t-0">
+			<div className="flex min-h-[200px] sm:min-h-[240px] items-center justify-center border-b bg-gray-50 pb-4 pl-4 pr-6 pt-4 dark:bg-card dark:bg-gray-900 dark:text-white sm:pl-6 lg:pl-8 xl:border-t-0">
 				<div className="flex w-full max-w-5xl items-center justify-between">
 					<div className="relative flex w-full flex-col">
 						<h1 className="text-hero flex-1 text-3xl tracking-tighter lg:text-4xl">
