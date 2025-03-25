@@ -3,7 +3,6 @@ import { type NextRequest, NextResponse } from "next/server";
 
 const publicAppPaths = [
 	"/sign-in",
-	"/verify-otp",
 	"/terms",
 	"/webhooks",
 	"/api/auth",

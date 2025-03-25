@@ -3,6 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+	InputOTP,
+	InputOTPGroup,
+	InputOTPSlot,
+} from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
 import { authClient, signIn } from "@/lib/betterauth/auth-client";
 import { FingerprintIcon } from "lucide-react";
@@ -15,6 +20,8 @@ import logo from "../../../public/images/logo.png";
 
 export default function SignInForm() {
 	const [email, setEmail] = useState("");
+	const [otp, setOtp] = useState("");
+	const [hasSentEmail, setHasSentEmail] = useState(false);
 	const [processing, setProcessing] = useState(false);
 
 	const router = useRouter();
@@ -45,87 +52,144 @@ export default function SignInForm() {
 					<CardTitle className="text-hero text-2xl">Get Started</CardTitle>
 				</CardHeader>
 
-				<CardContent className="grid gap-4">
-					<Label htmlFor="email">Email</Label>
+				{hasSentEmail ? (
+					<CardContent className="grid gap-4">
+						<Label>Login Code</Label>
 
-					<Input
-						id="email"
-						type="email"
-						placeholder="m@example.com"
-						required
-						onChange={(e) => {
-							setEmail(e.target.value);
-						}}
-						value={email}
-					/>
+						<InputOTP
+							maxLength={6}
+							onChange={(value) => {
+								setOtp(value);
+							}}
+						>
+							<InputOTPGroup>
+								<InputOTPSlot index={0} />
+								<InputOTPSlot index={1} />
+								<InputOTPSlot index={2} />
+								<InputOTPSlot index={3} />
+								<InputOTPSlot index={4} />
+								<InputOTPSlot index={5} />
+							</InputOTPGroup>
+						</InputOTP>
 
-					<Button
-						className="gap-2"
-						disabled={processing}
-						onClick={async () => {
-							try {
-								if (!email) return;
+						<Button
+							className="gap-2"
+							disabled={processing}
+							onClick={async () => {
+								try {
+									if (!otp || !email) return;
+									setProcessing(true);
+									toast.promise(
+										signIn
+											.emailOtp({ email, otp })
+											.then((result) => {
+												if (result?.error) {
+													throw new Error(result.error?.message);
+												}
+
+												router.push("/start");
+											})
+											.finally(() => {
+												setProcessing(false);
+											}),
+										{
+											loading: "Verifying your login code...",
+											success: "Login code verified!",
+											error: "Failed to verify login code.",
+										},
+									);
+								} catch (error) {
+									console.error(error);
+								} finally {
+									setProcessing(false);
+								}
+							}}
+						>
+							Verify Login Code
+						</Button>
+					</CardContent>
+				) : (
+					<CardContent className="grid gap-4">
+						<Label htmlFor="email">Email</Label>
+
+						<Input
+							id="email"
+							type="email"
+							placeholder="m@example.com"
+							required
+							onChange={(e) => {
+								setEmail(e.target.value);
+							}}
+							value={email}
+						/>
+
+						<Button
+							className="gap-2"
+							disabled={processing}
+							onClick={async () => {
+								try {
+									if (!email) return;
+									setProcessing(true);
+									toast.promise(
+										authClient.emailOtp
+											.sendVerificationOtp({ email, type: "sign-in" })
+											.then((result) => {
+												if (result?.error) {
+													throw new Error(result.error?.message);
+												}
+												setHasSentEmail(true);
+											})
+											.finally(() => {
+												setProcessing(false);
+											}),
+										{
+											loading: "Sending your login code...",
+											success: "Login code sent!",
+											error: "Failed to send login code.",
+										},
+									);
+								} catch (error) {
+									console.error(error);
+								} finally {
+									setProcessing(false);
+								}
+							}}
+						>
+							Sign-in with Email
+						</Button>
+
+						<Button
+							variant="secondary"
+							className="gap-2"
+							disabled={processing}
+							onClick={async () => {
 								setProcessing(true);
 								toast.promise(
-									authClient.emailOtp
-										.sendVerificationOtp({ email, type: "sign-in" })
+									signIn
+										.passkey()
 										.then((result) => {
 											if (result?.error) {
 												throw new Error(result.error?.message);
 											}
 
-											router.push(`/verify-otp?email=${email}`);
+											router.push("/start");
 										})
 										.finally(() => {
 											setProcessing(false);
 										}),
 									{
-										loading: "Sending your login code...",
-										success: "Login code sent!",
-										error: "Failed to send login code.",
+										loading: "Waiting for passkey...",
+										success: "Signed in with passkey!",
+										error: "Failed to receive passkey.",
 									},
 								);
-							} catch (error) {
-								console.error(error);
-							} finally {
-								setProcessing(false);
-							}
-						}}
-					>
-						Sign-in with Email
-					</Button>
-
-					<Button
-						variant="secondary"
-						className="gap-2"
-						disabled={processing}
-						onClick={async () => {
-							setProcessing(true);
-							toast.promise(
-								signIn
-									.passkey()
-									.then((result) => {
-										if (result?.error) {
-											throw new Error(result.error?.message);
-										}
-
-										router.push("/start");
-									})
-									.finally(() => {
-										setProcessing(false);
-									}),
-								{
-									loading: "Waiting for passkey...",
-									success: "Signed in with passkey!",
-									error: "Failed to receive passkey.",
-								},
-							);
-						}}
-					>
-						<FingerprintIcon size={16} />
-						Sign-in with Passkey
-					</Button>
-				</CardContent>
+							}}
+						>
+							<FingerprintIcon size={16} />
+							Sign-in with Passkey
+						</Button>
+					</CardContent>
+				)}
 			</Card>
 		</div>
 	);
