@@ -30,6 +30,7 @@
         "@react-email/components": "^0.0.32",
         "@turbowire/serverless": "^0.1.0",
         "@turbowire/web": "^0.3.0",
+        "@tursodatabase/api": "^1.9.0",
         "autoprefixer": "10.4.14",
         "better-auth": "^1.2.4",
         "class-variance-authority": "^0.6.1",
@@ -703,6 +704,8 @@
     "@turbowire/serverless": ["@turbowire/serverless@0.1.0", "", {}, "sha512-TyVGo9kNtgJ6Ibin+CUED3oJAqIcSHorTLuPCQtlxGbDrVWHJdsSBInPxS55/W72jS2skiniatO+0avisPNB6A=="],
 
     "@turbowire/web": ["@turbowire/web@0.3.0", "", {}, "sha512-zLrG2Ahnqlk35Qc0Us2G3CaQC+FhA5PpCiM935np6tdrIQI01l19NRNfDYmJ9VFLocrtstCaXx6RE7n9aXt1CQ=="],
+
+    "@tursodatabase/api": ["@tursodatabase/api@1.9.0", "", { "dependencies": { "whatwg-fetch": "^3.6.19" } }, "sha512-wRxSVBjauf8AVDNoFu8114AmaCEIyHP6BtQo2QzYRYCJ06JVmcrPYPw+Uh6RPDNTi6F8cfyU9ShgxB+EsUeW4Q=="],
 
     "@tybys/wasm-util": ["@tybys/wasm-util@0.9.0", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-6+7nlbMVX/PVDCwaIQ8nTOPveOcFLSt8GcXdx8hD0bt39uWxYT88uXzqTd4fTvqta7oeUJqudepapKNt2DYJFw=="],
 
@@ -1863,6 +1866,8 @@
     "vfile-message": ["vfile-message@4.0.2", "", { "dependencies": { "@types/unist": "^3.0.0", "unist-util-stringify-position": "^4.0.0" } }, "sha512-jRDZ1IMLttGj41KcZvlrYAaI3CfqpLpfpf+Mfig13viT6NKvRzWZ+lXz0Y5D60w6uJIBAOGq9mSHf0gktF0duw=="],
 
     "web-streams-polyfill": ["web-streams-polyfill@3.3.3", "", {}, "sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw=="],
+
+    "whatwg-fetch": ["whatwg-fetch@3.6.20", "", {}, "sha512-EqhiFU6daOA8kpjOWTL0olhVOF3i7OrFzSYiGsEMB8GcXS+RrzauAERX65xMeNWVqxA6HXH2m69Z9LaKKdisfg=="],
 
     "which": ["which@4.0.0", "", { "dependencies": { "isexe": "^3.1.1" }, "bin": { "node-which": "bin/which.js" } }, "sha512-GlaYyEb07DPxYCKhKzplCWBJtvxZcZMrL+4UkrTSJHHPyZU4mYYTv3qaOe77H7EODLSSopAUFAc6W8U4yqvscg=="],
 
