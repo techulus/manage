@@ -23,7 +23,6 @@ export const OtpEmail = ({ otp }: { otp: string }) => (
 						...text,
 						fontSize: "32px",
 						fontWeight: "bold",
-						textAlign: "center",
 						letterSpacing: "8px",
 						margin: "32px 0",
 					}}
