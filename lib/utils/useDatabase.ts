@@ -1,5 +1,6 @@
 import path from "node:path";
 import { createClient } from "@libsql/client";
+import { createClient as createTursoClient } from "@tursodatabase/api";
 import { type LibSQLDatabase, drizzle } from "drizzle-orm/libsql";
 import { migrate } from "drizzle-orm/libsql/migrator";
 import * as schema from "../../drizzle/schema";
@@ -11,25 +12,23 @@ function getDatabaseName(ownerId: string) {
 }
 
 export async function isDatabaseReady(): Promise<boolean> {
+	const turso = createTursoClient({
+		org: process.env.TURSO_ORG!,
+		token: process.env.TURSO_API_TOKEN!,
+	});
+
 	try {
 		const { ownerId } = await getOwner();
-		const result = await fetch(
-			`https://api.turso.tech/v1/organizations/${process.env.TURSO_ORG}/databases`,
-			{
-				method: "POST",
-				body: JSON.stringify({
-					name: getDatabaseName(ownerId),
-					group: process.env.TURSO_GROUP,
-				}),
-				headers: {
-					Authorization: `Bearer ${process.env.TURSO_API_TOKEN}`,
-				},
-			},
-		).then((res) => res.json());
-		if (result?.error && !result.error?.includes("already exists")) {
-			console.error("Error creating Turso DB", result.error);
-			return false;
+
+		const database = await turso.databases
+			.get(getDatabaseName(ownerId))
+			.catch(() => null);
+		if (!database) {
+			await turso.databases.create(getDatabaseName(ownerId), {
+				group: process.env.TURSO_GROUP!,
+			});
 		}
+
 		await migrateDatabase();
 		await addUserToTenantDb();
 		return true;

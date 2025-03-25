@@ -3,8 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+	InputOTP,
+	InputOTPGroup,
+	InputOTPSlot,
+} from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
-import { signIn } from "@/lib/betterauth/auth-client";
+import { authClient, signIn } from "@/lib/betterauth/auth-client";
 import { FingerprintIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,8 +20,9 @@ import logo from "../../../public/images/logo.png";
 
 export default function SignInForm() {
 	const [email, setEmail] = useState("");
+	const [otp, setOtp] = useState("");
+	const [hasSentEmail, setHasSentEmail] = useState(false);
 	const [processing, setProcessing] = useState(false);
-	const [hasSendEmail, setHasSendEmail] = useState(false);
 
 	const router = useRouter();
 
@@ -46,51 +52,50 @@ export default function SignInForm() {
 					<CardTitle className="text-hero text-2xl">Get Started</CardTitle>
 				</CardHeader>
 
-				<CardContent className="grid gap-4">
-					<Label htmlFor="email">Email</Label>
+				{hasSentEmail ? (
+					<CardContent className="grid gap-4">
+						<Label>Login Code</Label>
 
-					<Input
-						id="email"
-						type="email"
-						placeholder="m@example.com"
-						required
-						onChange={(e) => {
-							setEmail(e.target.value);
-						}}
-						value={email}
-					/>
+						<InputOTP
+							maxLength={6}
+							onChange={(value) => {
+								setOtp(value);
+							}}
+						>
+							<InputOTPGroup>
+								<InputOTPSlot index={0} />
+								<InputOTPSlot index={1} />
+								<InputOTPSlot index={2} />
+								<InputOTPSlot index={3} />
+								<InputOTPSlot index={4} />
+								<InputOTPSlot index={5} />
+							</InputOTPGroup>
+						</InputOTP>
 
-					{hasSendEmail ? (
-						<p className="text-sm text-gray-500 dark:text-gray-400">
-							An email has been sent to{" "}
-							<span className="font-semibold">{email}</span> with a magic link
-							to sign in.
-						</p>
-					) : (
 						<Button
 							className="gap-2"
 							disabled={processing}
 							onClick={async () => {
 								try {
-									if (!email) return;
+									if (!otp || !email) return;
 									setProcessing(true);
 									toast.promise(
 										signIn
-											.magicLink({ email, callbackURL: "/start" })
+											.emailOtp({ email, otp })
 											.then((result) => {
 												if (result?.error) {
 													throw new Error(result.error?.message);
 												}
 
-												setHasSendEmail(true);
+												router.push("/start");
 											})
 											.finally(() => {
 												setProcessing(false);
 											}),
 										{
-											loading: "Sending magic link...",
-											success: "Magic link sent!",
-											error: "Failed to send magic link.",
+											loading: "Verifying your login code...",
+											success: "Login code verified!",
+											error: "Failed to verify login code.",
 										},
 									);
 								} catch (error) {
@@ -100,41 +105,91 @@ export default function SignInForm() {
 								}
 							}}
 						>
-							Sign-in with Magic Link
+							Verify Login Code
 						</Button>
-					)}
+					</CardContent>
+				) : (
+					<CardContent className="grid gap-4">
+						<Label htmlFor="email">Email</Label>
 
-					<Button
-						variant="secondary"
-						className="gap-2"
-						disabled={processing}
-						onClick={async () => {
-							setProcessing(true);
-							toast.promise(
-								signIn
-									.passkey()
-									.then((result) => {
-										if (result?.error) {
-											throw new Error(result.error?.message);
-										}
+						<Input
+							id="email"
+							type="email"
+							placeholder="m@example.com"
+							required
+							onChange={(e) => {
+								setEmail(e.target.value);
+							}}
+							value={email}
+						/>
 
-										router.push("/start");
-									})
-									.finally(() => {
-										setProcessing(false);
-									}),
-								{
-									loading: "Waiting for passkey...",
-									success: "Signed in with passkey!",
-									error: "Failed to receive passkey.",
-								},
-							);
-						}}
-					>
-						<FingerprintIcon size={16} />
-						Sign-in with Passkey
-					</Button>
-				</CardContent>
+						<Button
+							className="gap-2"
+							disabled={processing}
+							onClick={async () => {
+								try {
+									if (!email) return;
+									setProcessing(true);
+									toast.promise(
+										authClient.emailOtp
+											.sendVerificationOtp({ email, type: "sign-in" })
+											.then((result) => {
+												if (result?.error) {
+													throw new Error(result.error?.message);
+												}
+												setHasSentEmail(true);
+											})
+											.finally(() => {
+												setProcessing(false);
+											}),
+										{
+											loading: "Sending your login code...",
+											success: "Login code sent!",
+											error: "Failed to send login code.",
+										},
+									);
+								} catch (error) {
+									console.error(error);
+								} finally {
+									setProcessing(false);
+								}
+							}}
+						>
+							Sign-in with Email
+						</Button>
+
+						<Button
+							variant="secondary"
+							className="gap-2"
+							disabled={processing}
+							onClick={async () => {
+								setProcessing(true);
+								toast.promise(
+									signIn
+										.passkey()
+										.then((result) => {
+											if (result?.error) {
+												throw new Error(result.error?.message);
+											}
+
+											router.push("/start");
+										})
+										.finally(() => {
+											setProcessing(false);
+										}),
+									{
+										loading: "Waiting for passkey...",
+										success: "Signed in with passkey!",
+										error: "Failed to receive passkey.",
+									},
+								);
+							}}
+						>
+							<FingerprintIcon size={16} />
+							Sign-in with Passkey
+						</Button>
+					</CardContent>
+				)}
 			</Card>
 		</div>
 	);
