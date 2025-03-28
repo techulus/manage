@@ -28,6 +28,7 @@ import {
 	File,
 	GaugeIcon,
 	ListChecksIcon,
+	ListIcon,
 	type LucideIcon,
 	SettingsIcon,
 } from "lucide-react";
@@ -200,6 +201,14 @@ export function NavMain() {
 						icon: CalendarCheck,
 						isActive: pathname.startsWith(
 							`/${tenant}/projects/${projectId}/events`,
+						),
+					},
+					{
+						title: "Activity",
+						url: `/${tenant}/projects/${projectId}/activity`,
+						icon: ListIcon,
+						isActive: pathname.startsWith(
+							`/${tenant}/projects/${projectId}/activity`,
 						),
 					},
 					{

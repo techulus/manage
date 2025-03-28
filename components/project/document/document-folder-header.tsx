@@ -10,7 +10,7 @@ export async function DocumentFolderHeader({
 }) {
 	const { orgSlug } = await getOwner();
 	return (
-		<div className="flex items-center justify-center gap-x-2 rounded-md hover:bg-white dark:hover:bg-gray-800 p-1">
+		<div className="flex items-center justify-center gap-x-2 rounded-md hover:bg-card p-1">
 			<Link
 				href={`/${orgSlug}/projects/${documentFolder.projectId}/documents/folders/${documentFolder.id}`}
 				className="flex flex-col text-sm font-medium"

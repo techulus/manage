@@ -2,7 +2,6 @@ import { deleteComment } from "@/app/(dashboard)/[tenant]/projects/actions";
 import { MarkdownView } from "@/components/core/markdown-view";
 import { UserAvatar } from "@/components/core/user-avatar";
 import { DeleteButton } from "@/components/form/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -46,14 +45,14 @@ export async function Comments({
 					className="relative flex pt-4"
 				>
 					<div className="flex space-x-4">
-						<div className="hidden w-[160px] text-xs text-gray-500 md:block">
+						<div className="hidden w-[160px] text-xs text-muted-foreground md:block">
 							{new Date(comment.createdAt).toLocaleString()}
 						</div>
 						{comment.creator ? <UserAvatar user={comment.creator} /> : null}
 						<div>
 							<div className="font-semibold">
 								{comment.creator?.firstName ?? "User"}
-								<span className="ml-2 text-xs text-gray-500 md:hidden">
+								<span className="ml-2 text-xs text-muted-foreground md:hidden">
 									{new Date(comment.createdAt).toLocaleString()}
 								</span>
 							</div>

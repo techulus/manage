@@ -143,7 +143,7 @@ export default async function ProjectDetails(props: Props) {
 							return (
 								<div
 									key={taskList.id}
-									className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800"
+									className="overflow-hidden rounded-lg border"
 								>
 									<TaskListHeader
 										orgSlug={orgSlug}
@@ -244,7 +244,7 @@ export default async function ProjectDetails(props: Props) {
 					</Link>
 				</div>
 
-				<div className="flex w-full rounded-lg border bg-white dark:bg-black">
+				<div className="flex w-full rounded-lg border bg-card">
 					<EventsCalendar
 						projectId={projectId}
 						userId={userId}

@@ -29,7 +29,7 @@ export const FileInfo = ({
 	return (
 		<ContextMenu>
 			<ContextMenuTrigger>
-				<div className="flex items-center justify-center gap-x-2 rounded-md hover:bg-white dark:hover:bg-gray-800 p-1">
+				<div className="flex items-center justify-center gap-x-2 rounded-md hover:bg-card p-1">
 					<Link
 						href={fileUrl}
 						target="_blank"

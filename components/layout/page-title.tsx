@@ -44,7 +44,7 @@ export default function PageTitle({
 	return (
 		<>
 			<div
-				className={`fixed top-0 left-0 right-0 z-40 bg-gray-50 dark:bg-card dark:bg-gray-900 dark:text-white sm:hidden border-b transition-opacity duration-300 ${isSticky ? "opacity-100" : "opacity-0"}`}
+				className={`fixed top-0 left-0 right-0 z-40 bg-background sm:hidden border-b transition-opacity duration-300 ${isSticky ? "opacity-100" : "opacity-0"}`}
 			>
 				<div className="flex w-full max-w-5xl items-center justify-between p-2">
 					<h1 className="w-full text-md font-semibold text-center tracking-tight">
@@ -70,7 +70,7 @@ export default function PageTitle({
 				</div>
 			</div>
 
-			<div className="flex min-h-[200px] sm:min-h-[240px] items-center justify-center border-b bg-gray-50 pb-4 pl-4 pr-6 pt-4 dark:bg-card dark:bg-gray-900 dark:text-white sm:pl-6 lg:pl-8 xl:border-t-0">
+			<div className="flex min-h-[200px] sm:min-h-[240px] items-center justify-center border-b pb-4 pl-4 pr-6 pt-4 sm:pl-6 lg:pl-8 xl:border-t-0">
 				<div className="flex w-full max-w-5xl items-center justify-between">
 					<div className="relative flex w-full flex-col">
 						<h1 className="text-hero flex-1 text-3xl tracking-tighter lg:text-4xl">

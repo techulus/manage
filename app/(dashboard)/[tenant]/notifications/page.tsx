@@ -1,6 +1,7 @@
 import PageSection from "@/components/core/section";
 import { UserAvatar } from "@/components/core/user-avatar";
 import PageTitle from "@/components/layout/page-title";
+import { Button } from "@/components/ui/button";
 import { toDateTimeString } from "@/lib/utils/date";
 import { getTimezone } from "@/lib/utils/useOwner";
 import { Dot } from "lucide-react";
@@ -9,7 +10,6 @@ import {
 	getUserNotifications,
 	markAllNotificationsAsRead,
 } from "../settings/actions";
-import { Button } from "@/components/ui/button";
 
 export default async function Notifications() {
 	const notifications = await getUserNotifications();
@@ -35,7 +35,7 @@ export default async function Notifications() {
 				{notifications.map((notification) => (
 					<div
 						key={notification.id}
-						className="px-3 py-2 text-sm transition-colors hover:bg-accent"
+						className="px-3 py-2 text-sm transition-colors hover:bg-accent rounded-md"
 					>
 						<div className="relative flex items-start gap-3 pe-3">
 							{notification.fromUser ? (

@@ -55,7 +55,7 @@ export default function EventsList({
 				<div
 					key={event.id}
 					className={cn(
-						"relative flex items-center justify-between border-b border-gray-200 dark:border-gray-800",
+						"relative flex items-center justify-between border-b",
 						idx === filteredEvents.length - 1 ? "border-b-0" : "",
 					)}
 				>

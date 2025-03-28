@@ -6,24 +6,24 @@ import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 
 export async function GET(
-    _: NextRequest,
-    props: { params: Promise<{ fileId: string; fileName: string }> }
+	_: NextRequest,
+	props: { params: Promise<{ fileId: string; fileName: string }> },
 ) {
-    const params = await props.params;
-    const { ownerId } = await getOwner();
-    const db = await database();
-    const { fileId } = params;
-    const key = `${ownerId}/${fileId}`;
+	const params = await props.params;
+	const { ownerId } = await getOwner();
+	const db = await database();
+	const { fileId } = params;
+	const key = `${ownerId}/${fileId}`;
 
-    const fileDetails = await db.query.blob.findFirst({
+	const fileDetails = await db.query.blob.findFirst({
 		where: eq(blob.key, key),
 	});
 
-    if (!fileDetails) {
+	if (!fileDetails) {
 		return new Response("Not found", { status: 404 });
 	}
 
-    try {
+	try {
 		const signedUrl = await getUrl(key);
 		const file = await fetch(signedUrl);
 
