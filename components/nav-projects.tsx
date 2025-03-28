@@ -1,6 +1,5 @@
 "use client";
 
-import { getSidebarWire } from "@/app/(dashboard)/[tenant]/settings/actions";
 import {
 	SidebarGroup,
 	SidebarGroupLabel,
@@ -17,7 +16,11 @@ import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-export function NavProjects() {
+export function NavProjects({
+	sidebarWire,
+}: {
+	sidebarWire: string;
+}) {
 	const { setOpenMobile } = useSidebar();
 	const { tenant, projectId } = useParams();
 	const pathname = usePathname();
@@ -77,19 +80,17 @@ export function NavProjects() {
 	}, [getProjects, isHydrated, projects, projectId]);
 
 	useEffect(() => {
-		let wire: TurboWire | undefined;
+		if (!sidebarWire) return;
 
-		getSidebarWire().then((signedWire) => {
-			wire = new TurboWire(signedWire);
-			wire.connect(() => {
-				getProjects();
-			});
+		const wire = new TurboWire(sidebarWire);
+		wire.connect(() => {
+			getProjects();
 		});
 
 		return () => {
 			wire?.disconnect();
 		};
-	}, [getProjects]);
+	}, [getProjects, sidebarWire]);
 
 	return (
 		<SidebarGroup className="group-data-[collapsible=icon]:hidden">

@@ -15,6 +15,8 @@ import type * as React from "react";
 
 export function AppSidebar({
 	user,
+	notificationsWire,
+	sidebarWire,
 	...props
 }: React.ComponentProps<typeof Sidebar> & {
 	user: {
@@ -22,6 +24,8 @@ export function AppSidebar({
 		imageUrl: string | null;
 		email: string;
 	};
+	notificationsWire: string;
+	sidebarWire: string;
 }) {
 	return (
 		<Sidebar collapsible="icon" {...props}>
@@ -29,8 +33,11 @@ export function AppSidebar({
 				<WorkspaceSwitcher />
 			</SidebarHeader>
 			<SidebarContent>
-				<NavMain />
-				<NavProjects />
+				<NavMain
+					notificationsWire={notificationsWire}
+					sidebarWire={sidebarWire}
+				/>
+				<NavProjects sidebarWire={sidebarWire} />
 			</SidebarContent>
 			<SidebarFooter>
 				<NavUser user={user} />
