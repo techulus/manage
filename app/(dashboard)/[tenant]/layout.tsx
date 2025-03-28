@@ -1,9 +1,11 @@
 import { AppSidebar } from "@/components/app-sidebar";
+import { SpinnerWithSpacing } from "@/components/core/loaders";
 import { ReportTimezone } from "@/components/core/report-timezone";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { isDatabaseReady } from "@/lib/utils/useDatabase";
 import { getOrganizations, getOwner, getUser } from "@/lib/utils/useOwner";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { getNotificationsWire, getSidebarWire } from "./settings/actions";
 
 export const fetchCache = "force-no-store"; // disable cache for console pages
@@ -57,7 +59,7 @@ export default async function ConsoleLayout(props: {
 				<SidebarTrigger className="absolute top-[18px] left-4 z-50" />
 				<div className="min-w-0 flex-1 xl:flex">
 					<div className="min-h-screen bg-background lg:min-w-0 lg:flex-1 pb-8">
-						{children}
+						<Suspense fallback={<SpinnerWithSpacing />}>{children}</Suspense>
 					</div>
 				</div>
 

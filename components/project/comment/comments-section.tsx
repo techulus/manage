@@ -16,6 +16,7 @@ export async function CommentsSection({
 	return (
 		<div className="flex flex-col space-y-4">
 			<Suspense
+				key={`${type}-${parentId}-${projectId}`}
 				fallback={
 					<div className="flex flex-col gap-4 animate-pulse">
 						<div className="flex space-x-4">
