@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import {
 	deleteBlob,
 	reloadDocuments,
@@ -29,7 +28,7 @@ export const FileInfo = ({
 	return (
 		<ContextMenu>
 			<ContextMenuTrigger>
-				<div className="flex items-center justify-center gap-x-2 rounded-md hover:bg-card p-1">
+				<div className="flex items-center justify-center gap-x-2 rounded-md hover:bg-muted p-1">
 					<Link
 						href={fileUrl}
 						target="_blank"

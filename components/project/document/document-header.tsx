@@ -11,7 +11,7 @@ export async function DocumentHeader({
 	const { orgSlug } = await getOwner();
 
 	return (
-		<div className="flex items-center justify-center gap-x-2 rounded-md p-1">
+		<div className="flex items-center justify-center gap-x-2 rounded-md p-1 hover:bg-muted">
 			<Link
 				href={`/${orgSlug}/projects/${document.projectId}/documents/${document.id}`}
 				className="flex flex-col text-sm font-medium"
