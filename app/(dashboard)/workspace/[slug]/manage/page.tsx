@@ -68,28 +68,6 @@ export default async function ManageWorkspace(props: {
 				</div>
 			</PageSection>
 
-			<PageSection>
-				<h2 className="flex items-center text-xl font-semibold leading-7 text-gray-900 dark:text-gray-200 p-4">
-					<DatabaseBackup className="mr-2 inline-block h-6 w-6" />
-					Database
-				</h2>
-				<div className="p-4 sm:flex">
-					<dt className="font-semibold text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
-						Backup
-					</dt>
-					<dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
-						<div className="text-gray-900 dark:text-gray-200">
-							<form action={createDatabaseBackup}>
-								<input type="hidden" name="id" value={workspace.id} />
-								<Button type="submit" variant="outline">
-									Download Backup
-								</Button>
-							</form>
-						</div>
-					</dd>
-				</div>
-			</PageSection>
-
 			<PageSection className="border-red-400 dark:border-red-900">
 				<h2 className="flex items-center text-xl font-semibold leading-7 text-red-500 dark:text-red-700 p-4">
 					<AlertTriangle className="mr-2 inline-block h-6 w-6" />

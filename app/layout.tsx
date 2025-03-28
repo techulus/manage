@@ -262,7 +262,7 @@ export default function RootLayout({
 				)}
 			>
 				<ThemeProvider>{children}</ThemeProvider>
-				<Toaster />
+				<Toaster position="top-center" />
 			</body>
 		</html>
 	);

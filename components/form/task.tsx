@@ -22,6 +22,7 @@ export default function InlineTaskForm() {
 		return (
 			<Button
 				type="button"
+				size="sm"
 				onClick={(e) => {
 					e.preventDefault();
 					setIsCreating(true);

@@ -52,14 +52,16 @@ export function NavProjects() {
 			statuses: ["active"],
 		})
 			.then((data) => {
-				setProjects(data.projects);
-				localStorage.setItem(
-					localStorageKey,
-					JSON.stringify({
-						ts: Date.now(),
-						data: data.projects,
-					}),
-				);
+				if (data?.projects) {
+					setProjects(data.projects);
+					localStorage.setItem(
+						localStorageKey,
+						JSON.stringify({
+							ts: Date.now(),
+							data: data.projects,
+						}),
+					);
+				}
 			})
 			.catch((error) => {
 				setProjects([]);
@@ -69,10 +71,10 @@ export function NavProjects() {
 	}, [localStorageKey]);
 
 	useEffect(() => {
-		if (!projects || !isHydrated) {
+		if (!projects || !isHydrated || projectId) {
 			getProjects();
 		}
-	}, [getProjects, isHydrated, projects]);
+	}, [getProjects, isHydrated, projects, projectId]);
 
 	useEffect(() => {
 		let wire: TurboWire | undefined;

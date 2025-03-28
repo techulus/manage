@@ -25,7 +25,7 @@ export default async function Notifications() {
 				</form>
 			</PageTitle>
 
-			<PageSection topInset>
+			<PageSection topInset className="overflow-hidden">
 				{!notifications.length ? (
 					<div className="text-center text-muted-foreground p-6 text-sm">
 						No notifications
@@ -35,7 +35,7 @@ export default async function Notifications() {
 				{notifications.map((notification) => (
 					<div
 						key={notification.id}
-						className="px-3 py-2 text-sm transition-colors hover:bg-accent rounded-md"
+						className="px-3 py-2 text-sm transition-colors hover:bg-accent"
 					>
 						<div className="relative flex items-start gap-3 pe-3">
 							{notification.fromUser ? (
