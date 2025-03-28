@@ -1,9 +1,6 @@
 "use client";
 
-import {
-	getNotificationsWire,
-	getUserNotifications,
-} from "@/app/(dashboard)/[tenant]/settings/actions";
+import { getUserNotifications } from "@/app/(dashboard)/[tenant]/settings/actions";
 import { cn } from "@/lib/utils";
 import { TurboWire } from "@turbowire/web";
 import { Bell, Dot } from "lucide-react";
@@ -13,7 +10,13 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { SidebarMenuButton, SidebarMenuItem, useSidebar } from "../ui/sidebar";
 
-function Notifications({ tenant }: { tenant: string }) {
+function Notifications({
+	tenant,
+	notificationsWire,
+}: {
+	tenant: string;
+	notificationsWire: string;
+}) {
 	const [unreadCount, setUnreadCount] = useState<number>(0);
 
 	const { setOpenMobile } = useSidebar();
@@ -30,27 +33,23 @@ function Notifications({ tenant }: { tenant: string }) {
 	useEffect(() => {
 		checkNotifications();
 
-		let wire: TurboWire | undefined;
-
-		getNotificationsWire().then((signedWire) => {
-			wire = new TurboWire(signedWire);
-			wire.connect((message) => {
-				try {
-					const data = JSON.parse(message);
-					if (data?.message) {
-						toast.info(data.message);
-					}
-					checkNotifications();
-				} catch (error) {
-					console.error(error);
+		const wire = new TurboWire(notificationsWire);
+		wire.connect((message) => {
+			try {
+				const data = JSON.parse(message);
+				if (data?.message) {
+					toast.info(data.message);
 				}
-			});
+				checkNotifications();
+			} catch (error) {
+				console.error(error);
+			}
 		});
 
 		return () => {
 			wire?.disconnect();
 		};
-	}, [checkNotifications]);
+	}, [checkNotifications, notificationsWire]);
 
 	return (
 		<SidebarMenuItem>

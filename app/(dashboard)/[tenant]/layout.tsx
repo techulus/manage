@@ -4,6 +4,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { isDatabaseReady } from "@/lib/utils/useDatabase";
 import { getOrganizations, getOwner, getUser } from "@/lib/utils/useOwner";
 import { redirect } from "next/navigation";
+import { getNotificationsWire, getSidebarWire } from "./settings/actions";
 
 export const fetchCache = "force-no-store"; // disable cache for console pages
 export const dynamic = "force-dynamic"; // disable static generation for console pages
@@ -36,6 +37,11 @@ export default async function ConsoleLayout(props: {
 		}
 	}
 
+	const [notificationsWire, sidebarWire] = await Promise.all([
+		getNotificationsWire(),
+		getSidebarWire(),
+	]);
+
 	return (
 		<SidebarProvider>
 			<AppSidebar
@@ -44,6 +50,8 @@ export default async function ConsoleLayout(props: {
 					email: user.email ?? "",
 					imageUrl: null,
 				}}
+				notificationsWire={notificationsWire}
+				sidebarWire={sidebarWire}
 			/>
 			<main className="relative mx-auto w-full flex-grow lg:flex">
 				<SidebarTrigger className="absolute top-[18px] left-4 z-50" />

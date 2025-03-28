@@ -1,6 +1,5 @@
 "use client";
 
-import { getSidebarWire } from "@/app/(dashboard)/[tenant]/settings/actions";
 import {
 	Collapsible,
 	CollapsibleContent,
@@ -49,7 +48,13 @@ type MainNavItem = {
 	}[];
 };
 
-export function NavMain() {
+export function NavMain({
+	notificationsWire,
+	sidebarWire,
+}: {
+	notificationsWire: string;
+	sidebarWire: string;
+}) {
 	const { setOpenMobile } = useSidebar();
 	const { tenant, projectId } = useParams();
 	const pathname = usePathname();
@@ -106,19 +111,15 @@ export function NavMain() {
 	}, [updateProjectData, projectId, projectData, isHydrated]);
 
 	useEffect(() => {
-		let wire: TurboWire | undefined;
-
-		getSidebarWire().then((signedWire) => {
-			wire = new TurboWire(signedWire);
-			wire.connect(() => {
-				updateProjectData();
-			});
+		const wire = new TurboWire(sidebarWire);
+		wire.connect(() => {
+			updateProjectData();
 		});
 
 		return () => {
 			wire?.disconnect();
 		};
-	}, [updateProjectData]);
+	}, [updateProjectData, sidebarWire]);
 
 	const navItems: MainNavItem[] = useMemo(() => {
 		const items: MainNavItem[] = [
@@ -227,7 +228,10 @@ export function NavMain() {
 	return (
 		<SidebarGroup>
 			<SidebarMenu>
-				<Notifications tenant={String(tenant)} />
+				<Notifications
+					tenant={String(tenant)}
+					notificationsWire={notificationsWire}
+				/>
 			</SidebarMenu>
 			<SidebarGroupLabel className="font-bold mt-4 uppercase">
 				Tools
