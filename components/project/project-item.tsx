@@ -21,7 +21,7 @@ export const ProjecItem = ({
 			)}
 		>
 			<div>
-				<h3 className="text-2xl tracking-tight text-muted-foreground">
+				<h3 className="text-2xl tracking-tight">
 					<Link
 						href={`./projects/${id}`}
 						className="focus:outline-none"
