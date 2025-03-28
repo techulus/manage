@@ -3,7 +3,6 @@
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/nav-user";
-import { WorkspaceSwitcher } from "@/components/workspace-switcher";
 import {
 	Sidebar,
 	SidebarContent,
@@ -11,6 +10,7 @@ import {
 	SidebarHeader,
 	SidebarRail,
 } from "@/components/ui/sidebar";
+import { WorkspaceSwitcher } from "@/components/workspace-switcher";
 import type * as React from "react";
 
 export function AppSidebar({
