@@ -18,6 +18,7 @@ import { authClient } from "@/lib/betterauth/auth-client";
 import { ChevronsUpDown, CogIcon, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export function WorkspaceSwitcher() {
 	const { isMobile } = useSidebar();
@@ -54,10 +55,20 @@ export function WorkspaceSwitcher() {
 						</DropdownMenuLabel>
 						<DropdownMenuItem
 							onClick={async () => {
-								await authClient.organization.setActive({
-									organizationId: null,
-								});
-								router.push("/start");
+								toast.promise(
+									authClient.organization
+										.setActive({
+											organizationId: null,
+										})
+										.then(() => {
+											router.push("/start");
+										}),
+									{
+										loading: "Switching to personal workspace...",
+										success: "Switched to personal workspace",
+										error: "Failed to switch to personal workspace",
+									},
+								);
 							}}
 							className="gap-2 p-2 cursor-pointer"
 						>
@@ -71,10 +82,20 @@ export function WorkspaceSwitcher() {
 								<button
 									type="button"
 									onClick={async () => {
-										await authClient.organization.setActive({
-											organizationId: org.id,
-										});
-										router.push("/start");
+										toast.promise(
+											authClient.organization
+												.setActive({
+													organizationId: org.id,
+												})
+												.then(() => {
+													router.push("/start");
+												}),
+											{
+												loading: `Switching to ${org.name}...`,
+												success: `Switched to ${org.name}`,
+												error: `Failed to switch to ${org.name}`,
+											},
+										);
 									}}
 								>
 									{org.name}
