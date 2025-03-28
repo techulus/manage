@@ -250,7 +250,7 @@ export default function RootLayout({
 				/>
 				<meta
 					name="theme-color"
-					content="#171717"
+					content="#000000"
 					media="(prefers-color-scheme: dark)"
 				/>
 			</head>
