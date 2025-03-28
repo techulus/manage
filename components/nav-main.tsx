@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/sidebar";
 import type { ProjectWithData } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import { getProjectById } from "@/lib/utils/useProjects";
 import { TurboWire } from "@turbowire/web";
 import {
 	CalendarCheck,
@@ -58,7 +57,6 @@ export function NavMain({
 	const { setOpenMobile } = useSidebar();
 	const { tenant, projectId } = useParams();
 	const pathname = usePathname();
-	const [isHydrated, setIsHydrated] = useState(false);
 
 	const localStorageKey = useMemo(
 		() => `tenant-${tenant}-project-${projectId}-nav`,
@@ -80,13 +78,13 @@ export function NavMain({
 			}
 		} catch (error) {
 			console.error(error);
-		} finally {
-			setIsHydrated(true);
 		}
 	}, [localStorageKey]);
 
 	const updateProjectData = useCallback(() => {
-		getProjectById(String(projectId), true)
+		if (!projectId) return;
+		fetch(`/api/user/projects/${projectId}`)
+			.then((res) => res.json())
 			.then((data) => {
 				setProjectData(data);
 				localStorage.setItem(
@@ -105,13 +103,9 @@ export function NavMain({
 	}, [projectId, localStorageKey]);
 
 	useEffect(() => {
-		if (projectId && (!projectData || !isHydrated)) {
-			updateProjectData();
-		}
-	}, [updateProjectData, projectId, projectData, isHydrated]);
-
-	useEffect(() => {
 		if (!sidebarWire) return;
+
+		updateProjectData();
 
 		const wire = new TurboWire(sidebarWire);
 		wire.connect(() => {

@@ -5,9 +5,14 @@ import { buttonVariants } from "@/components/ui/button";
 import { task, taskList } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
+import { getAllUsers } from "@/lib/utils/useUser";
 import { and, asc, eq, or } from "drizzle-orm";
 import Link from "next/link";
-import { createTask, partialUpdateTaskList } from "./actions";
+import {
+	createTask,
+	getActiveTaskLists,
+	partialUpdateTaskList,
+} from "./actions";
 
 type Props = {
 	params: Promise<{
@@ -31,42 +36,46 @@ export default async function TaskLists(props: Props) {
 	);
 
 	const db = await database();
-	const taskLists = await db.query.taskList
-		.findMany({
-			where: and(eq(taskList.projectId, +projectId), or(...statusFilter)),
-			with: {
-				tasks: {
-					orderBy: [asc(task.position)],
+	const [taskLists, archivedTaskLists, allTaskLists, allUsers] =
+		await Promise.all([
+			db.query.taskList
+				.findMany({
+					where: and(eq(taskList.projectId, +projectId), or(...statusFilter)),
 					with: {
-						creator: {
-							columns: {
-								firstName: true,
-								imageUrl: true,
-							},
-						},
-						assignee: {
-							columns: {
-								firstName: true,
-								imageUrl: true,
+						tasks: {
+							orderBy: [asc(task.position)],
+							with: {
+								creator: {
+									columns: {
+										firstName: true,
+										imageUrl: true,
+									},
+								},
+								assignee: {
+									columns: {
+										firstName: true,
+										imageUrl: true,
+									},
+								},
 							},
 						},
 					},
-				},
-			},
-		})
-		.execute();
-
-	const archivedTaskLists = await db.query.taskList
-		.findMany({
-			columns: {
-				id: true,
-			},
-			where: and(
-				eq(taskList.projectId, +projectId),
-				eq(taskList.status, "archived"),
-			),
-		})
-		.execute();
+				})
+				.execute(),
+			db.query.taskList
+				.findMany({
+					columns: {
+						id: true,
+					},
+					where: and(
+						eq(taskList.projectId, +projectId),
+						eq(taskList.status, "archived"),
+					),
+				})
+				.execute(),
+			getActiveTaskLists(+projectId),
+			getAllUsers(true),
+		]);
 
 	return (
 		<>
@@ -95,6 +104,8 @@ export default async function TaskLists(props: Props) {
 							partialUpdateTaskList={partialUpdateTaskList}
 							orgSlug={orgSlug}
 							timezone={timezone}
+							taskLists={allTaskLists}
+							users={allUsers}
 							compact
 						/>
 					))}

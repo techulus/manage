@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/sidebar";
 import type { ProjectWithCreator } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import { getProjectsForOwner } from "@/lib/utils/useProjects";
 import { TurboWire } from "@turbowire/web";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -24,7 +23,6 @@ export function NavProjects({
 	const { setOpenMobile } = useSidebar();
 	const { tenant, projectId } = useParams();
 	const pathname = usePathname();
-	const [isHydrated, setIsHydrated] = useState(false);
 
 	const localStorageKey = useMemo(
 		() => `tenant-${tenant}-projects-nav`,
@@ -45,15 +43,12 @@ export function NavProjects({
 			}
 		} catch (error) {
 			console.error(error);
-		} finally {
-			setIsHydrated(true);
 		}
 	}, [localStorageKey]);
 
 	const getProjects = useCallback(() => {
-		getProjectsForOwner({
-			statuses: ["active"],
-		})
+		fetch("/api/user/projects")
+			.then((res) => res.json())
 			.then((data) => {
 				if (data?.projects) {
 					setProjects(data.projects);
@@ -74,13 +69,9 @@ export function NavProjects({
 	}, [localStorageKey]);
 
 	useEffect(() => {
-		if (!projects || !isHydrated || projectId) {
-			getProjects();
-		}
-	}, [getProjects, isHydrated, projects, projectId]);
-
-	useEffect(() => {
 		if (!sidebarWire) return;
+
+		getProjects();
 
 		const wire = new TurboWire(sidebarWire);
 		wire.connect(() => {

@@ -15,30 +15,20 @@ import {
 } from "@/components/ui/popover";
 import type { User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import { allUsers } from "@/lib/utils/useUser";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Assignee } from "./assigee";
 
 export function AssignToUser({
+	users = [],
 	onUpdate,
 }: {
+	users: User[];
 	onUpdate: (userId: string) => void;
 }) {
-	const [users, setUsers] = useState<User[]>([]);
 	const [isAssigning, setIsAssigning] = useState(false);
 	const [open, setOpen] = useState(false);
 	const [value, setValue] = useState("");
-
-	useEffect(() => {
-		allUsers(true)
-			.then((users) => {
-				setUsers(users);
-			})
-			.catch((error) => {
-				console.error(error);
-			});
-	}, []);
 
 	const assignedTo = useMemo(() => {
 		const user = users.find((user) => user.id === value);

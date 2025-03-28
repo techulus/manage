@@ -6,10 +6,15 @@ import { task, taskList, user } from "@/drizzle/schema";
 import { toDateStringWithDay } from "@/lib/utils/date";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
+import { getAllUsers } from "@/lib/utils/useUser";
 import { and, asc, eq } from "drizzle-orm";
 import { CheckCircle, ClockIcon } from "lucide-react";
 import { notFound } from "next/navigation";
-import { createTask, partialUpdateTaskList } from "../actions";
+import {
+	createTask,
+	getActiveTaskLists,
+	partialUpdateTaskList,
+} from "../actions";
 
 type Props = {
 	params: Promise<{
@@ -64,6 +69,9 @@ export default async function TaskLists(props: Props) {
 	if (!currentUser) {
 		return notFound();
 	}
+
+	const allTaskLists = await getActiveTaskLists(+projectId);
+	const allUsers = await getAllUsers(true);
 
 	const totalCount = list.tasks.length;
 	const doneCount = list.tasks.filter((task) => task.status === "done").length;
@@ -126,6 +134,8 @@ export default async function TaskLists(props: Props) {
 					createTask={createTask}
 					orgSlug={orgSlug}
 					partialUpdateTaskList={partialUpdateTaskList}
+					taskLists={allTaskLists}
+					users={allUsers}
 					hideHeader
 				/>
 

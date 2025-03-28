@@ -40,7 +40,7 @@ export async function addUserToTenantDb() {
 		.run();
 }
 
-export async function allUsers(includeSelf = false): Promise<User[]> {
+export async function getAllUsers(includeSelf = false): Promise<User[]> {
 	const db = await database();
 	const { userId } = await getOwner();
 	const users: User[] = (await db.query.user.findMany()) ?? [];

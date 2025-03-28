@@ -3,7 +3,7 @@ import EventForm from "@/components/form/event";
 import PageTitle from "@/components/layout/page-title";
 import { calendarEvent } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
-import { allUsers } from "@/lib/utils/useUser";
+import { getAllUsers } from "@/lib/utils/useUser";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
@@ -18,7 +18,7 @@ export default async function EditEvent(props: Props) {
 	const params = await props.params;
 	const { projectId, eventId } = params;
 
-	const users = await allUsers();
+	const users = await getAllUsers();
 	const db = await database();
 	const event = await db.query.calendarEvent.findFirst({
 		where: eq(calendarEvent.id, +eventId),

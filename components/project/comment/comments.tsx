@@ -38,11 +38,11 @@ export async function Comments({
 	});
 
 	return (
-		<div className={cn("flex flex-col divide-y-2", className)}>
+		<div className={cn("flex flex-col divide-y", className)}>
 			{comments.map((comment) => (
 				<div
 					key={`${comment.type}-${comment.id}`}
-					className="relative flex pt-4"
+					className="relative flex pt-2"
 				>
 					<div className="flex space-x-4">
 						<div className="hidden w-[160px] text-xs text-muted-foreground md:block">

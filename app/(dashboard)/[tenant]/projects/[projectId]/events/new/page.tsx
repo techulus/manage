@@ -2,7 +2,7 @@ import PageSection from "@/components/core/section";
 import EventForm from "@/components/form/event";
 import PageTitle from "@/components/layout/page-title";
 import { getOwner } from "@/lib/utils/useOwner";
-import { allUsers } from "@/lib/utils/useUser";
+import { getAllUsers } from "@/lib/utils/useUser";
 
 type Props = {
 	params: Promise<{
@@ -17,7 +17,7 @@ export default async function CreateEvent(props: Props) {
 	const params = await props.params;
 	const searchParams = await props.searchParams;
 
-	const users = await allUsers();
+	const users = await getAllUsers();
 
 	return (
 		<>
