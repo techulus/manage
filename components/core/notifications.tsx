@@ -33,6 +33,8 @@ function Notifications({
 	useEffect(() => {
 		checkNotifications();
 
+		if (!notificationsWire) return;
+
 		const wire = new TurboWire(notificationsWire);
 		wire.connect((message) => {
 			try {

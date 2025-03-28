@@ -80,6 +80,8 @@ export function NavProjects({
 	}, [getProjects, isHydrated, projects, projectId]);
 
 	useEffect(() => {
+		if (!sidebarWire) return;
+
 		const wire = new TurboWire(sidebarWire);
 		wire.connect(() => {
 			getProjects();

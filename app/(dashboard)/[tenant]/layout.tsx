@@ -31,7 +31,7 @@ export default async function ConsoleLayout(props: {
 
 	if (orgId) {
 		const organizations = await getOrganizations();
-		const org = organizations.find((org) => org.id === orgId);
+		const org = organizations?.find((org) => org.id === orgId);
 		if (!org) {
 			redirect("/start");
 		}

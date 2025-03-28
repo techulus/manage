@@ -111,6 +111,8 @@ export function NavMain({
 	}, [updateProjectData, projectId, projectData, isHydrated]);
 
 	useEffect(() => {
+		if (!sidebarWire) return;
+
 		const wire = new TurboWire(sidebarWire);
 		wire.connect(() => {
 			updateProjectData();
