@@ -1,6 +1,6 @@
 "use client";
 
-import { getUserNotifications } from "@/app/(dashboard)/[tenant]/settings/actions";
+import type { Notification } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { TurboWire } from "@turbowire/web";
 import { Bell, Dot } from "lucide-react";
@@ -25,9 +25,11 @@ function Notifications({
 	const isActive = pathname === `/${tenant}/notifications`;
 
 	const checkNotifications = useCallback(() => {
-		getUserNotifications().then((notifications) => {
-			setUnreadCount(notifications.filter((x) => !x.read).length);
-		});
+		fetch("/api/user/notifications")
+			.then((res) => res.json())
+			.then((data) => {
+				setUnreadCount(data.filter((x: Notification) => !x.read).length);
+			});
 	}, []);
 
 	useEffect(() => {

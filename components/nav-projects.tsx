@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/sidebar";
 import type { ProjectWithCreator } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import { getProjectsForOwner } from "@/lib/utils/useProjects";
 import { TurboWire } from "@turbowire/web";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -48,9 +47,8 @@ export function NavProjects({
 	}, [localStorageKey]);
 
 	const getProjects = useCallback(() => {
-		getProjectsForOwner({
-			statuses: ["active"],
-		})
+		fetch("/api/user/projects")
+			.then((res) => res.json())
 			.then((data) => {
 				if (data?.projects) {
 					setProjects(data.projects);

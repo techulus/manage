@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/sidebar";
 import type { ProjectWithData } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import { getProjectById } from "@/lib/utils/useProjects";
 import { TurboWire } from "@turbowire/web";
 import {
 	CalendarCheck,
@@ -83,7 +82,9 @@ export function NavMain({
 	}, [localStorageKey]);
 
 	const updateProjectData = useCallback(() => {
-		getProjectById(String(projectId), true)
+		if (!projectId) return;
+		fetch(`/api/user/projects/${projectId}`)
+			.then((res) => res.json())
 			.then((data) => {
 				setProjectData(data);
 				localStorage.setItem(

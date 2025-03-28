@@ -125,10 +125,10 @@ export default async function Today(props: {
 	]);
 
 	const dueToday = tasksDueToday.filter(
-		(t) => t.taskList.status !== "archived",
+		(t) => t.taskList?.status !== "archived",
 	);
 
-	const overDue = overDueTasks.filter((t) => t.taskList.status !== "archived");
+	const overDue = overDueTasks.filter((t) => t.taskList?.status !== "archived");
 
 	const filteredEvents = events.filter((event) =>
 		filterByRepeatRule(event, new Date(today), timezone),
@@ -214,6 +214,7 @@ export default async function Today(props: {
 		</>
 	);
 }
+
 function TaskItem(
 	tenant: string,
 	task: {
