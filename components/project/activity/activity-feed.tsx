@@ -4,15 +4,10 @@ import { fetchActivities } from "@/app/(dashboard)/[tenant]/projects/actions";
 import { Spinner } from "@/components/core/loaders";
 import { MarkdownView } from "@/components/core/markdown-view";
 import { UserAvatar } from "@/components/core/user-avatar";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import type { ActivityWithActor } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import {
-	guessTimezone,
-	toDateStringWithDay,
-	toDateTimeString,
-} from "@/lib/utils/date";
+import { guessTimezone, toDateTimeString } from "@/lib/utils/date";
 import { PencilIcon, PlusCircleIcon, TrashIcon } from "lucide-react";
 import { useCallback, useState } from "react";
 
@@ -25,7 +20,7 @@ export function ActivityItem({
 			<div className={cn("relative pb-8", isLast ? "pb-2" : "")}>
 				{!isLast ? (
 					<span
-						className="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-800"
+						className="absolute left-5 top-5 -ml-px h-full w-0.5"
 						aria-hidden="true"
 					/>
 				) : null}
@@ -34,7 +29,7 @@ export function ActivityItem({
 						<div className="relative">
 							{item.actor ? <UserAvatar user={item.actor} /> : null}
 
-							<span className="absolute -bottom-0.5 -right-1 rounded-tl-md bg-white px-0.5 py-px dark:bg-black">
+							<span className="absolute -bottom-0.5 -right-1 rounded-tl-md bg-card px-0.5 py-px">
 								{item.action === "created" ? (
 									<PlusCircleIcon
 										className="h-5 w-5 text-gray-400"
@@ -104,7 +99,7 @@ export function ActivityFeed({
 	}, [projectId, initialActivities]);
 
 	return (
-		<div className="flex flex-col w-full rounded-lg bg-white dark:bg-black">
+		<div className="flex flex-col w-full rounded-lg">
 			{activities.length ? (
 				<>
 					<ul className="w-full px-6 py-4 md:p-6">

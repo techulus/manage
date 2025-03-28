@@ -104,7 +104,7 @@ export default async function Home() {
 											<span key={part}>
 												{part}
 												{i < arr.length - 1 && (
-													<span className="text-green-600 dark:text-green-400">
+													<span className="text-primary">
 														{feature.highlight}
 													</span>
 												)}

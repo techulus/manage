@@ -71,9 +71,9 @@ export const TaskItem = ({
 	return (
 		<Card
 			className={cn(
-				"flex scale-100 rounded-lg shadow-none dark:bg-black",
+				"flex scale-100 rounded-lg shadow-none",
 				detailsOpen
-					? "my-1 flex-col border-2 border-gray-200 bg-gray-50 dark:border-gray-700"
+					? "my-1 flex-col border-2 border-muted-foreground/20"
 					: "flex-row items-center justify-center space-x-2 border-none",
 			)}
 			ref={setNodeRef}

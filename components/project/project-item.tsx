@@ -17,11 +17,11 @@ export const ProjecItem = ({
 		<div
 			key={id}
 			className={cn(
-				"relative flex h-[120px] justify-between space-x-3 rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-sm hover:border-gray-400 dark:border-gray-800 dark:bg-black dark:hover:border-gray-700",
+				"relative flex h-[120px] justify-between space-x-3 rounded-lg border bg-card px-3 py-2 shadow-sm hover:border-foreground/20",
 			)}
 		>
 			<div>
-				<h3 className="text-2xl tracking-tight text-gray-900 dark:text-gray-50">
+				<h3 className="text-2xl tracking-tight text-muted-foreground">
 					<Link
 						href={`./projects/${id}`}
 						className="focus:outline-none"
@@ -31,7 +31,7 @@ export const ProjecItem = ({
 						{name}
 					</Link>
 				</h3>
-				<p className="mt-2 line-clamp-3 text-sm text-gray-500 dark:text-gray-200">
+				<p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
 					{convertMarkdownToPlainText(description)}
 				</p>
 				{dueDate ? (
@@ -41,7 +41,7 @@ export const ProjecItem = ({
 				) : null}
 			</div>
 			<span
-				className="pointer-events-none text-gray-300 group-hover:text-gray-400"
+				className="pointer-events-none text-muted-foreground group-hover:text-foreground"
 				aria-hidden="true"
 			>
 				<UserAvatar user={creator} />

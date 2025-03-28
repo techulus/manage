@@ -59,7 +59,9 @@ export function getDatabaseForOwner(
 ): LibSQLDatabase<typeof schema> {
 	return drizzle(
 		createClient({
+			// url: `file:${path.resolve(process.cwd(), "sqlite", ownerId)}.db`,
 			url: `libsql://${getDatabaseName(ownerId)}-${process.env.TURSO_ORG}.turso.io`,
+			// syncInterval: 60,
 			authToken: process.env.TURSO_GROUP_TOKEN,
 		}),
 		{ schema },

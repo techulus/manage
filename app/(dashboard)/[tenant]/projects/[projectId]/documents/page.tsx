@@ -23,12 +23,12 @@ type Props = {
 };
 
 export default async function ProjectDocuments(props: Props) {
-    const params = await props.params;
-    const { projectId } = params;
+	const params = await props.params;
+	const { projectId } = params;
 
-    const { orgSlug } = await getOwner();
-    const db = await database();
-    const data = await db.query.project
+	const { orgSlug } = await getOwner();
+	const db = await database();
+	const data = await db.query.project
 		.findFirst({
 			where: and(eq(project.id, +projectId)),
 			with: {
@@ -68,11 +68,11 @@ export default async function ProjectDocuments(props: Props) {
 		})
 		.execute();
 
-    if (!data) {
+	if (!data) {
 		return notFound();
 	}
 
-    return (
+	return (
 		<>
 			<PageTitle
 				title="Docs & Files"

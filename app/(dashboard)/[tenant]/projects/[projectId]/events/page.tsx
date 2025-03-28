@@ -121,7 +121,7 @@ export default async function EventDetails(props: Props) {
 			</PageSection>
 
 			<PageSection>
-				<div className="flex w-full rounded-lg bg-white dark:bg-black">
+				<div className="flex w-full rounded-lg">
 					<EventsCalendar
 						projectId={projectId}
 						userId={userId}

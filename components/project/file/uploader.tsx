@@ -55,7 +55,7 @@ export function FileUploader({
 	return (
 		<div
 			{...getRootProps()}
-			className="flex items-center rounded-full border border-gray-100 bg-gray-50 px-3 py-1 dark:border-gray-800 dark:bg-gray-900"
+			className="flex items-center rounded-full border bg-card px-3 py-1"
 		>
 			<input {...getInputProps()} disabled={loading} />
 			<p className="text-sm">Drop files here!</p>

@@ -10,12 +10,12 @@ type Props = {
 };
 
 export default async function ActivityDetails(props: Props) {
-    const params = await props.params;
-    const { projectId } = params;
+	const params = await props.params;
+	const { projectId } = params;
 
-    const activities = await fetchActivities(projectId);
+	const activities = await fetchActivities(projectId);
 
-    return (
+	return (
 		<>
 			<PageTitle title="Activity" />
 

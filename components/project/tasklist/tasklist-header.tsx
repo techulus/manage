@@ -43,7 +43,7 @@ export const TaskListHeader = ({
 			: null;
 
 	return (
-		<div className="group relative flex items-center gap-x-4 rounded-tl-lg rounded-tr-lg bg-white p-3 dark:bg-black">
+		<div className="group relative flex items-center gap-x-4 rounded-tl-lg rounded-tr-lg bg-card p-3">
 			<Link
 				href={`/${orgSlug}/projects/${taskList.projectId}/tasklists/${taskList.id}`}
 				className="text-sm font-medium flex-grow flex-auto"
