@@ -45,6 +45,10 @@ export async function getProjectById(
 	projectId: string | number,
 	withTasksAndDocs = false,
 ): Promise<ProjectWithData> {
+	if (Number.isNaN(+projectId)) {
+		throw new Error(`Invalid project id: ${projectId}`);
+	}
+
 	const db = await database();
 
 	const startOfDay = toStartOfDay(new Date());
@@ -62,6 +66,10 @@ export async function getProjectById(
 							},
 						},
 						documents: {
+							columns: {
+								id: true,
+								name: true,
+							},
 							where: isNull(document.folderId),
 							with: {
 								creator: {

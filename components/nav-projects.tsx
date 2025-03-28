@@ -24,7 +24,6 @@ export function NavProjects({
 	const { setOpenMobile } = useSidebar();
 	const { tenant, projectId } = useParams();
 	const pathname = usePathname();
-	const [isHydrated, setIsHydrated] = useState(false);
 
 	const localStorageKey = useMemo(
 		() => `tenant-${tenant}-projects-nav`,
@@ -45,8 +44,6 @@ export function NavProjects({
 			}
 		} catch (error) {
 			console.error(error);
-		} finally {
-			setIsHydrated(true);
 		}
 	}, [localStorageKey]);
 
@@ -74,13 +71,9 @@ export function NavProjects({
 	}, [localStorageKey]);
 
 	useEffect(() => {
-		if (!projects || !isHydrated || projectId) {
-			getProjects();
-		}
-	}, [getProjects, isHydrated, projects, projectId]);
-
-	useEffect(() => {
 		if (!sidebarWire) return;
+
+		getProjects();
 
 		const wire = new TurboWire(sidebarWire);
 		wire.connect(() => {

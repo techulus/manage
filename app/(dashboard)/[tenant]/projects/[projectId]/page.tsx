@@ -19,14 +19,10 @@ import {
 import { toDateStringWithDay } from "@/lib/utils/date";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 import { getProjectById } from "@/lib/utils/useProjects";
-import {
-	CalendarPlusIcon,
-	ListPlusIcon,
-	PencilIcon,
-	PlusIcon,
-} from "lucide-react";
+import { CalendarPlusIcon, ListPlusIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { archiveProject, deleteProject, unarchiveProject } from "../actions";
 
 type Props = {
@@ -208,13 +204,11 @@ export default async function ProjectDetails(props: Props) {
 					<ul className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-4 lg:grid-cols-6">
 						{project.documents.map((document) => (
 							<div key={document.id}>
-								{/* @ts-ignore */}
 								<DocumentHeader document={document} />
 							</div>
 						))}
 						{project.documentFolders.map((folder) => (
 							<div key={folder.id}>
-								{/* @ts-ignore */}
 								<DocumentFolderHeader documentFolder={folder} />
 							</div>
 						))}
@@ -256,8 +250,7 @@ export default async function ProjectDetails(props: Props) {
 				</div>
 			</div>
 
-			<div className="mx-auto max-w-5xl p-4 xl:p-0 lg:py-8">
-				{/* @ts-ignore */}
+			<div className="mx-auto max-w-5xl p-4 lg:py-8">
 				<CommentsSection
 					type="project"
 					parentId={project.id}

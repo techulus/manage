@@ -14,7 +14,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import type { Task, TaskList, TaskWithDetails } from "@/drizzle/types";
+import type { Task, TaskList, TaskWithDetails, User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { toDateStringWithDay, toStartOfDay } from "@/lib/utils/date";
 import { useSortable } from "@dnd-kit/sortable";
@@ -34,11 +34,13 @@ export const TaskItem = ({
 	projectId,
 	taskLists,
 	timezone,
+	users,
 	compact = false,
 }: {
 	task: TaskWithDetails;
 	projectId: number;
 	timezone: string;
+	users: User[];
 	taskLists?: TaskList[];
 	compact?: boolean;
 }) => {
@@ -163,6 +165,7 @@ export const TaskItem = ({
 										</>
 									) : (
 										<AssignToUser
+											users={users}
 											onUpdate={(userId) => {
 												toast.promise(
 													updateTask(id, projectId, {

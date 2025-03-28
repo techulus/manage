@@ -31,9 +31,9 @@ function Notifications({
 	}, []);
 
 	useEffect(() => {
-		checkNotifications();
-
 		if (!notificationsWire) return;
+
+		checkNotifications();
 
 		const wire = new TurboWire(notificationsWire);
 		wire.connect((message) => {

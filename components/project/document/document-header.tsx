@@ -9,7 +9,6 @@ export async function DocumentHeader({
 	document: DocumentWithCreator;
 }) {
 	const { orgSlug } = await getOwner();
-
 	return (
 		<div className="flex items-center justify-center gap-x-2 rounded-md p-1 hover:bg-muted">
 			<Link
