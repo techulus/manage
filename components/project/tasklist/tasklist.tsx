@@ -124,7 +124,7 @@ export const TaskListItem = ({
 			<div
 				className={cn(
 					"flex flex-col justify-center",
-					// compact ? "max-h-96 overflow-y-auto" : "",
+					compact ? "max-h-96 overflow-y-auto" : "",
 				)}
 			>
 				<DndContext
@@ -151,20 +151,22 @@ export const TaskListItem = ({
 					</SortableContext>
 				</DndContext>
 
-				<form
-					className="px-6 py-2"
-					action={async (formData: FormData) => {
-						const name = formData.get("name") as string;
-						await createTask({
-							name,
-							userId,
-							taskListId: taskList.id,
-							projectId,
-						});
-					}}
-				>
-					<InlineTaskForm />
-				</form>
+				{!compact ? (
+					<form
+						className="px-6 py-2"
+						action={async (formData: FormData) => {
+							const name = formData.get("name") as string;
+							await createTask({
+								name,
+								userId,
+								taskListId: taskList.id,
+								projectId,
+							});
+						}}
+					>
+						<InlineTaskForm />
+					</form>
+				) : null}
 
 				{compact
 					? null

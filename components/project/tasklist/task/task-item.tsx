@@ -179,6 +179,7 @@ export const TaskItem = ({
 								</dd>
 							</div>
 						</dl>
+
 						<dl>
 							<div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
 								<dt className="text-sm font-medium leading-6">Due</dt>
@@ -370,26 +371,31 @@ export const TaskItem = ({
 				</>
 			) : (
 				<>
-					<Checkbox
-						checked={status === "done"}
-						className={cn(
-							"my-4 ml-6 mr-1 transition-all",
-							status === "done" ? "my-2.5 opacity-50" : "scale-125",
-						)}
-						onCheckedChange={async (checked) => {
-							const status = checked ? "done" : "todo";
-							updateOptimisticTask({ status });
+					{!compact ? (
+						<Checkbox
+							checked={status === "done"}
+							className={cn(
+								"my-4 ml-6 mr-1 transition-all",
+								compact ? "py-0 my-0" : "",
+								status === "done" ? "my-2.5 opacity-50" : "scale-125",
+							)}
+							onCheckedChange={async (checked) => {
+								if (compact) return;
+								const status = checked ? "done" : "todo";
+								updateOptimisticTask({ status });
 
-							toast.promise(
-								updateTask(id, projectId, { status }),
-								updateTaskToastOptions,
-							);
-						}}
-					/>
+								toast.promise(
+									updateTask(id, projectId, { status }),
+									updateTaskToastOptions,
+								);
+							}}
+						/>
+					) : null}
 					<button
 						type="button"
 						className={cn(
 							"text-md w-full py-1 text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+							compact ? "ml-3 py-0" : "",
 							status === "done" ? "text-muted-foreground line-through" : "",
 						)}
 						onClick={() => {
@@ -409,9 +415,11 @@ export const TaskItem = ({
 							{task.dueDate ? (
 								<span className="text-muted-foreground ml-2 text-sm">
 									<CalendarClock className="h-4 w-4 inline-block text-primary mr-1 -mt-1" />
-									<span className="hidden md:inline">
-										{toDateStringWithDay(task.dueDate, timezone)}
-									</span>
+									{!compact ? (
+										<span className="hidden md:inline">
+											{toDateStringWithDay(task.dueDate, timezone)}
+										</span>
+									) : null}
 								</span>
 							) : null}
 							{task.description ? (
