@@ -20,7 +20,7 @@ import { toDateStringWithDay, toStartOfDay } from "@/lib/utils/date";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { AlignJustifyIcon, CalendarClock, FileIcon } from "lucide-react";
-import { useReducer, useState } from "react";
+import { use, useReducer, useState } from "react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader } from "../../../ui/card";
 import { Checkbox } from "../../../ui/checkbox";
@@ -32,16 +32,16 @@ import TaskNotesForm from "./notes-form";
 export const TaskItem = ({
 	task,
 	projectId,
-	taskLists,
+	taskListsPromise,
+	usersPromise,
 	timezone,
-	users,
 	compact = false,
 }: {
 	task: TaskWithDetails;
 	projectId: number;
 	timezone: string;
-	users: User[];
-	taskLists?: TaskList[];
+	usersPromise: Promise<User[]>;
+	taskListsPromise?: Promise<TaskList[]>;
 	compact?: boolean;
 }) => {
 	const [detailsOpen, setDetailsOpen] = useState(false);
@@ -69,6 +69,9 @@ export const TaskItem = ({
 		success: "Done!",
 		error: "Error while saving, please try again.",
 	};
+
+	const users = use(usersPromise);
+	const taskLists = taskListsPromise ? use(taskListsPromise) : [];
 
 	return (
 		<Card

@@ -1,3 +1,4 @@
+import path from "node:path";
 import { OtpEmail } from "@/components/emails/otp-email";
 import { LibsqlDialect } from "@libsql/kysely-libsql";
 import { betterAuth } from "better-auth";
@@ -15,6 +16,8 @@ export const auth = () =>
 	betterAuth({
 		database: {
 			dialect: new LibsqlDialect({
+				// url: `file:${path.resolve(process.cwd(), "sqlite", "auth")}.db`,
+				// syncUrl: `libsql://${process.env.TURSO_GROUP}-auth-${process.env.TURSO_ORG}.turso.io`,
 				url: `libsql://${process.env.TURSO_GROUP}-auth-${process.env.TURSO_ORG}.turso.io`,
 				authToken: process.env.TURSO_GROUP_TOKEN,
 			}),

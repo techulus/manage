@@ -2,12 +2,14 @@ import EmptyState from "@/components/core/empty-state";
 import PageTitle from "@/components/layout/page-title";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { task, taskList } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 import { getAllUsers } from "@/lib/utils/useUser";
 import { and, asc, eq, or } from "drizzle-orm";
 import Link from "next/link";
+import { Suspense } from "react";
 import {
 	createTask,
 	getActiveTaskLists,
@@ -36,46 +38,46 @@ export default async function TaskLists(props: Props) {
 	);
 
 	const db = await database();
-	const [taskLists, archivedTaskLists, allTaskLists, allUsers] =
-		await Promise.all([
-			db.query.taskList
-				.findMany({
-					where: and(eq(taskList.projectId, +projectId), or(...statusFilter)),
-					with: {
-						tasks: {
-							orderBy: [asc(task.position)],
-							with: {
-								creator: {
-									columns: {
-										firstName: true,
-										imageUrl: true,
-									},
+	const [taskLists, archivedTaskLists] = await Promise.all([
+		db.query.taskList
+			.findMany({
+				where: and(eq(taskList.projectId, +projectId), or(...statusFilter)),
+				with: {
+					tasks: {
+						orderBy: [asc(task.position)],
+						with: {
+							creator: {
+								columns: {
+									firstName: true,
+									imageUrl: true,
 								},
-								assignee: {
-									columns: {
-										firstName: true,
-										imageUrl: true,
-									},
+							},
+							assignee: {
+								columns: {
+									firstName: true,
+									imageUrl: true,
 								},
 							},
 						},
 					},
-				})
-				.execute(),
-			db.query.taskList
-				.findMany({
-					columns: {
-						id: true,
-					},
-					where: and(
-						eq(taskList.projectId, +projectId),
-						eq(taskList.status, "archived"),
-					),
-				})
-				.execute(),
-			getActiveTaskLists(+projectId),
-			getAllUsers(true),
-		]);
+				},
+			})
+			.execute(),
+		db.query.taskList
+			.findMany({
+				columns: {
+					id: true,
+				},
+				where: and(
+					eq(taskList.projectId, +projectId),
+					eq(taskList.status, "archived"),
+				),
+			})
+			.execute(),
+	]);
+
+	const allTasklistsPromise = getActiveTaskLists(+projectId);
+	const allUsersPromise = getAllUsers(true);
 
 	return (
 		<>
@@ -95,19 +97,33 @@ export default async function TaskLists(props: Props) {
 
 				<ul className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2">
 					{taskLists.map((taskList) => (
-						<TaskListItem
+						<Suspense
 							key={taskList.id}
-							taskList={taskList}
-							projectId={+projectId}
-							userId={userId}
-							createTask={createTask}
-							partialUpdateTaskList={partialUpdateTaskList}
-							orgSlug={orgSlug}
-							timezone={timezone}
-							taskLists={allTaskLists}
-							users={allUsers}
-							compact
-						/>
+							fallback={
+								<div className="max-h-96 w-full rounded-lg border p-4 bg-card">
+									<Skeleton className="h-4 w-3/4 mb-4" />
+									<Skeleton className="h-4 w-1/2 mb-2" />
+									<div className="space-y-3 mt-6">
+										<Skeleton className="h-4 w-full" />
+										<Skeleton className="h-4 w-full" />
+										<Skeleton className="h-4 w-full" />
+									</div>
+								</div>
+							}
+						>
+							<TaskListItem
+								taskList={taskList}
+								projectId={+projectId}
+								userId={userId}
+								createTask={createTask}
+								partialUpdateTaskList={partialUpdateTaskList}
+								orgSlug={orgSlug}
+								timezone={timezone}
+								taskListsPromise={allTasklistsPromise}
+								usersPromise={allUsersPromise}
+								compact
+							/>
+						</Suspense>
 					))}
 				</ul>
 

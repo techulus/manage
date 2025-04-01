@@ -1,8 +1,10 @@
+import { SpinnerWithSpacing } from "@/components/core/loaders";
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import EventsCalendar from "@/components/project/events/events-calendar";
 import { buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { calendarEvent } from "@/drizzle/schema";
 import { toDateStringWithDay } from "@/lib/utils/date";
 import { database } from "@/lib/utils/useDatabase";
@@ -21,6 +23,7 @@ import {
 } from "drizzle-orm";
 import { RssIcon } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
 
 type Props = {
 	params: Promise<{
@@ -49,7 +52,7 @@ export default async function EventDetails(props: Props) {
 	const dayCommentId = `${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDay()}`;
 
 	const db = await database();
-	const events = await db.query.calendarEvent
+	const eventsPromise = db.query.calendarEvent
 		.findMany({
 			where: and(
 				eq(calendarEvent.projectId, +projectId),
@@ -122,14 +125,20 @@ export default async function EventDetails(props: Props) {
 
 			<PageSection>
 				<div className="flex w-full rounded-lg">
-					<EventsCalendar
-						projectId={projectId}
-						userId={userId}
-						events={events}
-						orgSlug={orgSlug}
-						selectedDate={selectedDate.toISOString()}
-						timezone={timezone}
-					/>
+					<Suspense
+						key={`events-${projectId}-${selectedDate.toISOString()}`}
+						fallback={<SpinnerWithSpacing />}
+					>
+						<EventsCalendar
+							projectId={projectId}
+							userId={userId}
+							eventsPromise={eventsPromise}
+							events={[]}
+							orgSlug={orgSlug}
+							selectedDate={selectedDate.toISOString()}
+							timezone={timezone}
+						/>
+					</Suspense>
 				</div>
 			</PageSection>
 

@@ -54,16 +54,19 @@ export async function database(): Promise<LibSQLDatabase<typeof schema>> {
 	return getDatabaseForOwner(ownerId);
 }
 
-export function getDatabaseForOwner(
+export async function getDatabaseForOwner(
 	ownerId: string,
-): LibSQLDatabase<typeof schema> {
-	return drizzle(
-		createClient({
-			url: `libsql://${getDatabaseName(ownerId)}-${process.env.TURSO_ORG}.turso.io`,
-			// url: `file:${path.resolve(process.cwd(), "sqlite", ownerId)}.db`,
-			// syncUrl: `libsql://${getDatabaseName(ownerId)}-${process.env.TURSO_ORG}.turso.io`,
-			authToken: process.env.TURSO_GROUP_TOKEN,
-		}),
-		{ schema },
-	);
+): Promise<LibSQLDatabase<typeof schema>> {
+	const client = createClient({
+		// url: `file:${path.resolve(process.cwd(), "sqlite", ownerId)}.db`,
+		// syncUrl: `libsql://${getDatabaseName(ownerId)}-${process.env.TURSO_ORG}.turso.io`,
+		url: `libsql://${getDatabaseName(ownerId)}-${process.env.TURSO_ORG}.turso.io`,
+		authToken: process.env.TURSO_GROUP_TOKEN,
+	});
+
+	// console.log(`Syncing database for owner: ${ownerId}`);
+	// await client.sync();
+	// console.log(`Synced database for owner: ${ownerId}`);
+
+	return drizzle(client, { schema });
 }

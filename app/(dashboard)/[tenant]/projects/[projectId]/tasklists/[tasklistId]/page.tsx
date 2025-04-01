@@ -2,6 +2,7 @@ import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import { task, taskList, user } from "@/drizzle/schema";
 import { toDateStringWithDay } from "@/lib/utils/date";
 import { database } from "@/lib/utils/useDatabase";
@@ -10,6 +11,7 @@ import { getAllUsers } from "@/lib/utils/useUser";
 import { and, asc, eq } from "drizzle-orm";
 import { CheckCircle, ClockIcon } from "lucide-react";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import {
 	createTask,
 	getActiveTaskLists,
@@ -70,8 +72,8 @@ export default async function TaskLists(props: Props) {
 		return notFound();
 	}
 
-	const allTaskLists = await getActiveTaskLists(+projectId);
-	const allUsers = await getAllUsers(true);
+	const allTaskListsPromise = getActiveTaskLists(+projectId);
+	const allUsersPromise = getAllUsers(true);
 
 	const totalCount = list.tasks.length;
 	const doneCount = list.tasks.filter((task) => task.status === "done").length;
@@ -125,19 +127,33 @@ export default async function TaskLists(props: Props) {
 			</PageTitle>
 
 			<div className="mx-auto -mt-8 max-w-5xl px-4">
-				<TaskListItem
-					timezone={timezone}
-					key={list.id}
-					taskList={list}
-					projectId={+projectId}
-					userId={userId}
-					createTask={createTask}
-					orgSlug={orgSlug}
-					partialUpdateTaskList={partialUpdateTaskList}
-					taskLists={allTaskLists}
-					users={allUsers}
-					hideHeader
-				/>
+				<Suspense
+					fallback={
+						<div className="max-h-96 w-full rounded-lg border p-4 bg-card">
+							<Skeleton className="h-4 w-3/4 mb-4" />
+							<Skeleton className="h-4 w-1/2 mb-2" />
+							<div className="space-y-3 mt-6">
+								<Skeleton className="h-4 w-full" />
+								<Skeleton className="h-4 w-full" />
+								<Skeleton className="h-4 w-full" />
+							</div>
+						</div>
+					}
+				>
+					<TaskListItem
+						timezone={timezone}
+						key={list.id}
+						taskList={list}
+						projectId={+projectId}
+						userId={userId}
+						createTask={createTask}
+						orgSlug={orgSlug}
+						partialUpdateTaskList={partialUpdateTaskList}
+						taskListsPromise={allTaskListsPromise}
+						usersPromise={allUsersPromise}
+						hideHeader
+					/>
+				</Suspense>
 
 				<div className="py-8">
 					{/* @ts-ignore */}

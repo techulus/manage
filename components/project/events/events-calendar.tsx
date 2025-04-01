@@ -4,12 +4,14 @@ import { Calendar } from "@/components/ui/calendar";
 import type { EventWithInvites } from "@/drizzle/types";
 import { toMachineDateString } from "@/lib/utils/date";
 import { useRouter } from "next/navigation";
+import { use } from "react";
 import EventsList from "./events-list";
 
 export default function EventsCalendar({
 	projectId,
 	userId,
 	events,
+	eventsPromise,
 	selectedDate,
 	compact = false,
 	timezone,
@@ -18,6 +20,7 @@ export default function EventsCalendar({
 	projectId: string;
 	userId: string;
 	events: EventWithInvites[];
+	eventsPromise?: Promise<EventWithInvites[]>;
 	selectedDate?: string;
 	compact?: boolean;
 	timezone: string;
@@ -29,6 +32,8 @@ export default function EventsCalendar({
 		selectedDate ? new Date(selectedDate) : new Date(),
 		timezone,
 	);
+
+	const eventsData = eventsPromise ? use(eventsPromise) : events;
 
 	return (
 		<div className="flex w-full flex-col md:flex-row md:space-x-2">
@@ -45,7 +50,7 @@ export default function EventsCalendar({
 
 			<EventsList
 				orgSlug={orgSlug}
-				events={events}
+				events={eventsData}
 				projectId={projectId}
 				userId={userId}
 				date={currentDate}
