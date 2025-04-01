@@ -31,8 +31,8 @@ export const TaskListItem = ({
 	createTask,
 	partialUpdateTaskList,
 	timezone,
-	taskLists = [],
-	users,
+	taskListsPromise,
+	usersPromise,
 	hideHeader = false,
 	compact = false,
 }: {
@@ -41,8 +41,8 @@ export const TaskListItem = ({
 	projectId: number;
 	orgSlug: string;
 	timezone: string;
-	taskLists: TaskList[];
-	users: User[];
+	taskListsPromise: Promise<TaskList[]>;
+	usersPromise: Promise<User[]>;
 	createTask: (data: {
 		name: string;
 		userId: string;
@@ -143,9 +143,9 @@ export const TaskListItem = ({
 								key={task.id}
 								task={task}
 								projectId={+projectId}
-								taskLists={taskLists}
+								taskListsPromise={taskListsPromise}
+								usersPromise={usersPromise}
 								compact={compact}
-								users={users}
 							/>
 						))}
 					</SortableContext>
@@ -176,7 +176,7 @@ export const TaskListItem = ({
 								task={task}
 								projectId={+projectId}
 								timezone={timezone}
-								users={users}
+								usersPromise={usersPromise}
 							/>
 						))}
 			</div>
