@@ -131,6 +131,7 @@ export default function LoginPage() {
 	const [email, setEmail] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [otpSent, setOtpSent] = useState(false);
+	const router = useRouter();
 
 	const handleSendOtp = async (e: React.FormEvent) => {
 		e.preventDefault();
