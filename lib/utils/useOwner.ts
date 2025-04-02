@@ -27,6 +27,7 @@ export async function getUser(): Promise<User> {
 		headers: await headers(),
 	});
 	if (!session) {
+		console.warn("No session, redirecting to sign-in");
 		redirect("/sign-in");
 	}
 
@@ -47,6 +48,7 @@ export async function getOwner(): Promise<Result> {
 		headers: await headers(),
 	});
 	if (!session) {
+		console.warn("No session, redirecting to sign-in");
 		redirect("/sign-in");
 	}
 
