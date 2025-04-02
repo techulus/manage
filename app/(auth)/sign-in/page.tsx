@@ -20,7 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { authClient, signIn } from "@/lib/betterauth/auth-client";
 import { ArrowLeft, Fingerprint } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import type React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -34,7 +34,10 @@ interface OtpVerificationProps {
 function OtpVerification({ email, onBack }: OtpVerificationProps) {
 	const [otp, setOtp] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
+
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const redirectTo = searchParams.get("redirectTo");
 
 	const handleVerify = async () => {
 		if (otp.length !== 6) {
@@ -50,7 +53,7 @@ function OtpVerification({ email, onBack }: OtpVerificationProps) {
 					if (result?.error) {
 						throw new Error(result.error?.message);
 					}
-					router.push("/start");
+					router.push(redirectTo ?? "/start");
 				}),
 				{
 					loading: "Verifying your login code...",
@@ -131,7 +134,10 @@ export default function LoginPage() {
 	const [email, setEmail] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [otpSent, setOtpSent] = useState(false);
+
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const redirectTo = searchParams.get("redirectTo");
 
 	const handleSendOtp = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -180,7 +186,7 @@ export default function LoginPage() {
 						throw new Error(result.error?.message);
 					}
 
-					router.push("/start");
+					router.push(redirectTo ?? "/start");
 				}),
 				{
 					loading: "Waiting for passkey...",

@@ -21,14 +21,10 @@ export async function middleware(request: NextRequest) {
 	}
 
 	const session = getSessionCookie(request);
-	if (session && pathname === "/sign-in") {
-		return NextResponse.redirect(new URL("/start", request.nextUrl.href));
-	}
-
 	if (!session) {
 		return NextResponse.redirect(
 			new URL(
-				`/sign-in?redirectTo=${encodeURIComponent(request.nextUrl.href)}`,
+				`/sign-in?redirectTo=${encodeURIComponent(request.nextUrl.pathname)}`,
 				request.url,
 			),
 		);
