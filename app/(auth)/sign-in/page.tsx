@@ -20,9 +20,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { authClient, signIn } from "@/lib/betterauth/auth-client";
 import { ArrowLeft, Fingerprint } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import type React from "react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import logo from "../../../public/images/logo.png";
 
@@ -34,9 +34,12 @@ interface OtpVerificationProps {
 function OtpVerification({ email, onBack }: OtpVerificationProps) {
 	const [otp, setOtp] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
-	const router = useRouter();
 
-	const handleVerify = async () => {
+	const router = useRouter();
+	const searchParams = useSearchParams();
+	const redirectTo = searchParams.get("redirectTo");
+
+	const handleVerify = useCallback(async () => {
 		if (otp.length !== 6) {
 			toast.error("Please enter all 6 digits");
 			return;
@@ -45,26 +48,22 @@ function OtpVerification({ email, onBack }: OtpVerificationProps) {
 		setIsLoading(true);
 
 		try {
-			toast.promise(
-				signIn.emailOtp({ email, otp }).then((result) => {
-					if (result?.error) {
-						throw new Error(result.error?.message);
-					}
-					router.push("/start");
-				}),
-				{
-					loading: "Verifying your login code...",
-					success: "Login code verified!",
-					error: "Failed to verify login code.",
-				},
-			);
+			toast.info("Verifying login code...");
+			await signIn.emailOtp({ email, otp }).then((result) => {
+				if (result?.error) {
+					throw new Error(result.error?.message);
+				}
+
+				toast.success("Login code verified!");
+				router.replace(redirectTo ?? "/start");
+			});
 		} catch (err) {
 			toast.error("Verification failed");
 			console.error(err);
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	}, [otp, email, router, redirectTo]);
 
 	return (
 		<Card className="w-full max-w-md border-border bg-card text-card-foreground">
@@ -131,74 +130,77 @@ export default function LoginPage() {
 	const [email, setEmail] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [otpSent, setOtpSent] = useState(false);
+
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const redirectTo = searchParams.get("redirectTo");
 
-	const handleSendOtp = async (e: React.FormEvent) => {
-		e.preventDefault();
+	const handleSendOtp = useCallback(
+		async (e: React.FormEvent) => {
+			e.preventDefault();
 
-		// RFC 5322 compliant email regex
-		const emailRegex =
-			/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-		if (!email || !emailRegex.test(email)) {
-			toast.error("Please enter a valid email address");
-			return;
-		}
+			// RFC 5322 compliant email regex
+			const emailRegex =
+				/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+			if (!email || !emailRegex.test(email)) {
+				toast.error("Please enter a valid email address");
+				return;
+			}
 
-		setIsLoading(true);
+			setIsLoading(true);
 
-		try {
-			toast.promise(
-				authClient.emailOtp
+			try {
+				toast.info("Sending login code...");
+				await authClient.emailOtp
 					.sendVerificationOtp({ email, type: "sign-in" })
 					.then((result) => {
 						if (result?.error) {
 							throw new Error(result.error?.message);
 						}
+						toast.success("Login code sent!");
 						setOtpSent(true);
-					}),
-				{
-					loading: "Sending your login code...",
-					success: "Login code sent!",
-					error: "Failed to send login code.",
-				},
-			);
-		} catch (err) {
-			toast.error("Failed to send OTP");
-			console.error(err);
-		} finally {
-			setIsLoading(false);
-		}
-	};
+					});
+			} catch (err) {
+				toast.error("Failed to send OTP");
+				console.error(err);
+			} finally {
+				setIsLoading(false);
+			}
+		},
+		[email],
+	);
 
-	const handlePasskeyLogin = async () => {
+	const handlePasskeyLogin = useCallback(async () => {
 		setIsLoading(true);
 
 		try {
-			toast.promise(
-				signIn.passkey().then((result) => {
-					if (result?.error) {
-						throw new Error(result.error?.message);
-					}
+			toast.info("Waiting for passkey...");
+			await signIn.passkey().then((result) => {
+				if (result?.error) {
+					throw new Error(result.error?.message);
+				}
 
-					router.push("/start");
-				}),
-				{
-					loading: "Waiting for passkey...",
-					success: "Signed in with passkey!",
-					error: "Failed to receive passkey.",
-				},
-			);
+				toast.success("Signed in with passkey!");
+				router.replace(redirectTo ?? "/start");
+			});
 		} catch (err) {
 			toast.error("Authentication failed");
 			console.error(err);
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	}, [router, redirectTo]);
 
-	const resetOtpFlow = () => {
+	const resetOtpFlow = useCallback(() => {
 		setOtpSent(false);
-	};
+	}, []);
+
+	const handleEmailChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			setEmail(e.target.value);
+		},
+		[],
+	);
 
 	return (
 		<main className="flex min-h-screen flex-col items-center justify-center p-4 bg-background">
@@ -248,7 +250,7 @@ export default function LoginPage() {
 											type="email"
 											placeholder="name@example.com"
 											value={email}
-											onChange={(e) => setEmail(e.target.value)}
+											onChange={handleEmailChange}
 											className="bg-input text-input-foreground"
 											required
 										/>
