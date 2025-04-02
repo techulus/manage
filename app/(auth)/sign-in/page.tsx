@@ -53,8 +53,9 @@ function OtpVerification({ email, onBack }: OtpVerificationProps) {
 				if (result?.error) {
 					throw new Error(result.error?.message);
 				}
+
 				toast.success("Login code verified!");
-				router.push(redirectTo ?? "/start");
+				router.replace(redirectTo ?? "/start");
 			});
 		} catch (err) {
 			toast.error("Verification failed");
@@ -178,8 +179,9 @@ export default function LoginPage() {
 				if (result?.error) {
 					throw new Error(result.error?.message);
 				}
+
 				toast.success("Signed in with passkey!");
-				router.push(redirectTo ?? "/start");
+				router.replace(redirectTo ?? "/start");
 			});
 		} catch (err) {
 			toast.error("Authentication failed");
