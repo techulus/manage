@@ -118,7 +118,7 @@ export default async function ProjectDetails(props: Props) {
 			</PageSection>
 
 			<div className="mx-auto flex max-w-5xl flex-col p-4 xl:p-0 lg:pb-12">
-				<div className="flex justify-between flex-row items-center mt-8">
+				<div className="flex justify-between flex-row items-center my-4">
 					<h2 className="text-2xl font-bold leading-7 tracking-tight">
 						Task Lists
 					</h2>

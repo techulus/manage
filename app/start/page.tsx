@@ -6,13 +6,16 @@ import { redirect } from "next/navigation";
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export default async function Start() {
+	await sleep(500); // hack to prevent redirect loop
+
 	const { orgSlug } = await getOwner();
 
 	const ready = await isDatabaseReady();
-
 	if (!ready) {
-		await new Promise((resolve) => setTimeout(resolve, 2000));
+		await sleep(2000);
 		redirect("/start");
 	}
 
