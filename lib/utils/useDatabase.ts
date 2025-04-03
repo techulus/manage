@@ -38,7 +38,7 @@ export async function isDatabaseReady(): Promise<boolean> {
 	}
 }
 
-export async function migrateDatabase(): Promise<void> {
+async function migrateDatabase(): Promise<void> {
 	const db = await database();
 	const migrationsFolder = path.resolve(process.cwd(), "drizzle");
 	migrate(db, { migrationsFolder: migrationsFolder });
@@ -58,15 +58,9 @@ export async function getDatabaseForOwner(
 	ownerId: string,
 ): Promise<LibSQLDatabase<typeof schema>> {
 	const client = createClient({
-		// url: `file:${path.resolve(process.cwd(), "sqlite", ownerId)}.db`,
-		// syncUrl: `libsql://${getDatabaseName(ownerId)}-${process.env.TURSO_ORG}.turso.io`,
 		url: `libsql://${getDatabaseName(ownerId)}-${process.env.TURSO_ORG}.turso.io`,
 		authToken: process.env.TURSO_GROUP_TOKEN,
 	});
-
-	// console.log(`Syncing database for owner: ${ownerId}`);
-	// await client.sync();
-	// console.log(`Synced database for owner: ${ownerId}`);
 
 	return drizzle(client, { schema });
 }
