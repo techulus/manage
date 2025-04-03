@@ -9,7 +9,7 @@ import { getOwner } from "./useOwner";
 
 export async function addUserToTenantDb() {
 	const db = await database();
-	const session = await auth().api.getSession({
+	const session = await auth.api.getSession({
 		headers: await headers(),
 	});
 

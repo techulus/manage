@@ -1,24 +1,17 @@
-"use client";
+export function Greeting({ timezone }: { timezone: string }) {
+	const currentHour = new Date().toLocaleTimeString("en-US", {
+		hour: "numeric",
+		hour12: false,
+		timeZone: timezone,
+	});
 
-import { useEffect, useState } from "react";
-
-export function Greeting() {
-	const [greeting, setGreeting] = useState("");
-
-	useEffect(() => {
-		const getCurrentGreeting = () => {
-			const currentHour = new Date().getHours();
-			if (currentHour >= 5 && currentHour < 12) {
-				return "Good morning 👋";
-			}
-			if (currentHour >= 12 && currentHour < 18) {
-				return "Good afternoon 👋";
-			}
-			return "Good evening 👋";
-		};
-
-		setGreeting(getCurrentGreeting());
-	}, []);
+	const hour = Number.parseInt(currentHour);
+	const greeting =
+		hour >= 5 && hour < 12
+			? "Good morning 🌅"
+			: hour >= 12 && hour < 18
+				? "Good afternoon ☀️"
+				: "Good evening 🌙";
 
 	return <span>{greeting}</span>;
 }

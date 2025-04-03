@@ -23,7 +23,7 @@ type Result = {
 };
 
 export async function getUser(): Promise<User> {
-	const session = await auth().api.getSession({
+	const session = await auth.api.getSession({
 		headers: await headers(),
 	});
 	if (!session) {
@@ -44,7 +44,7 @@ export async function getUser(): Promise<User> {
 }
 
 export async function getOwner(): Promise<Result> {
-	const session = await auth().api.getSession({
+	const session = await auth.api.getSession({
 		headers: await headers(),
 	});
 	if (!session) {
@@ -56,7 +56,7 @@ export async function getOwner(): Promise<Result> {
 	const activeOrgId = session.session.activeOrganizationId;
 
 	const organization = activeOrgId
-		? await auth().api.getFullOrganization({
+		? await auth.api.getFullOrganization({
 				headers: await headers(),
 				query: {
 					organizationId: activeOrgId,
@@ -81,7 +81,7 @@ export async function getTimezone() {
 }
 
 export async function getOrganizations(): Promise<Organization[]> {
-	const organizations = await auth().api.listOrganizations({
+	const organizations = await auth.api.listOrganizations({
 		headers: await headers(),
 	});
 	return organizations as Organization[];

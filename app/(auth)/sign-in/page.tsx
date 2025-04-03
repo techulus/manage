@@ -17,11 +17,10 @@ import {
 } from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { authClient, signIn } from "@/lib/betterauth/auth-client";
+import { authClient } from "@/lib/betterauth/auth-client";
 import { ArrowLeft, Fingerprint } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import type React from "react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import logo from "../../../public/images/logo.png";
@@ -49,17 +48,20 @@ function OtpVerification({ email, onBack }: OtpVerificationProps) {
 
 		try {
 			toast.info("Verifying login code...");
-			await signIn.emailOtp({ email, otp }).then((result) => {
-				if (result?.error) {
-					throw new Error(result.error?.message);
-				}
-
-				toast.success("Login code verified!");
-				router.replace(redirectTo ?? "/start");
+			await authClient.signIn.emailOtp({
+				email,
+				otp,
+				fetchOptions: {
+					throw: true,
+					onSuccess: () => {
+						router.replace(redirectTo ?? "/start");
+						toast.success("Signed in successfully");
+					},
+				},
 			});
-		} catch (err) {
+		} catch (error) {
+			console.error(error);
 			toast.error("Verification failed");
-			console.error(err);
 		} finally {
 			setIsLoading(false);
 		}
@@ -151,18 +153,20 @@ export default function LoginPage() {
 
 			try {
 				toast.info("Sending login code...");
-				await authClient.emailOtp
-					.sendVerificationOtp({ email, type: "sign-in" })
-					.then((result) => {
-						if (result?.error) {
-							throw new Error(result.error?.message);
-						}
-						toast.success("Login code sent!");
-						setOtpSent(true);
-					});
-			} catch (err) {
+				await authClient.emailOtp.sendVerificationOtp({
+					email,
+					type: "sign-in",
+					fetchOptions: {
+						throw: true,
+						onSuccess: () => {
+							setOtpSent(true);
+							toast.success("Login code sent!");
+						},
+					},
+				});
+			} catch (error) {
+				console.error(error);
 				toast.error("Failed to send OTP");
-				console.error(err);
 			} finally {
 				setIsLoading(false);
 			}
@@ -175,21 +179,22 @@ export default function LoginPage() {
 
 		try {
 			toast.info("Waiting for passkey...");
-			await signIn.passkey().then((result) => {
-				if (result?.error) {
-					throw new Error(result.error?.message);
-				}
-
-				toast.success("Signed in with passkey!");
-				router.replace(redirectTo ?? "/start");
+			await authClient.signIn.passkey({
+				fetchOptions: {
+					throw: true,
+					onSuccess: () => {
+						toast.success("Signed in with passkey!");
+						router.replace(redirectTo ?? "/start");
+					},
+				},
 			});
-		} catch (err) {
+		} catch (error) {
+			console.error(error);
 			toast.error("Authentication failed");
-			console.error(err);
 		} finally {
 			setIsLoading(false);
 		}
-	}, [router, redirectTo]);
+	}, [redirectTo, router]);
 
 	const resetOtpFlow = useCallback(() => {
 		setOtpSent(false);

@@ -1,25 +1,20 @@
 import PageSection from "@/components/core/section";
 import { DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { auth } from "@/lib/betterauth/auth";
-import {
-	AlertTriangle,
-	ArrowLeftCircle,
-	DatabaseBackup,
-	User,
-} from "lucide-react";
+import { AlertTriangle, ArrowLeftCircle, User } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createDatabaseBackup, deleteWorkspace } from "../../actions";
+import { deleteWorkspace } from "../../actions";
 
 export default async function ManageWorkspace(props: {
 	params: Promise<{ slug: string }>;
 }) {
 	const { slug } = await props.params;
 
-	const workspace = await auth().api.getFullOrganization({
+	const workspace = await auth.api.getFullOrganization({
 		headers: await headers(),
 		query: {
 			organizationSlug: slug,

@@ -1,6 +1,5 @@
 import { CTA } from "@/components/landing-page/call-to-action";
 import { FeaturesSection } from "@/components/landing-page/feature-section";
-import Waitlist from "@/components/landing-page/waitlist";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SITE_METADATA } from "@/data/marketing";
@@ -59,9 +58,6 @@ export default async function Home() {
 							<p className="mt-6 p-3 text-lg leading-8 text-gray-600 dark:text-gray-400">
 								{SITE_METADATA.DESCRIPTION}
 							</p>
-							<div className="mt-10 flex items-center justify-center dark:bg-green-50 dark:rounded-md max-w-[600px] mx-auto">
-								<Waitlist />
-							</div>
 						</div>
 						<div className="mt-16 flow-root sm:mt-24">
 							<div className="relative mt-16 aspect-[2432/1442] h-[36rem] sm:h-auto sm:w-[calc(theme(maxWidth.7xl)-theme(spacing.16))]">

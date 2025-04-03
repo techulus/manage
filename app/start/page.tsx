@@ -9,13 +9,11 @@ export const dynamic = "force-dynamic";
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default async function Start() {
-	await sleep(500); // hack to prevent redirect loop
-
 	const { orgSlug } = await getOwner();
 
 	const ready = await isDatabaseReady();
 	if (!ready) {
-		await sleep(2000);
+		await sleep(2500);
 		redirect("/start");
 	}
 
