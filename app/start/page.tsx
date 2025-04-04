@@ -24,11 +24,11 @@ export default function Start() {
 						return;
 					}
 
-					setTimeout(pollSetup, 5000);
+					setTimeout(pollSetup, 2500);
 				})
 				.catch((error) => {
 					console.error("Error checking setup status:", error);
-					setTimeout(pollSetup, 5000);
+					setTimeout(pollSetup, 2500);
 				});
 		};
 
