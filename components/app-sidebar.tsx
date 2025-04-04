@@ -14,16 +14,10 @@ import { WorkspaceSwitcher } from "@/components/workspace-switcher";
 import type * as React from "react";
 
 export function AppSidebar({
-	user,
 	notificationsWire,
 	sidebarWire,
 	...props
 }: React.ComponentProps<typeof Sidebar> & {
-	user: {
-		firstName: string;
-		imageUrl: string | null;
-		email: string;
-	};
 	notificationsWire: string;
 	sidebarWire: string;
 }) {
@@ -40,7 +34,7 @@ export function AppSidebar({
 				<NavProjects sidebarWire={sidebarWire} />
 			</SidebarContent>
 			<SidebarFooter>
-				<NavUser user={user} />
+				<NavUser />
 			</SidebarFooter>
 			<SidebarRail />
 		</Sidebar>

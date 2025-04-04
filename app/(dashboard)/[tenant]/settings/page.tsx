@@ -1,4 +1,3 @@
-import { ManagePasskeys } from "@/components/auth/passkeys";
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { blob } from "@/drizzle/schema";
@@ -80,8 +79,6 @@ export default async function Settings() {
 					) : null}
 				</PageSection>
 			) : null}
-
-			<ManagePasskeys />
 		</>
 	);
 }

@@ -39,7 +39,7 @@ export function Spinner({
 
 export function SpinnerWithSpacing() {
 	return (
-		<div className="relative flex h-48 items-center justify-center py-5 pl-4 pr-4 sm:py-6 sm:pl-6 lg:pl-8 xl:pl-6">
+		<div className="relative flex h-48 items-center justify-center py-3 pl-4 pr-4 sm:pl-6 lg:pl-8 xl:pl-6">
 			<Spinner />
 		</div>
 	);

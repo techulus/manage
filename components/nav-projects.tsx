@@ -119,6 +119,14 @@ export function NavProjects({
 						</SidebarMenuButton>
 					</SidebarMenuItem>
 				))}
+
+				<SidebarMenuItem>
+					<SidebarMenuButton asChild onClick={() => setOpenMobile(false)}>
+						<Link href={`/${tenant}/settings`}>
+							<span>Settings</span>
+						</Link>
+					</SidebarMenuButton>
+				</SidebarMenuItem>
 			</SidebarMenu>
 		</SidebarGroup>
 	);

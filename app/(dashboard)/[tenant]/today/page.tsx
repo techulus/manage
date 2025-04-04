@@ -143,7 +143,7 @@ export default async function Today(props: {
 			<PageTitle title={toDateStringWithDay(today, timezone)} />
 
 			<PageSection topInset>
-				<Card className="p-6 bg-gradient-to-r from-primary/10 to-transparent border-none">
+				<Card className="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-none">
 					<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 						<h2 className="text-2xl font-semibold">
 							<Greeting timezone={timezone} />

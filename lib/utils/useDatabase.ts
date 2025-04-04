@@ -8,7 +8,9 @@ import { getOwner } from "./useOwner";
 import { addUserToTenantDb } from "./useUser";
 
 function getDatabaseName(ownerId: string) {
-	return `${ownerId}-${process.env.TURSO_GROUP}`.toLowerCase();
+	return `${ownerId}-${process.env.TURSO_GROUP}`
+		.toLowerCase()
+		.replace(/_/g, "-");
 }
 
 export async function isDatabaseReady(): Promise<boolean> {
@@ -20,11 +22,11 @@ export async function isDatabaseReady(): Promise<boolean> {
 	try {
 		const { ownerId } = await getOwner();
 
-		const database = await turso.databases
-			.get(getDatabaseName(ownerId))
-			.catch(() => null);
+		const databaseName = getDatabaseName(ownerId);
+		const database = await turso.databases.get(databaseName).catch(() => null);
+
 		if (!database) {
-			await turso.databases.create(getDatabaseName(ownerId), {
+			await turso.databases.create(databaseName, {
 				group: process.env.TURSO_GROUP!,
 			});
 		}

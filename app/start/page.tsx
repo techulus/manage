@@ -16,13 +16,19 @@ export default function Start() {
 				.then((data) => {
 					if (data.ready) {
 						router.replace(data.redirect);
-					} else {
-						setTimeout(pollSetup, 2500);
+						return;
 					}
+
+					if (data.redirect) {
+						router.replace(data.redirect);
+						return;
+					}
+
+					setTimeout(pollSetup, 5000);
 				})
 				.catch((error) => {
 					console.error("Error checking setup status:", error);
-					setTimeout(pollSetup, 2000);
+					setTimeout(pollSetup, 5000);
 				});
 		};
 
@@ -32,13 +38,7 @@ export default function Start() {
 	return (
 		<div className="flex min-h-screen w-full items-center justify-center">
 			<div className="flex flex-col items-center gap-4">
-				<Image
-					src={logo}
-					alt="Manage"
-					width={48}
-					height={48}
-					className="animate-pulse"
-				/>
+				<Image src={logo} alt="Manage" width={48} height={48} />
 				<Spinner className="mt-6" />
 			</div>
 		</div>
