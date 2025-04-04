@@ -7,12 +7,16 @@ import { database } from "./useDatabase";
 import { getOwner } from "./useOwner";
 
 export async function addUserToTenantDb() {
-	const db = await database();
 	const userData = await currentUser();
 	if (!userData) {
-		throw new Error("No session found");
+		throw new Error("No user found");
 	}
 
+	if (!userData.emailAddresses || userData.emailAddresses.length === 0) {
+		throw new Error("The user has no associated email addresses.");
+	}
+
+	const db = await database();
 	db.insert(user)
 		.values({
 			id: userData.id,
