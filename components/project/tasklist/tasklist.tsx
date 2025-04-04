@@ -111,7 +111,6 @@ export const TaskListItem = ({
 					doneCount={doneItems.length}
 					orgSlug={orgSlug}
 					partialUpdateTaskList={partialUpdateTaskList}
-					timezone={timezone}
 				/>
 			) : null}
 
