@@ -22,7 +22,6 @@ import { getProjectById } from "@/lib/utils/useProjects";
 import { CalendarPlusIcon, ListPlusIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { archiveProject, deleteProject, unarchiveProject } from "../actions";
 
 type Props = {
@@ -143,7 +142,6 @@ export default async function ProjectDetails(props: Props) {
 								>
 									<TaskListHeader
 										orgSlug={orgSlug}
-										timezone={timezone}
 										taskList={taskList}
 										totalCount={taskList.tasks.length}
 										doneCount={
