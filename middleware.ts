@@ -1,38 +1,26 @@
-import { getSessionCookie } from "better-auth/cookies";
-import { type NextRequest, NextResponse } from "next/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const publicAppPaths = [
-	"/sign-in",
+const isPublicRoute = createRouteMatcher([
+	"/",
+	"/sign-in(.*)",
 	"/terms",
-	"/webhooks",
-	"/api/auth",
-	"/api/calendar",
-	"/callback",
-];
+	"/webhooks(.*)",
+	"/api/auth(.*)",
+	"/api/calendar(.*)",
+	"/callback(.*)",
+]);
 
-export async function middleware(request: NextRequest) {
-	const { pathname } = request.nextUrl;
-
-	const isPublicAppPath = publicAppPaths.some((path) =>
-		pathname.startsWith(path),
-	);
-	if (isPublicAppPath || pathname === "/") {
-		return NextResponse.next();
+export default clerkMiddleware(async (auth, req) => {
+	if (!isPublicRoute(req)) {
+		await auth.protect();
 	}
-
-	const session = getSessionCookie(request);
-	if (!session) {
-		return NextResponse.redirect(
-			new URL(
-				`/sign-in?redirectTo=${encodeURIComponent(request.nextUrl.pathname)}`,
-				request.url,
-			),
-		);
-	}
-
-	return NextResponse.next();
-}
+});
 
 export const config = {
-	matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+	matcher: [
+		// Skip Next.js internals and all static files, unless found in search params
+		"/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+		// Always run for API routes
+		"/(api|trpc)(.*)",
+	],
 };
