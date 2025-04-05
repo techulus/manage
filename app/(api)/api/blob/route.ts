@@ -56,7 +56,7 @@ export async function PUT(request: NextRequest) {
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				})
-				.run();
+				.execute();
 
 			revalidatePath(
 				`/${orgSlug}/projects/${projectId}/documents/folders/${folder}`,
@@ -90,7 +90,7 @@ export async function PUT(request: NextRequest) {
 				updatedAt: new Date(),
 			})
 			.returning()
-			.get();
+			.execute();
 
 		if (folder) {
 			revalidatePath(

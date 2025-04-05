@@ -1,18 +1,21 @@
+"use client";
+
 import type { DocumentWithCreator } from "@/drizzle/types";
-import { getOwner } from "@/lib/utils/useOwner";
 import { File } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
-export async function DocumentHeader({
+export function DocumentHeader({
 	document,
 }: {
 	document: DocumentWithCreator;
 }) {
-	const { orgSlug } = await getOwner();
+	const { tenant, projectId } = useParams();
+
 	return (
 		<div className="flex items-center justify-center gap-x-2 rounded-md p-1 hover:bg-muted">
 			<Link
-				href={`/${orgSlug}/projects/${document.projectId}/documents/${document.id}`}
+				href={`/${tenant}/projects/${projectId}/documents/${document.id}`}
 				className="flex flex-col text-sm font-medium"
 				prefetch={false}
 			>

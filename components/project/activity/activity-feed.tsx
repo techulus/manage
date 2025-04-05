@@ -6,7 +6,6 @@ import { MarkdownView } from "@/components/core/markdown-view";
 import { UserAvatar } from "@/components/core/user-avatar";
 import { Button } from "@/components/ui/button";
 import type { ActivityWithActor } from "@/drizzle/types";
-import { cn } from "@/lib/utils";
 import { guessTimezone, toDateTimeString } from "@/lib/utils/date";
 import { PencilIcon, PlusCircleIcon, TrashIcon } from "lucide-react";
 import { useCallback, useState } from "react";
@@ -16,61 +15,70 @@ export function ActivityItem({
 	isLast,
 }: { item: ActivityWithActor; isLast: boolean }) {
 	return (
-		<li key={item.id}>
-			<div className={cn("relative pb-8", isLast ? "pb-2" : "")}>
+		<li key={item.id} className="hover:bg-muted/50 transition-colors">
+			<div className="relative px-4 pt-4">
 				{!isLast ? (
 					<span
-						className="absolute left-5 top-5 -ml-px h-full w-0.5"
+						className="absolute left-[2.25rem] top-12 -ml-px h-[calc(100%-2rem)] w-[2px] bg-border"
 						aria-hidden="true"
 					/>
 				) : null}
-				<div className="relative flex items-start space-x-3">
-					<>
-						<div className="relative">
-							{item.actor ? <UserAvatar user={item.actor} /> : null}
+				<div className="relative flex items-start space-x-4">
+					<div className="relative">
+						{item.actor ? (
+							<div className="h-9 w-9">
+								<UserAvatar
+									user={item.actor}
+									className="ring-2 ring-background"
+								/>
+							</div>
+						) : null}
 
-							<span className="absolute -bottom-0.5 -right-1 rounded-tl-md bg-card px-0.5 py-px">
-								{item.action === "created" ? (
+						<div className="absolute -bottom-1 -right-2 rounded-full bg-background shadow-sm p-1">
+							{item.action === "created" ? (
+								<div className="rounded-full border border-border bg-card p-[2px]">
 									<PlusCircleIcon
-										className="h-5 w-5 text-gray-400"
+										className="h-[14px] w-[14px] text-emerald-500"
 										aria-hidden="true"
 									/>
-								) : null}
-								{item.action === "updated" ? (
+								</div>
+							) : null}
+							{item.action === "updated" ? (
+								<div className="rounded-full border border-border bg-card p-[2px]">
 									<PencilIcon
-										className="h-5 w-5 text-gray-400"
+										className="h-[14px] w-[14px] text-blue-500"
 										aria-hidden="true"
 									/>
-								) : null}
-								{item.action === "deleted" ? (
+								</div>
+							) : null}
+							{item.action === "deleted" ? (
+								<div className="rounded-full border border-border bg-card p-[2px]">
 									<TrashIcon
-										className="h-5 w-5 text-gray-400"
+										className="h-[14px] w-[14px] text-red-500"
 										aria-hidden="true"
 									/>
-								) : null}
+								</div>
+							) : null}
+						</div>
+					</div>
+					<div className="min-w-0 flex-1">
+						<div className="flex flex-col text-sm sm:flex-row sm:items-center sm:gap-2">
+							<a
+								href={item.actor.id}
+								className="font-medium text-primary hover:underline"
+							>
+								{item.actor.firstName}
+							</a>
+							<span className="text-muted-foreground text-xs">
+								{toDateTimeString(item.createdAt, guessTimezone)}
 							</span>
 						</div>
-						<div className="min-w-0 flex-1">
-							<div className="text-sm text-primary">
-								<a href={item.actor.id} className="font-medium">
-									{item.actor.firstName}
-								</a>
+						{item.message ? (
+							<div className="mt-1 prose-sm text-muted-foreground">
+								<MarkdownView content={item.message} />
 							</div>
-							<div className="flex w-full flex-col md:flex-row md:justify-between">
-								<div className="max-w-xl">
-									{item.message ? (
-										<MarkdownView content={item.message} />
-									) : null}
-								</div>
-								<p
-									className="mt-0.5 text-sm text-gray-500"
-									suppressHydrationWarning
-								>
-									{toDateTimeString(item.createdAt, guessTimezone)}
-								</p>
-							</div>
-						</div>
-					</>
+						) : null}
+					</div>
 				</div>
 			</div>
 		</li>
@@ -92,17 +100,16 @@ export function ActivityFeed({
 			projectId,
 			initialActivities.length,
 		);
-		console.log("Found activities: ", activities.length);
 		setInitialActivities([...initialActivities, ...activities]);
 		setHasMore(activities.length === 50);
 		setIsLoading(false);
 	}, [projectId, initialActivities]);
 
 	return (
-		<div className="flex flex-col w-full rounded-lg">
+		<div className="flex flex-col w-full rounded-lg border bg-card">
 			{activities.length ? (
 				<>
-					<ul className="w-full px-6 py-4 md:p-6">
+					<ul className="w-full">
 						{initialActivities.map((activityItem, activityItemIdx) => (
 							<ActivityItem
 								key={activityItem.id}
@@ -111,15 +118,29 @@ export function ActivityFeed({
 							/>
 						))}
 					</ul>
-					<div className="flex p-4">
+					<div className="flex justify-center p-4 border-t">
 						{hasMore && !isLoading ? (
-							<Button onClick={loadMore}>View more</Button>
+							<Button
+								onClick={loadMore}
+								variant="outline"
+								size="sm"
+								className="w-full max-w-xs"
+							>
+								Load more
+							</Button>
 						) : null}
-						{isLoading ? <Spinner /> : null}
+						{isLoading ? <Spinner className="mx-auto" /> : null}
 					</div>
 				</>
 			) : (
-				<p className="p-12 text-center text-sm">No activity found</p>
+				<div className="flex flex-col items-center justify-center py-8 px-4 text-center">
+					<div className="rounded-full bg-muted/50 p-3">
+						<PlusCircleIcon className="h-5 w-5 text-muted-foreground" />
+					</div>
+					<p className="mt-2 text-sm text-muted-foreground">
+						No activity found
+					</p>
+				</div>
 			)}
 		</div>
 	);

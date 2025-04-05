@@ -1,42 +1,34 @@
-import { relations, sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import {
-	customType,
+	boolean,
 	integer,
+	jsonb,
+	pgTable,
 	real,
-	sqliteTable,
 	text,
-} from "drizzle-orm/sqlite-core";
+	timestamp,
+} from "drizzle-orm/pg-core";
 
-const dbJson = customType({
-	dataType: () => "text", // must be text for sqlite3 json operators to work
-	toDriver: (value: unknown) => {
-		return JSON.stringify(value);
-	},
-	fromDriver: (value: unknown) => {
-		return JSON.parse(value as string);
-	},
-});
-
-export const user = sqliteTable("User", {
+export const user = pgTable("User", {
 	id: text("id").primaryKey().notNull(),
 	email: text("email").notNull().unique(),
 	firstName: text("firstName"),
 	lastName: text("lastName"),
 	imageUrl: text("imageUrl"),
 	timeZone: text("timeZone"),
-	rawData: dbJson("rawData").notNull(),
-	createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-	updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+	rawData: jsonb("rawData").notNull(),
+	createdAt: timestamp().notNull().defaultNow(),
+	updatedAt: timestamp().notNull().defaultNow(),
 });
 
-export const project = sqliteTable("Project", {
-	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+export const project = pgTable("Project", {
+	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	name: text("name").notNull(),
 	description: text("description"),
 	status: text("status").notNull(),
-	dueDate: integer("dueDate", { mode: "timestamp" }),
-	createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-	updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+	dueDate: timestamp(),
+	createdAt: timestamp().notNull().defaultNow(),
+	updatedAt: timestamp().notNull().defaultNow(),
 	createdByUser: text("createdByUser")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
@@ -53,13 +45,13 @@ export const projectRelations = relations(project, ({ many, one }) => ({
 	events: many(calendarEvent),
 }));
 
-export const document = sqliteTable("Document", {
-	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+export const document = pgTable("Document", {
+	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	name: text("name").notNull(),
 	markdownContent: text("markdownContent").notNull(),
 	status: text("status").notNull(),
-	createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-	updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+	createdAt: timestamp().notNull().defaultNow(),
+	updatedAt: timestamp().notNull().defaultNow(),
 	projectId: integer("projectId")
 		.notNull()
 		.references(() => project.id, { onDelete: "cascade", onUpdate: "cascade" }),
@@ -87,8 +79,8 @@ export const documentRelations = relations(document, ({ one }) => ({
 	}),
 }));
 
-export const documentFolder = sqliteTable("DocumentFolder", {
-	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+export const documentFolder = pgTable("DocumentFolder", {
+	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	name: text("name").notNull(),
 	description: text("description"),
 	projectId: integer("projectId")
@@ -97,8 +89,8 @@ export const documentFolder = sqliteTable("DocumentFolder", {
 	createdByUser: text("createdByUser")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
-	createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-	updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+	createdAt: timestamp().notNull().defaultNow(),
+	updatedAt: timestamp().notNull().defaultNow(),
 });
 
 export const documentFolderRelations = relations(
@@ -117,8 +109,8 @@ export const documentFolderRelations = relations(
 	}),
 );
 
-export const task = sqliteTable("Task", {
-	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+export const task = pgTable("Task", {
+	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	taskListId: integer("taskListId")
 		.notNull()
 		.references(() => taskList.id, {
@@ -128,10 +120,10 @@ export const task = sqliteTable("Task", {
 	name: text("name").notNull(),
 	description: text("description"),
 	status: text("status").notNull(),
-	dueDate: integer("dueDate", { mode: "timestamp" }),
+	dueDate: timestamp(),
 	position: real("position").notNull(),
-	createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-	updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+	createdAt: timestamp().notNull().defaultNow(),
+	updatedAt: timestamp().notNull().defaultNow(),
 	assignedToUser: text("assignedToUser").references(() => user.id, {
 		onDelete: "cascade",
 		onUpdate: "cascade",
@@ -141,14 +133,14 @@ export const task = sqliteTable("Task", {
 		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
 });
 
-export const taskList = sqliteTable("TaskList", {
-	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+export const taskList = pgTable("TaskList", {
+	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	name: text("name").notNull(),
 	description: text("description"),
 	status: text("status").notNull(),
-	dueDate: integer("dueDate", { mode: "timestamp" }),
-	createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-	updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+	dueDate: timestamp(),
+	createdAt: timestamp().notNull().defaultNow(),
+	updatedAt: timestamp().notNull().defaultNow(),
 	projectId: integer("projectId")
 		.notNull()
 		.references(() => project.id, { onDelete: "cascade", onUpdate: "cascade" }),
@@ -157,7 +149,7 @@ export const taskList = sqliteTable("TaskList", {
 		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
 });
 
-export const blob = sqliteTable("Blob", {
+export const blob = pgTable("Blob", {
 	id: text("id").notNull().primaryKey(),
 	key: text("key").unique().notNull(),
 	name: text("name").notNull(),
@@ -173,20 +165,20 @@ export const blob = sqliteTable("Blob", {
 			onUpdate: "cascade",
 		},
 	),
-	createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-	updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+	createdAt: timestamp().notNull().defaultNow(),
+	updatedAt: timestamp().notNull().defaultNow(),
 });
 
-export const calendarEvent = sqliteTable("Event", {
-	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+export const calendarEvent = pgTable("Event", {
+	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	name: text("name").notNull(),
 	description: text("description"),
-	start: integer("start", { mode: "timestamp" }).notNull(),
-	end: integer("end", { mode: "timestamp" }),
-	allDay: integer("allDay", { mode: "boolean" }).notNull().default(false),
+	start: timestamp().notNull(),
+	end: timestamp(),
+	allDay: boolean("allDay").notNull().default(false),
 	repeatRule: text("repeatRule"),
-	createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-	updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+	createdAt: timestamp().notNull().defaultNow(),
+	updatedAt: timestamp().notNull().defaultNow(),
 	projectId: integer("projectId")
 		.notNull()
 		.references(() => project.id, { onDelete: "cascade", onUpdate: "cascade" }),
@@ -195,8 +187,8 @@ export const calendarEvent = sqliteTable("Event", {
 		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
 });
 
-export const eventInvite = sqliteTable("CalendarEventInvite", {
-	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+export const eventInvite = pgTable("CalendarEventInvite", {
+	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	eventId: integer("eventId")
 		.notNull()
 		.references(() => calendarEvent.id, {
@@ -207,16 +199,14 @@ export const eventInvite = sqliteTable("CalendarEventInvite", {
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
 	status: text("status"),
-	invitedAt: integer("createdAt", { mode: "timestamp" })
-		.notNull()
-		.default(sql`(unixepoch())`),
+	invitedAt: timestamp().notNull().defaultNow(),
 });
 
-export const comment = sqliteTable("Comment", {
-	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+export const comment = pgTable("Comment", {
+	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	content: text("content").notNull(),
-	createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
-	updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+	createdAt: timestamp().notNull().defaultNow(),
+	updatedAt: timestamp().notNull().defaultNow(),
 	createdByUser: text("createdByUser")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
@@ -224,8 +214,8 @@ export const comment = sqliteTable("Comment", {
 	parentId: integer("parentId").notNull(),
 });
 
-export const activity = sqliteTable("Activity", {
-	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+export const activity = pgTable("Activity", {
+	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	action: text("action").notNull(),
 	type: text("type").notNull(),
 	message: text("message"),
@@ -235,18 +225,16 @@ export const activity = sqliteTable("Activity", {
 	userId: text("userId")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
-	createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+	createdAt: timestamp().notNull().defaultNow(),
 });
 
-export const notification = sqliteTable("Notification", {
-	id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+export const notification = pgTable("Notification", {
+	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	type: text("type"),
 	message: text("message").notNull(),
 	target: text("target"),
-	read: integer("read", { mode: "boolean" }).notNull().default(false),
-	createdAt: integer("createdAt", { mode: "timestamp" })
-		.notNull()
-		.default(sql`(unixepoch())`),
+	read: boolean("read").notNull().default(false),
+	createdAt: timestamp().notNull().defaultNow(),
 	fromUser: text("fromUser").references(() => user.id, {
 		onDelete: "cascade",
 		onUpdate: "cascade",

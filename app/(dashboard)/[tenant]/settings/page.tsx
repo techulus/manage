@@ -1,4 +1,3 @@
-import { ManagePasskeys } from "@/components/auth/passkeys";
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { blob } from "@/drizzle/schema";
@@ -19,7 +18,7 @@ export default async function Settings() {
 				usage: sql<number>`sum(${blob.contentSize})`,
 			})
 			.from(blob)
-			.get(),
+			.execute(),
 		getTimezone(),
 	]);
 
@@ -39,8 +38,8 @@ export default async function Settings() {
 					</dt>
 					<dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
 						<div className="text-gray-900 dark:text-gray-200">
-							{bytesToMegabytes(storage?.usage ?? 0)} MB{" "}
-							<p className="inline font-bold">/ 5 GB</p> ({storage?.count}{" "}
+							{bytesToMegabytes(storage?.[0].usage ?? 0)} MB{" "}
+							<p className="inline font-bold">/ 5 GB</p> ({storage?.[0].count}{" "}
 							files)
 						</div>
 					</dd>
@@ -80,8 +79,6 @@ export default async function Settings() {
 					) : null}
 				</PageSection>
 			) : null}
-
-			<ManagePasskeys />
 		</>
 	);
 }

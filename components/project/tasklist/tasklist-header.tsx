@@ -14,8 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
 import type { TaskList } from "@/drizzle/types";
-import { toDateStringWithDay } from "@/lib/utils/date";
-import { CheckCircle, CircleEllipsisIcon, ClockIcon } from "lucide-react";
+import { CheckCircle, CircleEllipsisIcon } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 
@@ -25,7 +24,6 @@ export const TaskListHeader = ({
 	doneCount,
 	orgSlug,
 	partialUpdateTaskList,
-	timezone,
 }: {
 	taskList: TaskList;
 	totalCount?: number;
@@ -35,7 +33,6 @@ export const TaskListHeader = ({
 		id: number,
 		data: { status: string },
 	) => Promise<void>;
-	timezone: string;
 }) => {
 	const completedPercent =
 		totalCount != null && doneCount != null
@@ -74,19 +71,6 @@ export const TaskListHeader = ({
 									<span className="ml-2">{completedPercent}%</span>
 								</>
 							) : null}
-						</div>
-					) : null}
-
-					{taskList.dueDate ? (
-						<div className="flex flex-row items-center border rounded-lg py-1 px-2 space-x-2 w-[264px]">
-							<ClockIcon className="w-4 h-4" />
-							<p className="block">
-								{taskList.dueDate ? (
-									<span suppressHydrationWarning>
-										Due {toDateStringWithDay(taskList.dueDate, timezone)}
-									</span>
-								) : null}
-							</p>
 						</div>
 					) : null}
 				</div>

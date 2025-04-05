@@ -1,19 +1,10 @@
 import { user } from "@/drizzle/schema";
 import type { User } from "@/drizzle/types";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "../betterauth/auth";
 import { database } from "./useDatabase";
-
-type Organization = {
-	id: string;
-	name: string;
-	slug: string;
-	logo: string;
-	createdAt: Date;
-	meta: Record<string, string | number>;
-};
 
 type Result = {
 	ownerId: string;
@@ -23,17 +14,15 @@ type Result = {
 };
 
 export async function getUser(): Promise<User> {
-	const session = await auth().api.getSession({
-		headers: await headers(),
-	});
-	if (!session) {
+	const userData = await currentUser();
+	if (!userData) {
 		console.warn("No session, redirecting to sign-in");
 		redirect("/sign-in");
 	}
 
 	const db = await database();
 	const userDetails = await db.query.user.findFirst({
-		where: eq(user.id, session.user.id),
+		where: eq(user.id, userData.id),
 	});
 
 	if (!userDetails) {
@@ -44,31 +33,17 @@ export async function getUser(): Promise<User> {
 }
 
 export async function getOwner(): Promise<Result> {
-	const session = await auth().api.getSession({
-		headers: await headers(),
-	});
-	if (!session) {
+	const { userId, orgId, orgSlug } = await auth();
+	if (!userId) {
 		console.warn("No session, redirecting to sign-in");
 		redirect("/sign-in");
 	}
 
-	const userId = session.user.id;
-	const activeOrgId = session.session.activeOrganizationId;
-
-	const organization = activeOrgId
-		? await auth().api.getFullOrganization({
-				headers: await headers(),
-				query: {
-					organizationId: activeOrgId,
-				},
-			})
-		: null;
-
 	return {
-		ownerId: activeOrgId ?? userId,
+		ownerId: orgId ?? userId,
 		userId,
-		orgId: activeOrgId,
-		orgSlug: organization?.slug ?? "me",
+		orgId,
+		orgSlug: orgSlug ?? "me",
 	} as Result;
 }
 
@@ -78,11 +53,4 @@ export async function getTimezone() {
 		cookieStore.get("userTimezone")?.value ??
 		Intl.DateTimeFormat().resolvedOptions().timeZone
 	);
-}
-
-export async function getOrganizations(): Promise<Organization[]> {
-	const organizations = await auth().api.listOrganizations({
-		headers: await headers(),
-	});
-	return organizations as Organization[];
 }

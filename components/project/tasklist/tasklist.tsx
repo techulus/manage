@@ -86,7 +86,7 @@ export const TaskListItem = ({
 
 			const newPosition =
 				overTaskIndex === 0
-					? localTodoItems[0].position / 2
+					? localTodoItems?.[0].position / 2
 					: overTaskIndex === localTodoItems.length - 1
 						? localTodoItems[localTodoItems.length - 1].position + 1000
 						: (localTodoItems[overTaskIndex - 1].position +
@@ -111,7 +111,6 @@ export const TaskListItem = ({
 					doneCount={doneItems.length}
 					orgSlug={orgSlug}
 					partialUpdateTaskList={partialUpdateTaskList}
-					timezone={timezone}
 				/>
 			) : null}
 

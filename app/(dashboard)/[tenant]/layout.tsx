@@ -3,7 +3,7 @@ import { SpinnerWithSpacing } from "@/components/core/loaders";
 import { ReportTimezone } from "@/components/core/report-timezone";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { isDatabaseReady } from "@/lib/utils/useDatabase";
-import { getOrganizations, getOwner, getUser } from "@/lib/utils/useOwner";
+import { getOwner } from "@/lib/utils/useOwner";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { getNotificationsWire, getSidebarWire } from "./settings/actions";
@@ -24,19 +24,10 @@ export default async function ConsoleLayout(props: {
 
 	const { tenant } = await props.params;
 	const { children } = props;
-	const { orgSlug, orgId } = await getOwner();
-	const user = await getUser();
+	const { orgSlug } = await getOwner();
 
 	if (tenant !== orgSlug) {
 		redirect("/start");
-	}
-
-	if (orgId) {
-		const organizations = await getOrganizations();
-		const org = organizations?.find((org) => org.id === orgId);
-		if (!org) {
-			redirect("/start");
-		}
 	}
 
 	const [notificationsWire, sidebarWire] = await Promise.all([
@@ -47,11 +38,6 @@ export default async function ConsoleLayout(props: {
 	return (
 		<SidebarProvider>
 			<AppSidebar
-				user={{
-					firstName: user.firstName ?? "",
-					email: user.email ?? "",
-					imageUrl: null,
-				}}
 				notificationsWire={notificationsWire}
 				sidebarWire={sidebarWire}
 			/>

@@ -28,7 +28,7 @@
     --chart-3: 123.04 46.20% 33.53%;
     --chart-4: 124.48 55.37% 23.73%;
     --chart-5: 125.71 51.22% 8.04%;
-    --radius: 1rem;
+    --radius: 0.75rem;
     --sidebar-background: var(--background);
     --sidebar-foreground: var(--foreground);
     --sidebar-primary: var(--primary);

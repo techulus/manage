@@ -29,15 +29,12 @@ Manage is an open-source project management app inspired by Basecamp. With its i
 
 ```
 # Auth
-BETTER_AUTH_SECRET=
-BETTER_AUTH_URL=
 NEXT_PUBLIC_APP_URL=
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
 
-# Turso
-TURSO_ORG=
-TURSO_GROUP=
-TURSO_GROUP_TOKEN=
-TURSO_API_TOKEN=
+# Database
+DATABASE_URL=
 
 # Any S3 compatible storage
 S3_ENDPOINT="
@@ -52,12 +49,6 @@ TURBOWIRE_BROADCAST_KEY=
 
 # Email
 RESEND_API_KEY=
-```
-
-### Generate BetterAuth Migrations
-
-```bash
-pnpx @better-auth/cli generate --config ./lib/betterauth/config.ts
 ```
 
 ### Run using Docker

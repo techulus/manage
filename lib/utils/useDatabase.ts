@@ -1,34 +1,17 @@
 import path from "node:path";
-import { createClient } from "@libsql/client";
-import { createClient as createTursoClient } from "@tursodatabase/api";
-import { type LibSQLDatabase, drizzle } from "drizzle-orm/libsql";
-import { migrate } from "drizzle-orm/libsql/migrator";
+import { sql } from "drizzle-orm";
+import { type NodePgDatabase, drizzle } from "drizzle-orm/node-postgres";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
 import * as schema from "../../drizzle/schema";
 import { getOwner } from "./useOwner";
 import { addUserToTenantDb } from "./useUser";
 
 function getDatabaseName(ownerId: string) {
-	return `${ownerId}-${process.env.TURSO_GROUP}`.toLowerCase();
+	return ownerId.toLowerCase().replace(/ /g, "_");
 }
 
 export async function isDatabaseReady(): Promise<boolean> {
-	const turso = createTursoClient({
-		org: process.env.TURSO_ORG!,
-		token: process.env.TURSO_API_TOKEN!,
-	});
-
 	try {
-		const { ownerId } = await getOwner();
-
-		const database = await turso.databases
-			.get(getDatabaseName(ownerId))
-			.catch(() => null);
-		if (!database) {
-			await turso.databases.create(getDatabaseName(ownerId), {
-				group: process.env.TURSO_GROUP!,
-			});
-		}
-
 		await migrateDatabase();
 		await addUserToTenantDb();
 		return true;
@@ -38,13 +21,13 @@ export async function isDatabaseReady(): Promise<boolean> {
 	}
 }
 
-export async function migrateDatabase(): Promise<void> {
+async function migrateDatabase(): Promise<void> {
 	const db = await database();
 	const migrationsFolder = path.resolve(process.cwd(), "drizzle");
 	migrate(db, { migrationsFolder: migrationsFolder });
 }
 
-export async function database(): Promise<LibSQLDatabase<typeof schema>> {
+export async function database(): Promise<NodePgDatabase<typeof schema>> {
 	const { ownerId } = await getOwner();
 
 	if (!ownerId) {
@@ -56,17 +39,29 @@ export async function database(): Promise<LibSQLDatabase<typeof schema>> {
 
 export async function getDatabaseForOwner(
 	ownerId: string,
-): Promise<LibSQLDatabase<typeof schema>> {
-	const client = createClient({
-		// url: `file:${path.resolve(process.cwd(), "sqlite", ownerId)}.db`,
-		// syncUrl: `libsql://${getDatabaseName(ownerId)}-${process.env.TURSO_ORG}.turso.io`,
-		url: `libsql://${getDatabaseName(ownerId)}-${process.env.TURSO_ORG}.turso.io`,
-		authToken: process.env.TURSO_GROUP_TOKEN,
-	});
+): Promise<NodePgDatabase<typeof schema>> {
+	const databaseName = getDatabaseName(ownerId);
 
-	// console.log(`Syncing database for owner: ${ownerId}`);
-	// await client.sync();
-	// console.log(`Synced database for owner: ${ownerId}`);
+	const ownerDb = drizzle(
+		`${process.env.DATABASE_URL}/manage?sslmode=require`,
+		{
+			schema,
+		},
+	);
 
-	return drizzle(client, { schema });
+	const checkDb = await ownerDb.execute(
+		sql`SELECT 1 FROM pg_database WHERE datname = ${databaseName}`,
+	);
+	if (checkDb.rowCount === 0) {
+		await ownerDb.execute(sql`CREATE DATABASE ${sql.identifier(databaseName)}`);
+	}
+
+	const tenantDb = drizzle(
+		`${process.env.DATABASE_URL}/${databaseName}?sslmode=require`,
+		{
+			schema,
+		},
+	);
+
+	return tenantDb;
 }

@@ -1,1 +1,0 @@
-ALTER TABLE `Activity` ADD `action` text NOT NULL;

@@ -1,24 +1,46 @@
-import { isDatabaseReady } from "@/lib/utils/useDatabase";
-import { getOwner } from "@/lib/utils/useOwner";
-import { addUserToTenantDb } from "@/lib/utils/useUser";
-import { redirect } from "next/navigation";
+"use client";
 
-export const revalidate = 0;
-export const dynamic = "force-dynamic";
+import { Spinner } from "@/components/core/loaders";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import logo from "../../public/images/logo.png";
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+export default function Start() {
+	const router = useRouter();
 
-export default async function Start() {
-	await sleep(500); // hack to prevent redirect loop
+	useEffect(() => {
+		const pollSetup = () => {
+			fetch("/api/user/setup")
+				.then((res) => res.json())
+				.then((data) => {
+					if (data.ready) {
+						router.replace(data.redirect);
+						return;
+					}
 
-	const { orgSlug } = await getOwner();
+					if (data.redirect) {
+						router.replace(data.redirect);
+						return;
+					}
 
-	const ready = await isDatabaseReady();
-	if (!ready) {
-		await sleep(2000);
-		redirect("/start");
-	}
+					// setTimeout(pollSetup, 2500);
+				})
+				.catch((error) => {
+					console.error("Error checking setup status:", error);
+					// setTimeout(pollSetup, 2500);
+				});
+		};
 
-	await addUserToTenantDb();
-	redirect(`/${orgSlug}/today`);
+		pollSetup();
+	}, [router]);
+
+	return (
+		<div className="flex min-h-screen w-full items-center justify-center">
+			<div className="flex flex-col items-center gap-4">
+				<Image src={logo} alt="Manage" width={48} height={48} />
+				<Spinner className="mt-6" />
+			</div>
+		</div>
+	);
 }

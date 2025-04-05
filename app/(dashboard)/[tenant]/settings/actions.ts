@@ -19,7 +19,7 @@ export async function saveUserTimezone(timeZone: string) {
 	const { userId } = await getOwner();
 
 	const db = await database();
-	db.update(user).set({ timeZone }).where(eq(user.id, userId)).run();
+	db.update(user).set({ timeZone }).where(eq(user.id, userId)).execute();
 }
 
 export async function getUserNotifications() {
@@ -45,7 +45,7 @@ export async function markAllNotificationsAsRead() {
 	db.update(notification)
 		.set({ read: true })
 		.where(eq(notification.toUser, userId))
-		.run();
+		.execute();
 
 	await broadcastEvent("notifications", userId);
 	revalidatePath(`/${orgSlug}/notifications`);
