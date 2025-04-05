@@ -51,7 +51,7 @@ export async function createDocument(payload: FormData) {
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		})
-		.run();
+		.execute();
 
 	await logActivity({
 		action: "created",
@@ -98,15 +98,15 @@ export async function updateDocument(payload: FormData) {
 			updatedAt: new Date(),
 		})
 		.where(eq(document.id, +id))
-		.returning()
-		.get();
+		.returning({ name: document.name })
+		.execute();
 
 	if (currentDocument) {
 		await logActivity({
 			action: "updated",
 			type: "document",
 			message: `Updated document ${
-				documentDetails.name
+				documentDetails[0].name
 			}, ${generateObjectDiffMessage(currentDocument, data)}`,
 			projectId: +projectId,
 		});
@@ -144,7 +144,7 @@ export async function createDocumentFolder(payload: FormData) {
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		})
-		.run();
+		.execute();
 
 	await logActivity({
 		action: "created",
@@ -184,15 +184,15 @@ export async function updateDocumentFolder(payload: FormData) {
 			updatedAt: new Date(),
 		})
 		.where(eq(documentFolder.id, +id))
-		.returning()
-		.get();
+		.returning({ name: documentFolder.name })
+		.execute();
 
 	if (currentFolder)
 		await logActivity({
 			action: "updated",
 			type: "folder",
 			message: `Updated document folder ${
-				folderDetails.name
+				folderDetails[0].name
 			}, ${generateObjectDiffMessage(currentFolder, data)}`,
 			projectId: +projectId,
 		});
@@ -215,18 +215,18 @@ export async function deleteDocumentFolder(payload: FormData) {
 		db
 			.delete(documentFolder)
 			.where(eq(documentFolder.id, +id))
-			.returning()
-			.get(),
+			.returning({ name: documentFolder.name })
+			.execute(),
 		db
 			.delete(comment)
 			.where(and(eq(comment.type, "folder"), eq(comment.parentId, +id)))
-			.run(),
+			.execute(),
 	]);
 
 	await logActivity({
 		action: "deleted",
 		type: "folder",
-		message: `Deleted document folder ${folderDetails?.name}`,
+		message: `Deleted document folder ${folderDetails[0].name}`,
 		projectId: +projectId,
 	});
 
@@ -250,17 +250,21 @@ export async function deleteDocument(
 
 	const db = await database();
 	const [documentDetails, ..._] = await Promise.all([
-		db.delete(document).where(eq(document.id, +id)).returning().get(),
+		db
+			.delete(document)
+			.where(eq(document.id, +id))
+			.returning({ name: document.name })
+			.execute(),
 		db
 			.delete(comment)
 			.where(and(eq(comment.type, "document"), eq(comment.parentId, +id)))
-			.run(),
+			.execute(),
 	]);
 
 	await logActivity({
 		action: "deleted",
 		type: "document",
-		message: `Deleted document ${documentDetails?.name}`,
+		message: `Deleted document ${documentDetails[0].name}`,
 		projectId: +projectId,
 	});
 
@@ -304,13 +308,13 @@ export async function deleteBlob(
 	const blobDetails = await db
 		.delete(blob)
 		.where(eq(blob.id, file.id))
-		.returning()
-		.get();
+		.returning({ name: blob.name })
+		.execute();
 
 	await logActivity({
 		action: "deleted",
 		type: "blob",
-		message: `Deleted file ${blobDetails?.name}`,
+		message: `Deleted file ${blobDetails[0].name}`,
 		projectId: +projectId,
 	});
 }

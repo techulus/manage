@@ -24,8 +24,6 @@ export async function addUserToTenantDb() {
 			firstName: userData.firstName,
 			lastName: userData.lastName,
 			rawData: userData,
-			createdAt: new Date(),
-			updatedAt: new Date(),
 		})
 		.onConflictDoUpdate({
 			target: user.id,
@@ -34,10 +32,9 @@ export async function addUserToTenantDb() {
 				firstName: userData.firstName,
 				lastName: userData.lastName,
 				rawData: userData,
-				updatedAt: new Date(),
 			},
 		})
-		.run();
+		.execute();
 }
 
 export async function getAllUsers(includeSelf = false): Promise<User[]> {

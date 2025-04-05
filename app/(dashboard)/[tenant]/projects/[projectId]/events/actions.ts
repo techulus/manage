@@ -116,17 +116,17 @@ export async function createEvent(_: unknown, payload: FormData) {
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			})
-			.returning()
-			.get();
+			.returning({ id: calendarEvent.id })
+			.execute();
 
 		for (const userId of invites) {
 			db.insert(eventInvite)
 				.values({
-					eventId: createdEvent.id,
+					eventId: createdEvent[0].id,
 					userId,
 					status: "invited",
 				})
-				.run();
+				.execute();
 		}
 
 		await logActivity({
@@ -167,7 +167,7 @@ export async function updateEvent(_: unknown, payload: FormData) {
 		} = handleEventPayload(payload);
 
 		const db = await database();
-		db.delete(eventInvite).where(eq(eventInvite.eventId, id)).run();
+		db.delete(eventInvite).where(eq(eventInvite.eventId, id)).execute();
 
 		for (const userId of invites) {
 			db.insert(eventInvite)
@@ -176,7 +176,7 @@ export async function updateEvent(_: unknown, payload: FormData) {
 					userId,
 					status: "invited",
 				})
-				.run();
+				.execute();
 		}
 
 		const currentEvent = await db.query.calendarEvent
@@ -201,7 +201,7 @@ export async function updateEvent(_: unknown, payload: FormData) {
 			.where(
 				and(eq(calendarEvent.id, id), eq(calendarEvent.projectId, +projectId)),
 			)
-			.run();
+			.execute();
 
 		if (currentEvent)
 			await logActivity({
@@ -241,13 +241,13 @@ export async function deleteEvent(payload: FormData) {
 	const eventDetails = await db
 		.delete(calendarEvent)
 		.where(eq(calendarEvent.id, id))
-		.returning()
-		.get();
+		.returning({ name: calendarEvent.name })
+		.execute();
 
 	await logActivity({
 		action: "deleted",
 		type: "event",
-		message: `Deleted event ${eventDetails?.name}`,
+		message: `Deleted event ${eventDetails[0].name}`,
 		projectId: +projectId,
 	});
 

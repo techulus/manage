@@ -45,7 +45,7 @@ export async function logActivity({
 			userId,
 			createdAt: new Date(),
 		})
-		.run();
+		.execute();
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>

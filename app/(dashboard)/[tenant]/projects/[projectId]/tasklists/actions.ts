@@ -67,7 +67,7 @@ export async function createTaskList(payload: FormData) {
 			updatedAt: new Date(),
 		})
 		.returning()
-		.get();
+		.execute();
 
 	await logActivity({
 		action: "created",
@@ -110,7 +110,7 @@ export async function updateTaskList(payload: FormData) {
 			updatedAt: new Date(),
 		})
 		.where(eq(taskList.id, +id))
-		.run();
+		.execute();
 
 	if (currentTasklist)
 		await logActivity({
@@ -145,24 +145,23 @@ export async function partialUpdateTaskList(
 		.update(taskList)
 		.set({
 			...data,
-			updatedAt: new Date(),
 		})
 		.where(eq(taskList.id, +id))
-		.returning()
-		.get();
+		.returning({ name: taskList.name, projectId: taskList.projectId })
+		.execute();
 
 	if (currentTasklist)
 		await logActivity({
 			action: "updated",
 			type: "tasklist",
-			message: `Updated task list ${updated.name}, ${generateObjectDiffMessage(
+			message: `Updated task list ${updated[0].name}, ${generateObjectDiffMessage(
 				currentTasklist,
-				updated,
+				updated[0],
 			)}`,
-			projectId: +updated.projectId,
+			projectId: +updated[0].projectId,
 		});
 
-	revalidatePath(`/${orgSlug}/projects/${updated.projectId}/tasklists`);
+	revalidatePath(`/${orgSlug}/projects/${updated[0].projectId}/tasklists`);
 }
 
 export async function deleteTaskList(payload: FormData) {
@@ -174,13 +173,13 @@ export async function deleteTaskList(payload: FormData) {
 	const taskListDetails = await db
 		.delete(taskList)
 		.where(eq(taskList.id, +id))
-		.returning()
-		.get();
+		.returning({ name: taskList.name })
+		.execute();
 
 	await logActivity({
 		action: "deleted",
 		type: "tasklist",
-		message: `Deleted task list ${taskListDetails?.name}`,
+		message: `Deleted task list ${taskListDetails[0].name}`,
 		projectId: +projectId,
 	});
 
@@ -232,7 +231,7 @@ export async function createTask({
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		})
-		.run();
+		.execute();
 
 	await logActivity({
 		action: "created",
@@ -270,16 +269,20 @@ export async function updateTask(
 			updatedAt: new Date(),
 		})
 		.where(eq(task.id, +id))
-		.returning()
-		.get();
+		.returning({
+			name: task.name,
+			taskListId: task.taskListId,
+			assignedToUser: task.assignedToUser,
+		})
+		.execute();
 
 	if (currentTask)
 		await logActivity({
 			action: "updated",
 			type: "task",
-			message: `Updated task ${taskDetails.name}, ${generateObjectDiffMessage(
+			message: `Updated task ${taskDetails[0].name}, ${generateObjectDiffMessage(
 				currentTask,
-				taskDetails,
+				taskDetails[0],
 			)}`,
 			projectId: +projectId,
 		});
@@ -288,15 +291,15 @@ export async function updateTask(
 		db.insert(notification)
 			.values({
 				type: notificationType.assign,
-				message: `You have been assigned to task "${taskDetails.name}"`,
-				target: `/${orgSlug}/projects/${projectId}/tasklists/${taskDetails.taskListId}`,
+				message: `You have been assigned to task "${taskDetails[0].name}"`,
+				target: `/${orgSlug}/projects/${projectId}/tasklists/${taskDetails[0].taskListId}`,
 				fromUser: userId,
-				toUser: taskDetails.assignedToUser!,
+				toUser: taskDetails[0].assignedToUser!,
 			})
-			.run();
+			.execute();
 
-		await broadcastEvent("notifications", taskDetails.assignedToUser!, {
-			message: `You have been assigned to task "${taskDetails.name}"`,
+		await broadcastEvent("notifications", taskDetails[0].assignedToUser!, {
+			message: `You have been assigned to task "${taskDetails[0].name}"`,
 		});
 	}
 
@@ -315,13 +318,13 @@ export async function deleteTask({
 	const taskDetails = await db
 		.delete(task)
 		.where(eq(task.id, +id))
-		.returning()
-		.get();
+		.returning({ name: task.name })
+		.execute();
 
 	await logActivity({
 		action: "deleted",
 		type: "task",
-		message: `Deleted task ${taskDetails?.name}`,
+		message: `Deleted task ${taskDetails[0].name}`,
 		projectId: +projectId,
 	});
 
@@ -342,13 +345,13 @@ export async function repositionTask(
 			updatedAt: new Date(),
 		})
 		.where(eq(task.id, +id))
-		.returning()
-		.get();
+		.returning({ name: task.name })
+		.execute();
 
 	await logActivity({
 		action: "updated",
 		type: "task",
-		message: `Repositioned task \`${taskDetails.name}\``,
+		message: `Repositioned task \`${taskDetails[0].name}\``,
 		projectId: +projectId,
 	});
 
@@ -374,7 +377,7 @@ export async function forkTaskList(taskListId: number, projectId: number) {
 			updatedAt: new Date(),
 		})
 		.where(eq(taskList.id, +taskListId))
-		.run();
+		.execute();
 
 	const newTaskList = await db
 		.insert(taskList)
@@ -388,16 +391,16 @@ export async function forkTaskList(taskListId: number, projectId: number) {
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		})
-		.returning()
-		.get();
+		.returning({ id: taskList.id })
+		.execute();
 
 	db.update(task)
 		.set({
-			taskListId: newTaskList.id,
+			taskListId: newTaskList[0].id,
 			updatedAt: new Date(),
 		})
 		.where(and(eq(task.taskListId, +taskListId), eq(task.status, "todo")))
-		.run();
+		.execute();
 
 	await logActivity({
 		action: "updated",
@@ -465,7 +468,7 @@ export async function copyTaskToTaskList(
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		})
-		.run();
+		.execute();
 
 	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
 }
@@ -485,7 +488,7 @@ export async function moveTaskToTaskList(
 			updatedAt: new Date(),
 		})
 		.where(eq(task.id, taskId))
-		.run();
+		.execute();
 
 	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
 }

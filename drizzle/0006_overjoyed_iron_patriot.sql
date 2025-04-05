@@ -1,1 +1,0 @@
-ALTER TABLE `Activity` DROP COLUMN `updatedAt`;
