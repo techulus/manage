@@ -1,36 +1,17 @@
 import path from "node:path";
-import { createClient } from "@libsql/client";
-import { createClient as createTursoClient } from "@tursodatabase/api";
-import { type LibSQLDatabase, drizzle } from "drizzle-orm/libsql";
-import { migrate } from "drizzle-orm/libsql/migrator";
+import { sql } from "drizzle-orm";
+import { type NeonHttpDatabase, drizzle } from "drizzle-orm/neon-http";
+import { migrate } from "drizzle-orm/neon-http/migrator";
 import * as schema from "../../drizzle/schema";
 import { getOwner } from "./useOwner";
 import { addUserToTenantDb } from "./useUser";
 
 function getDatabaseName(ownerId: string) {
-	return `${ownerId}-${process.env.TURSO_GROUP}`
-		.toLowerCase()
-		.replace(/_/g, "-");
+	return ownerId.toLowerCase().replace(/ /g, "_");
 }
 
 export async function isDatabaseReady(): Promise<boolean> {
-	const turso = createTursoClient({
-		org: process.env.TURSO_ORG!,
-		token: process.env.TURSO_API_TOKEN!,
-	});
-
 	try {
-		const { ownerId } = await getOwner();
-
-		const databaseName = getDatabaseName(ownerId);
-		const database = await turso.databases.get(databaseName).catch(() => null);
-
-		if (!database) {
-			await turso.databases.create(databaseName, {
-				group: process.env.TURSO_GROUP!,
-			});
-		}
-
 		await migrateDatabase();
 		await addUserToTenantDb();
 		return true;
@@ -46,7 +27,7 @@ async function migrateDatabase(): Promise<void> {
 	migrate(db, { migrationsFolder: migrationsFolder });
 }
 
-export async function database(): Promise<LibSQLDatabase<typeof schema>> {
+export async function database(): Promise<NeonHttpDatabase<typeof schema>> {
 	const { ownerId } = await getOwner();
 
 	if (!ownerId) {
@@ -58,11 +39,29 @@ export async function database(): Promise<LibSQLDatabase<typeof schema>> {
 
 export async function getDatabaseForOwner(
 	ownerId: string,
-): Promise<LibSQLDatabase<typeof schema>> {
-	const client = createClient({
-		url: `libsql://${getDatabaseName(ownerId)}-${process.env.TURSO_ORG}.turso.io`,
-		authToken: process.env.TURSO_GROUP_TOKEN,
-	});
+): Promise<NeonHttpDatabase<typeof schema>> {
+	const databaseName = getDatabaseName(ownerId);
 
-	return drizzle(client, { schema });
+	const ownerDb = drizzle(
+		`${process.env.DATABASE_URL}/manage?sslmode=require`,
+		{
+			schema,
+		},
+	);
+
+	const checkDb = await ownerDb.execute(
+		sql`SELECT 1 FROM pg_database WHERE datname = ${databaseName}`,
+	);
+	if (checkDb.rowCount === 0) {
+		await ownerDb.execute(sql`CREATE DATABASE ${sql.identifier(databaseName)}`);
+	}
+
+	const tenantDb = drizzle(
+		`${process.env.DATABASE_URL}/${databaseName}?sslmode=require`,
+		{
+			schema,
+		},
+	);
+
+	return tenantDb;
 }

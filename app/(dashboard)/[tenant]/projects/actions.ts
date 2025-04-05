@@ -48,14 +48,14 @@ export async function createProject(payload: FormData) {
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		})
-		.returning()
-		.get();
+		.returning({ id: project.id })
+		.execute();
 
 	await logActivity({
 		action: "created",
 		type: "project",
 		message: `Created project ${name}`,
-		projectId: newProject.id,
+		projectId: newProject?.[0].id,
 	});
 
 	await broadcastEvent("update_sidebar", ownerId);
@@ -91,7 +91,7 @@ export async function updateProject(payload: FormData) {
 			updatedAt: new Date(),
 		})
 		.where(eq(project.id, id))
-		.run();
+		.execute();
 
 	if (currentProject) {
 		await logActivity({
@@ -123,13 +123,13 @@ export async function archiveProject(payload: FormData) {
 			updatedAt: new Date(),
 		})
 		.where(eq(project.id, id))
-		.returning()
-		.get();
+		.returning({ name: project.name })
+		.execute();
 
 	await logActivity({
 		action: "updated",
 		type: "project",
-		message: `Archived project ${projectDetails.name}`,
+		message: `Archived project ${projectDetails?.[0].name}`,
 		projectId: id,
 	});
 
@@ -151,13 +151,13 @@ export async function unarchiveProject(payload: FormData) {
 			updatedAt: new Date(),
 		})
 		.where(eq(project.id, id))
-		.returning()
-		.get();
+		.returning({ name: project.name })
+		.execute();
 
 	await logActivity({
 		action: "updated",
 		type: "project",
-		message: `Unarchived project ${projectDetails.name}`,
+		message: `Unarchived project ${projectDetails?.[0].name}`,
 		projectId: id,
 	});
 
@@ -174,11 +174,11 @@ export async function deleteProject(payload: FormData) {
 	const id = Number(payload.get("id"));
 
 	await Promise.all([
-		db.delete(project).where(eq(project.id, id)).run(),
+		db.delete(project).where(eq(project.id, id)).execute(),
 		db
 			.delete(comment)
 			.where(and(eq(comment.parentId, id), eq(comment.type, "project")))
-			.run(),
+			.execute(),
 	]);
 
 	await broadcastEvent("update_sidebar", ownerId);
@@ -220,7 +220,7 @@ export async function deleteComment(payload: FormData) {
 	const projectId = Number(payload.get("projectId"));
 
 	const db = await database();
-	db.delete(comment).where(eq(comment.id, id)).run();
+	db.delete(comment).where(eq(comment.id, id)).execute();
 
 	await logActivity({
 		action: "deleted",

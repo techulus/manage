@@ -20,24 +20,21 @@ export async function addUserToTenantDb() {
 	db.insert(user)
 		.values({
 			id: userData.id,
-			email: userData.emailAddresses[0].emailAddress,
+			email: userData.emailAddresses?.[0].emailAddress,
 			firstName: userData.firstName,
 			lastName: userData.lastName,
 			rawData: userData,
-			createdAt: new Date(),
-			updatedAt: new Date(),
 		})
 		.onConflictDoUpdate({
 			target: user.id,
 			set: {
-				email: userData.emailAddresses[0].emailAddress,
+				email: userData.emailAddresses?.[0].emailAddress,
 				firstName: userData.firstName,
 				lastName: userData.lastName,
 				rawData: userData,
-				updatedAt: new Date(),
 			},
 		})
-		.run();
+		.execute();
 }
 
 export async function getAllUsers(includeSelf = false): Promise<User[]> {
