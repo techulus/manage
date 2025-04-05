@@ -1,7 +1,7 @@
 import path from "node:path";
 import { sql } from "drizzle-orm";
-import { type NeonHttpDatabase, drizzle } from "drizzle-orm/neon-http";
-import { migrate } from "drizzle-orm/neon-http/migrator";
+import { type NodePgDatabase, drizzle } from "drizzle-orm/node-postgres";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
 import * as schema from "../../drizzle/schema";
 import { getOwner } from "./useOwner";
 import { addUserToTenantDb } from "./useUser";
@@ -27,7 +27,7 @@ async function migrateDatabase(): Promise<void> {
 	migrate(db, { migrationsFolder: migrationsFolder });
 }
 
-export async function database(): Promise<NeonHttpDatabase<typeof schema>> {
+export async function database(): Promise<NodePgDatabase<typeof schema>> {
 	const { ownerId } = await getOwner();
 
 	if (!ownerId) {
@@ -39,7 +39,7 @@ export async function database(): Promise<NeonHttpDatabase<typeof schema>> {
 
 export async function getDatabaseForOwner(
 	ownerId: string,
-): Promise<NeonHttpDatabase<typeof schema>> {
+): Promise<NodePgDatabase<typeof schema>> {
 	const databaseName = getDatabaseName(ownerId);
 
 	const ownerDb = drizzle(
