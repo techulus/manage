@@ -120,9 +120,10 @@ export async function createEvent(_: unknown, payload: FormData) {
 			.execute();
 
 		for (const userId of invites) {
-			db.insert(eventInvite)
+			void db
+				.insert(eventInvite)
 				.values({
-					eventId: createdEvent[0].id,
+					eventId: createdEvent?.[0].id,
 					userId,
 					status: "invited",
 				})
@@ -167,10 +168,11 @@ export async function updateEvent(_: unknown, payload: FormData) {
 		} = handleEventPayload(payload);
 
 		const db = await database();
-		db.delete(eventInvite).where(eq(eventInvite.eventId, id)).execute();
+		void db.delete(eventInvite).where(eq(eventInvite.eventId, id)).execute();
 
 		for (const userId of invites) {
-			db.insert(eventInvite)
+			void db
+				.insert(eventInvite)
 				.values({
 					eventId: id,
 					userId,
@@ -247,7 +249,7 @@ export async function deleteEvent(payload: FormData) {
 	await logActivity({
 		action: "deleted",
 		type: "event",
-		message: `Deleted event ${eventDetails[0].name}`,
+		message: `Deleted event ${eventDetails?.[0].name}`,
 		projectId: +projectId,
 	});
 

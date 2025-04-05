@@ -154,14 +154,14 @@ export async function partialUpdateTaskList(
 		await logActivity({
 			action: "updated",
 			type: "tasklist",
-			message: `Updated task list ${updated[0].name}, ${generateObjectDiffMessage(
+			message: `Updated task list ${updated?.[0].name}, ${generateObjectDiffMessage(
 				currentTasklist,
 				updated[0],
 			)}`,
-			projectId: +updated[0].projectId,
+			projectId: +updated?.[0].projectId,
 		});
 
-	revalidatePath(`/${orgSlug}/projects/${updated[0].projectId}/tasklists`);
+	revalidatePath(`/${orgSlug}/projects/${updated?.[0].projectId}/tasklists`);
 }
 
 export async function deleteTaskList(payload: FormData) {
@@ -179,7 +179,7 @@ export async function deleteTaskList(payload: FormData) {
 	await logActivity({
 		action: "deleted",
 		type: "tasklist",
-		message: `Deleted task list ${taskListDetails[0].name}`,
+		message: `Deleted task list ${taskListDetails?.[0].name}`,
 		projectId: +projectId,
 	});
 
@@ -280,7 +280,7 @@ export async function updateTask(
 		await logActivity({
 			action: "updated",
 			type: "task",
-			message: `Updated task ${taskDetails[0].name}, ${generateObjectDiffMessage(
+			message: `Updated task ${taskDetails?.[0].name}, ${generateObjectDiffMessage(
 				currentTask,
 				taskDetails[0],
 			)}`,
@@ -291,15 +291,15 @@ export async function updateTask(
 		db.insert(notification)
 			.values({
 				type: notificationType.assign,
-				message: `You have been assigned to task "${taskDetails[0].name}"`,
-				target: `/${orgSlug}/projects/${projectId}/tasklists/${taskDetails[0].taskListId}`,
+				message: `You have been assigned to task "${taskDetails?.[0].name}"`,
+				target: `/${orgSlug}/projects/${projectId}/tasklists/${taskDetails?.[0].taskListId}`,
 				fromUser: userId,
-				toUser: taskDetails[0].assignedToUser!,
+				toUser: taskDetails?.[0].assignedToUser!,
 			})
 			.execute();
 
-		await broadcastEvent("notifications", taskDetails[0].assignedToUser!, {
-			message: `You have been assigned to task "${taskDetails[0].name}"`,
+		await broadcastEvent("notifications", taskDetails?.[0].assignedToUser!, {
+			message: `You have been assigned to task "${taskDetails?.[0].name}"`,
 		});
 	}
 
@@ -324,7 +324,7 @@ export async function deleteTask({
 	await logActivity({
 		action: "deleted",
 		type: "task",
-		message: `Deleted task ${taskDetails[0].name}`,
+		message: `Deleted task ${taskDetails?.[0].name}`,
 		projectId: +projectId,
 	});
 
@@ -351,7 +351,7 @@ export async function repositionTask(
 	await logActivity({
 		action: "updated",
 		type: "task",
-		message: `Repositioned task \`${taskDetails[0].name}\``,
+		message: `Repositioned task \`${taskDetails?.[0].name}\``,
 		projectId: +projectId,
 	});
 
@@ -396,7 +396,7 @@ export async function forkTaskList(taskListId: number, projectId: number) {
 
 	db.update(task)
 		.set({
-			taskListId: newTaskList[0].id,
+			taskListId: newTaskList?.[0].id,
 			updatedAt: new Date(),
 		})
 		.where(and(eq(task.taskListId, +taskListId), eq(task.status, "todo")))

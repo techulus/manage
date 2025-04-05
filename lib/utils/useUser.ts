@@ -20,7 +20,7 @@ export async function addUserToTenantDb() {
 	db.insert(user)
 		.values({
 			id: userData.id,
-			email: userData.emailAddresses[0].emailAddress,
+			email: userData.emailAddresses?.[0].emailAddress,
 			firstName: userData.firstName,
 			lastName: userData.lastName,
 			rawData: userData,
@@ -28,7 +28,7 @@ export async function addUserToTenantDb() {
 		.onConflictDoUpdate({
 			target: user.id,
 			set: {
-				email: userData.emailAddresses[0].emailAddress,
+				email: userData.emailAddresses?.[0].emailAddress,
 				firstName: userData.firstName,
 				lastName: userData.lastName,
 				rawData: userData,

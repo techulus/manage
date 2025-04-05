@@ -106,7 +106,7 @@ export async function updateDocument(payload: FormData) {
 			action: "updated",
 			type: "document",
 			message: `Updated document ${
-				documentDetails[0].name
+				documentDetails?.[0].name
 			}, ${generateObjectDiffMessage(currentDocument, data)}`,
 			projectId: +projectId,
 		});
@@ -192,7 +192,7 @@ export async function updateDocumentFolder(payload: FormData) {
 			action: "updated",
 			type: "folder",
 			message: `Updated document folder ${
-				folderDetails[0].name
+				folderDetails?.[0].name
 			}, ${generateObjectDiffMessage(currentFolder, data)}`,
 			projectId: +projectId,
 		});
@@ -226,7 +226,7 @@ export async function deleteDocumentFolder(payload: FormData) {
 	await logActivity({
 		action: "deleted",
 		type: "folder",
-		message: `Deleted document folder ${folderDetails[0].name}`,
+		message: `Deleted document folder ${folderDetails?.[0].name}`,
 		projectId: +projectId,
 	});
 
@@ -264,7 +264,7 @@ export async function deleteDocument(
 	await logActivity({
 		action: "deleted",
 		type: "document",
-		message: `Deleted document ${documentDetails[0].name}`,
+		message: `Deleted document ${documentDetails?.[0].name}`,
 		projectId: +projectId,
 	});
 
@@ -314,7 +314,7 @@ export async function deleteBlob(
 	await logActivity({
 		action: "deleted",
 		type: "blob",
-		message: `Deleted file ${blobDetails[0].name}`,
+		message: `Deleted file ${blobDetails?.[0].name}`,
 		projectId: +projectId,
 	});
 }

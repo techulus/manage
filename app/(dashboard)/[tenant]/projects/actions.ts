@@ -55,7 +55,7 @@ export async function createProject(payload: FormData) {
 		action: "created",
 		type: "project",
 		message: `Created project ${name}`,
-		projectId: newProject[0].id,
+		projectId: newProject?.[0].id,
 	});
 
 	await broadcastEvent("update_sidebar", ownerId);
@@ -129,7 +129,7 @@ export async function archiveProject(payload: FormData) {
 	await logActivity({
 		action: "updated",
 		type: "project",
-		message: `Archived project ${projectDetails[0].name}`,
+		message: `Archived project ${projectDetails?.[0].name}`,
 		projectId: id,
 	});
 
@@ -157,7 +157,7 @@ export async function unarchiveProject(payload: FormData) {
 	await logActivity({
 		action: "updated",
 		type: "project",
-		message: `Unarchived project ${projectDetails[0].name}`,
+		message: `Unarchived project ${projectDetails?.[0].name}`,
 		projectId: id,
 	});
 
