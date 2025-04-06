@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { ProjectWithCreator } from "@/drizzle/types";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useSticky } from "@/hooks/use-sticky";
 import { cn } from "@/lib/utils";
 import logo from "@/public/images/logo.png";
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
@@ -37,7 +36,6 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 	const router = useRouter();
 	const { tenant, projectId } = useParams();
 	const pathname = usePathname();
-	const { ref, isSticky } = useSticky();
 
 	const [projects, setProjects] = useState<ProjectWithCreator[]>([]);
 
@@ -243,15 +241,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				</div>
 			</div>
 
-			<div
-				ref={ref}
-				className={cn(
-					"sticky top-0 z-10 border-b backdrop-blur-md transition-all duration-200",
-					isSticky
-						? "bg-gradient-to-b from-primary/10 to-transparent shadow-sm"
-						: "bg-transparent",
-				)}
-			>
+			<div className="sticky top-0 z-10 border-b backdrop-blur-md transition-all duration-200 bg-transparent">
 				<nav className="flex px-4 overflow-x-auto backdrop-blur-sm">
 					{navLinks.map((link) => (
 						<Link
