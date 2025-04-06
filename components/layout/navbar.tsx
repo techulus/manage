@@ -10,6 +10,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { ProjectWithCreator } from "@/drizzle/types";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import logo from "@/public/images/logo.png";
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
@@ -29,6 +30,7 @@ interface NavLink {
 }
 
 export function Navbar({ notificationsWire }: { notificationsWire: string }) {
+	const isMobile = useIsMobile();
 	const { systemTheme } = useTheme();
 	const appearance = systemTheme === "dark" ? { baseTheme: dark } : undefined;
 	const router = useRouter();
@@ -129,8 +131,8 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 	return (
 		<div className="border-b">
 			<div className="flex h-14 items-center px-4">
-				<div className="flex items-center space-x-2">
-					<Link href={`/${tenant}/today`} className="flex items-center">
+				<div className="flex items-center">
+					<Link href={`/${tenant}/today`} className="flex items-center mr-2">
 						<Image src={logo} alt="Manage" width={24} height={24} />
 						<span className="sr-only">Manage</span>
 					</Link>
@@ -140,7 +142,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 						strokeLinejoin="round"
 						viewBox="0 0 16 16"
 						width="16"
-						className="text-muted dark:text-muted-foreground w-5 h-5"
+						className="text-neutral-300 dark:text-neutral-600 w-5 h-5 mr-1"
 					>
 						<path
 							fillRule="evenodd"
@@ -164,7 +166,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 								strokeLinejoin="round"
 								viewBox="0 0 16 16"
 								width="16"
-								className="text-muted dark:text-muted-foreground w-5 h-5"
+								className="text-neutral-300 dark:text-neutral-600 w-5 h-5 mr-1"
 							>
 								<path
 									fillRule="evenodd"
@@ -215,7 +217,14 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				</div>
 
 				<div className="ml-auto flex items-center space-x-1">
-					<Button variant="ghost" size="icon" asChild>
+					<Button
+						variant="ghost"
+						size="icon"
+						className={cn({
+							hidden: isMobile,
+						})}
+						asChild
+					>
 						<Link href="/help">
 							<HelpCircle className="h-5 w-5" />
 							<span className="sr-only">Help</span>
@@ -224,11 +233,12 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 
 					<Notifications notificationsWire={notificationsWire} />
 
-					<UserButton appearance={appearance} />
+					<div className="pl-2 flex items-center">
+						<UserButton appearance={appearance} />
+					</div>
 				</div>
 			</div>
 
-			{/* Dynamic navigation */}
 			<nav className="flex px-4 overflow-x-auto">
 				{navLinks.map((link) => (
 					<Link

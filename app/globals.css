@@ -161,3 +161,9 @@ textarea,
     @apply bg-background text-foreground;
   }
 }
+
+@media (max-width: 768px) {
+  .cl-userPreviewTextContainer {
+    display: none;
+  }
+}
