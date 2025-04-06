@@ -1,6 +1,6 @@
 import { TurboWireHub } from "@turbowire/serverless";
 
-export type Event = "notifications" | "update_sidebar";
+export type Event = "notifications";
 
 export async function getSignedWireUrl(room: Event, userId: string) {
 	const turbowire = new TurboWireHub(process.env.TURBOWIRE_DOMAIN!);

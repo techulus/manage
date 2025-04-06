@@ -76,8 +76,6 @@ export async function createTaskList(payload: FormData) {
 		projectId: +projectId,
 	});
 
-	await broadcastEvent("update_sidebar", ownerId);
-
 	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
 	redirect(`/${orgSlug}/projects/${projectId}/tasklists`);
 }
@@ -122,8 +120,6 @@ export async function updateTaskList(payload: FormData) {
 			)}`,
 			projectId: +projectId,
 		});
-
-	await broadcastEvent("update_sidebar", ownerId);
 
 	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
 	redirect(`/${orgSlug}/projects/${projectId}/tasklists`);
@@ -183,7 +179,6 @@ export async function deleteTaskList(payload: FormData) {
 		projectId: +projectId,
 	});
 
-	await broadcastEvent("update_sidebar", ownerId);
 	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
 }
 
@@ -408,8 +403,6 @@ export async function forkTaskList(taskListId: number, projectId: number) {
 		message: `Forked task list ${taskListDetails.name}`,
 		projectId: +projectId,
 	});
-
-	await broadcastEvent("update_sidebar", ownerId);
 
 	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
 }

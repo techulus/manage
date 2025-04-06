@@ -142,14 +142,14 @@ export default async function Today(props: {
 		<>
 			<PageTitle title={toDateStringWithDay(today, timezone)} />
 
-			<div className="max-w-5xl mx-auto -mt-10 bg-background px-6 lg:px-0 pb-6">
-				<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-					<Card className="col-span-1 md:col-span-3 p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-none">
+			<div className="max-w-7xl mx-auto -mt-10 bg-background px-6 lg:px-0 pb-6">
+				<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+					<Card className="col-span-2 md:col-span-1 p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-none">
 						<h2 className="text-2xl font-semibold">
 							<Greeting timezone={timezone} />
 						</h2>
 					</Card>
-					<Card className="p-6 bg-gradient-to-br from-orange-500/10 to-orange-500/5 border-none">
+					<Card className="p-6 bg-gradient-to-br from-orange-500/10 to-orange-500/5 border-none h-32">
 						<div className="flex flex-col items-center justify-center h-full">
 							<span className="text-3xl font-bold text-orange-500">
 								{dueToday.length}
@@ -159,7 +159,7 @@ export default async function Today(props: {
 							</span>
 						</div>
 					</Card>
-					<Card className="p-6 bg-gradient-to-br from-red-500/10 to-red-500/5 border-none">
+					<Card className="p-6 bg-gradient-to-br from-red-500/10 to-red-500/5 border-none h-32">
 						<div className="flex flex-col items-center justify-center h-full">
 							<span className="text-3xl font-bold text-red-500">
 								{overDue.length}
@@ -167,14 +167,6 @@ export default async function Today(props: {
 							<span className="text-sm text-muted-foreground mt-1">
 								Overdue
 							</span>
-						</div>
-					</Card>
-					<Card className="p-6 bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-none">
-						<div className="flex flex-col items-center justify-center h-full">
-							<span className="text-3xl font-bold text-blue-500">
-								{filteredEvents.length}
-							</span>
-							<span className="text-sm text-muted-foreground mt-1">Events</span>
 						</div>
 					</Card>
 				</div>

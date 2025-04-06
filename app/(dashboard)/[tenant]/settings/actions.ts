@@ -55,8 +55,3 @@ export async function getNotificationsWire() {
 	const { userId } = await getOwner();
 	return getSignedWireUrl("notifications", userId);
 }
-
-export async function getSidebarWire() {
-	const { ownerId } = await getOwner();
-	return getSignedWireUrl("update_sidebar", ownerId);
-}

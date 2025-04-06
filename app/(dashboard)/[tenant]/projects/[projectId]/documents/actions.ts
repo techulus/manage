@@ -153,8 +153,6 @@ export async function createDocumentFolder(payload: FormData) {
 		projectId: +projectId,
 	});
 
-	await broadcastEvent("update_sidebar", ownerId);
-
 	revalidatePath(`/${orgSlug}/projects/${projectId}`);
 	revalidatePath(`/${orgSlug}/projects/${projectId}/documents`);
 	redirect(`/${orgSlug}/projects/${projectId}/documents`);
@@ -197,8 +195,6 @@ export async function updateDocumentFolder(payload: FormData) {
 			projectId: +projectId,
 		});
 
-	await broadcastEvent("update_sidebar", ownerId);
-
 	revalidatePath(`/${orgSlug}/projects/${projectId}`);
 	revalidatePath(`/${orgSlug}/projects/${projectId}/documents/folders/${id}`);
 	redirect(`/${orgSlug}/projects/${projectId}/documents/folders/${id}`);
@@ -229,8 +225,6 @@ export async function deleteDocumentFolder(payload: FormData) {
 		message: `Deleted document folder ${folderDetails?.[0].name}`,
 		projectId: +projectId,
 	});
-
-	await broadcastEvent("update_sidebar", ownerId);
 
 	revalidatePath(currentPath);
 	redirect(`/${orgSlug}/projects/${projectId}/documents`);

@@ -1,28 +1,19 @@
 "use client";
 
 import type { Notification } from "@/drizzle/types";
-import { cn } from "@/lib/utils";
 import { TurboWire } from "@turbowire/web";
-import { Bell, Dot } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Bell } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { SidebarMenuButton, SidebarMenuItem, useSidebar } from "../ui/sidebar";
+import { Button } from "../ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
-function Notifications({
-	tenant,
+export function Notifications({
 	notificationsWire,
 }: {
-	tenant: string;
 	notificationsWire: string;
 }) {
 	const [unreadCount, setUnreadCount] = useState<number>(0);
-
-	const { setOpenMobile } = useSidebar();
-	const pathname = usePathname();
-
-	const isActive = pathname === `/${tenant}/notifications`;
 
 	const checkNotifications = useCallback(() => {
 		fetch("/api/user/notifications")
@@ -56,27 +47,24 @@ function Notifications({
 	}, [checkNotifications, notificationsWire]);
 
 	return (
-		<SidebarMenuItem>
-			<SidebarMenuButton
-				asChild
-				onClick={() => {
-					setOpenMobile(false);
-				}}
-			>
-				<Link href={`/${tenant}/notifications`} className="relative flex">
-					<Bell className={cn(isActive ? "text-primary" : "")} />
-					<span className={cn(isActive ? "font-semibold" : "")}>
-						Notifications
-					</span>
-					<Dot
-						className={`ml-auto w-10 h-10 -mr-2 ${
-							unreadCount ? "text-red-600" : "text-transparent"
-						}`}
-					/>
-				</Link>
-			</SidebarMenuButton>
-		</SidebarMenuItem>
+		<Popover>
+			<PopoverTrigger asChild>
+				<Button variant="ghost" size="icon" className="relative">
+					<Bell className="h-5 w-5" />
+					{unreadCount ? (
+						<span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
+					) : null}
+					<span className="sr-only">Notifications</span>
+				</Button>
+			</PopoverTrigger>
+			<PopoverContent className="w-80" align="end">
+				<div className="flex flex-col space-y-4 p-2">
+					<h3 className="font-medium">Notifications</h3>
+					<div className="text-sm text-muted-foreground">
+						You have no new notifications.
+					</div>
+				</div>
+			</PopoverContent>
+		</Popover>
 	);
 }
-
-export { Notifications };

@@ -44,7 +44,6 @@ export default async function DocumentDetails(props: Props) {
 				}
 				actionLabel="Edit"
 				actionLink={`/${orgSlug}/projects/${projectId}/documents/${documentId}/edit`}
-				actionType="edit"
 			/>
 
 			<PageSection topInset>
@@ -81,7 +80,7 @@ export default async function DocumentDetails(props: Props) {
 				</div>
 			</PageSection>
 
-			<div className="mx-auto max-w-5xl py-8">
+			<div className="mx-auto max-w-7xl py-8">
 				{/* @ts-ignore */}
 				<CommentsSection
 					type="document"

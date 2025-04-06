@@ -58,8 +58,6 @@ export async function createProject(payload: FormData) {
 		projectId: newProject?.[0].id,
 	});
 
-	await broadcastEvent("update_sidebar", ownerId);
-
 	revalidatePath(`/${orgSlug}/projects`);
 	redirect(`/${orgSlug}/projects`);
 }
@@ -105,8 +103,6 @@ export async function updateProject(payload: FormData) {
 		});
 	}
 
-	await broadcastEvent("update_sidebar", ownerId);
-
 	revalidatePath(`/${orgSlug}/projects/${id}`);
 	redirect(`/${orgSlug}/projects/${id}`);
 }
@@ -132,8 +128,6 @@ export async function archiveProject(payload: FormData) {
 		message: `Archived project ${projectDetails?.[0].name}`,
 		projectId: id,
 	});
-
-	await broadcastEvent("update_sidebar", ownerId);
 
 	revalidatePath(`/${orgSlug}/projects`);
 	redirect(`/${orgSlug}/projects`);
@@ -161,8 +155,6 @@ export async function unarchiveProject(payload: FormData) {
 		projectId: id,
 	});
 
-	await broadcastEvent("update_sidebar", ownerId);
-
 	revalidatePath(`/${orgSlug}/projects`);
 	revalidatePath(`/${orgSlug}/projects/${id}`);
 	redirect(`/${orgSlug}/projects/${id}`);
@@ -180,8 +172,6 @@ export async function deleteProject(payload: FormData) {
 			.where(and(eq(comment.parentId, id), eq(comment.type, "project")))
 			.execute(),
 	]);
-
-	await broadcastEvent("update_sidebar", ownerId);
 
 	revalidatePath(`/${orgSlug}/projects`);
 	redirect(`/${orgSlug}/projects`);

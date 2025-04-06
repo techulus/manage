@@ -74,7 +74,6 @@ export default async function FolderDetails(props: Props) {
 				subTitle="Documents"
 				actionLabel="Edit"
 				actionLink={`/${orgSlug}/projects/${projectId}/documents/folders/${folderId}/edit`}
-				actionType="edit"
 			/>
 
 			<PageSection topInset>
@@ -131,7 +130,7 @@ export default async function FolderDetails(props: Props) {
 				</div>
 			</PageSection>
 
-			<div className="mx-auto max-w-5xl space-y-8 px-4 lg:px-0">
+			<div className="mx-auto max-w-7xl space-y-8 px-4 lg:px-0">
 				<div className="flex flex-col space-y-4">
 					{folder.documents.length || folder.files.length ? (
 						<ul className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-4 lg:grid-cols-6">

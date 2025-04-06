@@ -7,7 +7,7 @@ export const MarkdownView = ({ content }: { content: string }) => {
 	return (
 		<ReactMarkdown
 			remarkPlugins={[remarkGfm]}
-			className="prose max-w-5xl dark:prose-invert"
+			className="prose max-w-7xl dark:prose-invert"
 		>
 			{content}
 		</ReactMarkdown>

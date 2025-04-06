@@ -48,7 +48,6 @@ export default async function ProjectDetails(props: Props) {
 				title={project.name}
 				actionLabel="Edit"
 				actionLink={`/${orgSlug}/projects/${projectId}/edit`}
-				actionType="edit"
 			>
 				{project.dueDate || project.status === "archived" ? (
 					<div className="flex space-x-2">
@@ -116,7 +115,7 @@ export default async function ProjectDetails(props: Props) {
 				</div>
 			</PageSection>
 
-			<div className="mx-auto flex max-w-5xl flex-col p-4 xl:p-0 lg:pb-12">
+			<div className="mx-auto flex max-w-7xl flex-col p-4 xl:p-0 lg:pb-12">
 				<div className="flex justify-between flex-row items-center my-4">
 					<h2 className="text-2xl font-bold leading-7 tracking-tight">
 						Task Lists
@@ -162,7 +161,7 @@ export default async function ProjectDetails(props: Props) {
 				/>
 			</div>
 
-			<div className="mx-auto flex max-w-5xl flex-col space-y-4 mt-8 p-4 xl:p-0 lg:pb-12">
+			<div className="mx-auto flex max-w-7xl flex-col space-y-4 mt-8 p-4 xl:p-0 lg:pb-12">
 				<div className="flex justify-between flex-row items-center">
 					<h2 className="text-2xl font-bold leading-7 tracking-tight">
 						Docs &amp; Files
@@ -220,7 +219,7 @@ export default async function ProjectDetails(props: Props) {
 				/>
 			</div>
 
-			<div className="mx-auto flex max-w-5xl flex-col mt-8 space-y-4 p-4 xl:p-0">
+			<div className="mx-auto flex max-w-7xl flex-col mt-8 space-y-4 p-4 xl:p-0">
 				<div className="flex justify-between flex-row items-center">
 					<h2 className="text-2xl font-bold leading-7 tracking-tight">
 						Events
@@ -248,7 +247,7 @@ export default async function ProjectDetails(props: Props) {
 				</div>
 			</div>
 
-			<div className="mx-auto max-w-5xl p-4 lg:py-8">
+			<div className="mx-auto max-w-7xl p-4 lg:py-8">
 				<CommentsSection
 					type="project"
 					parentId={project.id}
