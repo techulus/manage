@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { SpinnerWithSpacing } from "./loaders";
 import { NotificationItem } from "./notification-item";
 
 export function Notifications({
@@ -16,10 +17,12 @@ export function Notifications({
 	notificationsWire: string;
 }) {
 	const trpc = useTRPC();
-	const { data: notifications } = useQuery(
+	const { data: notifications, isLoading: notificationsLoading } = useQuery(
 		trpc.user.getUserNotifications.queryOptions(),
 	);
-	const { data: timezone } = useQuery(trpc.settings.getTimezone.queryOptions());
+	const { data: timezone, isLoading: timezoneLoading } = useQuery(
+		trpc.settings.getTimezone.queryOptions(),
+	);
 
 	const unreadCount = notifications?.filter((x) => !x.read).length;
 
@@ -54,21 +57,29 @@ export function Notifications({
 					<span className="sr-only">Notifications</span>
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="w-80 sm:w-96 p-2" align="end">
-				<div className="flex flex-col space-y-4">
-					<h3 className="font-medium px-2">Notifications</h3>
-					<div className="text-sm text-muted-foreground">
-						{notifications?.length && timezone
-							? notifications.map((notification) => (
+			<PopoverContent className="w-80 sm:w-96 p-0" align="end">
+				{notificationsLoading || timezoneLoading ? (
+					<SpinnerWithSpacing />
+				) : (
+					<div className="flex flex-col">
+						<h3 className="font-medium px-4 py-2">Notifications</h3>
+						{notifications?.length && timezone ? (
+							<div className="flex flex-col divide-y">
+								{notifications.map((notification) => (
 									<NotificationItem
 										key={notification.id}
 										notification={notification}
 										timezone={timezone}
 									/>
-								))
-							: "You have no new notifications."}
+								))}
+							</div>
+						) : (
+							<div className="text-sm text-muted-foreground">
+								You have no new notifications.
+							</div>
+						)}
 					</div>
-				</div>
+				)}
 			</PopoverContent>
 		</Popover>
 	);
