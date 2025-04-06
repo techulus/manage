@@ -1,32 +1,30 @@
 "use client";
 
-import type { Notification } from "@/drizzle/types";
+import { useTRPC } from "@/trpc/client";
+import { useQuery } from "@tanstack/react-query";
 import { TurboWire } from "@turbowire/web";
 import { Bell } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { NotificationItem } from "./notification-item";
 
 export function Notifications({
 	notificationsWire,
 }: {
 	notificationsWire: string;
 }) {
-	const [unreadCount, setUnreadCount] = useState<number>(0);
+	const trpc = useTRPC();
+	const { data: notifications } = useQuery(
+		trpc.user.getUserNotifications.queryOptions(),
+	);
+	const { data: timezone } = useQuery(trpc.settings.getTimezone.queryOptions());
 
-	const checkNotifications = useCallback(() => {
-		fetch("/api/user/notifications")
-			.then((res) => res.json())
-			.then((data) => {
-				setUnreadCount(data.filter((x: Notification) => !x.read).length);
-			});
-	}, []);
+	const unreadCount = notifications?.filter((x) => !x.read).length;
 
 	useEffect(() => {
 		if (!notificationsWire) return;
-
-		checkNotifications();
 
 		const wire = new TurboWire(notificationsWire);
 		wire.connect((message) => {
@@ -35,7 +33,6 @@ export function Notifications({
 				if (data?.message) {
 					toast.info(data.message);
 				}
-				checkNotifications();
 			} catch (error) {
 				console.error(error);
 			}
@@ -44,7 +41,7 @@ export function Notifications({
 		return () => {
 			wire?.disconnect();
 		};
-	}, [checkNotifications, notificationsWire]);
+	}, [notificationsWire]);
 
 	return (
 		<Popover>
@@ -57,11 +54,19 @@ export function Notifications({
 					<span className="sr-only">Notifications</span>
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="w-80" align="end">
-				<div className="flex flex-col space-y-4 p-2">
-					<h3 className="font-medium">Notifications</h3>
+			<PopoverContent className="w-80 sm:w-96 p-2" align="end">
+				<div className="flex flex-col space-y-4">
+					<h3 className="font-medium px-2">Notifications</h3>
 					<div className="text-sm text-muted-foreground">
-						You have no new notifications.
+						{notifications?.length && timezone
+							? notifications.map((notification) => (
+									<NotificationItem
+										key={notification.id}
+										notification={notification}
+										timezone={timezone}
+									/>
+								))
+							: "You have no new notifications."}
 					</div>
 				</div>
 			</PopoverContent>

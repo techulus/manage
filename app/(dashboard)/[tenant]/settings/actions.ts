@@ -22,22 +22,6 @@ export async function saveUserTimezone(timeZone: string) {
 	db.update(user).set({ timeZone }).where(eq(user.id, userId)).execute();
 }
 
-export async function getUserNotifications() {
-	const { userId } = await getOwner();
-
-	const db = await database();
-	const notifications = await db.query.notification.findMany({
-		where: eq(notification.toUser, userId),
-		with: {
-			toUser: true,
-			fromUser: true,
-		},
-		orderBy: desc(notification.createdAt),
-	});
-
-	return notifications;
-}
-
 export async function markAllNotificationsAsRead() {
 	const { orgSlug, userId } = await getOwner();
 
@@ -49,9 +33,4 @@ export async function markAllNotificationsAsRead() {
 
 	await broadcastEvent("notifications", userId);
 	revalidatePath(`/${orgSlug}/notifications`);
-}
-
-export async function getNotificationsWire() {
-	const { userId } = await getOwner();
-	return getSignedWireUrl("notifications", userId);
 }

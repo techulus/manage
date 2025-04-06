@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import type { JSX, PropsWithChildren } from "react";
 import { buttonVariants } from "../ui/button";
@@ -22,7 +23,12 @@ export default function PageTitle({
 		<>
 			<div className="flex min-h-[180px] items-center justify-center border-b pb-4 pl-4 pr-6 pt-4 sm:pl-6 lg:pl-8 xl:border-t-0">
 				<div className="flex w-full max-w-7xl items-center justify-between">
-					<div className="relative flex w-full flex-col">
+					<div
+						className={cn(
+							"relative flex w-full flex-col",
+							children ? "-mt-6" : null,
+						)}
+					>
 						<h1 className="text-hero flex-1 text-3xl tracking-tighter lg:text-4xl">
 							{title}
 						</h1>

@@ -1,19 +1,15 @@
+import { NotificationItem } from "@/components/core/notification-item";
 import PageSection from "@/components/core/section";
-import { UserAvatar } from "@/components/core/user-avatar";
 import PageTitle from "@/components/layout/page-title";
 import { Button } from "@/components/ui/button";
-import { toDateTimeString } from "@/lib/utils/date";
-import { getTimezone } from "@/lib/utils/useOwner";
-import { Dot } from "lucide-react";
-import Link from "next/link";
-import {
-	getUserNotifications,
-	markAllNotificationsAsRead,
-} from "../settings/actions";
+import { caller } from "@/trpc/server";
+import { markAllNotificationsAsRead } from "../settings/actions";
 
 export default async function Notifications() {
-	const notifications = await getUserNotifications();
-	const timezone = await getTimezone();
+	const [notifications, timezone] = await Promise.all([
+		caller.user.getUserNotifications(),
+		caller.settings.getTimezone(),
+	]);
 
 	return (
 		<>
@@ -33,37 +29,11 @@ export default async function Notifications() {
 				) : null}
 
 				{notifications.map((notification) => (
-					<div
+					<NotificationItem
 						key={notification.id}
-						className="px-3 py-2 text-sm transition-colors hover:bg-accent"
-					>
-						<div className="relative flex items-start gap-3 pe-3">
-							{notification.fromUser ? (
-								<UserAvatar user={notification.fromUser} />
-							) : null}
-							<div className="flex-1 space-y-1">
-								<Link
-									href={notification.target ?? "#"}
-									className="text-left text-foreground/80 after:absolute after:inset-0"
-								>
-									{notification.fromUser ? (
-										<span className="font-medium text-foreground hover:underline">
-											{notification.fromUser.firstName}
-										</span>
-									) : null}{" "}
-									{notification.message}
-								</Link>
-								<div className="text-xs text-muted-foreground">
-									{toDateTimeString(notification.createdAt, timezone)}
-								</div>
-							</div>
-							{!notification.read ? (
-								<div className="absolute end-0 self-center">
-									<Dot className="ml-auto w-10 h-10 -mr-2 text-red-600" />
-								</div>
-							) : null}
-						</div>
-					</div>
+						notification={notification}
+						timezone={timezone}
+					/>
 				))}
 			</PageSection>
 		</>
