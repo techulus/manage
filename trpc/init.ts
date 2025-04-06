@@ -1,4 +1,5 @@
 import { database } from "@/lib/utils/useDatabase";
+import { getOwner } from "@/lib/utils/useOwner";
 import { auth } from "@clerk/nextjs/server";
 import { TRPCError, initTRPC } from "@trpc/server";
 import { cache } from "react";
@@ -8,19 +9,22 @@ export const createTRPCContext = cache(async () => {
 	/**
 	 * @see: https://trpc.io/docs/server/context
 	 */
-	const { sessionId, userId, orgId } = await auth();
-	if (!userId || !sessionId) {
+	const { sessionId } = await auth();
+	if (!sessionId) {
 		throw new TRPCError({
 			code: "UNAUTHORIZED",
 		});
 	}
 
+	const { orgSlug, ownerId, orgId, userId } = await getOwner();
 	const db = await database();
 
 	return {
 		sessionId,
 		userId,
 		orgId,
+		orgSlug,
+		ownerId,
 		db,
 	};
 });

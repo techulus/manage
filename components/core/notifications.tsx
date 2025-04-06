@@ -17,9 +17,11 @@ export function Notifications({
 	notificationsWire: string;
 }) {
 	const trpc = useTRPC();
-	const { data: notifications, isLoading: notificationsLoading } = useQuery(
-		trpc.user.getUserNotifications.queryOptions(),
-	);
+	const {
+		data: notifications,
+		isLoading: notificationsLoading,
+		refetch: refetchNotifications,
+	} = useQuery(trpc.user.getUserNotifications.queryOptions());
 	const { data: timezone, isLoading: timezoneLoading } = useQuery(
 		trpc.settings.getTimezone.queryOptions(),
 	);
@@ -33,6 +35,7 @@ export function Notifications({
 		wire.connect((message) => {
 			try {
 				const data = JSON.parse(message);
+				refetchNotifications();
 				if (data?.message) {
 					toast.info(data.message);
 				}
@@ -44,7 +47,7 @@ export function Notifications({
 		return () => {
 			wire?.disconnect();
 		};
-	}, [notificationsWire]);
+	}, [notificationsWire, refetchNotifications]);
 
 	return (
 		<Popover>

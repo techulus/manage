@@ -9,18 +9,19 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { ProjectWithCreator } from "@/drizzle/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import logo from "@/public/images/logo.png";
+import { useTRPC } from "@/trpc/client";
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
+import { useQuery } from "@tanstack/react-query";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Notifications } from "../core/notifications";
 
 interface NavLink {
@@ -37,27 +38,10 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 	const { tenant, projectId } = useParams();
 	const pathname = usePathname();
 
-	const [projects, setProjects] = useState<ProjectWithCreator[]>([]);
-
-	const getProjects = useCallback(() => {
-		fetch("/api/user/projects")
-			.then((res) => res.json())
-			.then((data) => {
-				if (data?.projects) {
-					setProjects(data.projects);
-				}
-			})
-			.catch((error) => {
-				setProjects([]);
-				console.error(error);
-			});
-	}, []);
-
-	useEffect(() => {
-		if (tenant) {
-			getProjects();
-		}
-	}, [getProjects, tenant]);
+	const trpc = useTRPC();
+	const { data: projects = [] } = useQuery(
+		trpc.user.getProjects.queryOptions(),
+	);
 
 	const activeProject = useMemo(() => {
 		if (!projectId) {

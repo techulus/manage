@@ -1,6 +1,8 @@
 "use client";
 
 import { Spinner } from "@/components/core/loaders";
+import { useTRPC } from "@/trpc/client";
+import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -9,31 +11,20 @@ import logo from "../../public/images/logo.png";
 export default function Start() {
 	const router = useRouter();
 
+	const trpc = useTRPC();
+	const { data } = useQuery({
+		...trpc.user.setup.queryOptions(),
+		refetchInterval: 2500,
+	});
+
 	useEffect(() => {
-		const pollSetup = () => {
-			fetch("/api/user/setup")
-				.then((res) => res.json())
-				.then((data) => {
-					if (data.ready) {
-						router.replace(data.redirect);
-						return;
-					}
+		if (!data) return;
 
-					if (data.redirect) {
-						router.replace(data.redirect);
-						return;
-					}
-
-					// setTimeout(pollSetup, 2500);
-				})
-				.catch((error) => {
-					console.error("Error checking setup status:", error);
-					// setTimeout(pollSetup, 2500);
-				});
-		};
-
-		pollSetup();
-	}, [router]);
+		if (data.redirect) {
+			router.replace(data.redirect);
+			return;
+		}
+	}, [data, router.replace]);
 
 	return (
 		<div className="flex min-h-screen w-full items-center justify-center">

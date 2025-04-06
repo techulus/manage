@@ -1,11 +1,33 @@
 import { notification, user } from "@/drizzle/schema";
 import type { NotificationWithUser } from "@/drizzle/types";
 import { getSignedWireUrl } from "@/lib/utils/turbowire";
+import { isDatabaseReady } from "@/lib/utils/useDatabase";
+import { getProjectsForOwner } from "@/lib/utils/useProjects";
 import { currentUser } from "@clerk/nextjs/server";
 import { desc, eq } from "drizzle-orm";
 import { baseProcedure, createTRPCRouter } from "../init";
 
 export const userRouter = createTRPCRouter({
+	setup: baseProcedure.query(async ({ ctx }) => {
+		if (!ctx.userId) {
+			return {
+				ready: false,
+				redirect: "/sign-in",
+			};
+		}
+
+		const ready = await isDatabaseReady();
+		if (!ready) {
+			return {
+				ready: false,
+			};
+		}
+
+		return {
+			ready: true,
+			redirect: `/${ctx.orgSlug}/today`,
+		};
+	}),
 	getCurrentUser: baseProcedure.query(async ({ ctx }) => {
 		const userData = await currentUser();
 		if (!userData) {
@@ -35,5 +57,12 @@ export const userRouter = createTRPCRouter({
 		});
 
 		return notifications as NotificationWithUser[];
+	}),
+	getProjects: baseProcedure.query(async () => {
+		const { projects } = await getProjectsForOwner({
+			statuses: ["active"],
+		});
+
+		return projects ?? [];
 	}),
 });
