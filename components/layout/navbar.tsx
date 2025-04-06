@@ -77,7 +77,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				},
 				{
 					href: `/${tenant}/projects/${projectId}/tasklists`,
-					label: "Task Lists",
+					label: "Tasks",
 					active: pathname.startsWith(
 						`/${tenant}/projects/${projectId}/tasklists`,
 					),
@@ -129,7 +129,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 	}, [tenant, projectId, pathname]);
 
 	return (
-		<div className="border-b">
+		<>
 			<div className="flex h-14 items-center px-4">
 				<div className="flex items-center">
 					<Link href={`/${tenant}/today`} className="flex items-center mr-2">
@@ -183,7 +183,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 										className="flex items-center p-1.5"
 										size="sm"
 									>
-										<span className="text-sm font-medium">
+										<span className="text-sm text-neutral-500 dark:text-neutral-400">
 											{activeProject?.name}
 										</span>
 										<ChevronDown className="h-4 w-4 text-muted-foreground" />
@@ -239,22 +239,24 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				</div>
 			</div>
 
-			<nav className="flex px-4 overflow-x-auto">
-				{navLinks.map((link) => (
-					<Link
-						key={link.href}
-						href={link.href}
-						className={cn(
-							"flex h-10 items-center px-4 text-sm font-medium border-b-2 transition-colors hover:text-primary",
-							link.active
-								? "border-primary text-primary"
-								: "border-transparent text-muted-foreground hover:border-muted",
-						)}
-					>
-						{link.label}
-					</Link>
-				))}
-			</nav>
-		</div>
+			<div className="sticky top-0 z-50 bg-background border-b">
+				<nav className="flex px-4 overflow-x-auto">
+					{navLinks.map((link) => (
+						<Link
+							key={link.href}
+							href={link.href}
+							className={cn(
+								"flex h-10 items-center px-4 text-sm font-medium border-b-2 transition-colors hover:text-primary",
+								link.active
+									? "border-primary text-primary"
+									: "border-transparent text-muted-foreground hover:border-muted",
+							)}
+						>
+							{link.label}
+						</Link>
+					))}
+				</nav>
+			</div>
+		</>
 	);
 }
