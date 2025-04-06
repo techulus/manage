@@ -20,7 +20,7 @@ export default function PageTitle({
 }: PropsWithChildren<Props>) {
 	return (
 		<>
-			<div className="flex min-h-[200px] items-center justify-center border-b pb-4 pl-4 pr-6 pt-4 sm:pl-6 lg:pl-8 xl:border-t-0">
+			<div className="flex min-h-[180px] items-center justify-center border-b pb-4 pl-4 pr-6 pt-4 sm:pl-6 lg:pl-8 xl:border-t-0">
 				<div className="flex w-full max-w-7xl items-center justify-between">
 					<div className="relative flex w-full flex-col">
 						<h1 className="text-hero flex-1 text-3xl tracking-tighter lg:text-4xl">
@@ -35,7 +35,7 @@ export default function PageTitle({
 					{actionLink && actionLabel ? (
 						<Link
 							href={actionLink}
-							className={buttonVariants({ size: "sm" })}
+							className={buttonVariants({ size: "sm", className: "-mt-6" })}
 							prefetch={false}
 						>
 							{actionLabel}

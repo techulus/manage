@@ -129,7 +129,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 	}, [tenant, projectId, pathname]);
 
 	return (
-		<>
+		<div className="bg-gradient-to-b from-primary/10 to-transparent border-b">
 			<div className="flex h-14 items-center px-4">
 				<div className="flex items-center">
 					<Link href={`/${tenant}/today`} className="flex items-center mr-2">
@@ -239,24 +239,22 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				</div>
 			</div>
 
-			<div className="sticky top-0 z-50 bg-background border-b">
-				<nav className="flex px-4 overflow-x-auto">
-					{navLinks.map((link) => (
-						<Link
-							key={link.href}
-							href={link.href}
-							className={cn(
-								"flex h-10 items-center px-4 text-sm font-medium border-b-2 transition-colors hover:text-primary",
-								link.active
-									? "border-primary text-primary"
-									: "border-transparent text-muted-foreground hover:border-muted",
-							)}
-						>
-							{link.label}
-						</Link>
-					))}
-				</nav>
-			</div>
-		</>
+			<nav className="flex px-4 overflow-x-auto">
+				{navLinks.map((link) => (
+					<Link
+						key={link.href}
+						href={link.href}
+						className={cn(
+							"flex h-10 items-center px-4 text-sm font-medium border-b-2 transition-colors hover:text-primary",
+							link.active
+								? "border-primary text-primary"
+								: "border-transparent text-muted-foreground hover:border-muted",
+						)}
+					>
+						{link.label}
+					</Link>
+				))}
+			</nav>
+		</div>
 	);
 }

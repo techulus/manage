@@ -87,7 +87,7 @@ export default async function TaskLists(props: Props) {
 				actionLink={`/${orgSlug}/projects/${projectId}/tasklists/new`}
 			/>
 
-			<div className="mx-auto my-12 -mt-6 max-w-7xl px-4">
+			<div className="mx-auto my-12 -mt-6 max-w-7xl">
 				<EmptyState
 					show={!taskLists.length}
 					label="task list"
