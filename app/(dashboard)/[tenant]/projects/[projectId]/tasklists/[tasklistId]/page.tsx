@@ -79,9 +79,9 @@ export default async function TaskLists(props: Props) {
 	const doneCount = list.tasks.filter((task) => task.status === "done").length;
 
 	const completedPercent =
-		totalCount != null && doneCount != null
+		totalCount && doneCount
 			? Math.round((doneCount / totalCount) * 100)
-			: null;
+			: undefined;
 
 	return (
 		<>
@@ -99,7 +99,7 @@ export default async function TaskLists(props: Props) {
 								{doneCount} of {totalCount}
 							</p>
 
-							{completedPercent != null ? (
+							{completedPercent ? (
 								<>
 									<Progress
 										className="h-3 max-w-[130px]"
@@ -126,7 +126,7 @@ export default async function TaskLists(props: Props) {
 				</div>
 			</PageTitle>
 
-			<div className="mx-auto -mt-8 max-w-5xl px-4">
+			<div className="mx-auto -mt-8 max-w-5xl">
 				<Suspense
 					fallback={
 						<div className="max-h-96 w-full rounded-lg border p-4 bg-card">

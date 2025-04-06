@@ -29,7 +29,6 @@ async function migrateDatabase(): Promise<void> {
 
 export async function database(): Promise<NodePgDatabase<typeof schema>> {
 	const { ownerId } = await getOwner();
-
 	if (!ownerId) {
 		throw new Error("Owner ID not found");
 	}

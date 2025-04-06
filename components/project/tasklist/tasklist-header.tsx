@@ -35,9 +35,9 @@ export const TaskListHeader = ({
 	) => Promise<void>;
 }) => {
 	const completedPercent =
-		totalCount != null && doneCount != null
+		totalCount && doneCount
 			? Math.round((doneCount / totalCount) * 100)
-			: null;
+			: undefined;
 
 	return (
 		<div className="group relative flex items-center gap-x-4 rounded-tl-lg rounded-tr-lg bg-card p-3">
@@ -55,14 +55,14 @@ export const TaskListHeader = ({
 				</div>
 
 				<div className="flex flex-col space-y-2 text-gray-500 dark:text-gray-400">
-					{totalCount != null && doneCount != null ? (
+					{totalCount && doneCount ? (
 						<div className="flex w-[264px] flex-row items-center border rounded-lg py-1 px-2 space-x-2">
 							<CheckCircle className="w-4 h-4" />
 							<p className="block">
 								{doneCount} of {totalCount}
 							</p>
 
-							{completedPercent != null ? (
+							{completedPercent ? (
 								<>
 									<Progress
 										className="h-3 max-w-[120px]"

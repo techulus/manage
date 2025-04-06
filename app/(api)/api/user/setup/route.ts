@@ -1,6 +1,5 @@
 import { isDatabaseReady } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
-import { addUserToTenantDb } from "@/lib/utils/useUser";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
@@ -20,8 +19,6 @@ export async function GET(_: Request) {
 				ready: false,
 			});
 		}
-
-		await addUserToTenantDb();
 
 		const { orgSlug } = await getOwner();
 		return NextResponse.json({

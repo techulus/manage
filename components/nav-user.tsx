@@ -17,7 +17,7 @@ export function NavUser() {
 	return (
 		<SidebarMenu className="pb-8 md:pb-0">
 			<SidebarMenuItem className="p-2">
-				<UserButton showName appearance={appearance} />
+				<UserButton appearance={appearance} showName />
 			</SidebarMenuItem>
 		</SidebarMenu>
 	);
