@@ -85,5 +85,6 @@ export type ActivityWithActor = Activity & {
 };
 
 export type NotificationWithUser = Notification & {
-	user: Pick<User, "id" | "firstName" | "imageUrl">;
+	fromUser: Pick<User, "id" | "firstName" | "imageUrl">;
+	toUser: Pick<User, "id" | "firstName" | "imageUrl">;
 };

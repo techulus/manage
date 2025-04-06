@@ -92,7 +92,7 @@ export default async function TaskLists(props: Props) {
 			>
 				<div className="flex flex-col pr-4 md:pr-0 space-y-2 md:flex-row md:space-y-0 md:space-x-2 text-gray-500 dark:text-gray-400">
 					{totalCount != null && doneCount != null ? (
-						<div className="flex w-[280px] flex-row items-center border rounded-lg py-1 px-2 space-x-2">
+						<div className="flex w-[280px] flex-row items-center space-x-2">
 							<CheckCircle className="w-4 h-4" />
 							<p className="block">
 								{doneCount} of {totalCount}
@@ -111,7 +111,7 @@ export default async function TaskLists(props: Props) {
 					) : null}
 
 					{list.dueDate ? (
-						<div className="flex flex-row items-center border rounded-lg py-1 px-2 space-x-2">
+						<div className="flex flex-row items-center space-x-2">
 							<ClockIcon className="w-4 h-4" />
 							<p className="block">
 								{list.dueDate ? (

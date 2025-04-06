@@ -3,9 +3,13 @@ import { ReportTimezone } from "@/components/core/report-timezone";
 import { Navbar } from "@/components/layout/navbar";
 import { isDatabaseReady } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
+import { TRPCReactProvider } from "@/trpc/client";
+import { caller, trpc } from "@/trpc/server";
+import { getQueryClient } from "@/trpc/server";
+import { HydrationBoundary } from "@tanstack/react-query";
+import { dehydrate } from "@tanstack/react-query";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { getNotificationsWire } from "./settings/actions";
 
 export default async function ConsoleLayout(props: {
 	children: React.ReactNode;
@@ -26,16 +30,23 @@ export default async function ConsoleLayout(props: {
 		redirect("/start");
 	}
 
-	const notificationsWire = await getNotificationsWire();
+	const notificationsWire = await caller.user.getNotificationsWire();
+
+	const queryClient = getQueryClient();
+	void queryClient.prefetchQuery(trpc.user.getUserNotifications.queryOptions());
 
 	return (
-		<main className="relative mx-auto w-full flex-grow flex-col">
-			<Navbar notificationsWire={notificationsWire} />
-			<div className="min-h-screen bg-background lg:min-w-0 lg:flex-1 pb-8">
-				<Suspense fallback={<SpinnerWithSpacing />}>{children}</Suspense>
-			</div>
+		<TRPCReactProvider>
+			<HydrationBoundary state={dehydrate(queryClient)}>
+				<main className="relative mx-auto w-full flex-grow flex-col">
+					<Navbar notificationsWire={notificationsWire} />
+					<div className="min-h-screen bg-background lg:min-w-0 lg:flex-1 pb-8">
+						<Suspense fallback={<SpinnerWithSpacing />}>{children}</Suspense>
+					</div>
 
-			<ReportTimezone />
-		</main>
+					<ReportTimezone />
+				</main>
+			</HydrationBoundary>
+		</TRPCReactProvider>
 	);
 }

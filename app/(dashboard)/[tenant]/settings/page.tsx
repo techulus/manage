@@ -1,25 +1,14 @@
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
-import { blob } from "@/drizzle/schema";
 import { bytesToMegabytes } from "@/lib/blobStore";
-import { database } from "@/lib/utils/useDatabase";
-import { getTimezone, getUser } from "@/lib/utils/useOwner";
-import { sql } from "drizzle-orm";
+import { caller } from "@/trpc/server";
 import { HardDrive, User2 } from "lucide-react";
 
 export default async function Settings() {
-	const db = await database();
-
 	const [user, storage, timezone] = await Promise.all([
-		getUser(),
-		db
-			.select({
-				count: sql<number>`count(*)`,
-				usage: sql<number>`sum(${blob.contentSize})`,
-			})
-			.from(blob)
-			.execute(),
-		getTimezone(),
+		caller.user.getCurrentUser(),
+		caller.settings.getStorageUsage(),
+		caller.settings.getTimezone(),
 	]);
 
 	return (
@@ -38,8 +27,8 @@ export default async function Settings() {
 					</dt>
 					<dd className="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
 						<div className="text-gray-900 dark:text-gray-200">
-							{bytesToMegabytes(storage?.[0].usage ?? 0)} MB{" "}
-							<p className="inline font-bold">/ 5 GB</p> ({storage?.[0].count}{" "}
+							{bytesToMegabytes(storage?.usage ?? 0)} MB{" "}
+							<p className="inline font-bold">/ 5 GB</p> ({storage?.count}{" "}
 							files)
 						</div>
 					</dd>
