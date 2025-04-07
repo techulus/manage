@@ -2,9 +2,7 @@
 
 import { activity, comment, project } from "@/drizzle/schema";
 import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
-import { broadcastEvent } from "@/lib/utils/turbowire";
 import { database } from "@/lib/utils/useDatabase";
-import { convertMarkdownToPlainText } from "@/lib/utils/useMarkdown";
 import { getOwner } from "@/lib/utils/useOwner";
 import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -197,7 +195,7 @@ export async function addComment(payload: FormData) {
 	await logActivity({
 		action: "created",
 		type: "comment",
-		message: `Created comment: ${convertMarkdownToPlainText(content)}`,
+		message: "Commented",
 		projectId,
 	});
 

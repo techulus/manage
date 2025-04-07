@@ -1,5 +1,5 @@
 import { deleteComment } from "@/app/(dashboard)/[tenant]/projects/actions";
-import { MarkdownView } from "@/components/core/markdown-view";
+import { HtmlPreview } from "@/components/core/html-view";
 import { UserAvatar } from "@/components/core/user-avatar";
 import { DeleteButton } from "@/components/form/button";
 import {
@@ -57,7 +57,7 @@ export async function Comments({
 								</span>
 							</div>
 							<div>
-								<MarkdownView content={comment.content} />
+								<HtmlPreview content={comment.content} />
 							</div>
 
 							{comment.creator?.id === userId ? (

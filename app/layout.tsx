@@ -1,14 +1,10 @@
 import { ThemeProvider } from "@/components/core/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import { SITE_METADATA } from "@/data/marketing";
 import { cn } from "@/lib/utils";
+import { ClerkProvider } from "@clerk/nextjs";
 import { Archivo } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
-import { TRPCReactProvider } from "@/trpc/client";
-import { getQueryClient } from "@/trpc/server";
-import { ClerkProvider } from "@clerk/nextjs";
-import { dehydrate } from "@tanstack/react-query";
-import { HydrationBoundary } from "@tanstack/react-query";
 
 const mainFont = Archivo({
 	subsets: ["latin"],
@@ -24,8 +20,6 @@ export default function RootLayout({
 }: {
 	children: React.ReactNode;
 }) {
-	const queryClient = getQueryClient();
-
 	return (
 		<ClerkProvider>
 			<html
@@ -269,13 +263,7 @@ export default function RootLayout({
 						"rounded-tl-xl rounded-tr-xl md:rounded-none",
 					)}
 				>
-					<ThemeProvider>
-						<TRPCReactProvider>
-							<HydrationBoundary state={dehydrate(queryClient)}>
-								{children}
-							</HydrationBoundary>
-						</TRPCReactProvider>
-					</ThemeProvider>
+					<ThemeProvider>{children}</ThemeProvider>
 					<Toaster position="top-center" />
 				</body>
 			</html>

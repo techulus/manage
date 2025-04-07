@@ -1,8 +1,8 @@
 "use client";
 
 import { fetchActivities } from "@/app/(dashboard)/[tenant]/projects/actions";
+import { HtmlPreview } from "@/components/core/html-view";
 import { Spinner } from "@/components/core/loaders";
-import { MarkdownView } from "@/components/core/markdown-view";
 import { UserAvatar } from "@/components/core/user-avatar";
 import { Button } from "@/components/ui/button";
 import type { ActivityWithActor } from "@/drizzle/types";
@@ -75,7 +75,7 @@ export function ActivityItem({
 						</div>
 						{item.message ? (
 							<div className="mt-1 prose-sm text-muted-foreground">
-								<MarkdownView content={item.message} />
+								<HtmlPreview content={item.message} />
 							</div>
 						) : null}
 					</div>

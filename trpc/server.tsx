@@ -18,7 +18,7 @@ export const trpc = createTRPCOptionsProxy({
 
 createTRPCOptionsProxy({
 	client: createTRPCClient({
-		links: [httpLink({ url: "/api/trpc" })],
+		links: [httpLink({ url: `${process.env.NEXT_PUBLIC_APP_URL}/api/trpc` })],
 	}),
 	queryClient: getQueryClient,
 });

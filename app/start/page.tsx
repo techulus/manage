@@ -1,37 +1,38 @@
-"use client";
+import { isDatabaseReady } from "@/lib/utils/useDatabase";
+import { auth } from "@clerk/nextjs/server";
+import { RedirectType, redirect } from "next/navigation";
 
-import { Spinner } from "@/components/core/loaders";
-import { useTRPC } from "@/trpc/client";
-import { useQuery } from "@tanstack/react-query";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import logo from "../../public/images/logo.png";
+export const fetchCache = "force-no-store";
+export const dynamic = "force-dynamic";
 
-export default function Start() {
-	const router = useRouter();
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-	const trpc = useTRPC();
-	const { data } = useQuery({
-		...trpc.user.setup.queryOptions(),
-		refetchInterval: 2500,
-	});
+export default async function Start() {
+	const { userId, orgSlug } = await auth();
+	if (!userId) {
+		console.warn("No session, redirecting to sign-in");
+		redirect("/sign-in");
+	}
 
-	useEffect(() => {
-		if (!data) return;
+	let ready = false;
+	let retryCount = 0;
+	const maxRetries = 10;
 
-		if (data.redirect) {
-			router.replace(data.redirect);
-			return;
+	while (!ready && retryCount < maxRetries) {
+		ready = await isDatabaseReady();
+		if (!ready) {
+			console.log(
+				`Database not ready, retrying (${retryCount + 1}/${maxRetries})...`,
+			);
+			await sleep(1500);
+			retryCount++;
 		}
-	}, [data, router.replace]);
+	}
 
-	return (
-		<div className="flex min-h-screen w-full items-center justify-center">
-			<div className="flex flex-col items-center gap-4">
-				<Image src={logo} alt="Manage" width={48} height={48} />
-				<Spinner className="mt-6" />
-			</div>
-		</div>
-	);
+	if (!ready) {
+		console.error("Database not ready after maximum retries");
+		redirect("/error");
+	}
+
+	redirect(`/${orgSlug ?? "me"}/today`, RedirectType.replace);
 }

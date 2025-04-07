@@ -1,5 +1,5 @@
 import EmptyState from "@/components/core/empty-state";
-import { MarkdownView } from "@/components/core/markdown-view";
+import { HtmlPreview } from "@/components/core/html-view";
 import PageSection from "@/components/core/section";
 import { DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
@@ -79,7 +79,7 @@ export default async function FolderDetails(props: Props) {
 			<PageSection topInset>
 				{folder.description ? (
 					<div className="flex flex-col px-4 py-2">
-						<MarkdownView content={folder.description ?? ""} />
+						<HtmlPreview content={folder.description ?? ""} />
 					</div>
 				) : null}
 

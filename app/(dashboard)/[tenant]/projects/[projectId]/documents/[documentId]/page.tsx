@@ -1,4 +1,4 @@
-import { MarkdownView } from "@/components/core/markdown-view";
+import { HtmlPreview } from "@/components/core/html-view";
 import PageSection from "@/components/core/section";
 import { DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
@@ -48,7 +48,7 @@ export default async function DocumentDetails(props: Props) {
 
 			<PageSection topInset>
 				<div className="p-4 lg:p-8">
-					<MarkdownView content={documentDetails.markdownContent} />
+					<HtmlPreview content={documentDetails.htmlContent} />
 				</div>
 			</PageSection>
 
@@ -68,7 +68,6 @@ export default async function DocumentDetails(props: Props) {
 									await deleteDocument(
 										documentId,
 										projectId,
-										documentDetails?.markdownContent,
 										documentDetails?.folderId,
 									);
 								}}

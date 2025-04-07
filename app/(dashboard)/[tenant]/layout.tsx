@@ -3,7 +3,9 @@ import { ReportTimezone } from "@/components/core/report-timezone";
 import { Navbar } from "@/components/layout/navbar";
 import { isDatabaseReady } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
-import { caller } from "@/trpc/server";
+import { TRPCReactProvider } from "@/trpc/client";
+import { caller, getQueryClient } from "@/trpc/server";
+import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
@@ -13,29 +15,34 @@ export default async function ConsoleLayout(props: {
 		tenant: string;
 	}>;
 }) {
+	const { tenant } = await props.params;
+	const { orgSlug } = await getOwner();
+	if (tenant !== orgSlug) {
+		redirect("/start");
+	}
+
 	const ready = await isDatabaseReady();
 	if (!ready) {
 		redirect("/start");
 	}
 
-	const { tenant } = await props.params;
-	const { children } = props;
-	const { orgSlug } = await getOwner();
-
-	if (tenant !== orgSlug) {
-		redirect("/start");
-	}
-
+	const queryClient = getQueryClient();
 	const notificationsWire = await caller.user.getNotificationsWire();
 
 	return (
-		<main className="relative mx-auto w-full flex-grow flex-col">
-			<Navbar notificationsWire={notificationsWire} />
-			<div className="min-h-screen bg-background lg:min-w-0 lg:flex-1 pb-8">
-				<Suspense fallback={<SpinnerWithSpacing />}>{children}</Suspense>
-			</div>
+		<TRPCReactProvider>
+			<HydrationBoundary state={dehydrate(queryClient)}>
+				<main className="relative mx-auto w-full flex-grow flex-col">
+					<Navbar notificationsWire={notificationsWire} />
+					<div className="min-h-screen bg-background lg:min-w-0 lg:flex-1 pb-8">
+						<Suspense fallback={<SpinnerWithSpacing />}>
+							{props.children}
+						</Suspense>
+					</div>
 
-			<ReportTimezone />
-		</main>
+					<ReportTimezone />
+				</main>
+			</HydrationBoundary>
+		</TRPCReactProvider>
 	);
 }

@@ -3,9 +3,7 @@
 import { blob, comment, document, documentFolder } from "@/drizzle/schema";
 import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { deleteFile } from "@/lib/blobStore";
-import { broadcastEvent } from "@/lib/utils/turbowire";
 import { database } from "@/lib/utils/useDatabase";
-import { deleteFilesInMarkdown } from "@/lib/utils/useMarkdown";
 import { getOwner } from "@/lib/utils/useOwner";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -16,7 +14,8 @@ const documentSchema = z.object({
 	name: z.string().min(2, {
 		message: "Name must be at least 2 characters.",
 	}),
-	markdownContent: z.string(),
+	htmlContent: z.string(),
+	metadata: z.string(),
 	status: z.enum(["active", "archived"]),
 });
 
@@ -30,13 +29,15 @@ const documentFolderSchema = z.object({
 export async function createDocument(payload: FormData) {
 	const { userId, orgSlug } = await getOwner();
 	const name = payload.get("name") as string;
-	const markdownContent = payload.get("markdownContent") as string;
+	const htmlContent = payload.get("htmlContent") as string;
+	const metadata = payload.get("metadata") as string;
 	const projectId = payload.get("projectId") as string;
 	const folderId = (payload.get("folderId") as string) ?? null;
 
 	const data = documentSchema.parse({
 		name,
-		markdownContent,
+		htmlContent,
+		metadata,
 		status: "active",
 	});
 
@@ -45,6 +46,7 @@ export async function createDocument(payload: FormData) {
 		.insert(document)
 		.values({
 			...data,
+			metadata: JSON.parse(data.metadata),
 			projectId: +projectId,
 			folderId: folderId ? +folderId : null,
 			createdByUser: userId,
@@ -75,14 +77,16 @@ export async function createDocument(payload: FormData) {
 export async function updateDocument(payload: FormData) {
 	const { orgSlug } = await getOwner();
 	const name = payload.get("name") as string;
-	const markdownContent = payload.get("markdownContent") as string;
+	const htmlContent = payload.get("htmlContent") as string;
+	const metadata = payload.get("metadata") as string;
 	const id = payload.get("id") as string;
 	const projectId = payload.get("projectId") as string;
 	const folderId = (payload.get("folderId") as string) ?? null;
 
 	const data = documentSchema.parse({
 		name,
-		markdownContent,
+		htmlContent,
+		metadata,
 		status: "active",
 	});
 
@@ -95,6 +99,7 @@ export async function updateDocument(payload: FormData) {
 		.update(document)
 		.set({
 			...data,
+			metadata: JSON.parse(data.metadata),
 			updatedAt: new Date(),
 		})
 		.where(eq(document.id, +id))
@@ -125,7 +130,7 @@ export async function updateDocument(payload: FormData) {
 }
 
 export async function createDocumentFolder(payload: FormData) {
-	const { userId, orgSlug, ownerId } = await getOwner();
+	const { userId, orgSlug } = await getOwner();
 	const name = payload.get("name") as string;
 	const description = payload.get("description") as string;
 	const projectId = payload.get("projectId") as string;
@@ -159,7 +164,7 @@ export async function createDocumentFolder(payload: FormData) {
 }
 
 export async function updateDocumentFolder(payload: FormData) {
-	const { orgSlug, ownerId } = await getOwner();
+	const { orgSlug } = await getOwner();
 	const name = payload.get("name") as string;
 	const description = payload.get("description") as string;
 	const id = payload.get("id") as string;
@@ -201,7 +206,7 @@ export async function updateDocumentFolder(payload: FormData) {
 }
 
 export async function deleteDocumentFolder(payload: FormData) {
-	const { orgSlug, ownerId } = await getOwner();
+	const { orgSlug } = await getOwner();
 	const id = payload.get("id") as string;
 	const projectId = payload.get("projectId") as string;
 	const currentPath = payload.get("currentPath") as string;
@@ -233,14 +238,9 @@ export async function deleteDocumentFolder(payload: FormData) {
 export async function deleteDocument(
 	id: string,
 	projectId: string,
-	content: string | null,
 	folderId: number | null,
 ) {
 	const { orgSlug } = await getOwner();
-
-	if (content) {
-		await deleteFilesInMarkdown(content);
-	}
 
 	const db = await database();
 	const [documentDetails, ..._] = await Promise.all([

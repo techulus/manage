@@ -48,7 +48,8 @@ export const projectRelations = relations(project, ({ many, one }) => ({
 export const document = pgTable("Document", {
 	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	name: text("name").notNull(),
-	markdownContent: text("markdownContent").notNull(),
+	htmlContent: text("htmlContent").notNull(),
+	metadata: jsonb("metadata").notNull(),
 	status: text("status").notNull(),
 	createdAt: timestamp().notNull().defaultNow(),
 	updatedAt: timestamp().notNull().defaultNow(),

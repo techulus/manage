@@ -1,72 +1,83 @@
-import type { BlobUploadResult } from "@/app/(api)/api/blob/route";
-import dynamic from "next/dynamic";
-import { useCallback, useMemo, useState } from "react";
-import { toast } from "sonner";
+"use client";
 
-const SimpleMDE = dynamic(() => import("react-simplemde-editor"), {
-	ssr: false,
-});
+import { BlockNoteEditor, type PartialBlock } from "@blocknote/core";
+import { BlockNoteView } from "@blocknote/mantine";
+import { useEffect, useMemo, useState } from "react";
+import "@blocknote/core/fonts/inter.css";
+import "@blocknote/mantine/style.css";
+import { Spinner } from "../core/loaders";
 
-export default function MarkdownEditor({
+export default function Editor({
 	defaultValue,
+	metadata = undefined,
 	name = "description",
-	compact = false,
-	placeholder = "Type here...",
 	setValue = () => {},
 }: {
 	defaultValue?: string;
 	name?: string;
-	compact?: boolean;
-	placeholder?: string;
 	setValue?: (value: string) => void;
+	metadata?: PartialBlock[] | undefined;
 }) {
 	const [value, onChange] = useState(defaultValue ?? "");
+	const [blocks, setBlocks] = useState<PartialBlock[]>([]);
+	const [initialContent, setInitialContent] = useState<
+		PartialBlock[] | undefined | "loading"
+	>("loading");
 
-	const onUploadImage = useCallback(
-		async (
-			file: File,
-			onSuccess: (url: string) => void,
-			onError: (error: string) => void,
-		) => {
-			try {
-				const result: BlobUploadResult = await fetch(
+	useEffect(() => {
+		if (defaultValue) {
+			BlockNoteEditor.create()
+				.tryParseHTMLToBlocks(defaultValue)
+				.then((blocks) => {
+					setInitialContent(blocks);
+				});
+		} else {
+			setInitialContent(undefined);
+		}
+	}, [defaultValue]);
+
+	const editor = useMemo(() => {
+		if (metadata) {
+			return BlockNoteEditor.create({ initialContent: metadata });
+		}
+		if (initialContent === "loading") {
+			return undefined;
+		}
+		return BlockNoteEditor.create({
+			initialContent,
+			uploadFile: async (file, blockId) => {
+				console.log(file, blockId);
+				const result: { url: string } = await fetch(
 					`/api/blob?name=${file.name}`,
 					{
 						method: "PUT",
 						body: file,
 					},
 				).then((res) => res.json());
-				return onSuccess(result.url);
-			} catch (e) {
-				console.error(e);
-				toast.error("Failed to upload image");
-				onError("Failed to upload image");
-			}
-		},
-		[],
-	);
+				return result.url;
+			},
+		});
+	}, [initialContent, metadata]);
 
-	const options = useMemo(() => {
-		return {
-			autofocus: !compact,
-			spellChecker: false,
-			uploadImage: true,
-			imageUploadFunction: onUploadImage,
-			maxHeight: compact ? "80px" : "240px",
-			placeholder,
-		};
-	}, [onUploadImage, placeholder, compact]);
+	if (editor === undefined) {
+		return <Spinner />;
+	}
 
 	return (
 		<>
 			<input type="hidden" name={name} defaultValue={value} />
-			<SimpleMDE
-				className={compact ? "simplemde-compact" : ""}
-				options={options}
-				value={value}
-				onChange={(value) => {
-					onChange(value);
-					setValue(value);
+			<input
+				type="hidden"
+				name={"metadata"}
+				defaultValue={JSON.stringify(blocks)}
+			/>
+			<BlockNoteView
+				editor={editor}
+				onChange={async () => {
+					setBlocks(editor.document);
+					const html = await editor.blocksToFullHTML(editor.document);
+					onChange(html);
+					setValue(html);
 				}}
 			/>
 		</>

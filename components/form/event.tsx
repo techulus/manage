@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { RRule, rrulestr } from "rrule";
 import { toast } from "sonner";
-import MarkdownEditor from "../editor";
+import Editor from "../editor";
 import { DateTimePicker } from "../project/events/date-time-picker";
 import { Assignee } from "../project/shared/assigee";
 import { MultiUserSelect } from "../project/shared/multi-user-select";
@@ -193,16 +193,15 @@ export default function EventForm({
 
 					<div className="space-y-2">
 						<label
-							htmlFor="markdownContent"
+							htmlFor="htmlContent"
 							className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5 lg:text-left"
 						>
 							Description
 						</label>
 						<div className="mt-2 sm:col-span-2 sm:mt-0">
-							<MarkdownEditor
+							<Editor
 								defaultValue={item?.description ?? ""}
 								name="description"
-								compact
 							/>
 						</div>
 					</div>

@@ -1,6 +1,6 @@
 import { deleteEvent } from "@/app/(dashboard)/[tenant]/projects/[projectId]/events/actions";
 import EmptyState from "@/components/core/empty-state";
-import { MarkdownView } from "@/components/core/markdown-view";
+import { HtmlPreview } from "@/components/core/html-view";
 import { UserAvatar } from "@/components/core/user-avatar";
 import { DeleteButton } from "@/components/form/button";
 import { buttonVariants } from "@/components/ui/button";
@@ -82,7 +82,7 @@ export default function EventsList({
 
 							{event.description && !compact ? (
 								<div className="pb-2">
-									<MarkdownView content={event.description ?? ""} />
+									<HtmlPreview content={event.description ?? ""} />
 								</div>
 							) : null}
 

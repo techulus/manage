@@ -1,8 +1,8 @@
 "use client";
 
 import { updateTask } from "@/app/(dashboard)/[tenant]/projects/[projectId]/tasklists/actions";
-import { MarkdownView } from "@/components/core/markdown-view";
-import MarkdownEditor from "@/components/editor";
+import { HtmlPreview } from "@/components/core/html-view";
+import Editor from "@/components/editor";
 import { Button } from "@/components/ui/button";
 import type { TaskWithDetails } from "@/drizzle/types";
 import { useState } from "react";
@@ -15,7 +15,7 @@ export default function TaskNotesForm({ task }: { task: TaskWithDetails }) {
 	if (isEditing)
 		return (
 			<div className="flex-grow">
-				<MarkdownEditor defaultValue={notes} setValue={setNotes} compact />
+				<Editor defaultValue={notes} setValue={setNotes} />
 				<div className="mt-2">
 					<Button
 						className="mr-2"
@@ -47,7 +47,7 @@ export default function TaskNotesForm({ task }: { task: TaskWithDetails }) {
 		<div className="flex flex-grow flex-col items-start">
 			{task.description ? (
 				<span className="w-full rounded-lg border border-muted p-2">
-					<MarkdownView content={task.description ?? ""} />
+					<HtmlPreview content={task.description ?? ""} />
 				</span>
 			) : null}
 			<Button
