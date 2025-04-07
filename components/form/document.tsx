@@ -2,7 +2,8 @@
 
 import { Input } from "@/components/ui/input";
 import type { Document } from "@/drizzle/types";
-import MarkdownEditor from "../editor";
+import type { PartialBlock } from "@blocknote/core";
+import Editor from "../editor";
 
 export default function DocumentForm({ item }: { item?: Document | null }) {
 	return (
@@ -21,15 +22,16 @@ export default function DocumentForm({ item }: { item?: Document | null }) {
 
 			<div className="space-y-2">
 				<label
-					htmlFor="markdownContent"
+					htmlFor="htmlContent"
 					className="block lg:text-left text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5"
 				>
 					Content
 				</label>
 				<div className="mt-2 sm:col-span-2 sm:mt-0">
-					<MarkdownEditor
-						defaultValue={item?.markdownContent ?? ""}
-						name="markdownContent"
+					<Editor
+						defaultValue={item?.htmlContent ?? ""}
+						metadata={item?.metadata as PartialBlock[]}
+						name="htmlContent"
 					/>
 				</div>
 			</div>

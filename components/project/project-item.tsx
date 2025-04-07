@@ -1,8 +1,8 @@
 import type { ProjectWithCreator } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { toDateStringWithDay } from "@/lib/utils/date";
-import { convertMarkdownToPlainText } from "@/lib/utils/useMarkdown";
 import Link from "next/link";
+import { HtmlPreview } from "../core/html-view";
 import { UserAvatar } from "../core/user-avatar";
 import { Badge } from "../ui/badge";
 
@@ -31,9 +31,11 @@ export const ProjecItem = ({
 						{name}
 					</Link>
 				</h3>
-				<p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
-					{convertMarkdownToPlainText(description)}
-				</p>
+				{description ? (
+					<p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
+						<HtmlPreview content={description} />
+					</p>
+				) : null}
 				{dueDate ? (
 					<Badge className="mt-2" variant="outline">
 						Due {toDateStringWithDay(dueDate, timezone)}

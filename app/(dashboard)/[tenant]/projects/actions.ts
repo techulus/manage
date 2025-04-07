@@ -2,9 +2,7 @@
 
 import { activity, comment, project } from "@/drizzle/schema";
 import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
-import { broadcastEvent } from "@/lib/utils/turbowire";
 import { database } from "@/lib/utils/useDatabase";
-import { convertMarkdownToPlainText } from "@/lib/utils/useMarkdown";
 import { getOwner } from "@/lib/utils/useOwner";
 import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -58,8 +56,6 @@ export async function createProject(payload: FormData) {
 		projectId: newProject?.[0].id,
 	});
 
-	await broadcastEvent("update_sidebar", ownerId);
-
 	revalidatePath(`/${orgSlug}/projects`);
 	redirect(`/${orgSlug}/projects`);
 }
@@ -105,8 +101,6 @@ export async function updateProject(payload: FormData) {
 		});
 	}
 
-	await broadcastEvent("update_sidebar", ownerId);
-
 	revalidatePath(`/${orgSlug}/projects/${id}`);
 	redirect(`/${orgSlug}/projects/${id}`);
 }
@@ -132,8 +126,6 @@ export async function archiveProject(payload: FormData) {
 		message: `Archived project ${projectDetails?.[0].name}`,
 		projectId: id,
 	});
-
-	await broadcastEvent("update_sidebar", ownerId);
 
 	revalidatePath(`/${orgSlug}/projects`);
 	redirect(`/${orgSlug}/projects`);
@@ -161,8 +153,6 @@ export async function unarchiveProject(payload: FormData) {
 		projectId: id,
 	});
 
-	await broadcastEvent("update_sidebar", ownerId);
-
 	revalidatePath(`/${orgSlug}/projects`);
 	revalidatePath(`/${orgSlug}/projects/${id}`);
 	redirect(`/${orgSlug}/projects/${id}`);
@@ -180,8 +170,6 @@ export async function deleteProject(payload: FormData) {
 			.where(and(eq(comment.parentId, id), eq(comment.type, "project")))
 			.execute(),
 	]);
-
-	await broadcastEvent("update_sidebar", ownerId);
 
 	revalidatePath(`/${orgSlug}/projects`);
 	redirect(`/${orgSlug}/projects`);
@@ -207,7 +195,7 @@ export async function addComment(payload: FormData) {
 	await logActivity({
 		action: "created",
 		type: "comment",
-		message: `Created comment: ${convertMarkdownToPlainText(content)}`,
+		message: "Commented",
 		projectId,
 	});
 

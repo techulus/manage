@@ -79,9 +79,9 @@ export default async function TaskLists(props: Props) {
 	const doneCount = list.tasks.filter((task) => task.status === "done").length;
 
 	const completedPercent =
-		totalCount != null && doneCount != null
+		totalCount && doneCount
 			? Math.round((doneCount / totalCount) * 100)
-			: null;
+			: undefined;
 
 	return (
 		<>
@@ -89,17 +89,16 @@ export default async function TaskLists(props: Props) {
 				title={list.name}
 				actionLabel="Edit"
 				actionLink={`/${orgSlug}/projects/${projectId}/tasklists/${list.id}/edit`}
-				actionType="edit"
 			>
 				<div className="flex flex-col pr-4 md:pr-0 space-y-2 md:flex-row md:space-y-0 md:space-x-2 text-gray-500 dark:text-gray-400">
 					{totalCount != null && doneCount != null ? (
-						<div className="flex w-[280px] flex-row items-center border rounded-lg py-1 px-2 space-x-2">
+						<div className="flex w-[280px] flex-row items-center space-x-2">
 							<CheckCircle className="w-4 h-4" />
 							<p className="block">
 								{doneCount} of {totalCount}
 							</p>
 
-							{completedPercent != null ? (
+							{completedPercent ? (
 								<>
 									<Progress
 										className="h-3 max-w-[130px]"
@@ -112,7 +111,7 @@ export default async function TaskLists(props: Props) {
 					) : null}
 
 					{list.dueDate ? (
-						<div className="flex flex-row items-center border rounded-lg py-1 px-2 space-x-2">
+						<div className="flex flex-row items-center space-x-2">
 							<ClockIcon className="w-4 h-4" />
 							<p className="block">
 								{list.dueDate ? (
@@ -126,7 +125,7 @@ export default async function TaskLists(props: Props) {
 				</div>
 			</PageTitle>
 
-			<div className="mx-auto -mt-8 max-w-5xl px-4">
+			<div className="mx-auto -mt-8 max-w-7xl">
 				<Suspense
 					fallback={
 						<div className="max-h-96 w-full rounded-lg border p-4 bg-card">

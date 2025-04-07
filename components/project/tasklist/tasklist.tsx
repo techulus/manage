@@ -18,7 +18,7 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { MarkdownView } from "../../core/markdown-view";
+import { HtmlPreview } from "../../core/html-view";
 import InlineTaskForm from "../../form/task";
 import { TaskItem } from "./task/task-item";
 import { TaskListHeader } from "./tasklist-header";
@@ -116,7 +116,7 @@ export const TaskListItem = ({
 
 			{taskList.description ? (
 				<div className="border-b px-4 py-2">
-					<MarkdownView content={taskList.description ?? ""} />
+					<HtmlPreview content={taskList.description ?? ""} />
 				</div>
 			) : null}
 

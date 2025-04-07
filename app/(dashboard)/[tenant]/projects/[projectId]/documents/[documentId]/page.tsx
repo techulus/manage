@@ -1,4 +1,4 @@
-import { MarkdownView } from "@/components/core/markdown-view";
+import { HtmlPreview } from "@/components/core/html-view";
 import PageSection from "@/components/core/section";
 import { DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
@@ -44,12 +44,11 @@ export default async function DocumentDetails(props: Props) {
 				}
 				actionLabel="Edit"
 				actionLink={`/${orgSlug}/projects/${projectId}/documents/${documentId}/edit`}
-				actionType="edit"
 			/>
 
 			<PageSection topInset>
 				<div className="p-4 lg:p-8">
-					<MarkdownView content={documentDetails.markdownContent} />
+					<HtmlPreview content={documentDetails.htmlContent} />
 				</div>
 			</PageSection>
 
@@ -69,7 +68,6 @@ export default async function DocumentDetails(props: Props) {
 									await deleteDocument(
 										documentId,
 										projectId,
-										documentDetails?.markdownContent,
 										documentDetails?.folderId,
 									);
 								}}
@@ -81,7 +79,7 @@ export default async function DocumentDetails(props: Props) {
 				</div>
 			</PageSection>
 
-			<div className="mx-auto max-w-5xl py-8">
+			<div className="mx-auto max-w-7xl py-8">
 				{/* @ts-ignore */}
 				<CommentsSection
 					type="document"

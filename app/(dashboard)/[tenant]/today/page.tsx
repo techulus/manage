@@ -139,34 +139,43 @@ export default async function Today(props: {
 	const { tenant } = await props.params;
 
 	return (
-		<div className="max-w-5xl mx-auto">
+		<>
 			<PageTitle title={toDateStringWithDay(today, timezone)} />
 
-			<PageSection topInset>
-				<Card className="px-4 py-3 bg-gradient-to-r from-primary/10 to-transparent border-none">
-					<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+			<div className="max-w-7xl mx-auto -mt-10 bg-background px-6 lg:px-0 pb-6">
+				<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+					<Card className="col-span-2 md:col-span-1 p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-none">
 						<h2 className="text-2xl font-semibold">
 							<Greeting timezone={timezone} />
 						</h2>
-						<div className="flex gap-3">
-							<Badge variant="outline" className="px-3 py-1">
-								{dueToday.length} Due Today
-							</Badge>
-							<Badge variant="destructive" className="px-3 py-1">
-								{overDue.length} Overdue
-							</Badge>
-							<Badge variant="secondary" className="px-3 py-1">
-								{filteredEvents.length} Events
-							</Badge>
+					</Card>
+					<Card className="p-6 bg-gradient-to-br from-orange-500/10 to-orange-500/5 border-none h-32">
+						<div className="flex flex-col items-center justify-center h-full">
+							<span className="text-3xl font-bold text-orange-500">
+								{dueToday.length}
+							</span>
+							<span className="text-sm text-muted-foreground mt-1">
+								Due Today
+							</span>
 						</div>
-					</div>
-				</Card>
-			</PageSection>
+					</Card>
+					<Card className="p-6 bg-gradient-to-br from-red-500/10 to-red-500/5 border-none h-32">
+						<div className="flex flex-col items-center justify-center h-full">
+							<span className="text-3xl font-bold text-red-500">
+								{overDue.length}
+							</span>
+							<span className="text-sm text-muted-foreground mt-1">
+								Overdue
+							</span>
+						</div>
+					</Card>
+				</div>
+			</div>
 
 			{filteredEvents.length ? (
 				<PageSection>
 					<div className="flex items-center justify-between p-4">
-						<h3 className="flex items-center text-xl font-medium text-primary">
+						<h3 className="flex items-center text-lg font-medium text-primary">
 							<CalendarClockIcon className="w-6 h-6 mr-2" />
 							Events
 						</h3>
@@ -226,7 +235,7 @@ export default async function Today(props: {
 					{overDue.length ? (
 						<>
 							<div className="flex items-center justify-between p-4">
-								<h3 className="flex items-center text-xl font-medium text-red-600 dark:text-red-500">
+								<h3 className="flex items-center text-lg font-medium text-red-600 dark:text-red-500">
 									<AlertTriangleIcon className="w-6 h-6 mr-2" />
 									Overdue
 								</h3>
@@ -238,7 +247,7 @@ export default async function Today(props: {
 					{dueToday.length ? (
 						<>
 							<div className="flex items-center justify-between p-4">
-								<h3 className="flex items-center text-xl font-medium text-orange-600">
+								<h3 className="flex items-center text-lg font-medium text-orange-600">
 									<InfoIcon className="w-6 h-6 mr-2" />
 									Due Today
 								</h3>
@@ -248,7 +257,7 @@ export default async function Today(props: {
 					) : null}
 				</PageSection>
 			) : null}
-		</div>
+		</>
 	);
 }
 

@@ -1,15 +1,13 @@
-import { AppSidebar } from "@/components/app-sidebar";
 import { SpinnerWithSpacing } from "@/components/core/loaders";
 import { ReportTimezone } from "@/components/core/report-timezone";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Navbar } from "@/components/layout/navbar";
 import { isDatabaseReady } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
+import { TRPCReactProvider } from "@/trpc/client";
+import { caller, getQueryClient } from "@/trpc/server";
+import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { getNotificationsWire, getSidebarWire } from "./settings/actions";
-
-export const fetchCache = "force-no-store"; // disable cache for console pages
-export const dynamic = "force-dynamic"; // disable static generation for console pages
 
 export default async function ConsoleLayout(props: {
 	children: React.ReactNode;
@@ -17,40 +15,34 @@ export default async function ConsoleLayout(props: {
 		tenant: string;
 	}>;
 }) {
+	const { tenant } = await props.params;
+	const { orgSlug } = await getOwner();
+	if (tenant !== orgSlug) {
+		redirect("/start");
+	}
+
 	const ready = await isDatabaseReady();
 	if (!ready) {
 		redirect("/start");
 	}
 
-	const { tenant } = await props.params;
-	const { children } = props;
-	const { orgSlug } = await getOwner();
-
-	if (tenant !== orgSlug) {
-		redirect("/start");
-	}
-
-	const [notificationsWire, sidebarWire] = await Promise.all([
-		getNotificationsWire(),
-		getSidebarWire(),
-	]);
+	const queryClient = getQueryClient();
+	const notificationsWire = await caller.user.getNotificationsWire();
 
 	return (
-		<SidebarProvider>
-			<AppSidebar
-				notificationsWire={notificationsWire}
-				sidebarWire={sidebarWire}
-			/>
-			<main className="relative mx-auto w-full flex-grow lg:flex">
-				<SidebarTrigger className="absolute top-[18px] left-4 z-50" />
-				<div className="min-w-0 flex-1 xl:flex">
+		<TRPCReactProvider>
+			<HydrationBoundary state={dehydrate(queryClient)}>
+				<main className="relative mx-auto w-full flex-grow flex-col">
+					<Navbar notificationsWire={notificationsWire} />
 					<div className="min-h-screen bg-background lg:min-w-0 lg:flex-1 pb-8">
-						<Suspense fallback={<SpinnerWithSpacing />}>{children}</Suspense>
+						<Suspense fallback={<SpinnerWithSpacing />}>
+							{props.children}
+						</Suspense>
 					</div>
-				</div>
 
-				<ReportTimezone />
-			</main>
-		</SidebarProvider>
+					<ReportTimezone />
+				</main>
+			</HydrationBoundary>
+		</TRPCReactProvider>
 	);
 }

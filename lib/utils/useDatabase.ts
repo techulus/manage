@@ -24,12 +24,11 @@ export async function isDatabaseReady(): Promise<boolean> {
 async function migrateDatabase(): Promise<void> {
 	const db = await database();
 	const migrationsFolder = path.resolve(process.cwd(), "drizzle");
-	migrate(db, { migrationsFolder: migrationsFolder });
+	await migrate(db, { migrationsFolder: migrationsFolder });
 }
 
 export async function database(): Promise<NodePgDatabase<typeof schema>> {
 	const { ownerId } = await getOwner();
-
 	if (!ownerId) {
 		throw new Error("Owner ID not found");
 	}

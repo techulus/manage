@@ -34,13 +34,12 @@ export default async function Projects(props: Props) {
 				}
 				actionLabel="New"
 				actionLink={`/${orgSlug}/projects/new`}
-				actionType="create"
 			/>
 
 			{projects.length ? (
 				<PageSection topInset bottomMargin>
 					<form action={`/${orgSlug}/projects`}>
-						<div className="mx-auto w-full max-w-5xl">
+						<div className="mx-auto w-full max-w-7xl">
 							<label htmlFor="search" className="sr-only">
 								Search projects
 							</label>
@@ -57,7 +56,7 @@ export default async function Projects(props: Props) {
 				</PageSection>
 			) : null}
 
-			<div className="mx-auto mt-8 flex max-w-5xl flex-col">
+			<div className="mx-auto mt-8 flex max-w-7xl flex-col">
 				<EmptyState
 					show={!projects.length}
 					isSearchResult={!!searchParams?.search}
@@ -77,7 +76,7 @@ export default async function Projects(props: Props) {
 			</div>
 
 			{archivedProjects.length > 0 && (
-				<div className="mx-auto mt-12 flex w-full max-w-5xl flex-grow items-center border-t border-muted p-4 md:py-4">
+				<div className="mx-auto mt-12 flex w-full max-w-7xl flex-grow items-center border-t border-muted p-4 md:py-4">
 					<p className="text-sm text-muted-foreground">
 						{archivedProjects.length} archived project(s)
 					</p>

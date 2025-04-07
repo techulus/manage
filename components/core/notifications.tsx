@@ -1,50 +1,44 @@
 "use client";
 
-import type { Notification } from "@/drizzle/types";
-import { cn } from "@/lib/utils";
+import { useTRPC } from "@/trpc/client";
+import { useQuery } from "@tanstack/react-query";
 import { TurboWire } from "@turbowire/web";
-import { Bell, Dot } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { Bell } from "lucide-react";
+import { useEffect } from "react";
 import { toast } from "sonner";
-import { SidebarMenuButton, SidebarMenuItem, useSidebar } from "../ui/sidebar";
+import { Button } from "../ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { SpinnerWithSpacing } from "./loaders";
+import { NotificationItem } from "./notification-item";
 
-function Notifications({
-	tenant,
+export function Notifications({
 	notificationsWire,
 }: {
-	tenant: string;
 	notificationsWire: string;
 }) {
-	const [unreadCount, setUnreadCount] = useState<number>(0);
+	const trpc = useTRPC();
+	const {
+		data: notifications,
+		isLoading: notificationsLoading,
+		refetch: refetchNotifications,
+	} = useQuery(trpc.user.getUserNotifications.queryOptions());
+	const { data: timezone, isLoading: timezoneLoading } = useQuery(
+		trpc.settings.getTimezone.queryOptions(),
+	);
 
-	const { setOpenMobile } = useSidebar();
-	const pathname = usePathname();
-
-	const isActive = pathname === `/${tenant}/notifications`;
-
-	const checkNotifications = useCallback(() => {
-		fetch("/api/user/notifications")
-			.then((res) => res.json())
-			.then((data) => {
-				setUnreadCount(data.filter((x: Notification) => !x.read).length);
-			});
-	}, []);
+	const unreadCount = notifications?.filter((x) => !x.read).length;
 
 	useEffect(() => {
 		if (!notificationsWire) return;
-
-		checkNotifications();
 
 		const wire = new TurboWire(notificationsWire);
 		wire.connect((message) => {
 			try {
 				const data = JSON.parse(message);
+				refetchNotifications();
 				if (data?.message) {
 					toast.info(data.message);
 				}
-				checkNotifications();
 			} catch (error) {
 				console.error(error);
 			}
@@ -53,30 +47,43 @@ function Notifications({
 		return () => {
 			wire?.disconnect();
 		};
-	}, [checkNotifications, notificationsWire]);
+	}, [notificationsWire, refetchNotifications]);
 
 	return (
-		<SidebarMenuItem>
-			<SidebarMenuButton
-				asChild
-				onClick={() => {
-					setOpenMobile(false);
-				}}
-			>
-				<Link href={`/${tenant}/notifications`} className="relative flex">
-					<Bell className={cn(isActive ? "text-primary" : "")} />
-					<span className={cn(isActive ? "font-semibold" : "")}>
-						Notifications
-					</span>
-					<Dot
-						className={`ml-auto w-10 h-10 -mr-2 ${
-							unreadCount ? "text-red-600" : "text-transparent"
-						}`}
-					/>
-				</Link>
-			</SidebarMenuButton>
-		</SidebarMenuItem>
+		<Popover>
+			<PopoverTrigger asChild>
+				<Button variant="ghost" size="icon" className="relative">
+					<Bell className="h-5 w-5" />
+					{unreadCount ? (
+						<span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
+					) : null}
+					<span className="sr-only">Notifications</span>
+				</Button>
+			</PopoverTrigger>
+			<PopoverContent className="w-80 sm:w-96 p-0" align="end">
+				{notificationsLoading || timezoneLoading ? (
+					<SpinnerWithSpacing />
+				) : (
+					<div className="flex flex-col">
+						<h3 className="font-medium px-4 py-2">Notifications</h3>
+						{notifications?.length && timezone ? (
+							<div className="flex flex-col divide-y">
+								{notifications.map((notification) => (
+									<NotificationItem
+										key={notification.id}
+										notification={notification}
+										timezone={timezone}
+									/>
+								))}
+							</div>
+						) : (
+							<div className="text-sm text-muted-foreground">
+								You have no new notifications.
+							</div>
+						)}
+					</div>
+				)}
+			</PopoverContent>
+		</Popover>
 	);
 }
-
-export { Notifications };

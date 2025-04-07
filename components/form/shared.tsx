@@ -2,7 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import type { DocumentFolder, Project, TaskList } from "@/drizzle/types";
-import MarkdownEditor from "../editor";
+import Editor from "../editor";
 import { DateTimePicker } from "../project/events/date-time-picker";
 
 export default function SharedForm({
@@ -34,7 +34,7 @@ export default function SharedForm({
 					Notes
 				</label>
 				<div className="mt-2 sm:col-span-2 sm:mt-0">
-					<MarkdownEditor defaultValue={item?.description ?? ""} compact />
+					<Editor defaultValue={item?.description ?? ""} />
 				</div>
 			</div>
 

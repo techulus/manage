@@ -1,4 +1,4 @@
-import { getUser } from "@/lib/utils/useOwner";
+import { caller } from "@/trpc/server";
 import { Suspense } from "react";
 import CommentForm from "./comment";
 import { Comments } from "./comments";
@@ -12,7 +12,8 @@ export async function CommentsSection({
 	parentId: string | number;
 	projectId: string | number;
 }) {
-	const creator = await getUser();
+	const creator = await caller.user.getCurrentUser();
+
 	return (
 		<div className="flex flex-col space-y-4">
 			<Suspense

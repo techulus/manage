@@ -11,6 +11,7 @@ type GenericObject = {
 		| Date
 		| null
 		| undefined
+		| unknown
 		| GenericObject;
 };
 

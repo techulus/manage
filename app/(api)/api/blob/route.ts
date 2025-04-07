@@ -38,36 +38,6 @@ export async function PUT(request: NextRequest) {
 			}
 		}
 
-		if (body.type === "text/markdown" && projectId && folder) {
-			if (!projectId || !folder) {
-				return NextResponse.error();
-			}
-
-			const content = await body.text();
-			await db
-				.insert(document)
-				.values({
-					name,
-					markdownContent: content,
-					status: "active",
-					projectId: +projectId,
-					folderId: +folder,
-					createdByUser: userId,
-					createdAt: new Date(),
-					updatedAt: new Date(),
-				})
-				.execute();
-
-			revalidatePath(
-				`/${orgSlug}/projects/${projectId}/documents/folders/${folder}`,
-			);
-
-			return NextResponse.json<BlobUploadResult>({
-				message: "ok",
-				url: `${getAppBaseUrl()}/${orgSlug}/projects/${projectId}/documents/folders/${folder}`,
-			});
-		}
-
 		const fileId = uuidv4();
 		const key = `${ownerId}/${fileId}`;
 

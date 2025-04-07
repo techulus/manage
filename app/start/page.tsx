@@ -1,46 +1,38 @@
-"use client";
+import { isDatabaseReady } from "@/lib/utils/useDatabase";
+import { auth } from "@clerk/nextjs/server";
+import { RedirectType, redirect } from "next/navigation";
 
-import { Spinner } from "@/components/core/loaders";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import logo from "../../public/images/logo.png";
+export const fetchCache = "force-no-store";
+export const dynamic = "force-dynamic";
 
-export default function Start() {
-	const router = useRouter();
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-	useEffect(() => {
-		const pollSetup = () => {
-			fetch("/api/user/setup")
-				.then((res) => res.json())
-				.then((data) => {
-					if (data.ready) {
-						router.replace(data.redirect);
-						return;
-					}
+export default async function Start() {
+	const { userId, orgSlug } = await auth();
+	if (!userId) {
+		console.warn("No session, redirecting to sign-in");
+		redirect("/sign-in");
+	}
 
-					if (data.redirect) {
-						router.replace(data.redirect);
-						return;
-					}
+	let ready = false;
+	let retryCount = 0;
+	const maxRetries = 10;
 
-					// setTimeout(pollSetup, 2500);
-				})
-				.catch((error) => {
-					console.error("Error checking setup status:", error);
-					// setTimeout(pollSetup, 2500);
-				});
-		};
+	while (!ready && retryCount < maxRetries) {
+		ready = await isDatabaseReady();
+		if (!ready) {
+			console.log(
+				`Database not ready, retrying (${retryCount + 1}/${maxRetries})...`,
+			);
+			await sleep(1500);
+			retryCount++;
+		}
+	}
 
-		pollSetup();
-	}, [router]);
+	if (!ready) {
+		console.error("Database not ready after maximum retries");
+		redirect("/error");
+	}
 
-	return (
-		<div className="flex min-h-screen w-full items-center justify-center">
-			<div className="flex flex-col items-center gap-4">
-				<Image src={logo} alt="Manage" width={48} height={48} />
-				<Spinner className="mt-6" />
-			</div>
-		</div>
-	);
+	redirect(`/${orgSlug ?? "me"}/today`, RedirectType.replace);
 }

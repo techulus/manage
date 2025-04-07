@@ -2,7 +2,7 @@
 
 import { addComment } from "@/app/(dashboard)/[tenant]/projects/actions";
 import { UserAvatar } from "@/components/core/user-avatar";
-import MarkdownEditor from "@/components/editor";
+import Editor from "@/components/editor";
 import { ActionButton } from "@/components/form/button";
 import type { User } from "@/drizzle/types";
 import { usePathname } from "next/navigation";
@@ -33,12 +33,7 @@ export default function CommentForm({
 				{creator ? <UserAvatar user={creator} /> : null}
 
 				<div className="relative flex-grow">
-					<MarkdownEditor
-						defaultValue={""}
-						name="content"
-						placeholder="Add a comment here..."
-						compact
-					/>
+					<Editor name="content" />
 					<ActionButton
 						size="sm"
 						className="absolute -bottom-12 left-0"

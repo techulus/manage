@@ -99,7 +99,6 @@ export default async function EventDetails(props: Props) {
 				title="Events"
 				actionLabel="New"
 				actionLink={`/${orgSlug}/projects/${projectId}/events/new`}
-				actionType="create"
 			>
 				<div className="font-medium text-gray-500">
 					{toDateStringWithDay(selectedDate, timezone)}
@@ -142,7 +141,7 @@ export default async function EventDetails(props: Props) {
 				</div>
 			</PageSection>
 
-			<div className="mx-auto max-w-5xl p-4 lg:p-0">
+			<div className="mx-auto max-w-7xl p-4 lg:p-0">
 				{/* @ts-ignore */}
 				<CommentsSection
 					type="event"
