@@ -114,7 +114,8 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 
 	return (
 		<>
-			<div className="bg-gradient-to-b from-primary/10 to-transparent">
+			<div className="fixed top-0 left-0 right-0 h-14 bg-gradient-to-b from-primary/10 to-transparent" />
+			<div className="relative">
 				<div className="flex h-14 items-center px-4">
 					<div className="flex items-center">
 						<Link href={`/${tenant}/today`} className="flex items-center mr-2">
@@ -225,7 +226,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				</div>
 			</div>
 
-			<div className="sticky top-0 z-10 border-b backdrop-blur-md transition-all duration-200 bg-transparent">
+			<div className="sticky top-0 z-10 border-b backdrop-blur-lg transition-all duration-200 bg-transparent">
 				<nav className="flex px-4 overflow-x-auto backdrop-blur-sm">
 					{navLinks.map((link) => (
 						<Link

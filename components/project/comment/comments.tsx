@@ -56,9 +56,7 @@ export async function Comments({
 									{new Date(comment.createdAt).toLocaleString()}
 								</span>
 							</div>
-							<div>
-								<HtmlPreview content={comment.content} />
-							</div>
+							<HtmlPreview content={comment.content} />
 
 							{comment.creator?.id === userId ? (
 								<DropdownMenu>
