@@ -74,7 +74,7 @@ export function ActivityItem({
 							</span>
 						</div>
 						{item.message ? (
-							<div className="mt-1 prose-sm text-muted-foreground">
+							<div className="mt-1">
 								<HtmlPreview content={item.message} />
 							</div>
 						) : null}

@@ -32,9 +32,9 @@ export const ProjecItem = ({
 					</Link>
 				</h3>
 				{description ? (
-					<p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
+					<div className="mt-2 line-clamp-3">
 						<HtmlPreview content={description} />
-					</p>
+					</div>
 				) : null}
 				{dueDate ? (
 					<Badge className="mt-2" variant="outline">
