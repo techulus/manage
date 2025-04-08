@@ -47,17 +47,6 @@ export const projectsRouter = createTRPCRouter({
 												imageUrl: true,
 											},
 										},
-										// I can't get count query to work, so I'm just selecting the id :(
-										documents: {
-											columns: {
-												id: true,
-											},
-										},
-										files: {
-											columns: {
-												id: true,
-											},
-										},
 									},
 								},
 							}
