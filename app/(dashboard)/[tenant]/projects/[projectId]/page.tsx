@@ -17,7 +17,6 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toDateStringWithDay } from "@/lib/utils/date";
-import { getOwner } from "@/lib/utils/useOwner";
 import { caller } from "@/trpc/server";
 import { CalendarPlusIcon, ListPlusIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
@@ -238,12 +237,7 @@ export default async function ProjectDetails(props: Props) {
 				</div>
 
 				<div className="flex w-full rounded-lg border bg-card">
-					<EventsCalendar
-						projectId={projectId}
-						events={project.events}
-						timezone={timezone}
-						compact
-					/>
+					<EventsCalendar timezone={timezone} compact />
 				</div>
 			</div>
 

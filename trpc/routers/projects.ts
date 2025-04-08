@@ -1,9 +1,6 @@
-import { calendarEvent, document, project, taskList } from "@/drizzle/schema";
+import { document, project, taskList } from "@/drizzle/schema";
 import type { ProjectWithData } from "@/drizzle/types";
-import { toEndOfDay } from "@/lib/utils/date";
-import { toStartOfDay } from "@/lib/utils/date";
-import { and, between, isNotNull, or } from "drizzle-orm";
-import { eq, isNull } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { baseProcedure, createTRPCRouter } from "../init";
 
@@ -16,9 +13,6 @@ export const projectsRouter = createTRPCRouter({
 			}),
 		)
 		.query(async ({ ctx, input }) => {
-			const startOfDay = toStartOfDay(new Date());
-			const endOfDay = toEndOfDay(new Date());
-
 			const data = await ctx.db.query.project
 				.findFirst({
 					where: and(eq(project.id, input.id)),
@@ -62,32 +56,6 @@ export const projectsRouter = createTRPCRouter({
 										files: {
 											columns: {
 												id: true,
-											},
-										},
-									},
-								},
-								events: {
-									where: or(
-										between(calendarEvent.start, startOfDay, endOfDay),
-										between(calendarEvent.end, startOfDay, endOfDay),
-										isNotNull(calendarEvent.repeatRule),
-									),
-									with: {
-										creator: {
-											columns: {
-												id: true,
-												firstName: true,
-												imageUrl: true,
-											},
-										},
-										invites: {
-											with: {
-												user: {
-													columns: {
-														firstName: true,
-														imageUrl: true,
-													},
-												},
 											},
 										},
 									},

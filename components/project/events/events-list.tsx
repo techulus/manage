@@ -32,7 +32,7 @@ export default function EventsList({
 	timezone,
 }: {
 	date: string;
-	projectId: string;
+	projectId: number;
 	events: EventWithInvites[];
 	timezone: string;
 	compact?: boolean;

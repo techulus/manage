@@ -6,7 +6,6 @@ import EventsCalendar from "@/components/project/events/events-calendar";
 import { buttonVariants } from "@/components/ui/button";
 import { toDateStringWithDay } from "@/lib/utils/date";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
-import { caller } from "@/trpc/server";
 import { RssIcon } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -30,10 +29,6 @@ export default async function EventDetails(props: Props) {
 
 	const timezone = await getTimezone();
 	const selectedDate = on ? new Date(on) : new Date();
-	const events = await caller.events.getByDate({
-		date: selectedDate,
-		projectId: +projectId,
-	});
 
 	const dayCommentId = `${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDay()}`;
 	const calendarSubscriptionUrl = `/api/calendar/${ownerId}/${projectId}/calendar.ics?userId=${userId}`;
@@ -74,8 +69,6 @@ export default async function EventDetails(props: Props) {
 						fallback={<SpinnerWithSpacing />}
 					>
 						<EventsCalendar
-							projectId={projectId}
-							events={events}
 							selectedDate={selectedDate.toISOString()}
 							timezone={timezone}
 						/>
