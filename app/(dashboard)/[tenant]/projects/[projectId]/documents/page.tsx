@@ -108,7 +108,7 @@ export default async function ProjectDocuments(props: Props) {
 
 			<PageSection topInset>
 				{data.documents.length || data.documentFolders.length ? (
-					<ul className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-4 lg:grid-cols-6">
+					<ul className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-4 lg:grid-cols-6 p-4">
 						{data.documents.map((document) => (
 							<div key={document.id}>
 								{/* @ts-ignore */}

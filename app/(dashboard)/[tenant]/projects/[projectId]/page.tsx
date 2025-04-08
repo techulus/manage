@@ -241,7 +241,6 @@ export default async function ProjectDetails(props: Props) {
 					<EventsCalendar
 						projectId={projectId}
 						events={project.events}
-						orgSlug={params.tenant}
 						timezone={timezone}
 						compact
 					/>

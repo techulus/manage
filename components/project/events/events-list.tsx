@@ -21,6 +21,7 @@ import {
 import { useUser } from "@clerk/nextjs";
 import { CircleEllipsisIcon } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { Assignee } from "../shared/assigee";
 
 export default function EventsList({
@@ -28,17 +29,16 @@ export default function EventsList({
 	projectId,
 	events,
 	compact,
-	orgSlug,
 	timezone,
 }: {
 	date: string;
 	projectId: string;
-	orgSlug: string;
 	events: EventWithInvites[];
 	timezone: string;
 	compact?: boolean;
 }) {
 	const { user } = useUser();
+	const { tenant } = useParams();
 	const filteredEvents = events.filter((x) =>
 		filterByRepeatRule(x, new Date(date), timezone),
 	);
@@ -49,7 +49,7 @@ export default function EventsList({
 				<EmptyState
 					show={!filteredEvents.length}
 					label="event"
-					createLink={`/${orgSlug}/projects/${projectId}/events/new?on=${date}`}
+					createLink={`/${tenant}/projects/${projectId}/events/new?on=${date}`}
 				/>
 			) : null}
 
@@ -96,7 +96,7 @@ export default function EventsList({
 									<DropdownMenuContent align="end">
 										<DropdownMenuItem className="w-full p-0">
 											<Link
-												href={`/${orgSlug}/projects/${projectId}/events/${event.id}/edit`}
+												href={`/${tenant}/projects/${projectId}/events/${event.id}/edit`}
 												className={buttonVariants({
 													variant: "ghost",
 													className: "w-full",
