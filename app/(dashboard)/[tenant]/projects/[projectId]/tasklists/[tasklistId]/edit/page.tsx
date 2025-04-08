@@ -4,13 +4,13 @@ import SharedForm from "@/components/form/shared";
 import PageTitle from "@/components/layout/page-title";
 import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
-import { getOwner } from "@/lib/utils/useOwner";
-import { getTaskListById } from "@/lib/utils/useProjects";
+import { caller } from "@/trpc/server";
 import Link from "next/link";
 import { updateTaskList } from "../../actions";
 
 type Props = {
 	params: Promise<{
+		tenant: string;
 		projectId: string;
 		tasklistId: string;
 	}>;
@@ -18,10 +18,9 @@ type Props = {
 
 export default async function EditTaskList(props: Props) {
 	const params = await props.params;
-	const { orgSlug } = await getOwner();
-	const tasklist = await getTaskListById(params.tasklistId);
+	const tasklist = await caller.tasks.getListById({ id: +params.tasklistId });
 
-	const backUrl = `/${orgSlug}/projects/${params.projectId}/tasklists`;
+	const backUrl = `/${params.tenant}/projects/${params.projectId}/tasklists`;
 
 	return (
 		<>

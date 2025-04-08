@@ -3,7 +3,7 @@ import { httpLink } from "@trpc/client";
 import { createTRPCClient } from "@trpc/client";
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import { cache } from "react";
-import { createTRPCContext } from "./init";
+import { createCallerFactory, createTRPCContext } from "./init";
 import { makeQueryClient } from "./query-client";
 import { appRouter } from "./routers/_app";
 
@@ -23,4 +23,4 @@ createTRPCOptionsProxy({
 	queryClient: getQueryClient,
 });
 
-export const caller = appRouter.createCaller(createTRPCContext);
+export const caller = createCallerFactory(appRouter)(createTRPCContext);

@@ -1,4 +1,4 @@
-import type { DocumentFolderWithDocuments } from "@/drizzle/types";
+import type { DocumentFolderWithCreator } from "@/drizzle/types";
 import { getOwner } from "@/lib/utils/useOwner";
 import { FolderClosed } from "lucide-react";
 import Link from "next/link";
@@ -6,7 +6,7 @@ import Link from "next/link";
 export async function DocumentFolderHeader({
 	documentFolder,
 }: {
-	documentFolder: DocumentFolderWithDocuments;
+	documentFolder: DocumentFolderWithCreator;
 }) {
 	const { orgSlug } = await getOwner();
 	return (

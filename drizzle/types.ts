@@ -30,8 +30,7 @@ export type ProjectWithCreator = Project & { creator: User };
 export type ProjectWithData = Project & {
 	taskLists: TaskListWithTasks[];
 	documents: DocumentWithCreator[];
-	documentFolders: DocumentFolderWithDocuments[];
-	events: EventWithInvites[];
+	documentFolders: DocumentFolderWithCreator[];
 };
 
 export type TaskWithDetails = Task & {
@@ -58,10 +57,8 @@ export type DocumentWithCreator = Document & {
 	creator: Pick<User, "firstName" | "imageUrl">;
 };
 
-export type DocumentFolderWithDocuments = DocumentFolder & {
+export type DocumentFolderWithCreator = DocumentFolder & {
 	creator: Pick<User, "firstName" | "imageUrl">;
-	documents: Pick<Document, "id">[];
-	files: Pick<Blob, "id">[];
 };
 
 export type BlobWithCreater = Blob & {
