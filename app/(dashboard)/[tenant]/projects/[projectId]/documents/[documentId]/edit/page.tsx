@@ -4,13 +4,13 @@ import DocumentForm from "@/components/form/document";
 import PageTitle from "@/components/layout/page-title";
 import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
-import { getOwner } from "@/lib/utils/useOwner";
-import { getDocumentById } from "@/lib/utils/useProjects";
+import { caller } from "@/trpc/server";
 import Link from "next/link";
 import { updateDocument } from "../../actions";
 
 type Props = {
 	params: Promise<{
+		tenant: string;
 		projectId: string;
 		documentId: string;
 	}>;
@@ -18,9 +18,9 @@ type Props = {
 
 export default async function EditDocument(props: Props) {
 	const params = await props.params;
-	const { orgSlug } = await getOwner();
-	const document = await getDocumentById(params.documentId);
-	const backUrl = `/${orgSlug}/projects/${params.projectId}/documents/${document.id}`;
+	const document = await caller.documents.getById({ id: +params.documentId });
+
+	const backUrl = `/${params.tenant}/projects/${params.projectId}/documents/${document.id}`;
 
 	return (
 		<>

@@ -9,7 +9,6 @@ import EventsList from "./events-list";
 
 export default function EventsCalendar({
 	projectId,
-	userId,
 	events,
 	eventsPromise,
 	selectedDate,
@@ -18,7 +17,6 @@ export default function EventsCalendar({
 	orgSlug,
 }: {
 	projectId: string;
-	userId: string;
 	events: EventWithInvites[];
 	eventsPromise?: Promise<EventWithInvites[]>;
 	selectedDate?: string;
@@ -52,7 +50,6 @@ export default function EventsCalendar({
 				orgSlug={orgSlug}
 				events={eventsData}
 				projectId={projectId}
-				userId={userId}
 				date={currentDate}
 				compact={compact}
 				timezone={timezone}

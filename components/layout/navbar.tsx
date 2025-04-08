@@ -40,7 +40,9 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 
 	const trpc = useTRPC();
 	const { data: projects = [] } = useQuery(
-		trpc.user.getProjects.queryOptions(),
+		trpc.user.getProjects.queryOptions({
+			statuses: ["active"],
+		}),
 	);
 
 	const activeProject = useMemo(() => {
@@ -114,8 +116,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 
 	return (
 		<>
-			<div className="fixed top-0 left-0 right-0 h-14 bg-gradient-to-b from-primary/10 to-transparent" />
-			<div className="relative">
+			<div className="relative z-10">
 				<div className="flex h-14 items-center px-4">
 					<div className="flex items-center">
 						<Link href={`/${tenant}/today`} className="flex items-center mr-2">

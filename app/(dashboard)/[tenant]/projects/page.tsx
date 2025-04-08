@@ -5,7 +5,7 @@ import { ProjecItem } from "@/components/project/project-item";
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
-import { getProjectsForOwner } from "@/lib/utils/useProjects";
+import { caller } from "@/trpc/server";
 import Link from "next/link";
 
 interface Props {
@@ -21,9 +21,9 @@ export default async function Projects(props: Props) {
 	const statuses = searchParams?.status?.split(",") ?? ["active"];
 	const timezone = await getTimezone();
 
-	const { projects, archivedProjects } = await getProjectsForOwner({
-		search: searchParams.search,
+	const projects = await caller.user.getProjects({
 		statuses,
+		search: searchParams.search,
 	});
 
 	return (
@@ -75,30 +75,25 @@ export default async function Projects(props: Props) {
 				</div>
 			</div>
 
-			{archivedProjects.length > 0 && (
-				<div className="mx-auto mt-12 flex w-full max-w-7xl flex-grow items-center border-t border-muted p-4 md:py-4">
-					<p className="text-sm text-muted-foreground">
-						{archivedProjects.length} archived project(s)
-					</p>
-					{statuses.includes("archived") ? (
-						<Link
-							href={`/${orgSlug}/projects`}
-							className={buttonVariants({ variant: "link" })}
-							prefetch={false}
-						>
-							Hide
-						</Link>
-					) : (
-						<Link
-							href={`/${orgSlug}/projects?status=active,archived`}
-							className={buttonVariants({ variant: "link" })}
-							prefetch={false}
-						>
-							Show
-						</Link>
-					)}
-				</div>
-			)}
+			<div className="mx-auto mt-12 flex w-full max-w-7xl flex-grow items-center border-t border-muted p-4 md:py-4">
+				{statuses.includes("archived") ? (
+					<Link
+						href={`/${orgSlug}/projects`}
+						className={buttonVariants({ variant: "link" })}
+						prefetch={false}
+					>
+						Hide Archived
+					</Link>
+				) : (
+					<Link
+						href={`/${orgSlug}/projects?status=active,archived`}
+						className={buttonVariants({ variant: "link" })}
+						prefetch={false}
+					>
+						Show Archived
+					</Link>
+				)}
+			</div>
 		</>
 	);
 }

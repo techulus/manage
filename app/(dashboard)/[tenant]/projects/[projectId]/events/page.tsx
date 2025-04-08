@@ -4,7 +4,6 @@ import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import EventsCalendar from "@/components/project/events/events-calendar";
 import { buttonVariants } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { calendarEvent } from "@/drizzle/schema";
 import { toDateStringWithDay } from "@/lib/utils/date";
 import { database } from "@/lib/utils/useDatabase";
@@ -130,7 +129,6 @@ export default async function EventDetails(props: Props) {
 					>
 						<EventsCalendar
 							projectId={projectId}
-							userId={userId}
 							eventsPromise={eventsPromise}
 							events={[]}
 							orgSlug={orgSlug}

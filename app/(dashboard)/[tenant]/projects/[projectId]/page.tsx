@@ -17,8 +17,8 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toDateStringWithDay } from "@/lib/utils/date";
-import { getOwner, getTimezone } from "@/lib/utils/useOwner";
-import { getProjectById } from "@/lib/utils/useProjects";
+import { getOwner } from "@/lib/utils/useOwner";
+import { caller } from "@/trpc/server";
 import { CalendarPlusIcon, ListPlusIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -26,6 +26,7 @@ import { archiveProject, deleteProject, unarchiveProject } from "../actions";
 
 type Props = {
 	params: Promise<{
+		tenant: string;
 		projectId: string;
 	}>;
 };
@@ -34,9 +35,10 @@ export default async function ProjectDetails(props: Props) {
 	const params = await props.params;
 	const { projectId } = params;
 
-	const project = await getProjectById(projectId, true);
-	const { userId, orgSlug } = await getOwner();
-	const timezone = await getTimezone();
+	const [project, timezone] = await Promise.all([
+		caller.projects.getProjectById({ id: +projectId, withTasksAndDocs: true }),
+		caller.settings.getTimezone(),
+	]);
 
 	if (!project) {
 		return notFound();
@@ -47,7 +49,7 @@ export default async function ProjectDetails(props: Props) {
 			<PageTitle
 				title={project.name}
 				actionLabel="Edit"
-				actionLink={`/${orgSlug}/projects/${projectId}/edit`}
+				actionLink={`/${params.tenant}/projects/${projectId}/edit`}
 			>
 				{project.dueDate || project.status === "archived" ? (
 					<div className="flex space-x-2">
@@ -123,7 +125,7 @@ export default async function ProjectDetails(props: Props) {
 
 					<Link
 						className={buttonVariants({ size: "sm" })}
-						href={`/${orgSlug}/projects/${projectId}/tasklists/new`}
+						href={`/${params.tenant}/projects/${projectId}/tasklists/new`}
 						prefetch={false}
 					>
 						<ListPlusIcon className="mr-1 h-5 w-5" /> New
@@ -140,7 +142,7 @@ export default async function ProjectDetails(props: Props) {
 									className="overflow-hidden rounded-lg border"
 								>
 									<TaskListHeader
-										orgSlug={orgSlug}
+										orgSlug={params.tenant}
 										taskList={taskList}
 										totalCount={taskList.tasks.length}
 										doneCount={
@@ -157,7 +159,7 @@ export default async function ProjectDetails(props: Props) {
 				<EmptyState
 					show={!project.taskLists.length}
 					label="task list"
-					createLink={`/${orgSlug}/projects/${projectId}/tasklists/new`}
+					createLink={`/${params.tenant}/projects/${projectId}/tasklists/new`}
 				/>
 			</div>
 
@@ -178,7 +180,7 @@ export default async function ProjectDetails(props: Props) {
 							<DropdownMenuItem>
 								<Link
 									className="w-full"
-									href={`/${orgSlug}/projects/${projectId}/documents/new`}
+									href={`/${params.tenant}/projects/${projectId}/documents/new`}
 									prefetch={false}
 								>
 									Document
@@ -187,7 +189,7 @@ export default async function ProjectDetails(props: Props) {
 							<DropdownMenuItem>
 								<Link
 									className="w-full"
-									href={`/${orgSlug}/projects/${projectId}/documents/folders/new`}
+									href={`/${params.tenant}/projects/${projectId}/documents/folders/new`}
 									prefetch={false}
 								>
 									Folder
@@ -215,7 +217,7 @@ export default async function ProjectDetails(props: Props) {
 				<EmptyState
 					show={!project.documents.length && !project.documentFolders.length}
 					label="document"
-					createLink={`/${orgSlug}/projects/${projectId}/documents/new`}
+					createLink={`/${params.tenant}/projects/${projectId}/documents/new`}
 				/>
 			</div>
 
@@ -227,7 +229,7 @@ export default async function ProjectDetails(props: Props) {
 
 					<Link
 						className={buttonVariants({ size: "sm" })}
-						href={`/${orgSlug}/projects/${projectId}/events/new`}
+						href={`/${params.tenant}/projects/${projectId}/events/new`}
 						prefetch={false}
 					>
 						<CalendarPlusIcon className="mr-1 h-5 w-5" /> New
@@ -238,9 +240,8 @@ export default async function ProjectDetails(props: Props) {
 				<div className="flex w-full rounded-lg border bg-card">
 					<EventsCalendar
 						projectId={projectId}
-						userId={userId}
 						events={project.events}
-						orgSlug={orgSlug}
+						orgSlug={params.tenant}
 						timezone={timezone}
 						compact
 					/>

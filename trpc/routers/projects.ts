@@ -1,0 +1,106 @@
+import { calendarEvent, document, project, taskList } from "@/drizzle/schema";
+import type { ProjectWithData } from "@/drizzle/types";
+import { toEndOfDay } from "@/lib/utils/date";
+import { toStartOfDay } from "@/lib/utils/date";
+import { and, between, isNotNull, or } from "drizzle-orm";
+import { eq, isNull } from "drizzle-orm";
+import { z } from "zod";
+import { baseProcedure, createTRPCRouter } from "../init";
+
+export const projectsRouter = createTRPCRouter({
+	getProjectById: baseProcedure
+		.input(
+			z.object({
+				id: z.number(),
+				withTasksAndDocs: z.boolean().optional().default(false),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const startOfDay = toStartOfDay(new Date());
+			const endOfDay = toEndOfDay(new Date());
+
+			const data = await ctx.db.query.project
+				.findFirst({
+					where: and(eq(project.id, input.id)),
+					with: input.withTasksAndDocs
+						? {
+								taskLists: {
+									where: eq(taskList.status, "active"),
+									with: {
+										tasks: true,
+									},
+								},
+								documents: {
+									columns: {
+										id: true,
+										name: true,
+									},
+									where: isNull(document.folderId),
+									with: {
+										creator: {
+											columns: {
+												firstName: true,
+												imageUrl: true,
+											},
+										},
+									},
+								},
+								documentFolders: {
+									with: {
+										creator: {
+											columns: {
+												firstName: true,
+												imageUrl: true,
+											},
+										},
+										// I can't get count query to work, so I'm just selecting the id :(
+										documents: {
+											columns: {
+												id: true,
+											},
+										},
+										files: {
+											columns: {
+												id: true,
+											},
+										},
+									},
+								},
+								events: {
+									where: or(
+										between(calendarEvent.start, startOfDay, endOfDay),
+										between(calendarEvent.end, startOfDay, endOfDay),
+										isNotNull(calendarEvent.repeatRule),
+									),
+									with: {
+										creator: {
+											columns: {
+												id: true,
+												firstName: true,
+												imageUrl: true,
+											},
+										},
+										invites: {
+											with: {
+												user: {
+													columns: {
+														firstName: true,
+														imageUrl: true,
+													},
+												},
+											},
+										},
+									},
+								},
+							}
+						: {},
+				})
+				.execute();
+
+			if (!data) {
+				throw new Error(`Project with id ${input.id} not found`);
+			}
+
+			return data as ProjectWithData;
+		}),
+});

@@ -1,3 +1,5 @@
+"use client";
+
 import { deleteEvent } from "@/app/(dashboard)/[tenant]/projects/[projectId]/events/actions";
 import EmptyState from "@/components/core/empty-state";
 import { HtmlPreview } from "@/components/core/html-view";
@@ -16,6 +18,7 @@ import {
 	eventToHumanReadableString,
 	filterByRepeatRule,
 } from "@/lib/utils/useEvents";
+import { useUser } from "@clerk/nextjs";
 import { CircleEllipsisIcon } from "lucide-react";
 import Link from "next/link";
 import { Assignee } from "../shared/assigee";
@@ -23,7 +26,6 @@ import { Assignee } from "../shared/assigee";
 export default function EventsList({
 	date,
 	projectId,
-	userId,
 	events,
 	compact,
 	orgSlug,
@@ -31,12 +33,12 @@ export default function EventsList({
 }: {
 	date: string;
 	projectId: string;
-	userId: string;
 	orgSlug: string;
 	events: EventWithInvites[];
 	timezone: string;
 	compact?: boolean;
 }) {
+	const { user } = useUser();
 	const filteredEvents = events.filter((x) =>
 		filterByRepeatRule(x, new Date(date), timezone),
 	);
@@ -86,7 +88,7 @@ export default function EventsList({
 								</div>
 							) : null}
 
-							{event.creator.id === userId ? (
+							{event.creator.id === user?.id ? (
 								<DropdownMenu>
 									<DropdownMenuTrigger className="absolute right-0 top-0">
 										<CircleEllipsisIcon className="h-6 w-6" />

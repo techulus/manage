@@ -5,7 +5,7 @@ import PageTitle from "@/components/layout/page-title";
 import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import { getOwner } from "@/lib/utils/useOwner";
-import { getProjectById } from "@/lib/utils/useProjects";
+import { caller } from "@/trpc/server";
 import Link from "next/link";
 import { updateProject } from "../../actions";
 
@@ -19,8 +19,11 @@ export default async function EditProject(props: Props) {
 	const params = await props.params;
 	const { projectId } = params;
 
-	const project = await getProjectById(projectId);
 	const { orgSlug } = await getOwner();
+	const project = await caller.projects.getProjectById({
+		id: +projectId,
+		withTasksAndDocs: false,
+	});
 
 	return (
 		<>

@@ -1,9 +1,9 @@
-import { notification, user } from "@/drizzle/schema";
+import { notification, project, user } from "@/drizzle/schema";
 import type { NotificationWithUser } from "@/drizzle/types";
 import { getSignedWireUrl } from "@/lib/utils/turbowire";
-import { getProjectsForOwner } from "@/lib/utils/useProjects";
 import { currentUser } from "@clerk/nextjs/server";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, like, or } from "drizzle-orm";
+import { z } from "zod";
 import { baseProcedure, createTRPCRouter } from "../init";
 
 export const userRouter = createTRPCRouter({
@@ -37,11 +37,32 @@ export const userRouter = createTRPCRouter({
 
 		return notifications as NotificationWithUser[];
 	}),
-	getProjects: baseProcedure.query(async () => {
-		const { projects } = await getProjectsForOwner({
-			statuses: ["active"],
-		});
+	getProjects: baseProcedure
+		.input(
+			z
+				.object({
+					statuses: z.array(z.string()).optional(),
+					search: z.string().optional(),
+				})
+				.optional(),
+		)
+		.query(async ({ ctx, input }) => {
+			const statuses = input?.statuses ?? ["active"];
+			const search = input?.search;
 
-		return projects ?? [];
-	}),
+			const statusFilter = statuses?.map((status) =>
+				eq(project.status, status),
+			);
+
+			const projects = await ctx.db.query.project.findMany({
+				where: search
+					? and(like(project.name, `%${search}%`), or(...statusFilter))
+					: and(or(...statusFilter)),
+				with: {
+					creator: true,
+				},
+			});
+
+			return projects;
+		}),
 });
