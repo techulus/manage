@@ -1,3 +1,5 @@
+"use client";
+
 import { SpinnerWithSpacing } from "@/components/core/loaders";
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
@@ -5,34 +7,28 @@ import { CommentsSection } from "@/components/project/comment/comments-section";
 import EventsCalendar from "@/components/project/events/events-calendar";
 import { buttonVariants } from "@/components/ui/button";
 import { toDateStringWithDay } from "@/lib/utils/date";
-import { getOwner, getTimezone } from "@/lib/utils/useOwner";
+import { useTRPC } from "@/trpc/client";
+import { useUser } from "@clerk/nextjs";
+import { useQuery } from "@tanstack/react-query";
 import { RssIcon } from "lucide-react";
 import Link from "next/link";
+import { useParams, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
-type Props = {
-	params: Promise<{
-		projectId: string;
-		tenant: string;
-	}>;
-	searchParams: Promise<{
-		on: string;
-	}>;
-};
+export default function EventDetails() {
+	const { projectId, tenant } = useParams();
+	const query = useSearchParams();
+	const on = query.get("on");
+	const { user } = useUser();
 
-export default async function EventDetails(props: Props) {
-	const searchParams = await props.searchParams;
-	const params = await props.params;
-	const { projectId, tenant } = params;
-	const { on } = searchParams;
-	const { userId, ownerId } = await getOwner();
-
-	const timezone = await getTimezone();
 	const selectedDate = on ? new Date(on) : new Date();
-
 	const dayCommentId = `${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDay()}`;
-	const calendarSubscriptionUrl = `/api/calendar/${ownerId}/${projectId}/calendar.ics?userId=${userId}`;
+	const calendarSubscriptionUrl = `/api/calendar/${tenant}/${projectId}/calendar.ics?userId=${user?.id}`;
 
+	const trpc = useTRPC();
+	const { data: timezone, isLoading } = useQuery(
+		trpc.settings.getTimezone.queryOptions(),
+	);
 	return (
 		<>
 			<PageTitle
@@ -41,13 +37,12 @@ export default async function EventDetails(props: Props) {
 				actionLink={`/${tenant}/projects/${projectId}/events/new`}
 			>
 				<div className="font-medium text-gray-500">
-					{toDateStringWithDay(selectedDate, timezone)}
+					{isLoading ? null : toDateStringWithDay(selectedDate, timezone!)}
 				</div>
 			</PageTitle>
 
 			<PageSection topInset>
 				<div className="flex justify-between p-1">
-					{/* Left buttons */}
 					<div className="isolate inline-flex sm:space-x-3">
 						<span className="inline-flex space-x-1">
 							<Link
@@ -70,18 +65,17 @@ export default async function EventDetails(props: Props) {
 					>
 						<EventsCalendar
 							selectedDate={selectedDate.toISOString()}
-							timezone={timezone}
+							timezone={timezone!}
 						/>
 					</Suspense>
 				</div>
 			</PageSection>
 
 			<div className="mx-auto max-w-7xl p-4 lg:p-0">
-				{/* @ts-ignore */}
 				<CommentsSection
 					type="event"
 					parentId={dayCommentId}
-					projectId={+projectId}
+					projectId={+projectId!}
 				/>
 			</div>
 		</>

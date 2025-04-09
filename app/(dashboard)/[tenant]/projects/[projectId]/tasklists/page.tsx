@@ -136,7 +136,6 @@ export default async function TaskLists(props: Props) {
 							<Link
 								href={`/${orgSlug}/projects/${projectId}/tasklists`}
 								className={buttonVariants({ variant: "link" })}
-								prefetch={false}
 							>
 								Hide
 							</Link>
@@ -144,7 +143,6 @@ export default async function TaskLists(props: Props) {
 							<Link
 								href={`/${orgSlug}/projects/${projectId}/tasklists?status=active,archived`}
 								className={buttonVariants({ variant: "link" })}
-								prefetch={false}
 							>
 								Show
 							</Link>

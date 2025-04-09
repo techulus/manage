@@ -29,12 +29,7 @@ export const FileInfo = ({
 		<ContextMenu>
 			<ContextMenuTrigger>
 				<div className="flex items-center justify-center gap-x-2 rounded-md hover:bg-muted p-1">
-					<Link
-						href={fileUrl}
-						target="_blank"
-						rel="noopener noreferrer"
-						prefetch={false}
-					>
+					<Link href={fileUrl} target="_blank" rel="noopener noreferrer">
 						<div className="relative">
 							<File
 								className="w-28 h-32 text-primary/60 -mt-2"

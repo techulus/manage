@@ -36,7 +36,6 @@ export default async function CreateDocumentFolder(props: Props) {
 							<Link
 								href={backUrl}
 								className={buttonVariants({ variant: "ghost" })}
-								prefetch={false}
 							>
 								Cancel
 							</Link>

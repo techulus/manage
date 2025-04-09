@@ -1,3 +1,5 @@
+"use client";
+
 import { deleteComment } from "@/app/(dashboard)/[tenant]/projects/actions";
 import { HtmlPreview } from "@/components/core/html-view";
 import { UserAvatar } from "@/components/core/user-avatar";
@@ -8,14 +10,13 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { comment } from "@/drizzle/schema";
 import { cn } from "@/lib/utils";
-import { database } from "@/lib/utils/useDatabase";
-import { getOwner } from "@/lib/utils/useOwner";
-import { and, desc, eq } from "drizzle-orm";
+import { useTRPC } from "@/trpc/client";
+import { useUser } from "@clerk/nextjs";
+import { useQuery } from "@tanstack/react-query";
 import { CircleEllipsisIcon } from "lucide-react";
 
-export async function Comments({
+export function Comments({
 	parentId,
 	projectId,
 	type,
@@ -26,16 +27,15 @@ export async function Comments({
 	projectId: string | number;
 	className?: string;
 }) {
-	const { userId } = await getOwner();
+	const { user } = useUser();
 
-	const db = await database();
-	const comments = await db.query.comment.findMany({
-		where: and(eq(comment.parentId, +parentId), eq(comment.type, type)),
-		orderBy: desc(comment.createdAt),
-		with: {
-			creator: true,
-		},
-	});
+	const trpc = useTRPC();
+	const { data: comments = [] } = useQuery(
+		trpc.projects.getComments.queryOptions({
+			parentId: +parentId,
+			type,
+		}),
+	);
 
 	return (
 		<div className={cn("flex flex-col divide-y", className)}>
@@ -58,7 +58,7 @@ export async function Comments({
 							</div>
 							<HtmlPreview content={comment.content} />
 
-							{comment.creator?.id === userId ? (
+							{comment.creator?.id === user?.id ? (
 								<DropdownMenu>
 									<DropdownMenuTrigger className="absolute right-2 top-4">
 										<CircleEllipsisIcon className="h-6 w-6" />

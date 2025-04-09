@@ -23,7 +23,6 @@ export default async function CreateProject() {
 							<Link
 								href={`/${orgSlug}/projects`}
 								className={buttonVariants({ variant: "ghost" })}
-								prefetch={false}
 							>
 								Cancel
 							</Link>

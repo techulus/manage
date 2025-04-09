@@ -42,7 +42,6 @@ export default function PageTitle({
 						<Link
 							href={actionLink}
 							className={buttonVariants({ size: "sm", className: "-mt-6" })}
-							prefetch={false}
 						>
 							{actionLabel}
 						</Link>

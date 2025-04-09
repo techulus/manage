@@ -37,7 +37,6 @@ export default async function CreateTaskList(props: Props) {
 							<Link
 								href={backUrl}
 								className={buttonVariants({ variant: "ghost" })}
-								prefetch={false}
 							>
 								Cancel
 							</Link>

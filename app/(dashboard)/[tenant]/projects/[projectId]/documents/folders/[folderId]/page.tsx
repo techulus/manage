@@ -101,7 +101,6 @@ export default async function FolderDetails(props: Props) {
 							<Link
 								href={`/${orgSlug}/projects/${projectId}/documents/folders/${folderId}/new`}
 								className={buttonVariants({ variant: "link" })}
-								prefetch={false}
 							>
 								<FilePlus2 className="mr-1 h-5 w-5" /> Document
 								<span className="sr-only">, document</span>

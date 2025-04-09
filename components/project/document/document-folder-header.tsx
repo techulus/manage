@@ -14,7 +14,6 @@ export async function DocumentFolderHeader({
 			<Link
 				href={`/${orgSlug}/projects/${documentFolder.projectId}/documents/folders/${documentFolder.id}`}
 				className="flex flex-col text-sm font-medium"
-				prefetch={false}
 			>
 				<FolderClosed
 					className="w-32 h-32 text-primary/60 -mt-2"

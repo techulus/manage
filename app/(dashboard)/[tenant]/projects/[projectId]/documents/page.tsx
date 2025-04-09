@@ -87,7 +87,6 @@ export default async function ProjectDocuments(props: Props) {
 								<Link
 									className="w-full"
 									href={`/${orgSlug}/projects/${projectId}/documents/new`}
-									prefetch={false}
 								>
 									Document
 								</Link>
@@ -96,7 +95,6 @@ export default async function ProjectDocuments(props: Props) {
 								<Link
 									className="w-full"
 									href={`/${orgSlug}/projects/${projectId}/documents/folders/new`}
-									prefetch={false}
 								>
 									Folder
 								</Link>

@@ -44,7 +44,6 @@ export const TaskListHeader = ({
 			<Link
 				href={`/${orgSlug}/projects/${taskList.projectId}/tasklists/${taskList.id}`}
 				className="text-sm font-medium flex-grow flex-auto"
-				prefetch={false}
 			>
 				<span className="absolute inset-0" aria-hidden="true" />
 				<div className="mb-2 flex">
@@ -89,7 +88,6 @@ export const TaskListHeader = ({
 								className: "w-full",
 								size: "sm",
 							})}
-							prefetch={false}
 						>
 							Edit
 						</Link>

@@ -80,7 +80,6 @@ export default async function Projects(props: Props) {
 					<Link
 						href={`/${orgSlug}/projects`}
 						className={buttonVariants({ variant: "link" })}
-						prefetch={false}
 					>
 						Hide Archived
 					</Link>
@@ -88,7 +87,6 @@ export default async function Projects(props: Props) {
 					<Link
 						href={`/${orgSlug}/projects?status=active,archived`}
 						className={buttonVariants({ variant: "link" })}
-						prefetch={false}
 					>
 						Show Archived
 					</Link>

@@ -1,6 +1,6 @@
-import { document, project, taskList } from "@/drizzle/schema";
+import { activity, comment, project, taskList } from "@/drizzle/schema";
 import type { ProjectWithData } from "@/drizzle/types";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { baseProcedure, createTRPCRouter } from "../init";
 
@@ -24,31 +24,6 @@ export const projectsRouter = createTRPCRouter({
 										tasks: true,
 									},
 								},
-								documents: {
-									columns: {
-										id: true,
-										name: true,
-									},
-									where: isNull(document.folderId),
-									with: {
-										creator: {
-											columns: {
-												firstName: true,
-												imageUrl: true,
-											},
-										},
-									},
-								},
-								documentFolders: {
-									with: {
-										creator: {
-											columns: {
-												firstName: true,
-												imageUrl: true,
-											},
-										},
-									},
-								},
 							}
 						: {},
 				})
@@ -59,5 +34,54 @@ export const projectsRouter = createTRPCRouter({
 			}
 
 			return data as ProjectWithData;
+		}),
+	getComments: baseProcedure
+		.input(
+			z.object({
+				parentId: z.number(),
+				type: z.string(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const comments = await ctx.db.query.comment.findMany({
+				where: and(
+					eq(comment.parentId, input.parentId),
+					eq(comment.type, input.type),
+				),
+				orderBy: desc(comment.createdAt),
+				with: {
+					creator: true,
+				},
+			});
+
+			return comments;
+		}),
+	getActivities: baseProcedure
+		.input(
+			z.object({
+				projectId: z.number(),
+				offset: z.number().optional().default(0),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const activities = await ctx.db.query.activity
+				.findMany({
+					with: {
+						actor: {
+							columns: {
+								id: true,
+								firstName: true,
+								imageUrl: true,
+							},
+						},
+					},
+					where: eq(activity.projectId, input.projectId),
+					orderBy: [desc(activity.createdAt)],
+					limit: 25,
+					offset: input.offset,
+				})
+				.execute();
+
+			return activities;
 		}),
 });

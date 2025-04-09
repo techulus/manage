@@ -220,27 +220,3 @@ export async function deleteComment(payload: FormData) {
 	const currentPath = payload.get("currentPath") as string;
 	revalidatePath(currentPath);
 }
-
-export async function fetchActivities(projectId: string | number, offset = 0) {
-	const db = await database();
-
-	const activities = await db.query.activity
-		.findMany({
-			with: {
-				actor: {
-					columns: {
-						id: true,
-						firstName: true,
-						imageUrl: true,
-					},
-				},
-			},
-			where: eq(activity.projectId, +projectId),
-			orderBy: [desc(activity.createdAt)],
-			limit: 50,
-			offset,
-		})
-		.execute();
-
-	return activities;
-}

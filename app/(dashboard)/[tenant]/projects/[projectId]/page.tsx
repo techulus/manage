@@ -7,6 +7,7 @@ import { CommentsSection } from "@/components/project/comment/comments-section";
 import { DocumentFolderHeader } from "@/components/project/document/document-folder-header";
 import { DocumentHeader } from "@/components/project/document/document-header";
 import EventsCalendar from "@/components/project/events/events-calendar";
+import WeekCalendar from "@/components/project/events/week-calendar";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -118,14 +119,11 @@ export default async function ProjectDetails(props: Props) {
 
 			<div className="mx-auto flex max-w-7xl flex-col p-4 xl:p-0 lg:pb-12">
 				<div className="flex justify-between flex-row items-center my-4">
-					<h2 className="text-2xl font-bold leading-7 tracking-tight">
-						Task Lists
-					</h2>
+					<h2 className="text-2xl font-bold leading-7 tracking-tight">Tasks</h2>
 
 					<Link
 						className={buttonVariants({ size: "sm" })}
 						href={`/${params.tenant}/projects/${projectId}/tasklists/new`}
-						prefetch={false}
 					>
 						<ListPlusIcon className="mr-1 h-5 w-5" /> New
 						<span className="sr-only">, task list</span>
@@ -133,7 +131,7 @@ export default async function ProjectDetails(props: Props) {
 				</div>
 
 				{project.taskLists.length ? (
-					<ul className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2 mt-4">
+					<ul className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2">
 						{project.taskLists.map((taskList) => {
 							return (
 								<div
@@ -162,83 +160,22 @@ export default async function ProjectDetails(props: Props) {
 				/>
 			</div>
 
-			<div className="mx-auto flex max-w-7xl flex-col space-y-4 mt-8 p-4 xl:p-0 lg:pb-12">
-				<div className="flex justify-between flex-row items-center">
-					<h2 className="text-2xl font-bold leading-7 tracking-tight">
-						Docs &amp; Files
-					</h2>
-
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button size="sm">
-								<PlusIcon className="mr-1 h-5 w-5" />
-								New
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent>
-							<DropdownMenuItem>
-								<Link
-									className="w-full"
-									href={`/${params.tenant}/projects/${projectId}/documents/new`}
-									prefetch={false}
-								>
-									Document
-								</Link>
-							</DropdownMenuItem>
-							<DropdownMenuItem>
-								<Link
-									className="w-full"
-									href={`/${params.tenant}/projects/${projectId}/documents/folders/new`}
-									prefetch={false}
-								>
-									Folder
-								</Link>
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
-				</div>
-
-				{project.documents.length || project.documentFolders.length ? (
-					<ul className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-4 lg:grid-cols-6">
-						{project.documents.map((document) => (
-							<div key={document.id}>
-								<DocumentHeader document={document} />
-							</div>
-						))}
-						{project.documentFolders.map((folder) => (
-							<div key={folder.id}>
-								<DocumentFolderHeader documentFolder={folder} />
-							</div>
-						))}
-					</ul>
-				) : null}
-
-				<EmptyState
-					show={!project.documents.length && !project.documentFolders.length}
-					label="document"
-					createLink={`/${params.tenant}/projects/${projectId}/documents/new`}
-				/>
-			</div>
-
 			<div className="mx-auto flex max-w-7xl flex-col mt-8 space-y-4 p-4 xl:p-0">
 				<div className="flex justify-between flex-row items-center">
 					<h2 className="text-2xl font-bold leading-7 tracking-tight">
-						Events
+						Events this week
 					</h2>
 
 					<Link
 						className={buttonVariants({ size: "sm" })}
 						href={`/${params.tenant}/projects/${projectId}/events/new`}
-						prefetch={false}
 					>
 						<CalendarPlusIcon className="mr-1 h-5 w-5" /> New
 						<span className="sr-only">, event</span>
 					</Link>
 				</div>
 
-				<div className="flex w-full rounded-lg border bg-card">
-					<EventsCalendar timezone={timezone} compact />
-				</div>
+				<WeekCalendar timezone={timezone} compact />
 			</div>
 
 			<div className="mx-auto max-w-7xl p-4 lg:py-8">

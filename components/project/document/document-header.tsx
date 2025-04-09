@@ -17,7 +17,6 @@ export function DocumentHeader({
 			<Link
 				href={`/${tenant}/projects/${projectId}/documents/${document.id}`}
 				className="flex flex-col text-sm font-medium"
-				prefetch={false}
 			>
 				<File
 					className="w-28 h-32 text-primary/60 -mt-2"

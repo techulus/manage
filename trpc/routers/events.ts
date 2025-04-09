@@ -1,5 +1,8 @@
 import { calendarEvent } from "@/drizzle/schema";
-import { getStartEndDateRangeInUtc } from "@/lib/utils/useEvents";
+import {
+	getStartEndDateRangeInUtc,
+	getStartEndWeekRangeInUtc,
+} from "@/lib/utils/useEvents";
 import { getTimezone } from "@/lib/utils/useOwner";
 import {
 	and,
@@ -46,6 +49,62 @@ export const eventsRouter = createTRPCRouter({
 							isNotNull(calendarEvent.repeatRule),
 							eq(calendarEvent.start, startOfDay),
 							eq(calendarEvent.end, endOfDay),
+						),
+					),
+					orderBy: [desc(calendarEvent.start), asc(calendarEvent.allDay)],
+					with: {
+						creator: {
+							columns: {
+								id: true,
+								firstName: true,
+								imageUrl: true,
+							},
+						},
+						invites: {
+							with: {
+								user: {
+									columns: {
+										firstName: true,
+										imageUrl: true,
+									},
+								},
+							},
+						},
+					},
+				})
+				.execute();
+
+			return events;
+		}),
+	getByWeek: baseProcedure
+		.input(
+			z.object({
+				projectId: z.number(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const { projectId } = input;
+
+			const timezone = await getTimezone();
+			const { startOfWeek, endOfWeek } = getStartEndWeekRangeInUtc(
+				timezone,
+				new Date(),
+			);
+
+			const events = await ctx.db.query.calendarEvent
+				.findMany({
+					where: and(
+						eq(calendarEvent.projectId, +projectId),
+						or(
+							between(calendarEvent.start, startOfWeek, endOfWeek),
+							between(calendarEvent.end, startOfWeek, endOfWeek),
+							and(
+								lt(calendarEvent.start, startOfWeek),
+								gt(calendarEvent.end, endOfWeek),
+							),
+							isNotNull(calendarEvent.repeatRule),
+							eq(calendarEvent.start, startOfWeek),
+							eq(calendarEvent.end, endOfWeek),
 						),
 					),
 					orderBy: [desc(calendarEvent.start), asc(calendarEvent.allDay)],

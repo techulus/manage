@@ -101,7 +101,6 @@ export default function EventsList({
 													variant: "ghost",
 													className: "w-full",
 												})}
-												prefetch={false}
 											>
 												Edit
 											</Link>

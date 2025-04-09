@@ -40,7 +40,6 @@ export default async function EditProject(props: Props) {
 							<Link
 								href={`/${orgSlug}/projects`}
 								className={buttonVariants({ variant: "ghost" })}
-								prefetch={false}
 							>
 								Cancel
 							</Link>
