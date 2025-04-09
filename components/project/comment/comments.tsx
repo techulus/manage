@@ -13,8 +13,9 @@ import {
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
 import { useUser } from "@clerk/nextjs";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CircleEllipsisIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export function Comments({
 	parentId,
@@ -28,6 +29,8 @@ export function Comments({
 	className?: string;
 }) {
 	const { user } = useUser();
+	const pathname = usePathname();
+	const queryClient = useQueryClient();
 
 	const trpc = useTRPC();
 	const { data: comments = [] } = useQuery(
@@ -65,7 +68,18 @@ export function Comments({
 									</DropdownMenuTrigger>
 									<DropdownMenuContent align="end">
 										<DropdownMenuItem className="m-0 p-0">
-											<form action={deleteComment}>
+											<form
+												action={async (formData: FormData) => {
+													formData.append("currentPath", pathname);
+													await deleteComment(formData);
+													queryClient.invalidateQueries({
+														queryKey: trpc.projects.getComments.queryKey({
+															parentId: +parentId,
+															type,
+														}),
+													});
+												}}
+											>
 												<input type="hidden" name="id" value={comment.id} />
 												<input
 													type="hidden"

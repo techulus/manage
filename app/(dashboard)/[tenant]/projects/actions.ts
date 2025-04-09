@@ -1,10 +1,11 @@
 "use server";
 
-import { activity, comment, project } from "@/drizzle/schema";
+import { comment, project } from "@/drizzle/schema";
 import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
-import { and, desc, eq } from "drizzle-orm";
+import { trpc } from "@/trpc/server";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
