@@ -153,6 +153,7 @@ export const taskList = pgTable("TaskList", {
 export const blob = pgTable("Blob", {
 	id: text("id").notNull().primaryKey(),
 	key: text("key").unique().notNull(),
+	blockId: text("blockId").unique(),
 	name: text("name").notNull(),
 	contentType: text("contentType").notNull(),
 	contentSize: integer("contentSize").notNull(),
@@ -205,14 +206,14 @@ export const eventInvite = pgTable("CalendarEventInvite", {
 
 export const comment = pgTable("Comment", {
 	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+	roomId: text("roomId").notNull(),
 	content: text("content").notNull(),
+	metadata: jsonb("metadata").notNull(),
 	createdAt: timestamp().notNull().defaultNow(),
 	updatedAt: timestamp().notNull().defaultNow(),
 	createdByUser: text("createdByUser")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
-	type: text("type").notNull(),
-	parentId: integer("parentId").notNull(),
 });
 
 export const activity = pgTable("Activity", {

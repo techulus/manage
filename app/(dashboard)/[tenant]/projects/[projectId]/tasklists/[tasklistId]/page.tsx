@@ -155,11 +155,8 @@ export default async function TaskLists(props: Props) {
 				</Suspense>
 
 				<div className="py-8">
-					{/* @ts-ignore */}
 					<CommentsSection
-						type="tasklist"
-						parentId={+tasklistId}
-						projectId={+projectId}
+						roomId={`project/${projectId}/tasklist/${tasklistId}`}
 					/>
 				</div>
 			</div>

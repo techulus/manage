@@ -16,10 +16,10 @@ import {
 	or,
 } from "drizzle-orm";
 import { z } from "zod";
-import { baseProcedure, createTRPCRouter } from "../init";
+import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const eventsRouter = createTRPCRouter({
-	getByDate: baseProcedure
+	getByDate: protectedProcedure
 		.input(
 			z.object({
 				date: z.date(),
@@ -76,7 +76,7 @@ export const eventsRouter = createTRPCRouter({
 
 			return events;
 		}),
-	getByWeek: baseProcedure
+	getByWeek: protectedProcedure
 		.input(
 			z.object({
 				projectId: z.number(),

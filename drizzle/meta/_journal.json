@@ -15,6 +15,13 @@
       "when": 1744007560006,
       "tag": "0001_striped_blizzard",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1744244303500,
+      "tag": "0002_warm_rocket_racer",
+      "breakpoints": true
     }
   ]
 }

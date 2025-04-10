@@ -1,10 +1,10 @@
 import { blob } from "@/drizzle/schema";
 import { sql } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { baseProcedure, createTRPCRouter } from "../init";
+import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const settingsRouter = createTRPCRouter({
-	getStorageUsage: baseProcedure.query(async ({ ctx }) => {
+	getStorageUsage: protectedProcedure.query(async ({ ctx }) => {
 		const details = await ctx.db
 			.select({
 				count: sql<number>`count(*)`,
@@ -18,7 +18,7 @@ export const settingsRouter = createTRPCRouter({
 			count: details?.[0].count ?? 0,
 		};
 	}),
-	getTimezone: baseProcedure.query(async () => {
+	getTimezone: protectedProcedure.query(async () => {
 		const cookieStore = await cookies();
 		return (
 			cookieStore.get("userTimezone")?.value ??

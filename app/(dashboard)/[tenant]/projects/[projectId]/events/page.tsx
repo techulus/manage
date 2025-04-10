@@ -12,14 +12,15 @@ import { useUser } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
 import { RssIcon } from "lucide-react";
 import Link from "next/link";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useQueryState } from "nuqs";
 import { Suspense } from "react";
 
 export default function EventDetails() {
 	const { projectId, tenant } = useParams();
-	const query = useSearchParams();
-	const on = query.get("on");
 	const { user } = useUser();
+
+	const [on] = useQueryState("on");
 
 	const selectedDate = on ? new Date(on) : new Date();
 	const dayCommentId = `${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDay()}`;
@@ -73,9 +74,7 @@ export default function EventDetails() {
 
 			<div className="mx-auto max-w-7xl p-4 lg:p-0">
 				<CommentsSection
-					type="event"
-					parentId={dayCommentId}
-					projectId={+projectId!}
+					roomId={`project/${projectId}/event/${dayCommentId}`}
 				/>
 			</div>
 		</>

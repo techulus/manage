@@ -5,7 +5,7 @@ import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { deleteFile } from "@/lib/blobStore";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
-import { and, eq } from "drizzle-orm";
+import { and, eq, like } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import * as z from "zod";
@@ -220,7 +220,7 @@ export async function deleteDocumentFolder(payload: FormData) {
 			.execute(),
 		db
 			.delete(comment)
-			.where(and(eq(comment.type, "folder"), eq(comment.parentId, +id)))
+			.where(like(comment.roomId, `project/${projectId}/folder/${id}/%`))
 			.execute(),
 	]);
 
@@ -251,7 +251,7 @@ export async function deleteDocument(
 			.execute(),
 		db
 			.delete(comment)
-			.where(and(eq(comment.type, "document"), eq(comment.parentId, +id)))
+			.where(eq(comment.roomId, `project/${projectId}/document/${id}`))
 			.execute(),
 	]);
 

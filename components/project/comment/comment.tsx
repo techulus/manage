@@ -1,42 +1,39 @@
 "use client";
 
-import { addComment } from "@/app/(dashboard)/[tenant]/projects/actions";
+import { Spinner } from "@/components/core/loaders";
 import { UserAvatar } from "@/components/core/user-avatar";
 import Editor from "@/components/editor";
-import { ActionButton } from "@/components/form/button";
-import type { User } from "@/drizzle/types";
+import { Button } from "@/components/ui/button";
 import { useTRPC } from "@/trpc/client";
-import { useQueryClient } from "@tanstack/react-query";
-import { usePathname } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
 
 export default function CommentForm({
-	type,
-	parentId,
-	projectId,
-	creator,
+	roomId,
 }: {
-	type: string;
-	parentId: string | number;
-	projectId: string | number;
-	creator: User;
+	roomId: string;
 }) {
+	const { projectId } = useParams();
+	const { user: creator } = useUser();
+
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
-	const pathname = usePathname();
+	const addComment = useMutation(trpc.projects.addComment.mutationOptions());
 
 	return (
 		<form
 			className="pb-12"
 			action={async (formData: FormData) => {
-				formData.append("currentPath", pathname);
-				formData.append("type", type);
-				formData.append("parentId", parentId.toString());
-				formData.append("projectId", projectId.toString());
-				await addComment(formData);
-				queryClient.invalidateQueries({
+				await addComment.mutateAsync({
+					roomId,
+					content: formData.get("content") as string,
+					metadata: formData.get("metadata") as string,
+					projectId: +projectId!,
+				});
+				await queryClient.invalidateQueries({
 					queryKey: trpc.projects.getComments.queryKey({
-						parentId: +parentId,
-						type,
+						roomId,
 					}),
 				});
 			}}
@@ -48,11 +45,14 @@ export default function CommentForm({
 
 				<div className="relative flex-grow">
 					<Editor name="content" />
-					<ActionButton
+					<Button
 						size="sm"
 						className="absolute -bottom-12 left-0"
-						label="Comment"
-					/>
+						type="submit"
+					>
+						{addComment.isPending ? <Spinner className="mr-2 h-4 w-4" /> : null}
+						Comment
+					</Button>
 				</div>
 			</div>
 		</form>

@@ -1,11 +1,9 @@
 "use server";
 
-import { notification, user } from "@/drizzle/schema";
-import { broadcastEvent, getSignedWireUrl } from "@/lib/utils/turbowire";
+import { user } from "@/drizzle/schema";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
-import { desc, eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 
 export async function saveUserTimezone(timeZone: string) {
@@ -20,17 +18,4 @@ export async function saveUserTimezone(timeZone: string) {
 
 	const db = await database();
 	db.update(user).set({ timeZone }).where(eq(user.id, userId)).execute();
-}
-
-export async function markAllNotificationsAsRead() {
-	const { orgSlug, userId } = await getOwner();
-
-	const db = await database();
-	db.update(notification)
-		.set({ read: true })
-		.where(eq(notification.toUser, userId))
-		.execute();
-
-	await broadcastEvent("notifications", userId);
-	revalidatePath(`/${orgSlug}/notifications`);
 }

@@ -80,11 +80,12 @@ export default async function DocumentDetails(props: Props) {
 			</PageSection>
 
 			<div className="mx-auto max-w-7xl py-8">
-				{/* @ts-ignore */}
 				<CommentsSection
-					type="document"
-					parentId={+documentId}
-					projectId={+projectId}
+					roomId={
+						documentDetails?.folderId
+							? `project/${projectId}/folder/${documentDetails.folderId}/document/${documentId}`
+							: `project/${projectId}/document/${documentId}`
+					}
 				/>
 			</div>
 		</>

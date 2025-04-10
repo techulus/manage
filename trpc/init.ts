@@ -1,7 +1,7 @@
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import { auth } from "@clerk/nextjs/server";
-import { initTRPC } from "@trpc/server";
+import { TRPCError, initTRPC } from "@trpc/server";
 import { cache } from "react";
 import superjson from "superjson";
 
@@ -9,18 +9,7 @@ export const createTRPCContext = cache(async () => {
 	/**
 	 * @see: https://trpc.io/docs/server/context
 	 */
-	const { sessionId } = await auth();
-	const { orgSlug, ownerId, orgId, userId } = await getOwner();
-	const db = await database();
-
-	return {
-		sessionId,
-		userId,
-		orgId,
-		orgSlug,
-		ownerId,
-		db,
-	};
+	return {};
 });
 
 export type Context = Awaited<ReturnType<typeof createTRPCContext>>;
@@ -38,4 +27,25 @@ const t = initTRPC.context<Context>().create({
 
 export const createTRPCRouter = t.router;
 export const createCallerFactory = t.createCallerFactory;
-export const baseProcedure = t.procedure;
+
+export const publicProcedure = t.procedure;
+export const protectedProcedure = t.procedure.use(async ({ next }) => {
+	const { sessionId } = await auth();
+	if (!sessionId) {
+		throw new TRPCError({ code: "UNAUTHORIZED" });
+	}
+
+	const { orgSlug, ownerId, orgId, userId } = await getOwner();
+	const db = await database();
+
+	return next({
+		ctx: {
+			sessionId,
+			userId,
+			orgId,
+			orgSlug,
+			ownerId,
+			db,
+		},
+	});
+});

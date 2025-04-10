@@ -1,10 +1,10 @@
 import { document } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { baseProcedure, createTRPCRouter } from "../init";
+import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const documentsRouter = createTRPCRouter({
-	getById: baseProcedure
+	getById: protectedProcedure
 		.input(z.object({ id: z.number() }))
 		.query(async ({ ctx, input }) => {
 			const data = await ctx.db.query.document

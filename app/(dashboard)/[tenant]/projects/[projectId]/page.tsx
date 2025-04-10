@@ -1,55 +1,50 @@
+"use client";
+
 import EmptyState from "@/components/core/empty-state";
 import { HtmlPreview } from "@/components/core/html-view";
+import { PageLoading } from "@/components/core/loaders";
 import PageSection from "@/components/core/section";
 import { ActionButton, DeleteButton } from "@/components/form/button";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
-import { DocumentFolderHeader } from "@/components/project/document/document-folder-header";
-import { DocumentHeader } from "@/components/project/document/document-header";
-import EventsCalendar from "@/components/project/events/events-calendar";
 import WeekCalendar from "@/components/project/events/week-calendar";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { buttonVariants } from "@/components/ui/button";
 import { toDateStringWithDay } from "@/lib/utils/date";
-import { caller } from "@/trpc/server";
-import { CalendarPlusIcon, ListPlusIcon, PlusIcon } from "lucide-react";
+import { useTRPC } from "@/trpc/client";
+import { useSuspenseQueries } from "@tanstack/react-query";
+import { CalendarPlusIcon, ListPlusIcon } from "lucide-react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { useParams } from "next/navigation";
+import { Suspense } from "react";
 import { archiveProject, deleteProject, unarchiveProject } from "../actions";
 
-type Props = {
-	params: Promise<{
-		tenant: string;
-		projectId: string;
-	}>;
-};
+export default function ProjectDetails() {
+	const params = useParams();
+	const projectId = +params.projectId!;
+	const tenant = params.tenant as string;
+	const trpc = useTRPC();
 
-export default async function ProjectDetails(props: Props) {
-	const params = await props.params;
-	const { projectId } = params;
-
-	const [project, timezone] = await Promise.all([
-		caller.projects.getProjectById({ id: +projectId, withTasksAndDocs: true }),
-		caller.settings.getTimezone(),
-	]);
-
-	if (!project) {
-		return notFound();
-	}
+	const [{ data: timezone }, { data: project }, { data: taskLists }] =
+		useSuspenseQueries({
+			queries: [
+				trpc.settings.getTimezone.queryOptions(),
+				trpc.projects.getProjectById.queryOptions({
+					id: projectId,
+				}),
+				trpc.tasks.getTaskLists.queryOptions({
+					projectId: projectId,
+				}),
+			],
+		});
 
 	return (
-		<>
+		<Suspense fallback={<PageLoading />}>
 			<PageTitle
 				title={project.name}
 				actionLabel="Edit"
-				actionLink={`/${params.tenant}/projects/${projectId}/edit`}
+				actionLink={`/${tenant}/projects/${projectId}/edit`}
 			>
 				{project.dueDate || project.status === "archived" ? (
 					<div className="flex space-x-2">
@@ -123,23 +118,23 @@ export default async function ProjectDetails(props: Props) {
 
 					<Link
 						className={buttonVariants({ size: "sm" })}
-						href={`/${params.tenant}/projects/${projectId}/tasklists/new`}
+						href={`/${tenant}/projects/${projectId}/tasklists/new`}
 					>
 						<ListPlusIcon className="mr-1 h-5 w-5" /> New
 						<span className="sr-only">, task list</span>
 					</Link>
 				</div>
 
-				{project.taskLists.length ? (
+				{taskLists.length ? (
 					<ul className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2">
-						{project.taskLists.map((taskList) => {
+						{taskLists.map((taskList) => {
 							return (
 								<div
 									key={taskList.id}
 									className="overflow-hidden rounded-lg border"
 								>
 									<TaskListHeader
-										orgSlug={params.tenant}
+										orgSlug={tenant}
 										taskList={taskList}
 										totalCount={taskList.tasks.length}
 										doneCount={
@@ -154,9 +149,9 @@ export default async function ProjectDetails(props: Props) {
 				) : null}
 
 				<EmptyState
-					show={!project.taskLists.length}
+					show={!taskLists.length}
 					label="task list"
-					createLink={`/${params.tenant}/projects/${projectId}/tasklists/new`}
+					createLink={`/${tenant}/projects/${projectId}/tasklists/new`}
 				/>
 			</div>
 
@@ -168,7 +163,7 @@ export default async function ProjectDetails(props: Props) {
 
 					<Link
 						className={buttonVariants({ size: "sm" })}
-						href={`/${params.tenant}/projects/${projectId}/events/new`}
+						href={`/${tenant}/projects/${projectId}/events/new`}
 					>
 						<CalendarPlusIcon className="mr-1 h-5 w-5" /> New
 						<span className="sr-only">, event</span>
@@ -179,12 +174,8 @@ export default async function ProjectDetails(props: Props) {
 			</div>
 
 			<div className="mx-auto max-w-7xl p-4 lg:py-8">
-				<CommentsSection
-					type="project"
-					parentId={project.id}
-					projectId={projectId}
-				/>
+				<CommentsSection roomId={`project/${project.id}`} />
 			</div>
-		</>
+		</Suspense>
 	);
 }

@@ -7,6 +7,7 @@ import { TRPCReactProvider } from "@/trpc/client";
 import { caller, getQueryClient } from "@/trpc/server";
 import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { redirect } from "next/navigation";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Suspense } from "react";
 
 export default async function ConsoleLayout(props: {
@@ -32,16 +33,18 @@ export default async function ConsoleLayout(props: {
 	return (
 		<TRPCReactProvider>
 			<HydrationBoundary state={dehydrate(queryClient)}>
-				<main className="relative mx-auto w-full flex-grow flex-col">
-					<Navbar notificationsWire={notificationsWire} />
-					<div className="min-h-screen bg-background lg:min-w-0 lg:flex-1 pb-8">
-						<Suspense fallback={<SpinnerWithSpacing />}>
-							{props.children}
-						</Suspense>
-					</div>
+				<NuqsAdapter>
+					<main className="relative mx-auto w-full flex-grow flex-col">
+						<Navbar notificationsWire={notificationsWire} />
+						<div className="min-h-screen bg-background lg:min-w-0 lg:flex-1 pb-8">
+							<Suspense fallback={<SpinnerWithSpacing />}>
+								{props.children}
+							</Suspense>
+						</div>
 
-					<ReportTimezone />
-				</main>
+						<ReportTimezone />
+					</main>
+				</NuqsAdapter>
 			</HydrationBoundary>
 		</TRPCReactProvider>
 	);
