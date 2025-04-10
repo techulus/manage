@@ -1,5 +1,5 @@
 import { activity, comment, project } from "@/drizzle/schema";
-import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
+import { logActivity } from "@/lib/activity";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
@@ -39,10 +39,9 @@ export const projectsRouter = createTRPCRouter({
 					await logActivity({
 						action: "updated",
 						type: "project",
-						message: `Updated project ${input.name}, ${generateObjectDiffMessage(
-							currentProject,
-							updatedProject?.[0],
-						)}`,
+						oldValue: currentProject,
+						newValue: updatedProject?.[0],
+						target: `/${ctx.orgSlug}/projects/${input.id}`,
 						projectId: +input.id,
 					});
 				}
@@ -56,16 +55,40 @@ export const projectsRouter = createTRPCRouter({
 						status: input.status,
 						createdByUser: ctx.userId,
 					})
-					.returning({ id: project.id })
+					.returning()
 					.execute();
 
 				await logActivity({
 					action: "created",
 					type: "project",
-					message: `Created project ${input.name}`,
+					target: `/${ctx.orgSlug}/projects/${newProject?.[0].id}`,
+					newValue: newProject?.[0],
 					projectId: newProject?.[0].id,
 				});
 			}
+		}),
+	updateProjectStatus: protectedProcedure
+		.input(
+			z.object({
+				id: z.number(),
+				status: z.enum(["active", "archived"]),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			await ctx.db
+				.update(project)
+				.set({ status: input.status })
+				.where(eq(project.id, input.id))
+				.execute();
+		}),
+	deleteProject: protectedProcedure
+		.input(
+			z.object({
+				id: z.number(),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			await ctx.db.delete(project).where(eq(project.id, input.id));
 		}),
 	getProjectById: protectedProcedure
 		.input(
@@ -124,7 +147,6 @@ export const projectsRouter = createTRPCRouter({
 			await logActivity({
 				action: "created",
 				type: "comment",
-				message: "Commented",
 				projectId: input.projectId,
 			});
 		}),
@@ -140,7 +162,6 @@ export const projectsRouter = createTRPCRouter({
 			await logActivity({
 				action: "deleted",
 				type: "comment",
-				message: "Deleted comment",
 				projectId: input.projectId,
 			});
 		}),

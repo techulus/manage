@@ -1,7 +1,6 @@
 "use server";
 
 import { calendarEvent, eventInvite } from "@/drizzle/schema";
-import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { toEndOfDay, toMachineDateString } from "@/lib/utils/date";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
@@ -130,13 +129,6 @@ export async function createEvent(_: unknown, payload: FormData) {
 				.execute();
 		}
 
-		await logActivity({
-			action: "created",
-			type: "event",
-			message: `Created event ${name}`,
-			projectId: +projectId,
-		});
-
 		const timezone = await getTimezone();
 		redirectPath = `/${orgSlug}/projects/${projectId}/events?on=${toMachineDateString(start, timezone)}`;
 		revalidatePath(`/${orgSlug}/projects/${projectId}/events`);
@@ -205,23 +197,6 @@ export async function updateEvent(_: unknown, payload: FormData) {
 			)
 			.execute();
 
-		if (currentEvent)
-			await logActivity({
-				action: "updated",
-				type: "event",
-				message: `Updated event ${name}, ${generateObjectDiffMessage(
-					currentEvent,
-					{
-						name,
-						description,
-						start,
-						end,
-						allDay,
-					},
-				)}`,
-				projectId: +projectId,
-			});
-
 		const timezone = await getTimezone();
 		revalidatePath(`/${orgSlug}/projects/${projectId}/events`);
 		redirectPath = `/${orgSlug}/projects/${projectId}/events?on=${toMachineDateString(start, timezone)}`;
@@ -245,13 +220,6 @@ export async function deleteEvent(payload: FormData) {
 		.where(eq(calendarEvent.id, id))
 		.returning({ name: calendarEvent.name })
 		.execute();
-
-	await logActivity({
-		action: "deleted",
-		type: "event",
-		message: `Deleted event ${eventDetails?.[0].name}`,
-		projectId: +projectId,
-	});
 
 	revalidatePath(currentPath);
 }

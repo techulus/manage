@@ -7,42 +7,41 @@ import { ProjecItem } from "@/components/project/project-item";
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTRPC } from "@/trpc/client";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQueries } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
+import { Suspense } from "react";
+import PageLoading from "../loading";
 
 export default function Projects() {
 	const params = useParams();
-
 	const [search, setSearch] = useQueryState("search");
 	const [statuses] = useQueryState("status", {
 		defaultValue: "active",
 	});
-
 	const trpc = useTRPC();
-
 	const orgSlug = params.tenant as string;
 
-	const { data: timezone } = useQuery(trpc.settings.getTimezone.queryOptions());
-
-	const { data: projects = [], isLoading } = useQuery(
-		trpc.user.getProjects.queryOptions({
-			statuses: statuses.split(","),
-			search: search ?? undefined,
-		}),
-	);
+	const [{ data: timezone }, { data: projects = [] }] = useSuspenseQueries({
+		queries: [
+			trpc.settings.getTimezone.queryOptions(),
+			trpc.user.getProjects.queryOptions({
+				statuses: statuses.split(","),
+				search: search ?? undefined,
+			}),
+		],
+	});
 
 	const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		const formData = new FormData(e.currentTarget);
 		const searchValue = formData.get("search") as string;
-
 		setSearch(searchValue);
 	};
 
 	return (
-		<>
+		<Suspense fallback={<PageLoading />}>
 			<PageTitle
 				title={search ? `Search '${search}'` : "Projects"}
 				actionLabel="New"
@@ -70,7 +69,7 @@ export default function Projects() {
 
 			<div className="mx-auto mt-8 flex max-w-7xl flex-col">
 				<EmptyState
-					show={!projects.length && !isLoading}
+					show={!projects.length}
 					isSearchResult={!!search}
 					label="projects"
 					createLink={`/${orgSlug}/projects/new`}
@@ -87,7 +86,7 @@ export default function Projects() {
 				</div>
 			</div>
 
-			<div className="mx-auto mt-12 flex w-full max-w-7xl flex-grow items-center border-t border-muted p-4 md:py-4">
+			<div className="mx-auto mt-12 flex w-full max-w-7xl flex-grow items-center border-t border-muted">
 				{statuses.includes("archived") ? (
 					<Link
 						href={`/${orgSlug}/projects`}
@@ -104,6 +103,6 @@ export default function Projects() {
 					</Link>
 				)}
 			</div>
-		</>
+		</Suspense>
 	);
 }

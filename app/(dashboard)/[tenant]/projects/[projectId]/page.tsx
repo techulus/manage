@@ -13,18 +13,23 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { toDateStringWithDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
-import { useSuspenseQueries } from "@tanstack/react-query";
+import {
+	useMutation,
+	useQueryClient,
+	useSuspenseQueries,
+} from "@tanstack/react-query";
 import { CalendarPlusIcon, ListPlusIcon } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { Suspense } from "react";
-import { archiveProject, deleteProject, unarchiveProject } from "../actions";
+import { useParams, useRouter } from "next/navigation";
+import { Suspense, useCallback } from "react";
 
 export default function ProjectDetails() {
+	const router = useRouter();
 	const params = useParams();
 	const projectId = +params.projectId!;
 	const tenant = params.tenant as string;
 	const trpc = useTRPC();
+	const queryClient = useQueryClient();
 
 	const [{ data: timezone }, { data: project }, { data: taskLists }] =
 		useSuspenseQueries({
@@ -38,6 +43,30 @@ export default function ProjectDetails() {
 				}),
 			],
 		});
+
+	const revalidateProjectData = useCallback(async () => {
+		await queryClient.invalidateQueries({
+			queryKey: [
+				trpc.user.getProjects,
+				trpc.projects.getProjectById.queryKey({
+					id: projectId,
+				}),
+			],
+		});
+	}, [
+		queryClient,
+		projectId,
+		trpc.user.getProjects,
+		trpc.projects.getProjectById,
+	]);
+
+	const updateProjectStatus = useMutation(
+		trpc.projects.updateProjectStatus.mutationOptions(),
+	);
+
+	const deleteProject = useMutation(
+		trpc.projects.deleteProject.mutationOptions(),
+	);
 
 	return (
 		<Suspense fallback={<PageLoading />}>
@@ -80,30 +109,39 @@ export default function ProjectDetails() {
 						<span className="isolate inline-flex">
 							{project.status === "archived" ? (
 								<>
-									<form action={unarchiveProject}>
-										<input
-											className="hidden"
-											name="id"
-											defaultValue={project.id}
-										/>
+									<form
+										action={async () => {
+											await updateProjectStatus.mutateAsync({
+												id: project.id,
+												status: "active",
+											});
+											await revalidateProjectData();
+										}}
+									>
 										<ActionButton label="Unarchive" variant="link" />
 									</form>
-									<form action={deleteProject}>
-										<input
-											className="hidden"
-											name="id"
-											defaultValue={project.id}
-										/>
+									<form
+										action={async () => {
+											await deleteProject.mutateAsync({
+												id: project.id,
+											});
+											await revalidateProjectData();
+											router.push(`/${tenant}/projects`);
+										}}
+									>
 										<DeleteButton action="Delete" />
 									</form>
 								</>
 							) : (
-								<form action={archiveProject}>
-									<input
-										className="hidden"
-										name="id"
-										defaultValue={project.id}
-									/>
+								<form
+									action={async () => {
+										await updateProjectStatus.mutateAsync({
+											id: project.id,
+											status: "archived",
+										});
+										await revalidateProjectData();
+									}}
+								>
 									<DeleteButton action="Archive" />
 								</form>
 							)}

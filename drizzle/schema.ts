@@ -220,7 +220,9 @@ export const activity = pgTable("Activity", {
 	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	action: text("action").notNull(),
 	type: text("type").notNull(),
-	message: text("message"),
+	oldValue: jsonb("oldValue"),
+	newValue: jsonb("newValue"),
+	target: text("target"),
 	projectId: integer("projectId")
 		.notNull()
 		.references(() => project.id, { onDelete: "cascade", onUpdate: "cascade" }),

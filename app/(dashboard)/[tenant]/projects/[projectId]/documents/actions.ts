@@ -1,7 +1,6 @@
 "use server";
 
 import { blob, comment, document, documentFolder } from "@/drizzle/schema";
-import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { deleteFile } from "@/lib/blobStore";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
@@ -55,13 +54,6 @@ export async function createDocument(payload: FormData) {
 		})
 		.execute();
 
-	await logActivity({
-		action: "created",
-		type: "document",
-		message: `Created document ${name}`,
-		projectId: +projectId,
-	});
-
 	revalidatePath(`/${orgSlug}/projects/${projectId}`);
 
 	if (folderId) {
@@ -106,17 +98,6 @@ export async function updateDocument(payload: FormData) {
 		.returning({ name: document.name })
 		.execute();
 
-	if (currentDocument) {
-		await logActivity({
-			action: "updated",
-			type: "document",
-			message: `Updated document ${
-				documentDetails?.[0].name
-			}, ${generateObjectDiffMessage(currentDocument, data)}`,
-			projectId: +projectId,
-		});
-	}
-
 	revalidatePath(`/${orgSlug}/projects/${projectId}`);
 
 	if (folderId) {
@@ -151,13 +132,6 @@ export async function createDocumentFolder(payload: FormData) {
 		})
 		.execute();
 
-	await logActivity({
-		action: "created",
-		type: "folder",
-		message: `Created document folder ${name}`,
-		projectId: +projectId,
-	});
-
 	revalidatePath(`/${orgSlug}/projects/${projectId}`);
 	revalidatePath(`/${orgSlug}/projects/${projectId}/documents`);
 	redirect(`/${orgSlug}/projects/${projectId}/documents`);
@@ -190,16 +164,6 @@ export async function updateDocumentFolder(payload: FormData) {
 		.returning({ name: documentFolder.name })
 		.execute();
 
-	if (currentFolder)
-		await logActivity({
-			action: "updated",
-			type: "folder",
-			message: `Updated document folder ${
-				folderDetails?.[0].name
-			}, ${generateObjectDiffMessage(currentFolder, data)}`,
-			projectId: +projectId,
-		});
-
 	revalidatePath(`/${orgSlug}/projects/${projectId}`);
 	revalidatePath(`/${orgSlug}/projects/${projectId}/documents/folders/${id}`);
 	redirect(`/${orgSlug}/projects/${projectId}/documents/folders/${id}`);
@@ -224,13 +188,6 @@ export async function deleteDocumentFolder(payload: FormData) {
 			.execute(),
 	]);
 
-	await logActivity({
-		action: "deleted",
-		type: "folder",
-		message: `Deleted document folder ${folderDetails?.[0].name}`,
-		projectId: +projectId,
-	});
-
 	revalidatePath(currentPath);
 	redirect(`/${orgSlug}/projects/${projectId}/documents`);
 }
@@ -254,13 +211,6 @@ export async function deleteDocument(
 			.where(eq(comment.roomId, `project/${projectId}/document/${id}`))
 			.execute(),
 	]);
-
-	await logActivity({
-		action: "deleted",
-		type: "document",
-		message: `Deleted document ${documentDetails?.[0].name}`,
-		projectId: +projectId,
-	});
 
 	if (folderId) {
 		revalidatePath(
@@ -304,11 +254,4 @@ export async function deleteBlob(
 		.where(eq(blob.id, file.id))
 		.returning({ name: blob.name })
 		.execute();
-
-	await logActivity({
-		action: "deleted",
-		type: "blob",
-		message: `Deleted file ${blobDetails?.[0].name}`,
-		projectId: +projectId,
-	});
 }

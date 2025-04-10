@@ -1,10 +1,10 @@
 "use client";
 
-import { HtmlPreview } from "@/components/core/html-view";
 import { Spinner, SpinnerWithSpacing } from "@/components/core/loaders";
 import { UserAvatar } from "@/components/core/user-avatar";
 import { Button } from "@/components/ui/button";
 import type { ActivityWithActor } from "@/drizzle/types";
+import { generateObjectDiffMessage } from "@/lib/activity/message";
 import { guessTimezone, toDateTimeString } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useQuery } from "@tanstack/react-query";
@@ -75,9 +75,9 @@ export function ActivityItem({
 								{toDateTimeString(item.createdAt, guessTimezone)}
 							</span>
 						</div>
-						{item.message ? (
+						{item.oldValue && item.newValue ? (
 							<div className="mt-1">
-								<HtmlPreview content={item.message} />
+								{generateObjectDiffMessage(item.oldValue, item.newValue)}
 							</div>
 						) : null}
 					</div>

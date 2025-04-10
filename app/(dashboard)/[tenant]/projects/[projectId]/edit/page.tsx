@@ -53,9 +53,7 @@ export default function EditProject() {
 								trpc.projects.getProjectById.queryKey({
 									id: +projectId!,
 								}),
-								trpc.user.getProjects.queryKey({
-									statuses: ["active"],
-								}),
+								trpc.user.getProjects,
 							],
 						});
 						router.push(`/${tenant}/projects/${projectId}`);
@@ -68,7 +66,7 @@ export default function EditProject() {
 					<CardFooter>
 						<div className="flex items-center justify-end gap-x-6">
 							<Link
-								href={`/${tenant}/projects`}
+								href={`/${tenant}/projects/${projectId}`}
 								className={buttonVariants({ variant: "ghost" })}
 							>
 								Cancel

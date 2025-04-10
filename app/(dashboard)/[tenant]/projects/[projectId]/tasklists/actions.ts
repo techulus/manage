@@ -2,7 +2,6 @@
 
 import { notificationType } from "@/data/notification";
 import { notification, task, taskList } from "@/drizzle/schema";
-import { generateObjectDiffMessage, logActivity } from "@/lib/activity";
 import { broadcastEvent } from "@/lib/utils/turbowire";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
@@ -69,13 +68,6 @@ export async function createTaskList(payload: FormData) {
 		.returning()
 		.execute();
 
-	await logActivity({
-		action: "created",
-		type: "tasklist",
-		message: `Created task list ${name}`,
-		projectId: +projectId,
-	});
-
 	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
 	redirect(`/${orgSlug}/projects/${projectId}/tasklists`);
 }
@@ -110,17 +102,6 @@ export async function updateTaskList(payload: FormData) {
 		.where(eq(taskList.id, +id))
 		.execute();
 
-	if (currentTasklist)
-		await logActivity({
-			action: "updated",
-			type: "tasklist",
-			message: `Updated task list ${name}, ${generateObjectDiffMessage(
-				currentTasklist,
-				data,
-			)}`,
-			projectId: +projectId,
-		});
-
 	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
 	redirect(`/${orgSlug}/projects/${projectId}/tasklists`);
 }
@@ -146,17 +127,6 @@ export async function partialUpdateTaskList(
 		.returning({ name: taskList.name, projectId: taskList.projectId })
 		.execute();
 
-	if (currentTasklist)
-		await logActivity({
-			action: "updated",
-			type: "tasklist",
-			message: `Updated task list ${updated?.[0].name}, ${generateObjectDiffMessage(
-				currentTasklist,
-				updated[0],
-			)}`,
-			projectId: +updated?.[0].projectId,
-		});
-
 	revalidatePath(`/${orgSlug}/projects/${updated?.[0].projectId}/tasklists`);
 }
 
@@ -171,13 +141,6 @@ export async function deleteTaskList(payload: FormData) {
 		.where(eq(taskList.id, +id))
 		.returning({ name: taskList.name })
 		.execute();
-
-	await logActivity({
-		action: "deleted",
-		type: "tasklist",
-		message: `Deleted task list ${taskListDetails?.[0].name}`,
-		projectId: +projectId,
-	});
 
 	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
 }
@@ -228,13 +191,6 @@ export async function createTask({
 		})
 		.execute();
 
-	await logActivity({
-		action: "created",
-		type: "task",
-		message: `Created task ${name}`,
-		projectId: +projectId,
-	});
-
 	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
 }
 
@@ -271,17 +227,6 @@ export async function updateTask(
 		})
 		.execute();
 
-	if (currentTask)
-		await logActivity({
-			action: "updated",
-			type: "task",
-			message: `Updated task ${taskDetails?.[0].name}, ${generateObjectDiffMessage(
-				currentTask,
-				taskDetails[0],
-			)}`,
-			projectId: +projectId,
-		});
-
 	if ("assignedToUser" in data && data.assignedToUser) {
 		db.insert(notification)
 			.values({
@@ -316,13 +261,6 @@ export async function deleteTask({
 		.returning({ name: task.name })
 		.execute();
 
-	await logActivity({
-		action: "deleted",
-		type: "task",
-		message: `Deleted task ${taskDetails?.[0].name}`,
-		projectId: +projectId,
-	});
-
 	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
 }
 
@@ -342,13 +280,6 @@ export async function repositionTask(
 		.where(eq(task.id, +id))
 		.returning({ name: task.name })
 		.execute();
-
-	await logActivity({
-		action: "updated",
-		type: "task",
-		message: `Repositioned task \`${taskDetails?.[0].name}\``,
-		projectId: +projectId,
-	});
 
 	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
 }
@@ -396,13 +327,6 @@ export async function forkTaskList(taskListId: number, projectId: number) {
 		})
 		.where(and(eq(task.taskListId, +taskListId), eq(task.status, "todo")))
 		.execute();
-
-	await logActivity({
-		action: "updated",
-		type: "tasklist",
-		message: `Forked task list ${taskListDetails.name}`,
-		projectId: +projectId,
-	});
 
 	revalidatePath(`/${orgSlug}/projects/${projectId}/tasklists`);
 }
