@@ -54,13 +54,15 @@ export default function EventsCalendar({
 					<Skeleton className="h-[60px] w-full rounded-md bg-muted-foreground/10" />
 				</div>
 			) : (
-				<EventsList
-					events={(events as EventWithInvites[]) ?? []}
-					projectId={+projectId!}
-					date={currentDate}
-					compact={compact}
-					timezone={timezone}
-				/>
+				<div className="flex w-full p-4">
+					<EventsList
+						events={(events as EventWithInvites[]) ?? []}
+						projectId={+projectId!}
+						date={currentDate}
+						compact={compact}
+						timezone={timezone}
+					/>
+				</div>
 			)}
 		</div>
 	);

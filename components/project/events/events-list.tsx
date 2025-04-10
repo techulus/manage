@@ -44,7 +44,7 @@ export default function EventsList({
 	);
 
 	return (
-		<div className="flex w-full flex-col space-y-4 p-4">
+		<div className="flex w-full flex-col space-y-4">
 			{!filteredEvents.length ? (
 				<EmptyState
 					show={!filteredEvents.length}
