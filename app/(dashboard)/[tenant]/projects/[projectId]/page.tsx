@@ -45,19 +45,21 @@ export default function ProjectDetails() {
 		});
 
 	const revalidateProjectData = useCallback(async () => {
-		await queryClient.invalidateQueries({
-			queryKey: [
-				trpc.user.getProjects,
-				trpc.projects.getProjectById.queryKey({
-					id: projectId,
-				}),
-			],
+		queryClient.invalidateQueries({
+			queryKey: trpc.user.getProjects.queryKey({
+				statuses: ["active"],
+			}),
+		});
+		queryClient.invalidateQueries({
+			queryKey: trpc.projects.getProjectById.queryKey({
+				id: projectId,
+			}),
 		});
 	}, [
 		queryClient,
 		projectId,
-		trpc.user.getProjects,
-		trpc.projects.getProjectById,
+		trpc.projects.getProjectById.queryKey,
+		trpc.user.getProjects.queryKey,
 	]);
 
 	const updateProjectStatus = useMutation(
@@ -83,9 +85,7 @@ export default function ProjectDetails() {
 							</Badge>
 						) : null}
 						{project.status === "archived" ? (
-							<Badge variant="outline" className="ml-2 text-red-500">
-								Archived
-							</Badge>
+							<Badge variant="secondary">Archived</Badge>
 						) : null}
 					</div>
 				) : null}

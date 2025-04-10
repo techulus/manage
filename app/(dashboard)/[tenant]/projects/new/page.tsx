@@ -33,13 +33,10 @@ export default function CreateProject() {
 								? new Date(formData.get("dueDate") as string)
 								: undefined,
 						});
-
-						await queryClient.invalidateQueries({
-							queryKey: [
-								trpc.user.getProjects.queryKey({
-									statuses: ["active"],
-								}),
-							],
+						queryClient.invalidateQueries({
+							queryKey: trpc.user.getProjects.queryKey({
+								statuses: ["active"],
+							}),
 						});
 					}}
 				>

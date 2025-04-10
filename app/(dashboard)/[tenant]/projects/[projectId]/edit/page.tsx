@@ -48,13 +48,15 @@ export default function EditProject() {
 								? new Date(formData.get("dueDate") as string)
 								: undefined,
 						});
-						await queryClient.invalidateQueries({
-							queryKey: [
-								trpc.projects.getProjectById.queryKey({
-									id: +projectId!,
-								}),
-								trpc.user.getProjects,
-							],
+						queryClient.invalidateQueries({
+							queryKey: trpc.projects.getProjectById.queryKey({
+								id: +projectId!,
+							}),
+						});
+						queryClient.invalidateQueries({
+							queryKey: trpc.user.getProjects.queryKey({
+								statuses: ["active"],
+							}),
 						});
 						router.push(`/${tenant}/projects/${projectId}`);
 					}}

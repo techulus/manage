@@ -31,7 +31,7 @@ export default function CommentForm({
 					metadata: formData.get("metadata") as string,
 					projectId: +projectId!,
 				});
-				await queryClient.invalidateQueries({
+				queryClient.invalidateQueries({
 					queryKey: trpc.projects.getComments.queryKey({
 						roomId,
 					}),
