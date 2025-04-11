@@ -15,11 +15,11 @@ import { useTRPC } from "@/trpc/client";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
-import { AlignJustifyIcon, CalendarClock, FileIcon } from "lucide-react";
+import { AlignJustifyIcon, CalendarClock, FileIcon, X } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { Card, CardContent, CardHeader } from "../../../ui/card";
+import { Card } from "../../../ui/card";
 import { Checkbox } from "../../../ui/checkbox";
 import { DateTimePicker } from "../../events/date-time-picker";
 import { Assignee } from "../../shared/assigee";
@@ -98,25 +98,96 @@ export const TaskItem = ({
 	);
 
 	return (
-		<Card
-			className={cn(
-				"flex scale-100 rounded-lg shadow-none",
-				detailsOpen
-					? "my-1 flex-col border-2 border-muted-foreground/20"
-					: "flex-row items-center justify-center space-x-2 border-none",
-			)}
-			ref={setNodeRef}
-			style={style}
-		>
+		<>
+			<Card
+				className={cn(
+					"flex scale-100 rounded-lg shadow-none",
+					"flex-row items-center justify-center space-x-2 border-none",
+				)}
+				ref={setNodeRef}
+				style={style}
+			>
+				{!compact ? (
+					<Checkbox
+						checked={task.status === "done"}
+						className={cn(
+							"my-4 ml-6 mr-1 transition-all",
+							compact ? "py-0 my-0" : "",
+							task.status === "done" ? "my-2.5 opacity-50" : "scale-125",
+						)}
+						onCheckedChange={async (checked) => {
+							if (compact) return;
+							const status = checked ? "done" : "todo";
+
+							toast.promise(
+								updateTask.mutateAsync({
+									id: task.id,
+									status,
+								}),
+								updateTaskToastOptions,
+							);
+						}}
+					/>
+				) : null}
+				<button
+					type="button"
+					className={cn(
+						"text-md w-full py-1 text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+						compact ? "ml-3 py-0" : "",
+						task.status === "done" ? "text-muted-foreground line-through" : "",
+					)}
+					onClick={() => {
+						if (!compact) setDetailsOpen(true);
+					}}
+				>
+					<div
+						className={cn(
+							"flex w-full items-center py-2",
+							task.status !== "done" ? "border-b" : "",
+						)}
+					>
+						{task.assignee ? (
+							<Assignee className="mr-2" user={task.assignee} imageOnly />
+						) : null}
+						{name}
+						{task.dueDate ? (
+							<span className="text-muted-foreground ml-2 text-sm">
+								<CalendarClock className="h-4 w-4 inline-block text-primary mr-1 -mt-1" />
+								{!compact ? (
+									<span className="hidden md:inline">
+										{toDateStringWithDay(task.dueDate, timezone!)}
+									</span>
+								) : null}
+							</span>
+						) : null}
+						{task.description ? (
+							<span className="ml-2">
+								<FileIcon className="h-4 w-4 text-primary" />
+							</span>
+						) : null}
+					</div>
+				</button>
+
+				{task.status !== "done" && !compact ? (
+					<div
+						className="cursor-move touch-none p-1 pr-3"
+						{...attributes}
+						{...listeners}
+					>
+						<AlignJustifyIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+					</div>
+				) : null}
+			</Card>
+
 			{detailsOpen ? (
-				<>
-					<CardHeader className="py-0">
-						<div className="flex items-center space-x-2">
+				<div className="absolute top-28 bottom-0 right-0 w-full sm:max-w-[650px] bg-background shadow-lg flex flex-col sm:rounded-tl-lg border animate-in slide-in-from-right duration-300 z-50">
+					<div className="flex items-center px-4 h-14 border-b">
+						<div className="flex items-center flex-1">
 							<Checkbox
 								checked={task.status === "done"}
 								className={cn(
-									task.status === "done" ? "opacity-50" : "scale-125",
-									"my-4 mr-1",
+									task.status === "done" ? "opacity-50" : "",
+									"mr-2",
 								)}
 								onCheckedChange={async (checked) => {
 									const status = checked ? "done" : "todo";
@@ -137,43 +208,47 @@ export const TaskItem = ({
 									type="text"
 									value={name}
 									onChange={(e) => setName(e.target.value)}
-									className="text-md w-full text-left font-medium leading-none"
+									className="text-md flex-1 text-left font-medium leading-none"
 								/>
 							) : (
-								<button
-									type="button"
-									onClick={() => setDetailsOpen(false)}
+								<span
 									className={cn(
-										"text-md w-full py-1 text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+										"text-md flex-1 font-medium leading-none",
 										task.status === "done"
 											? "text-muted-foreground line-through"
 											: "",
 									)}
 								>
 									{name}
-								</button>
+								</span>
 							)}
 						</div>
-					</CardHeader>
-					<CardContent className="pb-3">
-						<dl>
-							<div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-								<dt className="text-sm font-medium leading-6">Notes</dt>
-								<dd className="mt-1 flex items-start text-sm leading-6 sm:col-span-2 sm:mt-0">
-									<TaskNotesForm task={task} />
-								</dd>
-							</div>
-						</dl>
+						<button
+							type="button"
+							onClick={() => setDetailsOpen(false)}
+							onKeyDown={(e) => {
+								if (e.key === "Escape") setDetailsOpen(false);
+							}}
+							className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
+						>
+							<X className="h-6 w-6" />
+							<span className="sr-only">Close</span>
+						</button>
+					</div>
 
-						<dl>
-							<div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-								<dt className="text-sm font-medium leading-6">Assigned to</dt>
-								<dd className="mt-1 flex text-sm leading-6 sm:col-span-2 sm:mt-0">
+					<div className="flex-1 overflow-y-auto">
+						<div className="space-y-6 p-6">
+							<div className="space-y-1">
+								<h4 className="text-sm font-medium">Notes</h4>
+								<TaskNotesForm task={task} />
+							</div>
+
+							<div className="space-y-1">
+								<h4 className="text-sm font-medium">Assigned to</h4>
+								<div className="flex items-center justify-between">
 									{task.assignee ? (
 										<>
-											<span className="flex-grow">
-												<Assignee user={task.assignee} />
-											</span>
+											<Assignee user={task.assignee} />
 											<Button
 												size="sm"
 												variant="outline"
@@ -205,108 +280,106 @@ export const TaskItem = ({
 											}}
 										/>
 									)}
-								</dd>
+								</div>
 							</div>
-						</dl>
 
-						<dl>
-							<div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-								<dt className="text-sm font-medium leading-6">Due</dt>
-								<dd className="mt-1 flex items-start text-sm leading-6 sm:col-span-2 sm:mt-0">
-									{task.dueDate ? (
-										<div className="flex w-full items-center justify-between">
-											<p>{toDateStringWithDay(task.dueDate, timezone!)}</p>
-											<Button
-												size="sm"
-												variant="outline"
-												className="text-primary hover:text-red-500"
-												onClick={() => {
-													toast.promise(
-														updateTask.mutateAsync({
-															id: task.id,
-															dueDate: null,
-														}),
-														updateTaskToastOptions,
-													);
-												}}
-											>
-												Remove
-											</Button>
-										</div>
-									) : (
-										<div className="w-[220px]">
-											<DateTimePicker
-												dateOnly
-												name="dueDate"
-												onSelect={(dueDate) => {
-													toast.promise(
-														updateTask.mutateAsync({
-															id: task.id,
-															dueDate: toStartOfDay(dueDate).toISOString(),
-														}),
-														updateTaskToastOptions,
-													);
-												}}
-											/>
-										</div>
-									)}
-								</dd>
+							<div className="space-y-1">
+								<h4 className="text-sm font-medium">Due</h4>
+								{task.dueDate ? (
+									<div className="flex items-center justify-between">
+										<p className="text-sm">
+											{toDateStringWithDay(task.dueDate, timezone!)}
+										</p>
+										<Button
+											size="sm"
+											variant="outline"
+											className="text-primary hover:text-red-500"
+											onClick={() => {
+												toast.promise(
+													updateTask.mutateAsync({
+														id: task.id,
+														dueDate: null,
+													}),
+													updateTaskToastOptions,
+												);
+											}}
+										>
+											Remove
+										</Button>
+									</div>
+								) : (
+									<div className="w-[220px]">
+										<DateTimePicker
+											dateOnly
+											name="dueDate"
+											onSelect={(dueDate) => {
+												toast.promise(
+													updateTask.mutateAsync({
+														id: task.id,
+														dueDate: toStartOfDay(dueDate).toISOString(),
+													}),
+													updateTaskToastOptions,
+												);
+											}}
+										/>
+									</div>
+								)}
 							</div>
-						</dl>
 
-						<dl>
-							<div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-								<dt className="text-sm font-medium leading-6">Created By</dt>
-								<dd className="mt-1 flex text-sm leading-6 sm:col-span-2 sm:mt-0">
-									<span className="flex-grow">{task.creator?.firstName}</span>
-									<Button
-										size="sm"
-										variant="outline"
-										className="mr-2 text-primary"
-										onClick={async () => {
-											setIsEditing((val) => !val);
+							<div className="space-y-1">
+								<div className="flex items-center justify-between">
+									<h4 className="text-sm font-medium">Created By</h4>
+									<div className="space-x-2">
+										<Button
+											size="sm"
+											variant="outline"
+											className="text-primary"
+											onClick={async () => {
+												setIsEditing((val) => !val);
 
-											if (!isEditing) return;
+												if (!isEditing) return;
 
-											toast.promise(
-												updateTask.mutateAsync({
-													id: task.id,
-													name,
-												}),
-												updateTaskToastOptions,
-											);
-										}}
-									>
-										{isEditing ? "Save" : "Edit"}
-									</Button>
-									<Button
-										size="sm"
-										variant="outline"
-										className="text-primary hover:text-red-500"
-										onClick={() => {
-											toast.promise(
-												deleteTask.mutateAsync({
-													id: task.id,
-												}),
-												{
-													loading: "Deleting...",
-													success: "Deleted!",
-													error: "Error while deleting, please try again.",
-												},
-											);
-										}}
-									>
-										Delete
-									</Button>
-								</dd>
+												toast.promise(
+													updateTask.mutateAsync({
+														id: task.id,
+														name,
+													}),
+													updateTaskToastOptions,
+												);
+											}}
+										>
+											{isEditing ? "Save" : "Edit"}
+										</Button>
+										<Button
+											size="sm"
+											variant="outline"
+											className="text-primary hover:text-red-500"
+											onClick={() => {
+												toast.promise(
+													deleteTask.mutateAsync({
+														id: task.id,
+													}),
+													{
+														loading: "Deleting...",
+														success: "Deleted!",
+														error: "Error while deleting, please try again.",
+													},
+												);
+											}}
+										>
+											Delete
+										</Button>
+									</div>
+								</div>
+								<p className="text-sm text-muted-foreground">
+									{task.creator?.firstName}
+								</p>
 							</div>
-						</dl>
 
-						{taskLists?.filter((x) => x.id !== task.taskListId)?.length ? (
-							<dl>
-								<div className="py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-									<dt className="text-sm font-medium leading-6">Actions</dt>
-									<dd className="mt-1 flex items-start space-x-2 text-sm leading-6 sm:col-span-2 sm:mt-0">
+							{taskLists?.filter((x) => x.id !== task.taskListId)?.length ? (
+								<div className="space-y-1">
+									<h4 className="text-sm font-medium">Actions</h4>
+									<div className="flex items-center space-x-2">
 										<DropdownMenu>
 											<DropdownMenuTrigger asChild>
 												<Button
@@ -413,88 +486,13 @@ export const TaskItem = ({
 													))}
 											</DropdownMenuContent>
 										</DropdownMenu>
-									</dd>
+									</div>
 								</div>
-							</dl>
-						) : null}
-					</CardContent>
-				</>
-			) : (
-				<>
-					{!compact ? (
-						<Checkbox
-							checked={task.status === "done"}
-							className={cn(
-								"my-4 ml-6 mr-1 transition-all",
-								compact ? "py-0 my-0" : "",
-								task.status === "done" ? "my-2.5 opacity-50" : "scale-125",
-							)}
-							onCheckedChange={async (checked) => {
-								if (compact) return;
-								const status = checked ? "done" : "todo";
-
-								toast.promise(
-									updateTask.mutateAsync({
-										id: task.id,
-										status,
-									}),
-									updateTaskToastOptions,
-								);
-							}}
-						/>
-					) : null}
-					<button
-						type="button"
-						className={cn(
-							"text-md w-full py-1 text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-							compact ? "ml-3 py-0" : "",
-							task.status === "done"
-								? "text-muted-foreground line-through"
-								: "",
-						)}
-						onClick={() => {
-							if (!compact) setDetailsOpen(true);
-						}}
-					>
-						<div
-							className={cn(
-								"flex w-full items-center py-2",
-								task.status !== "done" ? "border-b" : "",
-							)}
-						>
-							{task.assignee ? (
-								<Assignee className="mr-2" user={task.assignee} imageOnly />
-							) : null}
-							{name}
-							{task.dueDate ? (
-								<span className="text-muted-foreground ml-2 text-sm">
-									<CalendarClock className="h-4 w-4 inline-block text-primary mr-1 -mt-1" />
-									{!compact ? (
-										<span className="hidden md:inline">
-											{toDateStringWithDay(task.dueDate, timezone!)}
-										</span>
-									) : null}
-								</span>
-							) : null}
-							{task.description ? (
-								<span className="ml-2">
-									<FileIcon className="h-4 w-4 text-primary" />
-								</span>
 							) : null}
 						</div>
-					</button>
-
-					{task.status !== "done" && !compact ? (
-						<div
-							className="cursor-move touch-none p-1 pr-3"
-							{...attributes}
-							{...listeners}
-						>
-							<AlignJustifyIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-						</div>
-					) : null}
-				</>
-			)}
-		</Card>
+					</div>
+				</div>
+			) : null}
+		</>
 	);
 };

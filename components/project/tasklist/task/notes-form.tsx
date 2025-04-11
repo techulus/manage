@@ -54,7 +54,7 @@ export default function TaskNotesForm({ task }: { task: TaskWithDetails }) {
 	return (
 		<div className="flex flex-grow flex-col items-start">
 			{task.description ? (
-				<span className="w-full rounded-lg border border-muted p-2">
+				<span className="w-full">
 					<HtmlPreview content={task.description ?? ""} />
 				</span>
 			) : null}

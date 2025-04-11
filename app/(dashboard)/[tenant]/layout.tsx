@@ -36,7 +36,7 @@ export default async function ConsoleLayout(props: {
 				<NuqsAdapter>
 					<main className="relative mx-auto w-full flex-grow flex-col">
 						<Navbar notificationsWire={notificationsWire} />
-						<div className="min-h-screen bg-background lg:min-w-0 lg:flex-1 pb-8">
+						<div className="min-h-screen bg-background lg:min-w-0 lg:flex-1 pb-8 tracking-tight">
 							<Suspense fallback={<SpinnerWithSpacing />}>
 								{props.children}
 							</Suspense>
