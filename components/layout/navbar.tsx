@@ -76,13 +76,6 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 					),
 				},
 				{
-					href: `/${tenant}/projects/${projectId}/documents`,
-					label: "Documents",
-					active: pathname.startsWith(
-						`/${tenant}/projects/${projectId}/documents`,
-					),
-				},
-				{
 					href: `/${tenant}/projects/${projectId}/events?on=${toMachineDateString(new Date(), timezone!)}`,
 					label: "Events",
 					active: pathname.startsWith(

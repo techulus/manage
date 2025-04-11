@@ -12,13 +12,12 @@ Manage is an open-source project management app inspired by Basecamp. With its i
 
 - [x] Basic Project management
 - [x] Task lists and tasks
-- [x] Documents - Creating and sharing documents
 - [x] Files - Uploading and sharing files
 - [x] Comments
 - [x] Events / Calendar
 - [x] Activity logs
+- [ ] Posts & files
 - [ ] Notifications
-- [ ] Users / teams management
 - [ ] Search
 - [ ] Admin panel
 - [ ] Permissions

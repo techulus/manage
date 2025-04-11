@@ -23,15 +23,7 @@ export async function logActivity({
 	projectId,
 }: {
 	action: "created" | "updated" | "deleted";
-	type:
-		| "tasklist"
-		| "task"
-		| "project"
-		| "document"
-		| "blob"
-		| "folder"
-		| "event"
-		| "comment";
+	type: "tasklist" | "task" | "project" | "blob" | "event" | "comment";
 	oldValue?: GenericObject;
 	newValue?: GenericObject;
 	target?: string;
