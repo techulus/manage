@@ -6,18 +6,26 @@ import { NotificationItem } from "@/components/core/notification-item";
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { Button } from "@/components/ui/button";
+import { toMs } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQueries } from "@tanstack/react-query";
 
 export default function Notifications() {
 	const trpc = useTRPC();
 
-	const { data: notifications, isLoading: notificationsLoading } = useQuery(
-		trpc.user.getUserNotifications.queryOptions(),
-	);
-	const { data: timezone, isLoading: timezoneLoading } = useQuery(
-		trpc.settings.getTimezone.queryOptions(),
-	);
+	const [
+		{ data: notifications, isLoading: notificationsLoading },
+		{ data: timezone, isLoading: timezoneLoading },
+	] = useQueries({
+		queries: [
+			trpc.user.getUserNotifications.queryOptions(),
+			{
+				...trpc.settings.getTimezone.queryOptions(),
+				gcTime: toMs(60),
+			},
+		],
+	});
+
 	const markNotificationsAsRead = useMutation(
 		trpc.user.markNotificationsAsRead.mutationOptions(),
 	);

@@ -6,6 +6,7 @@ import PageTitle from "@/components/layout/page-title";
 import { ProjecItem } from "@/components/project/project-item";
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toMs } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useSuspenseQueries } from "@tanstack/react-query";
 import Link from "next/link";
@@ -25,7 +26,10 @@ export default function Projects() {
 
 	const [{ data: timezone }, { data: projects = [] }] = useSuspenseQueries({
 		queries: [
-			trpc.settings.getTimezone.queryOptions(),
+			{
+				...trpc.settings.getTimezone.queryOptions(),
+				gcTime: toMs(60),
+			},
 			trpc.user.getProjects.queryOptions({
 				statuses: statuses.split(","),
 				search: search ?? undefined,

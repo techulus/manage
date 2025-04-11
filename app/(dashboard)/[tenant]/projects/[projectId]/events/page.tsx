@@ -1,12 +1,11 @@
 "use client";
 
-import { SpinnerWithSpacing } from "@/components/core/loaders";
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import EventsCalendar from "@/components/project/events/events-calendar";
 import { buttonVariants } from "@/components/ui/button";
-import { toDateStringWithDay } from "@/lib/utils/date";
+import { toDateStringWithDay, toMs } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useUser } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
@@ -14,22 +13,32 @@ import { RssIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { Suspense } from "react";
+import { useMemo } from "react";
 
 export default function EventDetails() {
 	const { projectId, tenant } = useParams();
 	const { user } = useUser();
 
 	const [on] = useQueryState("on");
-
 	const selectedDate = on ? new Date(on) : new Date();
-	const dayCommentId = `${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDay()}`;
-	const calendarSubscriptionUrl = `/api/calendar/${tenant}/${projectId}/calendar.ics?userId=${user?.id}`;
+
+	const dayCommentId = useMemo(
+		() =>
+			`${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDay()}`,
+		[projectId, selectedDate],
+	);
+	const calendarSubscriptionUrl = useMemo(
+		() =>
+			`/api/calendar/${tenant}/${projectId}/calendar.ics?userId=${user?.id}`,
+		[tenant, projectId, user?.id],
+	);
 
 	const trpc = useTRPC();
-	const { data: timezone, isLoading } = useQuery(
-		trpc.settings.getTimezone.queryOptions(),
-	);
+	const { data: timezone, isLoading } = useQuery({
+		...trpc.settings.getTimezone.queryOptions(),
+		gcTime: toMs(60),
+	});
+
 	return (
 		<>
 			<PageTitle
@@ -60,15 +69,7 @@ export default function EventDetails() {
 
 			<PageSection>
 				<div className="flex w-full rounded-lg">
-					<Suspense
-						key={`events-${projectId}-${selectedDate.toISOString()}`}
-						fallback={<SpinnerWithSpacing />}
-					>
-						<EventsCalendar
-							selectedDate={selectedDate.toISOString()}
-							timezone={timezone!}
-						/>
-					</Suspense>
+					<EventsCalendar timezone={timezone!} />
 				</div>
 			</PageSection>
 

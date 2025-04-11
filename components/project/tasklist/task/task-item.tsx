@@ -1,11 +1,5 @@
 "use client";
 
-import {
-	copyTaskToTaskList,
-	deleteTask,
-	moveTaskToTaskList,
-	updateTask,
-} from "@/app/(dashboard)/[tenant]/projects/[projectId]/tasklists/actions";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -14,13 +8,16 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import type { Task, TaskList, TaskWithDetails, User } from "@/drizzle/types";
+import type { TaskList, TaskWithDetails } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import { toDateStringWithDay, toStartOfDay } from "@/lib/utils/date";
+import { toDateStringWithDay, toMs, toStartOfDay } from "@/lib/utils/date";
+import { useTRPC } from "@/trpc/client";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
 import { AlignJustifyIcon, CalendarClock, FileIcon } from "lucide-react";
-import { use, useReducer, useState } from "react";
+import { useParams } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader } from "../../../ui/card";
 import { Checkbox } from "../../../ui/checkbox";
@@ -31,38 +28,23 @@ import TaskNotesForm from "./notes-form";
 
 export const TaskItem = ({
 	task,
-	projectId,
-	taskListsPromise,
-	usersPromise,
-	timezone,
 	compact = false,
 }: {
 	task: TaskWithDetails;
-	projectId: number;
-	timezone: string;
-	usersPromise: Promise<User[]>;
-	taskListsPromise?: Promise<TaskList[]>;
 	compact?: boolean;
 }) => {
+	const { projectId } = useParams();
 	const [detailsOpen, setDetailsOpen] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
-	const [optimisticTask, updateOptimisticTask] = useReducer(
-		(task: Task, data: { status: string } | { name: string }) => ({
-			...task,
-			...data,
-		}),
-		task,
-	);
-
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: task.id });
+
+	const [name, setName] = useState(task.name ?? "");
 
 	const style = {
 		transform: CSS.Transform.toString(transform),
 		transition,
 	};
-
-	const { id, name, status } = optimisticTask;
 
 	const updateTaskToastOptions = {
 		loading: "Saving...",
@@ -70,8 +52,54 @@ export const TaskItem = ({
 		error: "Error while saving, please try again.",
 	};
 
-	const users = use(usersPromise);
-	const taskLists = taskListsPromise ? use(taskListsPromise) : [];
+	const trpc = useTRPC();
+	const [{ data: users = [] }, { data: taskLists = [] }, { data: timezone }] =
+		useQueries({
+			queries: [
+				{
+					...trpc.settings.getAllUsers.queryOptions(),
+					gcTime: toMs(60),
+				},
+				trpc.tasks.getTaskLists.queryOptions({
+					projectId: +projectId!,
+				}),
+				{
+					...trpc.settings.getTimezone.queryOptions(),
+					gcTime: toMs(60),
+				},
+			],
+		});
+
+	const queryClient = useQueryClient();
+	const createTask = useMutation(
+		trpc.tasks.createTask.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: trpc.tasks.getListById.queryKey({ id: task.taskListId }),
+				});
+			},
+		}),
+	);
+	const updateTask = useMutation(
+		trpc.tasks.updateTask.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: trpc.tasks.getListById.queryKey({
+						id: task.taskListId,
+					}),
+				});
+			},
+		}),
+	);
+	const deleteTask = useMutation(
+		trpc.tasks.deleteTask.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: trpc.tasks.getListById.queryKey({ id: task.taskListId }),
+				});
+			},
+		}),
+	);
 
 	return (
 		<Card
@@ -89,17 +117,19 @@ export const TaskItem = ({
 					<CardHeader className="py-0">
 						<div className="flex items-center space-x-2">
 							<Checkbox
-								checked={status === "done"}
+								checked={task.status === "done"}
 								className={cn(
-									status === "done" ? "opacity-50" : "scale-125",
+									task.status === "done" ? "opacity-50" : "scale-125",
 									"my-4 mr-1",
 								)}
 								onCheckedChange={async (checked) => {
 									const status = checked ? "done" : "todo";
-									updateOptimisticTask({ status });
 
 									toast.promise(
-										updateTask(id, projectId, { status }),
+										updateTask.mutateAsync({
+											id: task.id,
+											status,
+										}),
 										updateTaskToastOptions,
 									);
 								}}
@@ -110,9 +140,7 @@ export const TaskItem = ({
 								<Input
 									type="text"
 									value={name}
-									onChange={(e) =>
-										updateOptimisticTask({ name: e.target.value })
-									}
+									onChange={(e) => setName(e.target.value)}
 									className="text-md w-full text-left font-medium leading-none"
 								/>
 							) : (
@@ -121,7 +149,7 @@ export const TaskItem = ({
 									onClick={() => setDetailsOpen(false)}
 									className={cn(
 										"text-md w-full py-1 text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-										status === "done"
+										task.status === "done"
 											? "text-muted-foreground line-through"
 											: "",
 									)}
@@ -156,7 +184,8 @@ export const TaskItem = ({
 												className="text-primary hover:text-red-500"
 												onClick={() => {
 													toast.promise(
-														updateTask(id, projectId, {
+														updateTask.mutateAsync({
+															id: task.id,
 															assignedToUser: null,
 														}),
 														updateTaskToastOptions,
@@ -171,7 +200,8 @@ export const TaskItem = ({
 											users={users}
 											onUpdate={(userId) => {
 												toast.promise(
-													updateTask(id, projectId, {
+													updateTask.mutateAsync({
+														id: task.id,
 														assignedToUser: userId,
 													}),
 													updateTaskToastOptions,
@@ -189,14 +219,15 @@ export const TaskItem = ({
 								<dd className="mt-1 flex items-start text-sm leading-6 sm:col-span-2 sm:mt-0">
 									{task.dueDate ? (
 										<div className="flex w-full items-center justify-between">
-											<p>{toDateStringWithDay(task.dueDate, timezone)}</p>
+											<p>{toDateStringWithDay(task.dueDate, timezone!)}</p>
 											<Button
 												size="sm"
 												variant="outline"
 												className="text-primary hover:text-red-500"
 												onClick={() => {
 													toast.promise(
-														updateTask(id, projectId, {
+														updateTask.mutateAsync({
+															id: task.id,
 															dueDate: null,
 														}),
 														updateTaskToastOptions,
@@ -213,8 +244,9 @@ export const TaskItem = ({
 												name="dueDate"
 												onSelect={(dueDate) => {
 													toast.promise(
-														updateTask(id, projectId, {
-															dueDate: toStartOfDay(dueDate),
+														updateTask.mutateAsync({
+															id: task.id,
+															dueDate: toStartOfDay(dueDate).toISOString(),
 														}),
 														updateTaskToastOptions,
 													);
@@ -241,7 +273,10 @@ export const TaskItem = ({
 											if (!isEditing) return;
 
 											toast.promise(
-												updateTask(id, projectId, { name }),
+												updateTask.mutateAsync({
+													id: task.id,
+													name,
+												}),
 												updateTaskToastOptions,
 											);
 										}}
@@ -254,9 +289,8 @@ export const TaskItem = ({
 										className="text-primary hover:text-red-500"
 										onClick={() => {
 											toast.promise(
-												deleteTask({
-													id,
-													projectId,
+												deleteTask.mutateAsync({
+													id: task.id,
 												}),
 												{
 													loading: "Deleting...",
@@ -296,11 +330,10 @@ export const TaskItem = ({
 																className="w-full"
 																action={() => {
 																	toast.promise(
-																		moveTaskToTaskList(
-																			task.id,
-																			list.id,
-																			projectId,
-																		),
+																		updateTask.mutateAsync({
+																			id: task.id,
+																			taskListId: list.id,
+																		}),
 																		{
 																			loading: "Moving...",
 																			success: "Moved!",
@@ -335,17 +368,17 @@ export const TaskItem = ({
 											<DropdownMenuContent>
 												{taskLists
 													.filter((x) => x.id !== task.taskListId)
-													.map((list) => (
+													.map((list: TaskList) => (
 														<DropdownMenuItem key={list.id} className="w-full">
 															<form
 																className="w-full"
 																action={() => {
 																	toast.promise(
-																		copyTaskToTaskList(
-																			task.id,
-																			list.id,
-																			projectId,
-																		),
+																		createTask.mutateAsync({
+																			name: task.name,
+																			taskListId: list.id,
+																			status: "todo",
+																		}),
 																		{
 																			loading: "Copying...",
 																			success: "Copied!",
@@ -376,19 +409,21 @@ export const TaskItem = ({
 				<>
 					{!compact ? (
 						<Checkbox
-							checked={status === "done"}
+							checked={task.status === "done"}
 							className={cn(
 								"my-4 ml-6 mr-1 transition-all",
 								compact ? "py-0 my-0" : "",
-								status === "done" ? "my-2.5 opacity-50" : "scale-125",
+								task.status === "done" ? "my-2.5 opacity-50" : "scale-125",
 							)}
 							onCheckedChange={async (checked) => {
 								if (compact) return;
 								const status = checked ? "done" : "todo";
-								updateOptimisticTask({ status });
 
 								toast.promise(
-									updateTask(id, projectId, { status }),
+									updateTask.mutateAsync({
+										id: task.id,
+										status,
+									}),
 									updateTaskToastOptions,
 								);
 							}}
@@ -399,7 +434,9 @@ export const TaskItem = ({
 						className={cn(
 							"text-md w-full py-1 text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
 							compact ? "ml-3 py-0" : "",
-							status === "done" ? "text-muted-foreground line-through" : "",
+							task.status === "done"
+								? "text-muted-foreground line-through"
+								: "",
 						)}
 						onClick={() => {
 							if (!compact) setDetailsOpen(true);
@@ -420,7 +457,7 @@ export const TaskItem = ({
 									<CalendarClock className="h-4 w-4 inline-block text-primary mr-1 -mt-1" />
 									{!compact ? (
 										<span className="hidden md:inline">
-											{toDateStringWithDay(task.dueDate, timezone)}
+											{toDateStringWithDay(task.dueDate, timezone!)}
 										</span>
 									) : null}
 								</span>

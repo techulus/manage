@@ -1,39 +1,69 @@
+"use client";
+
 import PageSection from "@/components/core/section";
 import { SaveButton } from "@/components/form/button";
 import SharedForm from "@/components/form/shared";
 import PageTitle from "@/components/layout/page-title";
 import { buttonVariants } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
-import { caller } from "@/trpc/server";
+import { useTRPC } from "@/trpc/client";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { updateTaskList } from "../../actions";
+import { useParams, useRouter } from "next/navigation";
 
-type Props = {
-	params: Promise<{
-		tenant: string;
-		projectId: string;
-		tasklistId: string;
-	}>;
-};
+export default function EditTaskList() {
+	const { tenant, projectId, tasklistId } = useParams();
+	const router = useRouter();
+	const queryClient = useQueryClient();
+	const trpc = useTRPC();
 
-export default async function EditTaskList(props: Props) {
-	const params = await props.params;
-	const tasklist = await caller.tasks.getListById({ id: +params.tasklistId });
+	const { data: tasklist } = useQuery(
+		trpc.tasks.getListById.queryOptions({ id: +tasklistId! }),
+	);
 
-	const backUrl = `/${params.tenant}/projects/${params.projectId}/tasklists`;
+	const upsertTaskList = useMutation(
+		trpc.tasks.upsertTaskList.mutationOptions(),
+	);
+
+	const backUrl = `/${tenant}/projects/${projectId}/tasklists`;
 
 	return (
 		<>
 			<PageTitle title="Update Task list" />
 
 			<PageSection topInset>
-				<form action={updateTaskList}>
-					<input type="hidden" name="id" defaultValue={params.tasklistId} />
-					<input
-						type="hidden"
-						name="projectId"
-						defaultValue={params.projectId}
-					/>
+				<form
+					action={async (formData) => {
+						const name = formData.get("name") as string;
+						const description = formData.get("description") as string;
+						const dueDate = formData.get("dueDate") as string;
+						const status = formData.get("status") as string;
+
+						await upsertTaskList.mutateAsync({
+							id: +tasklistId!,
+							projectId: +projectId!,
+							name,
+							description,
+							dueDate,
+							status: status ?? "active",
+						});
+
+						queryClient.invalidateQueries({
+							queryKey: trpc.tasks.getListById.queryKey({ id: +tasklistId! }),
+						});
+						queryClient.invalidateQueries({
+							queryKey: trpc.tasks.getTaskLists.queryKey({
+								projectId: +projectId!,
+							}),
+						});
+
+						router.push(
+							`/${tenant}/projects/${projectId}/tasklists/${tasklistId}`,
+						);
+					}}
+				>
+					<input type="hidden" name="id" defaultValue={tasklistId} />
+					<input type="hidden" name="projectId" defaultValue={projectId} />
 					<CardContent>
 						<SharedForm item={tasklist} />
 					</CardContent>

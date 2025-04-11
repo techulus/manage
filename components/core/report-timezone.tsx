@@ -1,15 +1,23 @@
 "use client";
 
-import { saveUserTimezone } from "@/app/(dashboard)/[tenant]/settings/actions";
+import { useTRPC } from "@/trpc/client";
+import { useMutation } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { memo } from "react";
 
-export function ReportTimezone() {
+export const ReportTimezone = memo(function ReportTimezone() {
+	const trpc = useTRPC();
+	const saveTimezone = useMutation(
+		trpc.settings.saveTimezone.mutationOptions(),
+	);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: no explanation
 	useEffect(() => {
 		const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 		if (timeZone) {
-			saveUserTimezone(timeZone);
+			saveTimezone.mutate(timeZone);
 		}
 	}, []);
 
 	return null;
-}
+});

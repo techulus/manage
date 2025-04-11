@@ -11,11 +11,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { toMachineDateString, toMs } from "@/lib/utils/date";
 import logo from "@/public/images/logo.png";
 import { useTRPC } from "@/trpc/client";
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
-import { useQuery } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -39,11 +40,17 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 	const pathname = usePathname();
 
 	const trpc = useTRPC();
-	const { data: projects = [] } = useQuery(
-		trpc.user.getProjects.queryOptions({
-			statuses: ["active"],
-		}),
-	);
+	const [{ data: projects = [] }, { data: timezone }] = useQueries({
+		queries: [
+			trpc.user.getProjects.queryOptions({
+				statuses: ["active"],
+			}),
+			{
+				...trpc.settings.getTimezone.queryOptions(),
+				gcTime: toMs(60),
+			},
+		],
+	});
 
 	const activeProject = useMemo(() => {
 		if (!projectId) {
@@ -76,7 +83,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 					),
 				},
 				{
-					href: `/${tenant}/projects/${projectId}/events`,
+					href: `/${tenant}/projects/${projectId}/events?on=${toMachineDateString(new Date(), timezone!)}`,
 					label: "Events",
 					active: pathname.startsWith(
 						`/${tenant}/projects/${projectId}/events`,
@@ -112,7 +119,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				active: pathname === `/${tenant}/settings`,
 			},
 		];
-	}, [tenant, projectId, pathname]);
+	}, [tenant, projectId, pathname, timezone]);
 
 	return (
 		<>
@@ -175,7 +182,9 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="start" className="w-56">
-								<DropdownMenuLabel>Projects</DropdownMenuLabel>
+								<DropdownMenuLabel>
+									<Link href={`/${tenant}/projects`}>Projects</Link>
+								</DropdownMenuLabel>
 								<DropdownMenuSeparator />
 								{projects.map((project) => (
 									<DropdownMenuItem
@@ -224,7 +233,10 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 			</div>
 
 			<div className="sticky top-0 z-10 border-b backdrop-blur-lg transition-all duration-200 bg-transparent">
-				<nav className="flex px-4 overflow-x-auto backdrop-blur-sm">
+				<nav
+					className="flex px-4 overflow-x-auto backdrop-blur-sm"
+					suppressHydrationWarning
+				>
 					{navLinks.map((link) => (
 						<Link
 							key={link.href}

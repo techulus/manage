@@ -1,5 +1,6 @@
 "use client";
 
+import { PageLoading } from "@/components/core/loaders";
 import PageSection from "@/components/core/section";
 import { SaveButton } from "@/components/form/button";
 import SharedForm from "@/components/form/shared";
@@ -15,7 +16,6 @@ import {
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
-import PageLoading from "../loading";
 
 export default function EditProject() {
 	const { tenant, projectId } = useParams();

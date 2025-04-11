@@ -1,21 +1,41 @@
 "use client";
 
-import { updateTask } from "@/app/(dashboard)/[tenant]/projects/[projectId]/tasklists/actions";
 import { HtmlPreview } from "@/components/core/html-view";
 import Editor from "@/components/editor";
 import { Button } from "@/components/ui/button";
 import type { TaskWithDetails } from "@/drizzle/types";
+import { useTRPC } from "@/trpc/client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { toast } from "sonner";
 
 export default function TaskNotesForm({ task }: { task: TaskWithDetails }) {
 	const [isEditing, setIsEditing] = useState(false);
-	const [notes, setNotes] = useState(task?.description ?? "");
+
+	const trpc = useTRPC();
+	const queryClient = useQueryClient();
+	const updateTask = useMutation(
+		trpc.tasks.updateTask.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: trpc.tasks.getListById.queryKey({ id: task.taskListId }),
+				});
+			},
+		}),
+	);
 
 	if (isEditing)
 		return (
-			<div className="flex-grow">
-				<Editor defaultValue={notes} setValue={setNotes} />
+			<form
+				className="flex-grow"
+				action={async (formData) => {
+					await updateTask.mutateAsync({
+						id: task.id,
+						description: formData.get("description") as string,
+					});
+					setIsEditing(false);
+				}}
+			>
+				<Editor defaultValue={task.description ?? ""} />
 				<div className="mt-2">
 					<Button
 						className="mr-2"
@@ -26,21 +46,9 @@ export default function TaskNotesForm({ task }: { task: TaskWithDetails }) {
 					>
 						Cancel
 					</Button>
-					<Button
-						onClick={() => {
-							setIsEditing(false);
-
-							toast.promise(updateTask(task.id, 1, { description: notes }), {
-								loading: "Saving...",
-								success: "Done!",
-								error: "Error while saving, please try again.",
-							});
-						}}
-					>
-						Save
-					</Button>
+					<Button type="submit">Save</Button>
 				</div>
-			</div>
+			</form>
 		);
 
 	return (

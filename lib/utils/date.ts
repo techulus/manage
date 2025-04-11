@@ -74,3 +74,7 @@ export function getStartOfWeek(date: Date) {
 export function getEndOfWeek(date: Date) {
 	return endOfWeek(date, { weekStartsOn: 1 });
 }
+
+export function toMs(durationInMinutes: number) {
+	return durationInMinutes * 60 * 1000;
+}

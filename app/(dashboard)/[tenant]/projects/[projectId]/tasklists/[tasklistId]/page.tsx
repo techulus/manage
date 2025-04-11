@@ -1,82 +1,35 @@
+"use client";
+
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { Progress } from "@/components/ui/progress";
-import { Skeleton } from "@/components/ui/skeleton";
-import { task, taskList, user } from "@/drizzle/schema";
-import { toDateStringWithDay } from "@/lib/utils/date";
-import { database } from "@/lib/utils/useDatabase";
-import { getOwner, getTimezone } from "@/lib/utils/useOwner";
-import { getAllUsers } from "@/lib/utils/useUser";
-import { and, asc, eq } from "drizzle-orm";
+import { toDateStringWithDay, toMs } from "@/lib/utils/date";
+import { useTRPC } from "@/trpc/client";
+import { useSuspenseQueries } from "@tanstack/react-query";
 import { CheckCircle, ClockIcon } from "lucide-react";
-import { notFound } from "next/navigation";
+import { useParams } from "next/navigation";
 import { Suspense } from "react";
-import {
-	createTask,
-	getActiveTaskLists,
-	partialUpdateTaskList,
-} from "../actions";
+import PageLoading from "../loading";
 
-type Props = {
-	params: Promise<{
-		projectId: string;
-		tasklistId: string;
-	}>;
-};
+export default function TaskLists() {
+	const { projectId, tasklistId, tenant } = useParams();
 
-export default async function TaskLists(props: Props) {
-	const params = await props.params;
-	const { userId, orgSlug } = await getOwner();
-	const { projectId, tasklistId } = params;
-
-	const timezone = await getTimezone();
-	const db = await database();
-	const list = await db.query.taskList
-		.findFirst({
-			where: and(
-				eq(taskList.projectId, +projectId),
-				eq(taskList.id, +tasklistId),
-			),
-			with: {
-				tasks: {
-					orderBy: [asc(task.position)],
-					with: {
-						creator: {
-							columns: {
-								firstName: true,
-								imageUrl: true,
-							},
-						},
-						assignee: {
-							columns: {
-								firstName: true,
-								imageUrl: true,
-							},
-						},
-					},
-				},
+	const trpc = useTRPC();
+	const [{ data: list }, { data: timezone }] = useSuspenseQueries({
+		queries: [
+			trpc.tasks.getListById.queryOptions({
+				id: +tasklistId!,
+			}),
+			{
+				...trpc.settings.getTimezone.queryOptions(),
+				gcTime: toMs(60),
 			},
-		})
-		.execute();
-
-	if (!list) {
-		return notFound();
-	}
-
-	const currentUser = await db.query.user.findFirst({
-		where: eq(user.id, userId),
+		],
 	});
 
-	if (!currentUser) {
-		return notFound();
-	}
-
-	const allTaskListsPromise = getActiveTaskLists(+projectId);
-	const allUsersPromise = getAllUsers(true);
-
-	const totalCount = list.tasks.length;
-	const doneCount = list.tasks.filter((task) => task.status === "done").length;
+	const totalCount = list?.tasks.length;
+	const doneCount = list?.tasks.filter((task) => task.status === "done").length;
 
 	const completedPercent =
 		totalCount && doneCount
@@ -84,11 +37,11 @@ export default async function TaskLists(props: Props) {
 			: undefined;
 
 	return (
-		<>
+		<Suspense fallback={<PageLoading />}>
 			<PageTitle
 				title={list.name}
 				actionLabel="Edit"
-				actionLink={`/${orgSlug}/projects/${projectId}/tasklists/${list.id}/edit`}
+				actionLink={`/${tenant}/projects/${projectId}/tasklists/${list.id}/edit`}
 			>
 				<div className="flex flex-col pr-4 md:pr-0 space-y-2 md:flex-row md:space-y-0 md:space-x-2 text-gray-500 dark:text-gray-400">
 					{totalCount != null && doneCount != null ? (
@@ -126,33 +79,7 @@ export default async function TaskLists(props: Props) {
 			</PageTitle>
 
 			<div className="mx-auto -mt-8 max-w-7xl">
-				<Suspense
-					fallback={
-						<div className="max-h-96 w-full rounded-lg border p-4 bg-card">
-							<Skeleton className="h-4 w-3/4 mb-4" />
-							<Skeleton className="h-4 w-1/2 mb-2" />
-							<div className="space-y-3 mt-6">
-								<Skeleton className="h-4 w-full" />
-								<Skeleton className="h-4 w-full" />
-								<Skeleton className="h-4 w-full" />
-							</div>
-						</div>
-					}
-				>
-					<TaskListItem
-						timezone={timezone}
-						key={list.id}
-						taskList={list}
-						projectId={+projectId}
-						userId={userId}
-						createTask={createTask}
-						orgSlug={orgSlug}
-						partialUpdateTaskList={partialUpdateTaskList}
-						taskListsPromise={allTaskListsPromise}
-						usersPromise={allUsersPromise}
-						hideHeader
-					/>
-				</Suspense>
+				<TaskListItem key={list.id} id={list.id} hideHeader />
 
 				<div className="py-8">
 					<CommentsSection
@@ -160,6 +87,6 @@ export default async function TaskLists(props: Props) {
 					/>
 				</div>
 			</div>
-		</>
+		</Suspense>
 	);
 }

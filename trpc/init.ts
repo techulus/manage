@@ -1,5 +1,5 @@
 import { database } from "@/lib/utils/useDatabase";
-import { getOwner } from "@/lib/utils/useOwner";
+import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 import { auth } from "@clerk/nextjs/server";
 import { TRPCError, initTRPC } from "@trpc/server";
 import { cache } from "react";
@@ -9,7 +9,9 @@ export const createTRPCContext = cache(async () => {
 	/**
 	 * @see: https://trpc.io/docs/server/context
 	 */
-	return {};
+	return {
+		timezone: await getTimezone(),
+	};
 });
 
 export type Context = Awaited<ReturnType<typeof createTRPCContext>>;

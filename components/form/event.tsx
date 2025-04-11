@@ -1,16 +1,15 @@
 "use client";
 
-import {
-	createEvent,
-	updateEvent,
-} from "@/app/(dashboard)/[tenant]/projects/[projectId]/events/actions";
 import { Input } from "@/components/ui/input";
-import type { EventWithInvites, User } from "@/drizzle/types";
+import type { EventWithInvites } from "@/drizzle/types";
+import { toMachineDateString, toMs } from "@/lib/utils/date";
+import { useTRPC } from "@/trpc/client";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash2Icon } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
-import { RRule, rrulestr } from "rrule";
-import { toast } from "sonner";
+import { useParams, useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
+import { useState } from "react";
+import { type Frequency, RRule, rrulestr } from "rrule";
 import Editor from "../editor";
 import { DateTimePicker } from "../project/events/date-time-picker";
 import { Assignee } from "../project/shared/assigee";
@@ -30,20 +29,24 @@ import { SaveButton } from "./button";
 
 export default function EventForm({
 	item,
-	on,
-	users,
-	projectId,
 }: {
 	item?: EventWithInvites | null;
-	projectId: string;
-	on?: string;
-	users: User[];
 }) {
+	const { projectId, tenant } = useParams();
+	const [on] = useQueryState("on");
 	const router = useRouter();
-	const [state, formAction] = useActionState(
-		item ? updateEvent : createEvent,
-		null,
-	);
+	const trpc = useTRPC();
+	const queryClient = useQueryClient();
+	const upsertEvent = useMutation(trpc.events.upsert.mutationOptions());
+	const { data: timezone } = useQuery({
+		...trpc.settings.getTimezone.queryOptions(),
+		gcTime: toMs(60),
+	});
+
+	const { data: users = [] } = useQuery({
+		...trpc.settings.getAllUsers.queryOptions(),
+		gcTime: toMs(60),
+	});
 
 	const [allDay, setAllDay] = useState(item?.allDay ?? false);
 	const [invites, setInvites] = useState<string[]>(
@@ -60,14 +63,47 @@ export default function EventForm({
 		start = new Date(date.setHours(start.getHours(), start.getMinutes()));
 	}
 
-	useEffect(() => {
-		if (state?.message) {
-			toast.error(state.message);
-		}
-	}, [state]);
-
 	return (
-		<form action={formAction}>
+		<form
+			action={async (formData: FormData) => {
+				const event = await upsertEvent.mutateAsync({
+					name: formData.get("name") as string,
+					start: new Date(formData.get("start") as string),
+					allDay: formData.get("allDay") === "on",
+					projectId: +(formData.get("projectId") as string),
+					id: +(formData.get("id") as string),
+					repeat: formData.get("repeat")
+						? (Number(formData.get("repeat")) as Frequency)
+						: undefined,
+					description: formData.get("description") as string,
+					end: formData.get("end")
+						? new Date(formData.get("end") as string)
+						: undefined,
+					invites: formData.get("invites")
+						? (formData.get("invites") as string).split(",")
+						: [],
+					repeatUntil: formData.get("repeatUntil")
+						? new Date(formData.get("repeatUntil") as string)
+						: undefined,
+				});
+
+				queryClient.invalidateQueries({
+					queryKey: trpc.events.getByDate.queryKey({
+						date: event.start,
+						projectId: +projectId!,
+					}),
+				});
+				queryClient.invalidateQueries({
+					queryKey: trpc.events.getByWeek.queryKey({
+						projectId: +projectId!,
+					}),
+				});
+
+				router.push(
+					`/${tenant}/projects/${projectId}/events?on=${toMachineDateString(event.start, timezone!)}`,
+				);
+			}}
+		>
 			<CardContent>
 				<div className="my-2 space-y-4">
 					{item ? (

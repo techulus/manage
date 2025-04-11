@@ -6,30 +6,29 @@ import type { EventWithInvites } from "@/drizzle/types";
 import { toMachineDateString } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useQuery } from "@tanstack/react-query";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useQueryState } from "nuqs";
 import EventsList from "./events-list";
 
 export default function EventsCalendar({
-	selectedDate,
 	compact = false,
 	timezone,
 }: {
-	selectedDate?: string;
 	compact?: boolean;
 	timezone: string;
 }) {
-	const router = useRouter();
-	const { tenant, projectId } = useParams();
+	const { projectId } = useParams();
 
+	const [on, setOn] = useQueryState("on");
 	const currentDate = toMachineDateString(
-		selectedDate ? new Date(selectedDate) : new Date(),
+		on ? new Date(on) : new Date(),
 		timezone,
 	);
 
 	const trpc = useTRPC();
 	const { data: events, isLoading } = useQuery({
 		...trpc.events.getByDate.queryOptions({
-			date: selectedDate ? new Date(selectedDate) : new Date(),
+			date: on ? new Date(on) : new Date(),
 			projectId: +projectId!,
 		}),
 		queryHash: `events-${currentDate}-${projectId}`,
@@ -42,9 +41,7 @@ export default function EventsCalendar({
 				mode="single"
 				selected={new Date(currentDate)}
 				onDayClick={(date) => {
-					router.push(
-						`/${tenant}/projects/${projectId}/events?on=${toMachineDateString(date, timezone)}`,
-					);
+					setOn(toMachineDateString(date, timezone));
 				}}
 			/>
 

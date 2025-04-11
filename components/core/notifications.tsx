@@ -1,5 +1,6 @@
 "use client";
 
+import { toMs } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useQuery } from "@tanstack/react-query";
 import { TurboWire } from "@turbowire/web";
@@ -22,9 +23,10 @@ export function Notifications({
 		isLoading: notificationsLoading,
 		refetch: refetchNotifications,
 	} = useQuery(trpc.user.getUserNotifications.queryOptions());
-	const { data: timezone, isLoading: timezoneLoading } = useQuery(
-		trpc.settings.getTimezone.queryOptions(),
-	);
+	const { data: timezone, isLoading: timezoneLoading } = useQuery({
+		...trpc.settings.getTimezone.queryOptions(),
+		gcTime: toMs(60),
+	});
 
 	const unreadCount = notifications?.filter((x) => !x.read).length;
 

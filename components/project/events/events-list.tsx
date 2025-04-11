@@ -1,6 +1,5 @@
 "use client";
 
-import { deleteEvent } from "@/app/(dashboard)/[tenant]/projects/[projectId]/events/actions";
 import EmptyState from "@/components/core/empty-state";
 import { HtmlPreview } from "@/components/core/html-view";
 import { UserAvatar } from "@/components/core/user-avatar";
@@ -18,7 +17,9 @@ import {
 	eventToHumanReadableString,
 	filterByRepeatRule,
 } from "@/lib/utils/useEvents";
+import { useTRPC } from "@/trpc/client";
 import { useUser } from "@clerk/nextjs";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CircleEllipsisIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -41,6 +42,26 @@ export default function EventsList({
 	const { tenant } = useParams();
 	const filteredEvents = events.filter((x) =>
 		filterByRepeatRule(x, new Date(date), timezone),
+	);
+
+	const trpc = useTRPC();
+	const queryClient = useQueryClient();
+	const deleteEvent = useMutation(
+		trpc.events.delete.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: trpc.events.getByDate.queryKey({
+						date: new Date(date),
+						projectId,
+					}),
+				});
+				queryClient.invalidateQueries({
+					queryKey: trpc.events.getByWeek.queryKey({
+						projectId,
+					}),
+				});
+			},
+		}),
 	);
 
 	return (
@@ -106,13 +127,14 @@ export default function EventsList({
 											</Link>
 										</DropdownMenuItem>
 										<DropdownMenuItem className="w-full p-0">
-											<form action={deleteEvent} className="w-full">
-												<input type="hidden" name="id" value={event.id} />
-												<input
-													type="hidden"
-													name="projectId"
-													value={event.projectId}
-												/>
+											<form
+												action={async () => {
+													await deleteEvent.mutateAsync({
+														id: event.id,
+													});
+												}}
+												className="w-full"
+											>
 												<DeleteButton
 													action="Delete"
 													className="w-full"
