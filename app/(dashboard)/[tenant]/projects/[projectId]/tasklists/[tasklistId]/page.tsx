@@ -4,7 +4,7 @@ import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { Progress } from "@/components/ui/progress";
-import { toDateStringWithDay, toMs } from "@/lib/utils/date";
+import { toDateStringWithDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useSuspenseQueries } from "@tanstack/react-query";
 import { CheckCircle, ClockIcon } from "lucide-react";
@@ -21,10 +21,7 @@ export default function TaskLists() {
 			trpc.tasks.getListById.queryOptions({
 				id: +tasklistId!,
 			}),
-			{
-				...trpc.settings.getTimezone.queryOptions(),
-				gcTime: toMs(60),
-			},
+			trpc.settings.getTimezone.queryOptions(),
 		],
 	});
 

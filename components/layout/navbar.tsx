@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import { toMachineDateString, toMs } from "@/lib/utils/date";
+import { toMachineDateString } from "@/lib/utils/date";
 import logo from "@/public/images/logo.png";
 import { useTRPC } from "@/trpc/client";
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
@@ -45,10 +45,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 			trpc.user.getProjects.queryOptions({
 				statuses: ["active"],
 			}),
-			{
-				...trpc.settings.getTimezone.queryOptions(),
-				gcTime: toMs(60),
-			},
+			trpc.settings.getTimezone.queryOptions(),
 		],
 	});
 

@@ -10,14 +10,14 @@ import {
 import { Input } from "@/components/ui/input";
 import type { TaskList, TaskWithDetails } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import { toDateStringWithDay, toMs, toStartOfDay } from "@/lib/utils/date";
+import { toDateStringWithDay, toStartOfDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
 import { AlignJustifyIcon, CalendarClock, FileIcon } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader } from "../../../ui/card";
 import { Checkbox } from "../../../ui/checkbox";
@@ -56,48 +56,44 @@ export const TaskItem = ({
 	const [{ data: users = [] }, { data: taskLists = [] }, { data: timezone }] =
 		useQueries({
 			queries: [
-				{
-					...trpc.settings.getAllUsers.queryOptions(),
-					gcTime: toMs(60),
-				},
+				trpc.settings.getAllUsers.queryOptions(),
 				trpc.tasks.getTaskLists.queryOptions({
 					projectId: +projectId!,
 				}),
-				{
-					...trpc.settings.getTimezone.queryOptions(),
-					gcTime: toMs(60),
-				},
+				trpc.settings.getTimezone.queryOptions(),
 			],
 		});
+
+	const invalidateData = useCallback(() => {
+		queryClient.invalidateQueries({
+			queryKey: trpc.tasks.getListById.queryKey({ id: task.taskListId }),
+		});
+		queryClient.invalidateQueries({
+			queryKey: trpc.tasks.getTaskLists.queryKey({
+				projectId: +projectId!,
+			}),
+		});
+	}, [
+		projectId,
+		task.taskListId,
+		trpc.tasks.getListById.queryKey,
+		trpc.tasks.getTaskLists.queryKey,
+	]);
 
 	const queryClient = useQueryClient();
 	const createTask = useMutation(
 		trpc.tasks.createTask.mutationOptions({
-			onSuccess: () => {
-				queryClient.invalidateQueries({
-					queryKey: trpc.tasks.getListById.queryKey({ id: task.taskListId }),
-				});
-			},
+			onSuccess: invalidateData,
 		}),
 	);
 	const updateTask = useMutation(
 		trpc.tasks.updateTask.mutationOptions({
-			onSuccess: () => {
-				queryClient.invalidateQueries({
-					queryKey: trpc.tasks.getListById.queryKey({
-						id: task.taskListId,
-					}),
-				});
-			},
+			onSuccess: invalidateData,
 		}),
 	);
 	const deleteTask = useMutation(
 		trpc.tasks.deleteTask.mutationOptions({
-			onSuccess: () => {
-				queryClient.invalidateQueries({
-					queryKey: trpc.tasks.getListById.queryKey({ id: task.taskListId }),
-				});
-			},
+			onSuccess: invalidateData,
 		}),
 	);
 
@@ -330,10 +326,19 @@ export const TaskItem = ({
 																className="w-full"
 																action={() => {
 																	toast.promise(
-																		updateTask.mutateAsync({
-																			id: task.id,
-																			taskListId: list.id,
-																		}),
+																		updateTask
+																			.mutateAsync({
+																				id: task.id,
+																				taskListId: list.id,
+																			})
+																			.then(() => {
+																				queryClient.invalidateQueries({
+																					queryKey:
+																						trpc.tasks.getListById.queryKey({
+																							id: list.id,
+																						}),
+																				});
+																			}),
 																		{
 																			loading: "Moving...",
 																			success: "Moved!",
@@ -374,11 +379,20 @@ export const TaskItem = ({
 																className="w-full"
 																action={() => {
 																	toast.promise(
-																		createTask.mutateAsync({
-																			name: task.name,
-																			taskListId: list.id,
-																			status: "todo",
-																		}),
+																		createTask
+																			.mutateAsync({
+																				name: task.name,
+																				taskListId: list.id,
+																				status: "todo",
+																			})
+																			.then(() => {
+																				queryClient.invalidateQueries({
+																					queryKey:
+																						trpc.tasks.getListById.queryKey({
+																							id: list.id,
+																						}),
+																				});
+																			}),
 																		{
 																			loading: "Copying...",
 																			success: "Copied!",

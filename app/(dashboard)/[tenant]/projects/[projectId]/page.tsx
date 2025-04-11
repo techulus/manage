@@ -11,7 +11,7 @@ import WeekCalendar from "@/components/project/events/week-calendar";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { toDateStringWithDay, toMs } from "@/lib/utils/date";
+import { toDateStringWithDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import {
 	useMutation,
@@ -34,10 +34,7 @@ export default function ProjectDetails() {
 	const [{ data: timezone }, { data: project }, { data: taskLists }] =
 		useSuspenseQueries({
 			queries: [
-				{
-					...trpc.settings.getTimezone.queryOptions(),
-					gcTime: toMs(60),
-				},
+				trpc.settings.getTimezone.queryOptions(),
 				trpc.projects.getProjectById.queryOptions({
 					id: projectId,
 				}),

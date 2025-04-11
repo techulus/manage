@@ -6,7 +6,6 @@ import { NotificationItem } from "@/components/core/notification-item";
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { Button } from "@/components/ui/button";
-import { toMs } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useMutation, useQueries } from "@tanstack/react-query";
 
@@ -19,10 +18,7 @@ export default function Notifications() {
 	] = useQueries({
 		queries: [
 			trpc.user.getUserNotifications.queryOptions(),
-			{
-				...trpc.settings.getTimezone.queryOptions(),
-				gcTime: toMs(60),
-			},
+			trpc.settings.getTimezone.queryOptions(),
 		],
 	});
 

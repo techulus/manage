@@ -2,9 +2,9 @@
 
 import { Input } from "@/components/ui/input";
 import type { EventWithInvites } from "@/drizzle/types";
-import { toMachineDateString, toMs } from "@/lib/utils/date";
+import { toMachineDateString } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
 import { Trash2Icon } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
@@ -38,14 +38,12 @@ export default function EventForm({
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
 	const upsertEvent = useMutation(trpc.events.upsert.mutationOptions());
-	const { data: timezone } = useQuery({
-		...trpc.settings.getTimezone.queryOptions(),
-		gcTime: toMs(60),
-	});
 
-	const { data: users = [] } = useQuery({
-		...trpc.settings.getAllUsers.queryOptions(),
-		gcTime: toMs(60),
+	const [{ data: timezone }, { data: users = [] }] = useQueries({
+		queries: [
+			trpc.settings.getTimezone.queryOptions(),
+			trpc.settings.getAllUsers.queryOptions(),
+		],
 	});
 
 	const [allDay, setAllDay] = useState(item?.allDay ?? false);

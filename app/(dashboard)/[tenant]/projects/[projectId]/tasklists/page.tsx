@@ -5,7 +5,7 @@ import PageTitle from "@/components/layout/page-title";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { buttonVariants } from "@/components/ui/button";
 import { useTRPC } from "@/trpc/client";
-import { useSuspenseQueries } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
@@ -17,14 +17,12 @@ export default function TaskLists() {
 	});
 
 	const trpc = useTRPC();
-	const [{ data: taskLists }] = useSuspenseQueries({
-		queries: [
-			trpc.tasks.getTaskLists.queryOptions({
-				projectId: +projectId!,
-				statuses: statuses.split(",") ?? ["active"],
-			}),
-		],
-	});
+	const { data: taskLists } = useSuspenseQuery(
+		trpc.tasks.getTaskLists.queryOptions({
+			projectId: +projectId!,
+			statuses: statuses.split(",") ?? ["active"],
+		}),
+	);
 
 	return (
 		<>

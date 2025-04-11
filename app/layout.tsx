@@ -3,10 +3,10 @@ import { Toaster } from "@/components/ui/sonner";
 import { SITE_METADATA } from "@/data/marketing";
 import { cn } from "@/lib/utils";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Archivo } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const mainFont = Archivo({
+const mainFont = Inter({
 	subsets: ["latin"],
 });
 

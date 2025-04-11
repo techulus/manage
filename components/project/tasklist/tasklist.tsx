@@ -20,7 +20,7 @@ import {
 import {
 	useMutation,
 	useQueryClient,
-	useSuspenseQueries,
+	useSuspenseQuery,
 } from "@tanstack/react-query";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { HtmlPreview } from "../../core/html-view";
@@ -38,13 +38,11 @@ export const TaskListItem = ({
 	compact?: boolean;
 }) => {
 	const trpc = useTRPC();
-	const [{ data: taskList }] = useSuspenseQueries({
-		queries: [
-			trpc.tasks.getListById.queryOptions({
-				id,
-			}),
-		],
-	});
+	const { data: taskList } = useSuspenseQuery(
+		trpc.tasks.getListById.queryOptions({
+			id,
+		}),
+	);
 
 	const queryClient = useQueryClient();
 	const createTask = useMutation(

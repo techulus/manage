@@ -5,7 +5,7 @@ import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import EventsCalendar from "@/components/project/events/events-calendar";
 import { buttonVariants } from "@/components/ui/button";
-import { toDateStringWithDay, toMs } from "@/lib/utils/date";
+import { toDateStringWithDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useUser } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
@@ -34,10 +34,9 @@ export default function EventDetails() {
 	);
 
 	const trpc = useTRPC();
-	const { data: timezone, isLoading } = useQuery({
-		...trpc.settings.getTimezone.queryOptions(),
-		gcTime: toMs(60),
-	});
+	const { data: timezone, isLoading } = useQuery(
+		trpc.settings.getTimezone.queryOptions(),
+	);
 
 	return (
 		<>
