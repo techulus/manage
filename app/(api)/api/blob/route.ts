@@ -1,11 +1,9 @@
-import { blob, document, documentFolder } from "@/drizzle/schema";
+import { blob } from "@/drizzle/schema";
 import { upload } from "@/lib/blobStore";
 import { getAppBaseUrl } from "@/lib/utils/url";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
-import { eq } from "drizzle-orm";
 import mime from "mime-types";
-import { revalidatePath } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 
@@ -15,29 +13,14 @@ export type BlobUploadResult = {
 };
 
 export async function PUT(request: NextRequest) {
-	const { ownerId, userId, orgSlug } = await getOwner();
+	const { ownerId, userId } = await getOwner();
 	const body = await request.blob();
 	const extension = mime.extension(body.type);
-	const folder = request.nextUrl.searchParams.get("folder") ?? null;
-	const projectId = request.nextUrl.searchParams.get("projectId");
 	const name = request.nextUrl.searchParams.get("name") ?? uuidv4();
 
 	const db = await database();
 
 	try {
-		if (folder) {
-			const verifyFolder = await db.query.documentFolder.findFirst({
-				columns: {
-					id: true,
-				},
-				where: eq(documentFolder.id, +folder),
-			});
-
-			if (!verifyFolder) {
-				return NextResponse.error();
-			}
-		}
-
 		const fileId = uuidv4();
 		const key = `${ownerId}/${fileId}`;
 
@@ -55,18 +38,11 @@ export async function PUT(request: NextRequest) {
 				contentType: body.type,
 				contentSize: body.size,
 				createdByUser: userId,
-				documentFolderId: folder ? +folder : null,
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			})
 			.returning()
 			.execute();
-
-		if (folder) {
-			revalidatePath(
-				`/${orgSlug}/projects/${projectId}/documents/folders/${folder}`,
-			);
-		}
 
 		return NextResponse.json<BlobUploadResult>({
 			message: "ok",

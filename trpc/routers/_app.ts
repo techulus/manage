@@ -1,5 +1,4 @@
 import { createTRPCRouter } from "../init";
-import { documentsRouter } from "./documents";
 import { eventsRouter } from "./events";
 import { projectsRouter } from "./projects";
 import { settingsRouter } from "./settings";
@@ -11,7 +10,6 @@ export const appRouter = createTRPCRouter({
 	settings: settingsRouter,
 	projects: projectsRouter,
 	tasks: tasksRouter,
-	documents: documentsRouter,
 	events: eventsRouter,
 });
 

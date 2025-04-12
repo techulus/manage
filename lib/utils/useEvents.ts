@@ -2,6 +2,8 @@ import type { CalendarEvent, EventWithInvites } from "@/drizzle/types";
 import { isSameDay } from "date-fns";
 import { rrulestr } from "rrule";
 import {
+	getEndOfWeek,
+	getStartOfWeek,
 	toDateStringWithDay,
 	toDateTimeString,
 	toEndOfDay,
@@ -38,6 +40,19 @@ export const getStartEndDateRangeInUtc = (
 	return {
 		startOfDay,
 		endOfDay,
+	};
+};
+
+export const getStartEndWeekRangeInUtc = (timezone: string, date: Date) => {
+	const startOfWeekInUserTZ = getStartOfWeek(toTimeZone(date, timezone));
+	const endOfWeekInUserTZ = getEndOfWeek(toTimeZone(date, timezone));
+
+	const startOfWeek = toUTC(startOfWeekInUserTZ, timezone);
+	const endOfWeek = toUTC(endOfWeekInUserTZ, timezone);
+
+	return {
+		startOfWeek,
+		endOfWeek,
 	};
 };
 

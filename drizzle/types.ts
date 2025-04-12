@@ -3,8 +3,6 @@ import type {
 	activity,
 	blob,
 	calendarEvent,
-	document,
-	documentFolder,
 	eventInvite,
 	notification,
 	project,
@@ -17,8 +15,6 @@ export type User = InferSelectModel<typeof user>;
 export type Project = InferSelectModel<typeof project>;
 export type TaskList = InferSelectModel<typeof taskList>;
 export type Task = InferSelectModel<typeof task>;
-export type Document = InferSelectModel<typeof document>;
-export type DocumentFolder = InferSelectModel<typeof documentFolder>;
 export type Blob = InferSelectModel<typeof blob>;
 export type CalendarEvent = InferSelectModel<typeof calendarEvent>;
 export type EventInvite = InferSelectModel<typeof eventInvite>;
@@ -26,12 +22,6 @@ export type Activity = InferSelectModel<typeof activity>;
 export type Notification = InferSelectModel<typeof notification>;
 
 export type ProjectWithCreator = Project & { creator: User };
-
-export type ProjectWithData = Project & {
-	taskLists: TaskListWithTasks[];
-	documents: DocumentWithCreator[];
-	documentFolders: DocumentFolderWithCreator[];
-};
 
 export type TaskWithDetails = Task & {
 	creator: {
@@ -46,19 +36,6 @@ export type TaskWithDetails = Task & {
 
 export type TaskListWithTasks = TaskList & {
 	tasks: TaskWithDetails[];
-};
-
-export type FolderWithContents = DocumentFolder & {
-	documents: DocumentWithCreator[];
-	files: BlobWithCreater[];
-};
-
-export type DocumentWithCreator = Document & {
-	creator: Pick<User, "firstName" | "imageUrl">;
-};
-
-export type DocumentFolderWithCreator = DocumentFolder & {
-	creator: Pick<User, "firstName" | "imageUrl">;
 };
 
 export type BlobWithCreater = Blob & {

@@ -1,4 +1,4 @@
-import { endOfDay, startOfDay } from "date-fns";
+import { endOfDay, endOfWeek, startOfDay, startOfWeek } from "date-fns";
 import { fromZonedTime, toZonedTime } from "date-fns-tz";
 
 export function toTimeZone(date: Date | string, timeZone: string) {
@@ -66,3 +66,15 @@ export function toMachineDateString(date: Date, timeZone: string) {
 }
 
 export const guessTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+export function getStartOfWeek(date: Date) {
+	return startOfWeek(date, { weekStartsOn: 1 });
+}
+
+export function getEndOfWeek(date: Date) {
+	return endOfWeek(date, { weekStartsOn: 1 });
+}
+
+export function toMs(durationInMinutes: number) {
+	return durationInMinutes * 60 * 1000;
+}

@@ -1,11 +1,10 @@
 "use client";
 
-import { deleteEvent } from "@/app/(dashboard)/[tenant]/projects/[projectId]/events/actions";
 import EmptyState from "@/components/core/empty-state";
 import { HtmlPreview } from "@/components/core/html-view";
 import { UserAvatar } from "@/components/core/user-avatar";
 import { DeleteButton } from "@/components/form/button";
-import { buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -18,10 +17,12 @@ import {
 	eventToHumanReadableString,
 	filterByRepeatRule,
 } from "@/lib/utils/useEvents";
+import { useTRPC } from "@/trpc/client";
 import { useUser } from "@clerk/nextjs";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CircleEllipsisIcon } from "lucide-react";
-import Link from "next/link";
 import { useParams } from "next/navigation";
+import { parseAsInteger, useQueryState } from "nuqs";
 import { Assignee } from "../shared/assigee";
 
 export default function EventsList({
@@ -43,13 +44,38 @@ export default function EventsList({
 		filterByRepeatRule(x, new Date(date), timezone),
 	);
 
+	const [_, setEditing] = useQueryState(
+		"editing",
+		parseAsInteger.withDefault(0),
+	);
+
+	const trpc = useTRPC();
+	const queryClient = useQueryClient();
+	const deleteEvent = useMutation(
+		trpc.events.delete.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: trpc.events.getByDate.queryKey({
+						date: new Date(date),
+						projectId,
+					}),
+				});
+				queryClient.invalidateQueries({
+					queryKey: trpc.events.getByWeek.queryKey({
+						projectId,
+					}),
+				});
+			},
+		}),
+	);
+
 	return (
-		<div className="flex w-full flex-col space-y-4 p-4">
+		<div className="flex w-full flex-col space-y-4">
 			{!filteredEvents.length ? (
 				<EmptyState
 					show={!filteredEvents.length}
 					label="event"
-					createLink={`/${tenant}/projects/${projectId}/events/new?on=${date}`}
+					createLink={`/${tenant}/projects/${projectId}/events?on=${date}&create=true`}
 				/>
 			) : null}
 
@@ -95,25 +121,24 @@ export default function EventsList({
 									</DropdownMenuTrigger>
 									<DropdownMenuContent align="end">
 										<DropdownMenuItem className="w-full p-0">
-											<Link
-												href={`/${tenant}/projects/${projectId}/events/${event.id}/edit`}
-												className={buttonVariants({
-													variant: "ghost",
-													className: "w-full",
-												})}
-												prefetch={false}
+											<Button
+												variant="ghost"
+												className="w-full"
+												size="sm"
+												onClick={() => setEditing(event.id)}
 											>
 												Edit
-											</Link>
+											</Button>
 										</DropdownMenuItem>
 										<DropdownMenuItem className="w-full p-0">
-											<form action={deleteEvent} className="w-full">
-												<input type="hidden" name="id" value={event.id} />
-												<input
-													type="hidden"
-													name="projectId"
-													value={event.projectId}
-												/>
+											<form
+												action={async () => {
+													await deleteEvent.mutateAsync({
+														id: event.id,
+													});
+												}}
+												className="w-full"
+											>
 												<DeleteButton
 													action="Delete"
 													className="w-full"

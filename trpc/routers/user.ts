@@ -1,13 +1,13 @@
 import { notification, project, user } from "@/drizzle/schema";
 import type { NotificationWithUser } from "@/drizzle/types";
-import { getSignedWireUrl } from "@/lib/utils/turbowire";
+import { broadcastEvent, getSignedWireUrl } from "@/lib/utils/turbowire";
 import { currentUser } from "@clerk/nextjs/server";
 import { and, desc, eq, like, or } from "drizzle-orm";
 import { z } from "zod";
-import { baseProcedure, createTRPCRouter } from "../init";
+import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const userRouter = createTRPCRouter({
-	getCurrentUser: baseProcedure.query(async ({ ctx }) => {
+	getCurrentUser: protectedProcedure.query(async ({ ctx }) => {
 		const userData = await currentUser();
 		if (!userData) {
 			throw new Error("User not found");
@@ -22,10 +22,10 @@ export const userRouter = createTRPCRouter({
 
 		return userDetails;
 	}),
-	getNotificationsWire: baseProcedure.query(async ({ ctx }) => {
+	getNotificationsWire: protectedProcedure.query(async ({ ctx }) => {
 		return getSignedWireUrl("notifications", ctx.userId);
 	}),
-	getUserNotifications: baseProcedure.query(async ({ ctx }) => {
+	getUserNotifications: protectedProcedure.query(async ({ ctx }) => {
 		const notifications = await ctx.db.query.notification.findMany({
 			where: eq(notification.toUser, ctx.userId),
 			with: {
@@ -37,7 +37,15 @@ export const userRouter = createTRPCRouter({
 
 		return notifications as NotificationWithUser[];
 	}),
-	getProjects: baseProcedure
+	markNotificationsAsRead: protectedProcedure.mutation(async ({ ctx }) => {
+		await ctx.db
+			.update(notification)
+			.set({ read: true })
+			.where(eq(notification.toUser, ctx.userId))
+			.execute();
+		await broadcastEvent("notifications", ctx.userId);
+	}),
+	getProjects: protectedProcedure
 		.input(
 			z
 				.object({

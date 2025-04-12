@@ -15,7 +15,7 @@ export default async function Settings() {
 		<>
 			<PageTitle title="Settings" />
 
-			<PageSection topInset bottomMargin>
+			<PageSection bottomMargin>
 				<h2 className="flex items-center text-xl font-semibold leading-7 text-gray-900 dark:text-gray-200 p-4">
 					<HardDrive className="mr-2 inline-block h-6 w-6" />
 					Storage

@@ -1,5 +1,7 @@
-import { deleteComment } from "@/app/(dashboard)/[tenant]/projects/actions";
+"use client";
+
 import { HtmlPreview } from "@/components/core/html-view";
+import { SpinnerWithSpacing } from "@/components/core/loaders";
 import { UserAvatar } from "@/components/core/user-avatar";
 import { DeleteButton } from "@/components/form/button";
 import {
@@ -8,84 +10,93 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { comment } from "@/drizzle/schema";
 import { cn } from "@/lib/utils";
-import { database } from "@/lib/utils/useDatabase";
-import { getOwner } from "@/lib/utils/useOwner";
-import { and, desc, eq } from "drizzle-orm";
+import { useTRPC } from "@/trpc/client";
+import { useUser } from "@clerk/nextjs";
+import {
+	useMutation,
+	useQueryClient,
+	useSuspenseQuery,
+} from "@tanstack/react-query";
 import { CircleEllipsisIcon } from "lucide-react";
+import { useParams } from "next/navigation";
+import { Suspense } from "react";
 
-export async function Comments({
-	parentId,
-	projectId,
-	type,
+export function Comments({
+	roomId,
 	className,
 }: {
-	type: string;
-	parentId: string | number;
-	projectId: string | number;
+	roomId: string;
 	className?: string;
 }) {
-	const { userId } = await getOwner();
+	const { projectId } = useParams();
+	const { user } = useUser();
+	const queryClient = useQueryClient();
 
-	const db = await database();
-	const comments = await db.query.comment.findMany({
-		where: and(eq(comment.parentId, +parentId), eq(comment.type, type)),
-		orderBy: desc(comment.createdAt),
-		with: {
-			creator: true,
-		},
-	});
+	const trpc = useTRPC();
+	const { data: comments = [] } = useSuspenseQuery(
+		trpc.projects.getComments.queryOptions({
+			roomId,
+		}),
+	);
+	const deleteComment = useMutation(
+		trpc.projects.deleteComment.mutationOptions(),
+	);
 
 	return (
-		<div className={cn("flex flex-col divide-y", className)}>
-			{comments.map((comment) => (
-				<div
-					key={`${comment.type}-${comment.id}`}
-					className="relative flex pt-2"
-				>
-					<div className="flex space-x-4">
-						<div className="hidden w-[160px] text-xs text-muted-foreground md:block">
-							{new Date(comment.createdAt).toLocaleString()}
-						</div>
-						{comment.creator ? <UserAvatar user={comment.creator} /> : null}
-						<div>
-							<div className="font-semibold">
-								{comment.creator?.firstName ?? "User"}
-								<span className="ml-2 text-xs text-muted-foreground md:hidden">
-									{new Date(comment.createdAt).toLocaleString()}
-								</span>
+		<Suspense fallback={<SpinnerWithSpacing />}>
+			<div className={cn("flex flex-col divide-y", className)}>
+				{comments.map((comment) => (
+					<div key={comment.id} className="relative flex pt-2">
+						<div className="flex space-x-4">
+							<div className="hidden w-[160px] text-xs text-muted-foreground md:block">
+								{new Date(comment.createdAt).toLocaleString()}
 							</div>
-							<HtmlPreview content={comment.content} />
+							{comment.creator ? <UserAvatar user={comment.creator} /> : null}
+							<div>
+								<div className="font-semibold">
+									{comment.creator?.firstName ?? "User"}
+									<span className="ml-2 text-xs text-muted-foreground md:hidden">
+										{new Date(comment.createdAt).toLocaleString()}
+									</span>
+								</div>
+								<HtmlPreview content={comment.content} />
 
-							{comment.creator?.id === userId ? (
-								<DropdownMenu>
-									<DropdownMenuTrigger className="absolute right-2 top-4">
-										<CircleEllipsisIcon className="h-6 w-6" />
-									</DropdownMenuTrigger>
-									<DropdownMenuContent align="end">
-										<DropdownMenuItem className="m-0 p-0">
-											<form action={deleteComment}>
-												<input type="hidden" name="id" value={comment.id} />
-												<input
-													type="hidden"
-													name="projectId"
-													value={projectId}
-												/>
-												<DeleteButton
-													action="Delete"
-													className="w-full"
-													compact
-												/>
-											</form>
-										</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							) : null}
+								{comment.creator?.id === user?.id ? (
+									<DropdownMenu>
+										<DropdownMenuTrigger className="absolute right-2 top-4">
+											<CircleEllipsisIcon className="h-6 w-6" />
+										</DropdownMenuTrigger>
+										<DropdownMenuContent align="end">
+											<DropdownMenuItem className="m-0 p-0">
+												<form
+													action={async () => {
+														await deleteComment.mutateAsync({
+															id: comment.id,
+															projectId: +projectId!,
+														});
+														queryClient.invalidateQueries({
+															queryKey: trpc.projects.getComments.queryKey({
+																roomId,
+															}),
+														});
+													}}
+												>
+													<DeleteButton
+														action="Delete"
+														className="w-full"
+														compact
+													/>
+												</form>
+											</DropdownMenuItem>
+										</DropdownMenuContent>
+									</DropdownMenu>
+								) : null}
+							</div>
 						</div>
 					</div>
-				</div>
-			))}
-		</div>
+				))}
+			</div>
+		</Suspense>
 	);
 }

@@ -20,7 +20,6 @@ export function Footer() {
 							<Link
 								href={item.href}
 								className="text-sm font-semibold leading-6 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
-								prefetch={false}
 							>
 								{item.name}
 							</Link>

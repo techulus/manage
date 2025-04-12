@@ -1,10 +1,12 @@
-import { blob } from "@/drizzle/schema";
-import { sql } from "drizzle-orm";
+import { blob, user } from "@/drizzle/schema";
+import type { User } from "@/drizzle/types";
+import { eq, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { baseProcedure, createTRPCRouter } from "../init";
+import { z } from "zod";
+import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const settingsRouter = createTRPCRouter({
-	getStorageUsage: baseProcedure.query(async ({ ctx }) => {
+	getStorageUsage: protectedProcedure.query(async ({ ctx }) => {
 		const details = await ctx.db
 			.select({
 				count: sql<number>`count(*)`,
@@ -18,11 +20,33 @@ export const settingsRouter = createTRPCRouter({
 			count: details?.[0].count ?? 0,
 		};
 	}),
-	getTimezone: baseProcedure.query(async () => {
+	saveTimezone: protectedProcedure
+		.input(z.string())
+		.mutation(async ({ ctx, input }) => {
+			const cookieStore = await cookies();
+			cookieStore.set("userTimezone", input, {
+				path: "/",
+				sameSite: "strict",
+				maxAge: 60 * 60 * 24 * 365,
+			});
+
+			await ctx.db
+				.update(user)
+				.set({ timeZone: input })
+				.where(eq(user.id, ctx.userId))
+				.execute();
+		}),
+	getTimezone: protectedProcedure.output(z.string()).query(async () => {
 		const cookieStore = await cookies();
 		return (
 			cookieStore.get("userTimezone")?.value ??
 			Intl.DateTimeFormat().resolvedOptions().timeZone
 		);
 	}),
+	getAllUsers: protectedProcedure
+		.input(z.boolean().optional().default(false))
+		.query(async ({ ctx, input }) => {
+			const users: User[] = (await ctx.db.query.user.findMany()) ?? [];
+			return input ? users : users.filter((user) => user.id !== ctx.userId);
+		}),
 });

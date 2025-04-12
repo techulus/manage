@@ -1,7 +1,7 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import type { DocumentFolder, Project, TaskList } from "@/drizzle/types";
+import type { Project, TaskList } from "@/drizzle/types";
 import Editor from "../editor";
 import { DateTimePicker } from "../project/events/date-time-picker";
 
@@ -9,7 +9,7 @@ export default function SharedForm({
 	item,
 	showDueDate = true,
 }: {
-	item?: Project | TaskList | DocumentFolder | null;
+	item?: Project | TaskList | null;
 	showDueDate?: boolean;
 }) {
 	return (

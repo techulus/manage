@@ -19,7 +19,7 @@ export async function Header() {
 						className="-mt-2 mr-2"
 					/>
 
-					<Link href="/" className="-m-1.5 p-1.5" prefetch={false}>
+					<Link href="/" className="-m-1.5 p-1.5">
 						<p className="relative tracking-tight">
 							Manage
 							<sup className="absolute left-[calc(100%+.1rem)] top-0 text-xs">
@@ -32,7 +32,6 @@ export async function Header() {
 				<Link
 					className={buttonVariants({ size: "sm", variant: "outline" })}
 					href="/start"
-					prefetch={false}
 				>
 					Console
 				</Link>
