@@ -55,7 +55,7 @@ export function PageLoading() {
 				</div>
 			</PageTitle>
 
-			<PageSection topInset bottomMargin>
+			<PageSection bottomMargin>
 				<div className="flex flex-col space-y-2 p-4">
 					<Skeleton className="h-[20px] w-full rounded-md bg-muted-foreground/20" />
 					<Skeleton className="h-[20px] w-full rounded-md bg-muted-foreground/20" />

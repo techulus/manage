@@ -1,6 +1,8 @@
 "use client";
 
+import { Panel } from "@/components/core/panel";
 import PageSection from "@/components/core/section";
+import EventForm from "@/components/form/event";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import EventsCalendar from "@/components/project/events/events-calendar";
@@ -8,11 +10,12 @@ import { buttonVariants } from "@/components/ui/button";
 import { toDateStringWithDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useUser } from "@clerk/nextjs";
+import { Title } from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { RssIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useQueryState } from "nuqs";
+import { parseAsBoolean, useQueryState } from "nuqs";
 import { useMemo } from "react";
 
 export default function EventDetails() {
@@ -20,6 +23,14 @@ export default function EventDetails() {
 	const { user } = useUser();
 
 	const [on] = useQueryState("on");
+	const [create, setCreate] = useQueryState(
+		"create",
+		parseAsBoolean.withDefault(false),
+	);
+	const [editing, setEditing] = useQueryState(
+		"editing",
+		parseAsBoolean.withDefault(false),
+	);
 	const selectedDate = on ? new Date(on) : new Date();
 
 	const dayCommentId = useMemo(
@@ -43,14 +54,14 @@ export default function EventDetails() {
 			<PageTitle
 				title="Events"
 				actionLabel="New"
-				actionLink={`/${tenant}/projects/${projectId}/events/new`}
+				actionLink={`/${tenant}/projects/${projectId}/events?create=true`}
 			>
 				<div className="font-medium text-gray-500">
 					{isLoading ? null : toDateStringWithDay(selectedDate, timezone!)}
 				</div>
 			</PageTitle>
 
-			<PageSection topInset>
+			<PageSection>
 				<div className="flex justify-between p-1">
 					<div className="isolate inline-flex sm:space-x-3">
 						<span className="inline-flex space-x-1">
@@ -77,6 +88,20 @@ export default function EventDetails() {
 					roomId={`project/${projectId}/event/${dayCommentId}`}
 				/>
 			</div>
+
+			<Panel open={editing}>
+				<Title>
+					<PageTitle title="Edit Event" compact />
+				</Title>
+				<EventForm />
+			</Panel>
+
+			<Panel open={create} setOpen={setCreate}>
+				<Title>
+					<PageTitle title="Create Event" compact />
+				</Title>
+				<EventForm />
+			</Panel>
 		</>
 	);
 }

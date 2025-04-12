@@ -23,7 +23,7 @@ export default function CreateProject() {
 	return (
 		<>
 			<PageTitle title="Create Project" />
-			<PageSection topInset>
+			<PageSection>
 				<form
 					action={async (formData) => {
 						await createProject.mutateAsync({

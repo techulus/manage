@@ -31,7 +31,7 @@ export default function EditTaskList() {
 		<>
 			<PageTitle title="Update Task list" />
 
-			<PageSection topInset>
+			<PageSection>
 				<form
 					action={async (formData) => {
 						const name = formData.get("name") as string;

@@ -1,5 +1,6 @@
 "use client";
 
+import { Panel } from "@/components/core/panel";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -14,6 +15,7 @@ import { toDateStringWithDay, toStartOfDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Close, Title } from "@radix-ui/react-dialog";
 import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
 import { AlignJustifyIcon, CalendarClock, FileIcon, X } from "lucide-react";
 import { useParams } from "next/navigation";
@@ -179,8 +181,8 @@ export const TaskItem = ({
 				) : null}
 			</Card>
 
-			{detailsOpen ? (
-				<div className="absolute top-28 bottom-0 right-0 w-full sm:max-w-[650px] bg-background shadow-lg flex flex-col sm:rounded-tl-lg border animate-in slide-in-from-right duration-300 z-50">
+			<Panel open={detailsOpen} setOpen={setDetailsOpen}>
+				<Title>
 					<div className="flex items-center px-4 h-14 border-b">
 						<div className="flex items-center flex-1">
 							<Checkbox
@@ -223,73 +225,32 @@ export const TaskItem = ({
 								</span>
 							)}
 						</div>
-						<button
-							type="button"
-							onClick={() => setDetailsOpen(false)}
-							onKeyDown={(e) => {
-								if (e.key === "Escape") setDetailsOpen(false);
-							}}
-							className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
-						>
-							<X className="h-6 w-6" />
-							<span className="sr-only">Close</span>
-						</button>
+						<Close asChild>
+							<button
+								type="button"
+								aria-label="Close"
+								className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
+							>
+								<X className="h-6 w-6" />
+								<span className="sr-only">Close</span>
+							</button>
+						</Close>
 					</div>
+				</Title>
 
-					<div className="flex-1 overflow-y-auto">
-						<div className="space-y-6 p-6">
-							<div className="space-y-1">
-								<h4 className="text-sm font-medium">Notes</h4>
-								<TaskNotesForm task={task} />
-							</div>
+				<div className="flex-1 overflow-hidden overflow-y-scroll">
+					<div className="space-y-6 p-6">
+						<div className="space-y-1">
+							<h4 className="text-sm font-medium">Notes</h4>
+							<TaskNotesForm task={task} />
+						</div>
 
-							<div className="space-y-1">
-								<h4 className="text-sm font-medium">Assigned to</h4>
-								<div className="flex items-center justify-between">
-									{task.assignee ? (
-										<>
-											<Assignee user={task.assignee} />
-											<Button
-												size="sm"
-												variant="outline"
-												className="text-primary hover:text-red-500"
-												onClick={() => {
-													toast.promise(
-														updateTask.mutateAsync({
-															id: task.id,
-															assignedToUser: null,
-														}),
-														updateTaskToastOptions,
-													);
-												}}
-											>
-												Unassign
-											</Button>
-										</>
-									) : (
-										<AssignToUser
-											users={users}
-											onUpdate={(userId) => {
-												toast.promise(
-													updateTask.mutateAsync({
-														id: task.id,
-														assignedToUser: userId,
-													}),
-													updateTaskToastOptions,
-												);
-											}}
-										/>
-									)}
-								</div>
-							</div>
-
-							<div className="space-y-1">
-								<h4 className="text-sm font-medium">Due</h4>
-								{task.dueDate ? (
-									<div className="flex items-center justify-between">
-										<p className="text-sm">
-											{toDateStringWithDay(task.dueDate, timezone!)}
-										</p>
+						<div className="space-y-1">
+							<h4 className="text-sm font-medium">Assigned to</h4>
+							<div className="flex items-center justify-between">
+								{task.assignee ? (
+									<>
+										<Assignee user={task.assignee} />
 										<Button
 											size="sm"
 											variant="outline"
@@ -298,201 +259,241 @@ export const TaskItem = ({
 												toast.promise(
 													updateTask.mutateAsync({
 														id: task.id,
-														dueDate: null,
+														assignedToUser: null,
 													}),
 													updateTaskToastOptions,
 												);
 											}}
 										>
-											Remove
+											Unassign
 										</Button>
-									</div>
+									</>
 								) : (
-									<div className="w-[220px]">
-										<DateTimePicker
-											dateOnly
-											name="dueDate"
-											onSelect={(dueDate) => {
-												toast.promise(
-													updateTask.mutateAsync({
-														id: task.id,
-														dueDate: toStartOfDay(dueDate).toISOString(),
-													}),
-													updateTaskToastOptions,
-												);
-											}}
-										/>
-									</div>
+									<AssignToUser
+										users={users}
+										onUpdate={(userId) => {
+											toast.promise(
+												updateTask.mutateAsync({
+													id: task.id,
+													assignedToUser: userId,
+												}),
+												updateTaskToastOptions,
+											);
+										}}
+									/>
 								)}
 							</div>
-
-							<div className="space-y-1">
-								<div className="flex items-center justify-between">
-									<h4 className="text-sm font-medium">Created By</h4>
-									<div className="space-x-2">
-										<Button
-											size="sm"
-											variant="outline"
-											className="text-primary"
-											onClick={async () => {
-												setIsEditing((val) => !val);
-
-												if (!isEditing) return;
-
-												toast.promise(
-													updateTask.mutateAsync({
-														id: task.id,
-														name,
-													}),
-													updateTaskToastOptions,
-												);
-											}}
-										>
-											{isEditing ? "Save" : "Edit"}
-										</Button>
-										<Button
-											size="sm"
-											variant="outline"
-											className="text-primary hover:text-red-500"
-											onClick={() => {
-												toast.promise(
-													deleteTask.mutateAsync({
-														id: task.id,
-													}),
-													{
-														loading: "Deleting...",
-														success: "Deleted!",
-														error: "Error while deleting, please try again.",
-													},
-												);
-											}}
-										>
-											Delete
-										</Button>
-									</div>
-								</div>
-								<p className="text-sm text-muted-foreground">
-									{task.creator?.firstName}
-								</p>
-							</div>
-
-							{taskLists?.filter((x) => x.id !== task.taskListId)?.length ? (
-								<div className="space-y-1">
-									<h4 className="text-sm font-medium">Actions</h4>
-									<div className="flex items-center space-x-2">
-										<DropdownMenu>
-											<DropdownMenuTrigger asChild>
-												<Button
-													variant="outline"
-													size="sm"
-													className="text-primary"
-												>
-													Move to...
-												</Button>
-											</DropdownMenuTrigger>
-											<DropdownMenuContent>
-												{taskLists
-													.filter((x) => x.id !== task.taskListId)
-													.map((list) => (
-														<DropdownMenuItem key={list.id} className="w-full">
-															<form
-																className="w-full"
-																action={() => {
-																	toast.promise(
-																		updateTask
-																			.mutateAsync({
-																				id: task.id,
-																				taskListId: list.id,
-																			})
-																			.then(() => {
-																				queryClient.invalidateQueries({
-																					queryKey:
-																						trpc.tasks.getListById.queryKey({
-																							id: list.id,
-																						}),
-																				});
-																			}),
-																		{
-																			loading: "Moving...",
-																			success: "Moved!",
-																			error:
-																				"Error while moving, please try again.",
-																		},
-																	);
-																}}
-															>
-																<button
-																	type="submit"
-																	className="w-full text-left"
-																>
-																	{list.name}
-																</button>
-															</form>
-														</DropdownMenuItem>
-													))}
-											</DropdownMenuContent>
-										</DropdownMenu>
-
-										<DropdownMenu>
-											<DropdownMenuTrigger asChild>
-												<Button
-													variant="outline"
-													size="sm"
-													className="text-primary"
-												>
-													Copy to...
-												</Button>
-											</DropdownMenuTrigger>
-											<DropdownMenuContent>
-												{taskLists
-													.filter((x) => x.id !== task.taskListId)
-													.map((list: TaskList) => (
-														<DropdownMenuItem key={list.id} className="w-full">
-															<form
-																className="w-full"
-																action={() => {
-																	toast.promise(
-																		createTask
-																			.mutateAsync({
-																				name: task.name,
-																				taskListId: list.id,
-																				status: "todo",
-																			})
-																			.then(() => {
-																				queryClient.invalidateQueries({
-																					queryKey:
-																						trpc.tasks.getListById.queryKey({
-																							id: list.id,
-																						}),
-																				});
-																			}),
-																		{
-																			loading: "Copying...",
-																			success: "Copied!",
-																			error:
-																				"Error while copying, please try again.",
-																		},
-																	);
-																}}
-															>
-																<button
-																	type="submit"
-																	className="w-full text-left"
-																>
-																	{list.name}
-																</button>
-															</form>
-														</DropdownMenuItem>
-													))}
-											</DropdownMenuContent>
-										</DropdownMenu>
-									</div>
-								</div>
-							) : null}
 						</div>
+
+						<div className="space-y-1">
+							<h4 className="text-sm font-medium">Due</h4>
+							{task.dueDate ? (
+								<div className="flex items-center justify-between">
+									<p className="text-sm">
+										{toDateStringWithDay(task.dueDate, timezone!)}
+									</p>
+									<Button
+										size="sm"
+										variant="outline"
+										className="text-primary hover:text-red-500"
+										onClick={() => {
+											toast.promise(
+												updateTask.mutateAsync({
+													id: task.id,
+													dueDate: null,
+												}),
+												updateTaskToastOptions,
+											);
+										}}
+									>
+										Remove
+									</Button>
+								</div>
+							) : (
+								<div className="w-[220px]">
+									<DateTimePicker
+										dateOnly
+										name="dueDate"
+										onSelect={(dueDate) => {
+											toast.promise(
+												updateTask.mutateAsync({
+													id: task.id,
+													dueDate: toStartOfDay(dueDate).toISOString(),
+												}),
+												updateTaskToastOptions,
+											);
+										}}
+									/>
+								</div>
+							)}
+						</div>
+
+						<div className="space-y-1">
+							<div className="flex items-center justify-between">
+								<h4 className="text-sm font-medium">Created By</h4>
+								<div className="space-x-2">
+									<Button
+										size="sm"
+										variant="outline"
+										className="text-primary"
+										onClick={async () => {
+											setIsEditing((val) => !val);
+
+											if (!isEditing) return;
+
+											toast.promise(
+												updateTask.mutateAsync({
+													id: task.id,
+													name,
+												}),
+												updateTaskToastOptions,
+											);
+										}}
+									>
+										{isEditing ? "Save" : "Edit"}
+									</Button>
+									<Button
+										size="sm"
+										variant="outline"
+										className="text-primary hover:text-red-500"
+										onClick={() => {
+											toast.promise(
+												deleteTask.mutateAsync({
+													id: task.id,
+												}),
+												{
+													loading: "Deleting...",
+													success: "Deleted!",
+													error: "Error while deleting, please try again.",
+												},
+											);
+										}}
+									>
+										Delete
+									</Button>
+								</div>
+							</div>
+							<p className="text-sm text-muted-foreground">
+								{task.creator?.firstName}
+							</p>
+						</div>
+
+						{taskLists?.filter((x) => x.id !== task.taskListId)?.length ? (
+							<div className="space-y-1">
+								<h4 className="text-sm font-medium">Actions</h4>
+								<div className="flex items-center space-x-2">
+									<DropdownMenu>
+										<DropdownMenuTrigger asChild>
+											<Button
+												variant="outline"
+												size="sm"
+												className="text-primary"
+											>
+												Move to...
+											</Button>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent>
+											{taskLists
+												.filter((x) => x.id !== task.taskListId)
+												.map((list) => (
+													<DropdownMenuItem key={list.id} className="w-full">
+														<form
+															className="w-full"
+															action={() => {
+																toast.promise(
+																	updateTask
+																		.mutateAsync({
+																			id: task.id,
+																			taskListId: list.id,
+																		})
+																		.then(() => {
+																			queryClient.invalidateQueries({
+																				queryKey:
+																					trpc.tasks.getListById.queryKey({
+																						id: list.id,
+																					}),
+																			});
+																		}),
+																	{
+																		loading: "Moving...",
+																		success: "Moved!",
+																		error:
+																			"Error while moving, please try again.",
+																	},
+																);
+															}}
+														>
+															<button
+																type="submit"
+																className="w-full text-left"
+															>
+																{list.name}
+															</button>
+														</form>
+													</DropdownMenuItem>
+												))}
+										</DropdownMenuContent>
+									</DropdownMenu>
+
+									<DropdownMenu>
+										<DropdownMenuTrigger asChild>
+											<Button
+												variant="outline"
+												size="sm"
+												className="text-primary"
+											>
+												Copy to...
+											</Button>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent>
+											{taskLists
+												.filter((x) => x.id !== task.taskListId)
+												.map((list: TaskList) => (
+													<DropdownMenuItem key={list.id} className="w-full">
+														<form
+															className="w-full"
+															action={() => {
+																toast.promise(
+																	createTask
+																		.mutateAsync({
+																			name: task.name,
+																			taskListId: list.id,
+																			status: "todo",
+																		})
+																		.then(() => {
+																			queryClient.invalidateQueries({
+																				queryKey:
+																					trpc.tasks.getListById.queryKey({
+																						id: list.id,
+																					}),
+																			});
+																		}),
+																	{
+																		loading: "Copying...",
+																		success: "Copied!",
+																		error:
+																			"Error while copying, please try again.",
+																	},
+																);
+															}}
+														>
+															<button
+																type="submit"
+																className="w-full text-left"
+															>
+																{list.name}
+															</button>
+														</form>
+													</DropdownMenuItem>
+												))}
+										</DropdownMenuContent>
+									</DropdownMenu>
+								</div>
+							</div>
+						) : null}
 					</div>
 				</div>
-			) : null}
+			</Panel>
 		</>
 	);
 };

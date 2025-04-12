@@ -48,7 +48,7 @@ export default function Projects() {
 				actionLink={`/${orgSlug}/projects/new`}
 			/>
 
-			<PageSection topInset bottomMargin>
+			<PageSection bottomMargin>
 				<form onSubmit={handleSearch}>
 					<div className="mx-auto w-full max-w-7xl">
 						<label htmlFor="search" className="sr-only">

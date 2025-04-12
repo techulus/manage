@@ -4,7 +4,7 @@ import EmptyState from "@/components/core/empty-state";
 import { HtmlPreview } from "@/components/core/html-view";
 import { UserAvatar } from "@/components/core/user-avatar";
 import { DeleteButton } from "@/components/form/button";
-import { buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -21,8 +21,8 @@ import { useTRPC } from "@/trpc/client";
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CircleEllipsisIcon } from "lucide-react";
-import Link from "next/link";
 import { useParams } from "next/navigation";
+import { parseAsInteger, useQueryState } from "nuqs";
 import { Assignee } from "../shared/assigee";
 
 export default function EventsList({
@@ -42,6 +42,11 @@ export default function EventsList({
 	const { tenant } = useParams();
 	const filteredEvents = events.filter((x) =>
 		filterByRepeatRule(x, new Date(date), timezone),
+	);
+
+	const [_, setEditing] = useQueryState(
+		"editing",
+		parseAsInteger.withDefault(0),
 	);
 
 	const trpc = useTRPC();
@@ -70,7 +75,7 @@ export default function EventsList({
 				<EmptyState
 					show={!filteredEvents.length}
 					label="event"
-					createLink={`/${tenant}/projects/${projectId}/events/new?on=${date}`}
+					createLink={`/${tenant}/projects/${projectId}/events?on=${date}&create=true`}
 				/>
 			) : null}
 
@@ -116,15 +121,14 @@ export default function EventsList({
 									</DropdownMenuTrigger>
 									<DropdownMenuContent align="end">
 										<DropdownMenuItem className="w-full p-0">
-											<Link
-												href={`/${tenant}/projects/${projectId}/events/${event.id}/edit`}
-												className={buttonVariants({
-													variant: "ghost",
-													className: "w-full",
-												})}
+											<Button
+												variant="ghost"
+												className="w-full"
+												size="sm"
+												onClick={() => setEditing(event.id)}
 											>
 												Edit
-											</Link>
+											</Button>
 										</DropdownMenuItem>
 										<DropdownMenuItem className="w-full p-0">
 											<form

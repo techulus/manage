@@ -91,7 +91,7 @@ export default function ProjectDetails() {
 				) : null}
 			</PageTitle>
 
-			<PageSection topInset>
+			<PageSection>
 				{project.description ? (
 					<div className="flex flex-col px-4 py-2 lg:px-8">
 						<HtmlPreview content={project.description ?? ""} />

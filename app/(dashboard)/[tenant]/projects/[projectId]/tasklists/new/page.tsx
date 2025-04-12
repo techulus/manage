@@ -27,7 +27,7 @@ export default function CreateTaskList() {
 		<>
 			<PageTitle title="Create task list" />
 
-			<PageSection topInset>
+			<PageSection>
 				<form
 					action={async (formData) => {
 						const name = formData.get("name") as string;

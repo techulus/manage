@@ -37,7 +37,7 @@ export default function EditProject() {
 		<Suspense fallback={<PageLoading />}>
 			<PageTitle title={project.name} />
 
-			<PageSection topInset>
+			<PageSection>
 				<form
 					action={async (formData) => {
 						await updateProject.mutateAsync({

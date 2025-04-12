@@ -7,7 +7,7 @@ export default function ActivityDetails() {
 		<>
 			<PageTitle title="Activity" />
 
-			<PageSection topInset>
+			<PageSection>
 				<ActivityFeed />
 			</PageSection>
 		</>

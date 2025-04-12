@@ -47,7 +47,7 @@ export default function Notifications() {
 				</Button>
 			</PageTitle>
 
-			<PageSection topInset className="overflow-hidden">
+			<PageSection className="overflow-hidden">
 				{!notifications?.length ? (
 					<div className="text-center text-muted-foreground p-6 text-sm">
 						No notifications

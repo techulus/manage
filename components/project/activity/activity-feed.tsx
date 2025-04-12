@@ -94,6 +94,7 @@ export function ActivityFeed() {
 	const [allActivities, setAllActivities] = useState<ActivityWithActor[]>([]);
 
 	const trpc = useTRPC();
+	// Use useInfiniteQuery to fetch activities
 	const { data: activities = [], isLoading } = useQuery(
 		trpc.projects.getActivities.queryOptions({
 			projectId: +projectId!,
