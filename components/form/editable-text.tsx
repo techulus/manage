@@ -72,7 +72,7 @@ export default function EditableText({
 							Update {label}
 						</Dialog.Title>
 						<div className="relative px-3 py-2 mt-2 bg-background rounded-md space-y-2">
-							<Dialog.Close asChild className="absolute right-0 top-0 -mt-10">
+							<Dialog.Close asChild className="absolute right-0 top-1 -mt-12">
 								<Button type="button" variant="ghost">
 									<X className="w-5 h-5 text-primary" />
 								</Button>
