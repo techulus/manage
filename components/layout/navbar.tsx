@@ -222,7 +222,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				</div>
 			</div>
 
-			<div className="sticky top-0 z-10 border-b backdrop-blur-lg transition-all duration-200 bg-transparent">
+			<div className="sticky top-0 z-10 border-b backdrop-blur-lg transition-all duration-200 bg-transparent text-sm">
 				<nav
 					className="flex px-4 overflow-x-auto backdrop-blur-sm"
 					suppressHydrationWarning

@@ -22,7 +22,18 @@ export default function EditTaskList() {
 	);
 
 	const upsertTaskList = useMutation(
-		trpc.tasks.upsertTaskList.mutationOptions(),
+		trpc.tasks.upsertTaskList.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: trpc.tasks.getListById.queryKey({ id: +tasklistId! }),
+				});
+				queryClient.invalidateQueries({
+					queryKey: trpc.tasks.getTaskLists.queryKey({
+						projectId: +projectId!,
+					}),
+				});
+			},
+		}),
 	);
 
 	const backUrl = `/${tenant}/projects/${projectId}/tasklists`;
@@ -46,15 +57,6 @@ export default function EditTaskList() {
 							description,
 							dueDate,
 							status: status ?? "active",
-						});
-
-						queryClient.invalidateQueries({
-							queryKey: trpc.tasks.getListById.queryKey({ id: +tasklistId! }),
-						});
-						queryClient.invalidateQueries({
-							queryKey: trpc.tasks.getTaskLists.queryKey({
-								projectId: +projectId!,
-							}),
 						});
 
 						router.push(

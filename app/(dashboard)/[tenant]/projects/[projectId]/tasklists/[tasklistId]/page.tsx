@@ -6,16 +6,21 @@ import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { Progress } from "@/components/ui/progress";
 import { toDateStringWithDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
-import { useSuspenseQueries } from "@tanstack/react-query";
+import {
+	useMutation,
+	useQueryClient,
+	useSuspenseQueries,
+} from "@tanstack/react-query";
 import { CheckCircle, ClockIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { Suspense } from "react";
 import PageLoading from "../loading";
 
 export default function TaskLists() {
-	const { projectId, tasklistId, tenant } = useParams();
+	const { projectId, tasklistId } = useParams();
 
 	const trpc = useTRPC();
+	const queryClient = useQueryClient();
 	const [{ data: list }, { data: timezone }] = useSuspenseQueries({
 		queries: [
 			trpc.tasks.getListById.queryOptions({
@@ -24,6 +29,21 @@ export default function TaskLists() {
 			trpc.settings.getTimezone.queryOptions(),
 		],
 	});
+
+	const upsertTaskList = useMutation(
+		trpc.tasks.upsertTaskList.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: trpc.tasks.getListById.queryKey({ id: +tasklistId! }),
+				});
+				queryClient.invalidateQueries({
+					queryKey: trpc.tasks.getTaskLists.queryKey({
+						projectId: +projectId!,
+					}),
+				});
+			},
+		}),
+	);
 
 	const totalCount = list?.tasks.length;
 	const doneCount = list?.tasks.filter((task) => task.status === "done").length;
@@ -37,10 +57,17 @@ export default function TaskLists() {
 		<Suspense fallback={<PageLoading />}>
 			<PageTitle
 				title={list.name}
-				actionLabel="Edit"
-				actionLink={`/${tenant}/projects/${projectId}/tasklists/${list.id}/edit`}
+				editableTitle
+				titleOnChange={async (val) => {
+					await upsertTaskList.mutateAsync({
+						id: list.id,
+						name: val,
+						projectId: +projectId!,
+						description: list.description,
+					});
+				}}
 			>
-				<div className="flex flex-col pr-4 md:pr-0 space-y-2 md:flex-row md:space-y-0 md:space-x-2 text-gray-500 dark:text-gray-400">
+				<div className="flex flex-col pr-4 md:pr-0 space-y-1 md:flex-row md:space-y-0 md:space-x-2 text-gray-500 dark:text-gray-400">
 					{totalCount != null && doneCount != null ? (
 						<div className="flex w-[280px] flex-row items-center space-x-2">
 							<CheckCircle className="w-4 h-4" />
@@ -71,11 +98,16 @@ export default function TaskLists() {
 								) : null}
 							</p>
 						</div>
-					) : null}
+					) : (
+						<div className="flex flex-row items-center space-x-2">
+							<ClockIcon className="w-4 h-4" />
+							<p className="block">Add due date</p>
+						</div>
+					)}
 				</div>
 			</PageTitle>
 
-			<div className="mx-auto -mt-8 max-w-7xl">
+			<div className="mx-auto max-w-7xl">
 				<TaskListItem key={list.id} id={list.id} hideHeader />
 
 				<div className="py-8">

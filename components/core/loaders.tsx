@@ -49,7 +49,7 @@ export function PageLoading() {
 	return (
 		<>
 			<PageTitle title="">
-				<div className="-mt-6 flex w-full max-w-7xl flex-col justify-center space-y-2">
+				<div className="flex w-full max-w-7xl flex-col justify-center space-y-2">
 					<Skeleton className="h-[20px] w-[300px] rounded-md bg-muted-foreground/20" />
 					<Skeleton className="h-[20px] w-[300px] rounded-md bg-muted-foreground/20" />
 				</div>

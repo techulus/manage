@@ -1,20 +1,33 @@
 "use client";
 
 import EmptyState from "@/components/core/empty-state";
+import { Panel } from "@/components/core/panel";
+import { SaveButton } from "@/components/form/button";
+import SharedForm from "@/components/form/shared";
 import PageTitle from "@/components/layout/page-title";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { useTRPC } from "@/trpc/client";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { Title } from "@radix-ui/react-dialog";
+import {
+	useMutation,
+	useQueryClient,
+	useSuspenseQuery,
+} from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useQueryState } from "nuqs";
+import { parseAsBoolean, useQueryState } from "nuqs";
 
 export default function TaskLists() {
 	const { projectId, tenant } = useParams();
 	const [statuses] = useQueryState("status", {
 		defaultValue: "active",
 	});
+
+	const [create, setCreate] = useQueryState(
+		"create",
+		parseAsBoolean.withDefault(false),
+	);
 
 	const trpc = useTRPC();
 	const { data: taskLists } = useSuspenseQuery(
@@ -24,15 +37,20 @@ export default function TaskLists() {
 		}),
 	);
 
+	const queryClient = useQueryClient();
+	const upsertTaskList = useMutation(
+		trpc.tasks.upsertTaskList.mutationOptions(),
+	);
+
 	return (
 		<>
 			<PageTitle
 				title="Task Lists"
 				actionLabel="New"
-				actionLink={`/${tenant}/projects/${projectId}/tasklists/new`}
+				actionLink={`/${tenant}/projects/${projectId}/tasklists?create=true`}
 			/>
 
-			<div className="mx-4 sm:mx-auto my-12 -mt-6 max-w-7xl">
+			<div className="mx-4 sm:mx-auto max-w-7xl">
 				<EmptyState
 					show={!taskLists.length}
 					label="task list"
@@ -63,6 +81,50 @@ export default function TaskLists() {
 					)}
 				</div>
 			</div>
+
+			<Panel open={create} setOpen={setCreate}>
+				<Title>
+					<PageTitle title="Create Task List" compact />
+				</Title>
+				<form
+					action={async (formData) => {
+						const name = formData.get("name") as string;
+						const description = formData.get("description") as string;
+						const dueDate = formData.get("dueDate") as string;
+						const status = formData.get("status") as string;
+
+						await upsertTaskList.mutateAsync({
+							projectId: +projectId!,
+							name,
+							description,
+							dueDate,
+							status: status ?? "active",
+						});
+
+						queryClient.invalidateQueries({
+							queryKey: trpc.tasks.getTaskLists.queryKey({
+								projectId: +projectId!,
+							}),
+						});
+
+						setCreate(false);
+					}}
+					className="px-6"
+				>
+					<SharedForm />
+
+					<div className="mt-6 flex items-center justify-end gap-x-6">
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => setCreate(false)}
+						>
+							Cancel
+						</Button>
+						<SaveButton />
+					</div>
+				</form>
+			</Panel>
 		</>
 	);
 }

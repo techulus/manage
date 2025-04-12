@@ -1,6 +1,7 @@
 "use client";
 
 import { Panel } from "@/components/core/panel";
+import EditableText from "@/components/form/editable-text";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -8,7 +9,6 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import type { TaskList, TaskWithDetails } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { toDateStringWithDay, toStartOfDay } from "@/lib/utils/date";
@@ -37,11 +37,8 @@ export const TaskItem = ({
 }) => {
 	const { projectId } = useParams();
 	const [detailsOpen, setDetailsOpen] = useState(false);
-	const [isEditing, setIsEditing] = useState(false);
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: task.id });
-
-	const [name, setName] = useState(task.name ?? "");
 
 	const style = {
 		transform: CSS.Transform.toString(transform),
@@ -151,7 +148,7 @@ export const TaskItem = ({
 						{task.assignee ? (
 							<Assignee className="mr-2" user={task.assignee} imageOnly />
 						) : null}
-						{name}
+						{task.name}
 						{task.dueDate ? (
 							<span className="text-muted-foreground ml-2 text-sm">
 								<CalendarClock className="h-4 w-4 inline-block text-primary mr-1 -mt-1" />
@@ -176,7 +173,7 @@ export const TaskItem = ({
 						{...attributes}
 						{...listeners}
 					>
-						<AlignJustifyIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+						<AlignJustifyIcon className="h-5 w-5 opacity-40" />
 					</div>
 				) : null}
 			</Card>
@@ -202,28 +199,18 @@ export const TaskItem = ({
 										updateTaskToastOptions,
 									);
 								}}
-								disabled={isEditing}
 							/>
 
-							{isEditing ? (
-								<Input
-									type="text"
-									value={name}
-									onChange={(e) => setName(e.target.value)}
-									className="text-md flex-1 text-left font-medium leading-none"
-								/>
-							) : (
-								<span
-									className={cn(
-										"text-md flex-1 font-medium leading-none",
-										task.status === "done"
-											? "text-muted-foreground line-through"
-											: "",
-									)}
-								>
-									{name}
-								</span>
-							)}
+							<EditableText
+								value={task.name}
+								label="task"
+								onChange={async (val) => {
+									await updateTask.mutateAsync({
+										id: task.id,
+										name: val,
+									});
+								}}
+							/>
 						</div>
 						<Close asChild>
 							<button
@@ -331,27 +318,17 @@ export const TaskItem = ({
 						<div className="space-y-1">
 							<div className="flex items-center justify-between">
 								<h4 className="text-sm font-medium">Created By</h4>
-								<div className="space-x-2">
-									<Button
-										size="sm"
-										variant="outline"
-										className="text-primary"
-										onClick={async () => {
-											setIsEditing((val) => !val);
+								<div className="space-x-2"></div>
+							</div>
+							<p className="text-sm text-muted-foreground">
+								{task.creator?.firstName}
+							</p>
+						</div>
 
-											if (!isEditing) return;
-
-											toast.promise(
-												updateTask.mutateAsync({
-													id: task.id,
-													name,
-												}),
-												updateTaskToastOptions,
-											);
-										}}
-									>
-										{isEditing ? "Save" : "Edit"}
-									</Button>
+						{taskLists?.filter((x) => x.id !== task.taskListId)?.length ? (
+							<div className="space-y-1">
+								<h4 className="text-sm font-medium">Actions</h4>
+								<div className="flex items-center space-x-2">
 									<Button
 										size="sm"
 										variant="outline"
@@ -371,17 +348,7 @@ export const TaskItem = ({
 									>
 										Delete
 									</Button>
-								</div>
-							</div>
-							<p className="text-sm text-muted-foreground">
-								{task.creator?.firstName}
-							</p>
-						</div>
 
-						{taskLists?.filter((x) => x.id !== task.taskListId)?.length ? (
-							<div className="space-y-1">
-								<h4 className="text-sm font-medium">Actions</h4>
-								<div className="flex items-center space-x-2">
 									<DropdownMenu>
 										<DropdownMenuTrigger asChild>
 											<Button

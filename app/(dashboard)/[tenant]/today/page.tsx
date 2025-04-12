@@ -142,7 +142,7 @@ export default async function Today(props: {
 		<>
 			<PageTitle title={toDateStringWithDay(today, timezone)} />
 
-			<div className="max-w-7xl mx-auto -mt-10 bg-background px-6 lg:px-0 pb-6">
+			<div className="max-w-7xl mx-auto -mt-4 bg-background px-6 lg:px-0 pb-6">
 				<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
 					<Card className="col-span-2 md:col-span-1 p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-none">
 						<h2 className="text-2xl font-semibold">
