@@ -126,7 +126,7 @@ export default function ProjectDetails() {
 												id: project.id,
 											});
 											await revalidateProjectData();
-											router.push(`/${tenant}/projects`);
+											router.push(`/${tenant}/today`);
 										}}
 									>
 										<DeleteButton action="Delete" />

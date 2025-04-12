@@ -94,11 +94,6 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				active: pathname === `/${tenant}/today`,
 			},
 			{
-				href: `/${tenant}/projects`,
-				label: "Projects",
-				active: pathname === `/${tenant}/projects`,
-			},
-			{
 				href: `/${tenant}/notifications`,
 				label: "Notifications",
 				active: pathname === `/${tenant}/notifications`,
@@ -172,10 +167,6 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="start" className="w-56">
-								<DropdownMenuLabel>
-									<Link href={`/${tenant}/projects`}>Projects</Link>
-								</DropdownMenuLabel>
-								<DropdownMenuSeparator />
 								{projects.map((project) => (
 									<DropdownMenuItem
 										key={project.id}

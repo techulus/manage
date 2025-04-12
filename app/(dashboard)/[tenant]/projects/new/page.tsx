@@ -46,7 +46,7 @@ export default function CreateProject() {
 					<CardFooter>
 						<div className="ml-auto flex items-center justify-end gap-x-6">
 							<Link
-								href={`/${tenant}/projects`}
+								href={`/${tenant}/today`}
 								className={buttonVariants({ variant: "ghost" })}
 							>
 								Cancel
