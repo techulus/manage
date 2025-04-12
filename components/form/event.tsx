@@ -19,7 +19,6 @@ import { DateTimePicker } from "../project/events/date-time-picker";
 import { Assignee } from "../project/shared/assigee";
 import { MultiUserSelect } from "../project/shared/multi-user-select";
 import { Button } from "../ui/button";
-import { CardContent, CardFooter } from "../ui/card";
 import { Label } from "../ui/label";
 import {
 	Select,
@@ -84,6 +83,7 @@ export default function EventForm() {
 
 	return (
 		<form
+			className="flex-1 overflow-hidden overflow-y-auto"
 			action={async (formData: FormData) => {
 				const event = await upsertEvent.mutateAsync({
 					name: formData.get("name") as string,
@@ -123,7 +123,7 @@ export default function EventForm() {
 				setEditing(null);
 			}}
 		>
-			<div className="p-6 space-y-4">
+			<div className="px-6 space-y-4">
 				{item ? <input type="hidden" name="id" defaultValue={item.id} /> : null}
 				<input type="hidden" name="projectId" defaultValue={projectId} />
 				<div className="space-y-2">

@@ -26,7 +26,7 @@ export default function PageTitle({
 			<div
 				className={cn(
 					"flex min-h-[180px] items-center justify-center pb-4 pl-4 pr-6 pt-4 sm:pl-6 lg:pl-8 xl:border-t-0",
-					compact ? "min-h-0 h-[80px] overflow-y-auto pb-0 pl-0" : "",
+					compact ? "min-h-0 h-[80px] overflow-y-auto pb-0" : "",
 				)}
 			>
 				<div className="flex w-full max-w-7xl items-center justify-between">
