@@ -1,10 +1,12 @@
 "use client";
 
+import EditableDate from "@/components/form/editable-date";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
+import { DateTimePicker } from "@/components/project/events/date-time-picker";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { Progress } from "@/components/ui/progress";
-import { toDateStringWithDay } from "@/lib/utils/date";
+import { toDateStringWithDay, toStartOfDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import {
 	useMutation,
@@ -30,8 +32,8 @@ export default function TaskLists() {
 		],
 	});
 
-	const upsertTaskList = useMutation(
-		trpc.tasks.upsertTaskList.mutationOptions({
+	const updateTaskList = useMutation(
+		trpc.tasks.updateTaskList.mutationOptions({
 			onSuccess: () => {
 				queryClient.invalidateQueries({
 					queryKey: trpc.tasks.getListById.queryKey({ id: +tasklistId! }),
@@ -59,11 +61,9 @@ export default function TaskLists() {
 				title={list.name}
 				editableTitle
 				titleOnChange={async (val) => {
-					await upsertTaskList.mutateAsync({
+					await updateTaskList.mutateAsync({
 						id: list.id,
 						name: val,
-						projectId: +projectId!,
-						description: list.description,
 					});
 				}}
 			>
@@ -87,23 +87,17 @@ export default function TaskLists() {
 						</div>
 					) : null}
 
-					{list.dueDate ? (
-						<div className="flex flex-row items-center space-x-2">
-							<ClockIcon className="w-4 h-4" />
-							<p className="block">
-								{list.dueDate ? (
-									<span suppressHydrationWarning>
-										Due {toDateStringWithDay(list.dueDate, timezone)}
-									</span>
-								) : null}
-							</p>
-						</div>
-					) : (
-						<div className="flex flex-row items-center space-x-2">
-							<ClockIcon className="w-4 h-4" />
-							<p className="block">Add due date</p>
-						</div>
-					)}
+					<EditableDate
+						value={list.dueDate}
+						timezone={timezone}
+						onChange={async (dueDate) => {
+							await updateTaskList.mutateAsync({
+								id: list.id,
+								dueDate: toStartOfDay(dueDate).toISOString(),
+							});
+						}}
+						label="Due"
+					/>
 				</div>
 			</PageTitle>
 

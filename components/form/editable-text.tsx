@@ -53,7 +53,7 @@ export default function EditableText({
 				<Dialog.Portal>
 					<Dialog.Overlay
 						className={cn(
-							"fixed inset-0 z-50 bg-muted/60 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+							"fixed inset-0 z-50 bg-muted/70 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
 						)}
 					/>
 					<Dialog.Content
@@ -68,15 +68,16 @@ export default function EditableText({
 							"fixed left-[50%] top-[30%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] p-4",
 						)}
 					>
-						<Dialog.Title className="relative p-2 bg-background rounded-md text-sm">
+						<Dialog.Title className="p-2 bg-background rounded-md text-sm font-semibold inline-block">
 							Update {label}
+						</Dialog.Title>
+						<div className="relative px-3 py-2 mt-2 bg-background rounded-md space-y-2">
 							<Dialog.Close asChild className="absolute right-0 top-0 -mt-10">
 								<Button type="button" variant="ghost">
 									<X className="w-5 h-5 text-primary" />
 								</Button>
 							</Dialog.Close>
-						</Dialog.Title>
-						<div className="p-4 mt-2 bg-background rounded-md space-y-2">
+
 							<Input
 								ref={inputRef}
 								type={type}

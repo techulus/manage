@@ -30,10 +30,9 @@ export const tasksRouter = createTRPCRouter({
 
 			return data;
 		}),
-	upsertTaskList: protectedProcedure
+	createTaskList: protectedProcedure
 		.input(
 			z.object({
-				id: z.number().optional(),
 				projectId: z.number(),
 				name: z.string().min(2, {
 					message: "Name must be at least 2 characters.",
@@ -47,34 +46,67 @@ export const tasksRouter = createTRPCRouter({
 					.nullable()
 					.optional()
 					.transform((val) => (val?.trim()?.length ? new Date(val) : null)),
-				status: z.string().optional().default("active"),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			if (input.id) {
-				const data = await ctx.db
-					.update(taskList)
-					.set({
-						name: input.name,
-						description: input.description,
-						dueDate: input.dueDate,
-						status: input.status,
-					})
-					.where(eq(taskList.id, input.id))
-					.returning();
-				return data;
-			}
-
 			const data = await ctx.db
 				.insert(taskList)
 				.values({
 					name: input.name,
 					description: input.description,
 					dueDate: input.dueDate,
-					status: input.status,
+					status: "active",
 					projectId: input.projectId,
 					createdByUser: ctx.userId,
 				})
+				.returning();
+
+			return data;
+		}),
+	updateTaskList: protectedProcedure
+		.input(
+			z
+				.object({
+					id: z.number(),
+					name: z.string().min(2, {
+						message: "Name must be at least 2 characters.",
+					}),
+				})
+				.or(
+					z.object({
+						id: z.number(),
+						description: z
+							.string()
+							.nullable()
+							.transform((val) => (val?.trim()?.length ? val : null)),
+					}),
+				)
+				.or(
+					z.object({
+						id: z.number(),
+						dueDate: z
+							.string()
+							.nullable()
+							.optional()
+							.transform((val) => (val?.trim()?.length ? new Date(val) : null)),
+					}),
+				)
+				.or(
+					z.object({
+						id: z.number(),
+						status: z.string().optional().default("active"),
+					}),
+				),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const filteredInput = Object.fromEntries(
+				Object.entries(input).filter(([key]) => key !== "id"),
+			);
+
+			const data = await ctx.db
+				.update(taskList)
+				.set(filteredInput)
+				.where(eq(taskList.id, input.id))
 				.returning();
 
 			return data;

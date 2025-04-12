@@ -38,8 +38,16 @@ export default function TaskLists() {
 	);
 
 	const queryClient = useQueryClient();
-	const upsertTaskList = useMutation(
-		trpc.tasks.upsertTaskList.mutationOptions(),
+	const createTaskList = useMutation(
+		trpc.tasks.createTaskList.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: trpc.tasks.getTaskLists.queryKey({
+						projectId: +projectId!,
+					}),
+				});
+			},
+		}),
 	);
 
 	return (
@@ -91,20 +99,12 @@ export default function TaskLists() {
 						const name = formData.get("name") as string;
 						const description = formData.get("description") as string;
 						const dueDate = formData.get("dueDate") as string;
-						const status = formData.get("status") as string;
 
-						await upsertTaskList.mutateAsync({
+						await createTaskList.mutateAsync({
 							projectId: +projectId!,
 							name,
 							description,
 							dueDate,
-							status: status ?? "active",
-						});
-
-						queryClient.invalidateQueries({
-							queryKey: trpc.tasks.getTaskLists.queryKey({
-								projectId: +projectId!,
-							}),
 						});
 
 						setCreate(false);

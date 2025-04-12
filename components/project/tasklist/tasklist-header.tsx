@@ -36,8 +36,8 @@ export const TaskListHeader = ({
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
 
-	const upsertTaskList = useMutation(
-		trpc.tasks.upsertTaskList.mutationOptions(),
+	const updateTaskList = useMutation(
+		trpc.tasks.updateTaskList.mutationOptions(),
 	);
 
 	const deleteTaskList = useMutation(
@@ -104,13 +104,9 @@ export const TaskListHeader = ({
 							size="sm"
 							onClick={async () => {
 								toast.promise(
-									upsertTaskList
+									updateTaskList
 										.mutateAsync({
 											id: taskList.id,
-											name: taskList.name,
-											description: taskList.description,
-											dueDate: taskList.dueDate?.toISOString(),
-											projectId: taskList.projectId,
 											status:
 												taskList.status === "active" ? "archived" : "active",
 										})
