@@ -167,18 +167,16 @@ export const TaskListItem = ({
 					</DndContext>
 
 					{!compact ? (
-						<form
-							className="px-6 py-2"
-							action={async (formData: FormData) => {
-								const name = formData.get("name") as string;
-								await createTask.mutateAsync({
-									name,
-									taskListId: taskList.id,
-								});
-							}}
-						>
-							<InlineTaskForm />
-						</form>
+						<div className="px-6 py-2">
+							<InlineTaskForm
+								action={async (name) => {
+									await createTask.mutateAsync({
+										name,
+										taskListId: taskList.id,
+									});
+								}}
+							/>
+						</div>
 					) : null}
 
 					{compact

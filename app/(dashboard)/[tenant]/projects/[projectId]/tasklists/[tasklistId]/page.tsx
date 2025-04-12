@@ -67,7 +67,7 @@ export default function TaskLists() {
 					});
 				}}
 			>
-				<div className="flex flex-col pr-4 md:pr-0 space-y-1 md:flex-row md:space-y-0 md:space-x-2 text-gray-500 dark:text-gray-400">
+				<div className="flex flex-col pr-4 md:pr-0 space-y-1 space-x-0 md:flex-row md:space-y-0 md:space-x-2 text-gray-500 dark:text-gray-400">
 					{totalCount != null && doneCount != null ? (
 						<div className="flex w-[280px] flex-row items-center space-x-2">
 							<CheckCircle className="w-4 h-4" />
@@ -93,7 +93,7 @@ export default function TaskLists() {
 						onChange={async (dueDate) => {
 							await updateTaskList.mutateAsync({
 								id: list.id,
-								dueDate: toStartOfDay(dueDate).toISOString(),
+								dueDate: dueDate ? toStartOfDay(dueDate).toISOString() : null,
 							});
 						}}
 						label="Due"
