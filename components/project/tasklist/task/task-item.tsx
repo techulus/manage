@@ -2,6 +2,7 @@
 
 import { Panel } from "@/components/core/panel";
 import EditableText from "@/components/form/editable-text";
+import NotesForm from "@/components/form/notes-form";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -26,7 +27,6 @@ import { Checkbox } from "../../../ui/checkbox";
 import { DateTimePicker } from "../../events/date-time-picker";
 import { Assignee } from "../../shared/assigee";
 import { AssignToUser } from "../../shared/assign-to-user";
-import TaskNotesForm from "./notes-form";
 
 export const TaskItem = ({
 	task,
@@ -227,10 +227,16 @@ export const TaskItem = ({
 
 				<div className="flex-1 overflow-hidden overflow-y-scroll">
 					<div className="space-y-6 p-6">
-						<div className="space-y-1">
-							<h4 className="text-sm font-medium">Notes</h4>
-							<TaskNotesForm task={task} />
-						</div>
+						<form
+							action={async (formData) => {
+								await updateTask.mutateAsync({
+									id: task.id,
+									description: formData.get("description") as string,
+								});
+							}}
+						>
+							<NotesForm value={task.description} name="description" />
+						</form>
 
 						<div className="space-y-1">
 							<h4 className="text-sm font-medium">Assigned to</h4>

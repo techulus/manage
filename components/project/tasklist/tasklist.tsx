@@ -23,7 +23,6 @@ import {
 	useSuspenseQuery,
 } from "@tanstack/react-query";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
-import { HtmlPreview } from "../../core/html-view";
 import InlineTaskForm from "../../form/task";
 import { TaskItem } from "./task/task-item";
 import { TaskListHeader } from "./tasklist-header";
