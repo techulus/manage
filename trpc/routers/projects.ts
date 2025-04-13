@@ -5,81 +5,88 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const projectsRouter = createTRPCRouter({
-	upsertProject: protectedProcedure
+	createProject: protectedProcedure
 		.input(
 			z.object({
-				id: z.number().optional(),
 				name: z.string(),
 				description: z.string().optional(),
 				dueDate: z.date().optional(),
-				status: z.enum(["active", "archived"]).optional().default("active"),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			if (input.id) {
-				const currentProject = await ctx.db.query.project
-					.findFirst({
-						where: eq(project.id, +input.id),
-					})
-					.execute();
+			const newProject = await ctx.db
+				.insert(project)
+				.values({
+					name: input.name,
+					description: input.description,
+					dueDate: input.dueDate,
+					status: "active",
+					createdByUser: ctx.userId,
+				})
+				.returning()
+				.execute();
 
-				const updatedProject = await ctx.db
-					.update(project)
-					.set({
-						name: input.name,
-						description: input.description,
-						dueDate: input.dueDate,
-						status: input.status,
-						updatedAt: new Date(),
-					})
-					.where(eq(project.id, input.id))
-					.returning();
+			await logActivity({
+				action: "created",
+				type: "project",
+				target: `/${ctx.orgSlug}/projects/${newProject?.[0].id}`,
+				newValue: newProject?.[0],
+				projectId: newProject?.[0].id,
+			});
+		}),
+	updateProject: protectedProcedure
+		.input(
+			z
+				.object({
+					id: z.number(),
+					name: z.string(),
+				})
+				.or(
+					z.object({
+						id: z.number(),
+						description: z.string(),
+					}),
+				)
+				.or(
+					z.object({
+						id: z.number(),
+						dueDate: z.date().nullable(),
+					}),
+				)
+				.or(
+					z.object({
+						id: z.number(),
+						status: z.enum(["active", "archived"]),
+					}),
+				),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const currentProject = await ctx.db.query.project
+				.findFirst({
+					where: eq(project.id, +input.id),
+				})
+				.execute();
 
-				if (currentProject) {
-					await logActivity({
-						action: "updated",
-						type: "project",
-						oldValue: currentProject,
-						newValue: updatedProject?.[0],
-						target: `/${ctx.orgSlug}/projects/${input.id}`,
-						projectId: +input.id,
-					});
-				}
-			} else {
-				const newProject = await ctx.db
-					.insert(project)
-					.values({
-						name: input.name,
-						description: input.description,
-						dueDate: input.dueDate,
-						status: input.status,
-						createdByUser: ctx.userId,
-					})
-					.returning()
-					.execute();
+			const filteredInput = Object.fromEntries(
+				Object.entries(input).filter(([key]) => key !== "id"),
+			);
 
+			const updatedProject = await ctx.db
+				.update(project)
+				.set(filteredInput)
+				.where(eq(project.id, input.id))
+				.returning();
+
+			if (currentProject) {
 				await logActivity({
-					action: "created",
+					action: "updated",
 					type: "project",
-					target: `/${ctx.orgSlug}/projects/${newProject?.[0].id}`,
-					newValue: newProject?.[0],
-					projectId: newProject?.[0].id,
+					oldValue: currentProject,
+					newValue: updatedProject?.[0],
+					target: `/${ctx.orgSlug}/projects/${input.id}`,
+					projectId: +input.id,
 				});
 			}
-		}),
-	updateProjectStatus: protectedProcedure
-		.input(
-			z.object({
-				id: z.number(),
-				status: z.enum(["active", "archived"]),
-			}),
-		)
-		.mutation(async ({ ctx, input }) => {
-			await ctx.db
-				.update(project)
-				.set({ status: input.status })
-				.where(eq(project.id, input.id))
-				.execute();
 		}),
 	deleteProject: protectedProcedure
 		.input(

@@ -48,7 +48,7 @@ export default function EditableDate({
 				<ClockIcon className="w-4 h-4" />
 				<button
 					type="button"
-					className="outline-none hover:bg-destructive p-1 px-2 rounded-md group flex items-center gap-1"
+					className="outline-none hover:bg-destructive/40 p-1 px-2 rounded-md group flex items-center gap-1"
 					onClick={async () => {
 						await onChange(null);
 						setIsDeleting(false);
@@ -66,7 +66,7 @@ export default function EditableDate({
 			<ClockIcon className="w-4 h-4" />
 			<button
 				type="button"
-				className="outline-none hover:bg-destructive/80 p-1 px-2 rounded-md group flex items-center gap-1"
+				className="outline-none hover:bg-destructive/40 p-1 px-2 rounded-md group flex items-center gap-1"
 				onClick={() => setIsDeleting(true)}
 			>
 				<span suppressHydrationWarning>

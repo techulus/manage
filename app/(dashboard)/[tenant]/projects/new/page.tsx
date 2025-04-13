@@ -17,7 +17,7 @@ export default function CreateProject() {
 	const queryClient = useQueryClient();
 
 	const createProject = useMutation(
-		trpc.projects.upsertProject.mutationOptions(),
+		trpc.projects.createProject.mutationOptions(),
 	);
 
 	return (

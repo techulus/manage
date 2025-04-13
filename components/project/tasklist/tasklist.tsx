@@ -138,12 +138,6 @@ export const TaskListItem = ({
 					/>
 				) : null}
 
-				{taskList.description ? (
-					<div className="border-b px-4 py-2">
-						<HtmlPreview content={taskList.description ?? ""} />
-					</div>
-				) : null}
-
 				<div
 					className={cn(
 						"flex flex-col justify-center",

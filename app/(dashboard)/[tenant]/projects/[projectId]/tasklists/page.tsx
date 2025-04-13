@@ -62,7 +62,7 @@ export default function TaskLists() {
 				<EmptyState
 					show={!taskLists.length}
 					label="task list"
-					createLink={`/${tenant}/projects/${projectId}/tasklists/new`}
+					createLink={`/${tenant}/projects/${projectId}/tasklists?create=true`}
 				/>
 
 				<ul className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2">

@@ -1,19 +1,20 @@
 "use client";
 
+import PageSection from "@/components/core/section";
 import EditableDate from "@/components/form/editable-date";
+import NotesForm from "@/components/form/notes-form";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
-import { DateTimePicker } from "@/components/project/events/date-time-picker";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { Progress } from "@/components/ui/progress";
-import { toDateStringWithDay, toStartOfDay } from "@/lib/utils/date";
+import { toStartOfDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import {
 	useMutation,
 	useQueryClient,
 	useSuspenseQueries,
 } from "@tanstack/react-query";
-import { CheckCircle, ClockIcon } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import { useParams } from "next/navigation";
 import { Suspense } from "react";
 import PageLoading from "../loading";
@@ -100,6 +101,20 @@ export default function TaskLists() {
 					/>
 				</div>
 			</PageTitle>
+
+			<PageSection>
+				<form
+					className="flex flex-col px-4 py-2"
+					action={async (formData) => {
+						await updateTaskList.mutateAsync({
+							id: list.id,
+							description: formData.get("description") as string,
+						});
+					}}
+				>
+					<NotesForm value={list.description} name="description" />
+				</form>
+			</PageSection>
 
 			<div className="mx-auto max-w-7xl">
 				<TaskListItem key={list.id} id={list.id} hideHeader />
