@@ -54,8 +54,14 @@ export default function TaskLists() {
 		<>
 			<PageTitle
 				title="Task Lists"
-				actionLabel="New"
-				actionLink={`/${tenant}/projects/${projectId}/tasklists?create=true`}
+				actions={
+					<Link
+						href={`/${tenant}/projects/${projectId}/tasklists?create=true`}
+						className={buttonVariants()}
+					>
+						New
+					</Link>
+				}
 			/>
 
 			<div className="mx-4 sm:mx-auto max-w-7xl">

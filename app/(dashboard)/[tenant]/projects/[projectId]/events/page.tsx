@@ -50,8 +50,14 @@ export default function EventDetails() {
 		<>
 			<PageTitle
 				title="Events"
-				actionLabel="New"
-				actionLink={`/${tenant}/projects/${projectId}/events?create=true`}
+				actions={
+					<Link
+						href={`/${tenant}/projects/${projectId}/events?create=true`}
+						className={buttonVariants()}
+					>
+						New
+					</Link>
+				}
 			>
 				<div className="font-medium text-gray-500">
 					{isLoading ? null : toDateStringWithDay(selectedDate, timezone!)}

@@ -1,14 +1,10 @@
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 import type { JSX, PropsWithChildren } from "react";
 import EditableText from "../form/editable-text";
-import { buttonVariants } from "../ui/button";
 
 interface Props {
 	title: string;
 	subTitle?: string;
-	actionLink?: string;
-	actionLabel?: string;
 	actions?: JSX.Element;
 	compact?: boolean;
 	editableTitle?: boolean;
@@ -18,8 +14,6 @@ interface Props {
 export default function PageTitle({
 	title,
 	subTitle,
-	actionLink,
-	actionLabel,
 	children,
 	actions,
 	compact = false,
@@ -60,12 +54,6 @@ export default function PageTitle({
 						) : null}
 						<div className="block w-full pt-2">{children}</div>
 					</div>
-
-					{actionLink && actionLabel ? (
-						<Link href={actionLink} className={buttonVariants()}>
-							{actionLabel}
-						</Link>
-					) : null}
 
 					{actions ?? null}
 				</div>
