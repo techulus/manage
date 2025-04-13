@@ -11,11 +11,9 @@ export default function Editor({
 	defaultValue,
 	metadata = undefined,
 	name = "description",
-	setValue = () => {},
 }: {
 	defaultValue?: string;
 	name?: string;
-	setValue?: (value: string) => void;
 	metadata?: PartialBlock[] | undefined;
 }) {
 	const [value, onChange] = useState(defaultValue ?? "");
@@ -77,7 +75,6 @@ export default function Editor({
 					setBlocks(editor.document);
 					const html = await editor.blocksToFullHTML(editor.document);
 					onChange(html);
-					setValue(html);
 				}}
 			/>
 		</>

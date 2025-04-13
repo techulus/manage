@@ -3,10 +3,10 @@ import { Toaster } from "@/components/ui/sonner";
 import { SITE_METADATA } from "@/data/marketing";
 import { cn } from "@/lib/utils";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Archivo } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const mainFont = Archivo({
+const mainFont = Inter({
 	subsets: ["latin"],
 });
 
@@ -27,6 +27,10 @@ export default function RootLayout({
 			suppressHydrationWarning
 		>
 			<head>
+				{/* <script
+					crossOrigin="anonymous"
+					src="//unpkg.com/react-scan/dist/auto.global.js"
+				/> */}
 				<meta
 					name="viewport"
 					content="width=device-width, initial-scale=1, maximum-scale=1"
@@ -258,9 +262,9 @@ export default function RootLayout({
 			<body className="min-h-full min-w-full flex-1">
 				<ClerkProvider>
 					<ThemeProvider>
-						{children}
-						<Toaster position="top-center" />
 						<div className="fixed top-0 left-0 right-0 h-32 bg-gradient-to-b from-primary/10 to-transparent -z-0" />
+						<Toaster position="top-center" />
+						{children}
 					</ThemeProvider>
 				</ClerkProvider>
 			</body>

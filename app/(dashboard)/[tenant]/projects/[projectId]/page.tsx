@@ -1,77 +1,123 @@
+"use client";
+
 import EmptyState from "@/components/core/empty-state";
 import { HtmlPreview } from "@/components/core/html-view";
+import { PageLoading } from "@/components/core/loaders";
 import PageSection from "@/components/core/section";
 import { ActionButton, DeleteButton } from "@/components/form/button";
+import EditableDate from "@/components/form/editable-date";
+import NotesForm from "@/components/form/notes-form";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
-import { DocumentFolderHeader } from "@/components/project/document/document-folder-header";
-import { DocumentHeader } from "@/components/project/document/document-header";
-import EventsCalendar from "@/components/project/events/events-calendar";
+import WeekCalendar from "@/components/project/events/week-calendar";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { toDateStringWithDay, toStartOfDay } from "@/lib/utils/date";
+import { useTRPC } from "@/trpc/client";
 import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { toDateStringWithDay } from "@/lib/utils/date";
-import { caller } from "@/trpc/server";
-import { CalendarPlusIcon, ListPlusIcon, PlusIcon } from "lucide-react";
+	useMutation,
+	useQueryClient,
+	useSuspenseQueries,
+} from "@tanstack/react-query";
+import { CalendarPlusIcon, ListPlusIcon } from "lucide-react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { archiveProject, deleteProject, unarchiveProject } from "../actions";
+import { useParams, useRouter } from "next/navigation";
+import { Suspense } from "react";
 
-type Props = {
-	params: Promise<{
-		tenant: string;
-		projectId: string;
-	}>;
-};
+export default function ProjectDetails() {
+	const router = useRouter();
+	const params = useParams();
+	const projectId = +params.projectId!;
+	const tenant = params.tenant as string;
+	const trpc = useTRPC();
+	const queryClient = useQueryClient();
 
-export default async function ProjectDetails(props: Props) {
-	const params = await props.params;
-	const { projectId } = params;
+	const [{ data: timezone }, { data: project }, { data: taskLists }] =
+		useSuspenseQueries({
+			queries: [
+				trpc.settings.getTimezone.queryOptions(),
+				trpc.projects.getProjectById.queryOptions({
+					id: projectId,
+				}),
+				trpc.tasks.getTaskLists.queryOptions({
+					projectId: projectId,
+				}),
+			],
+		});
 
-	const [project, timezone] = await Promise.all([
-		caller.projects.getProjectById({ id: +projectId, withTasksAndDocs: true }),
-		caller.settings.getTimezone(),
-	]);
+	const updateProject = useMutation(
+		trpc.projects.updateProject.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: trpc.user.getProjects.queryKey({
+						statuses: ["active"],
+					}),
+				});
+				queryClient.invalidateQueries({
+					queryKey: trpc.projects.getProjectById.queryKey({
+						id: projectId,
+					}),
+				});
+			},
+		}),
+	);
 
-	if (!project) {
-		return notFound();
-	}
+	const deleteProject = useMutation(
+		trpc.projects.deleteProject.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: trpc.user.getProjects.queryKey({
+						statuses: ["active"],
+					}),
+				});
+			},
+		}),
+	);
 
 	return (
-		<>
+		<Suspense fallback={<PageLoading />}>
 			<PageTitle
 				title={project.name}
-				actionLabel="Edit"
-				actionLink={`/${params.tenant}/projects/${projectId}/edit`}
+				editableTitle
+				titleOnChange={async (val) => {
+					await updateProject.mutateAsync({
+						id: project.id,
+						name: val,
+					});
+				}}
 			>
-				{project.dueDate || project.status === "archived" ? (
-					<div className="flex space-x-2">
-						{project.dueDate ? (
-							<Badge variant="outline">
-								Due {toDateStringWithDay(project.dueDate, timezone)}
-							</Badge>
-						) : null}
-						{project.status === "archived" ? (
-							<Badge variant="outline" className="ml-2 text-red-500">
-								Archived
-							</Badge>
-						) : null}
-					</div>
-				) : null}
+				<div className="flex flex-col pr-4 md:pr-0 space-y-1 space-x-0 md:flex-row md:space-y-0 md:space-x-2 text-gray-500 dark:text-gray-400">
+					{project.status === "archived" ? (
+						<Badge variant="secondary">Archived</Badge>
+					) : null}
+
+					<EditableDate
+						value={project.dueDate}
+						timezone={timezone}
+						onChange={async (date) => {
+							await updateProject.mutateAsync({
+								id: project.id,
+								dueDate: date ? toStartOfDay(date) : null,
+							});
+						}}
+						label="Due"
+					/>
+				</div>
 			</PageTitle>
 
-			<PageSection topInset>
-				{project.description ? (
-					<div className="flex flex-col px-4 py-2 lg:px-8">
-						<HtmlPreview content={project.description ?? ""} />
-					</div>
-				) : null}
+			<PageSection>
+				<form
+					className="flex flex-col px-4 py-2"
+					action={async (formData) => {
+						await updateProject.mutateAsync({
+							id: project.id,
+							description: formData.get("description") as string,
+						});
+					}}
+				>
+					<NotesForm value={project.description ?? ""} name="description" />
+				</form>
 
 				<div className="flex h-12 flex-col justify-center">
 					<div className="flex justify-between px-4 py-3">
@@ -84,30 +130,36 @@ export default async function ProjectDetails(props: Props) {
 						<span className="isolate inline-flex">
 							{project.status === "archived" ? (
 								<>
-									<form action={unarchiveProject}>
-										<input
-											className="hidden"
-											name="id"
-											defaultValue={project.id}
-										/>
+									<form
+										action={async () => {
+											await updateProject.mutateAsync({
+												id: project.id,
+												status: "active",
+											});
+										}}
+									>
 										<ActionButton label="Unarchive" variant="link" />
 									</form>
-									<form action={deleteProject}>
-										<input
-											className="hidden"
-											name="id"
-											defaultValue={project.id}
-										/>
+									<form
+										action={async () => {
+											await deleteProject.mutateAsync({
+												id: project.id,
+											});
+											router.push(`/${tenant}/today`);
+										}}
+									>
 										<DeleteButton action="Delete" />
 									</form>
 								</>
 							) : (
-								<form action={archiveProject}>
-									<input
-										className="hidden"
-										name="id"
-										defaultValue={project.id}
-									/>
+								<form
+									action={async () => {
+										await updateProject.mutateAsync({
+											id: project.id,
+											status: "archived",
+										});
+									}}
+								>
 									<DeleteButton action="Archive" />
 								</form>
 							)}
@@ -118,30 +170,26 @@ export default async function ProjectDetails(props: Props) {
 
 			<div className="mx-auto flex max-w-7xl flex-col p-4 xl:p-0 lg:pb-12">
 				<div className="flex justify-between flex-row items-center my-4">
-					<h2 className="text-2xl font-bold leading-7 tracking-tight">
-						Task Lists
-					</h2>
+					<h2 className="text-2xl font-bold leading-7 tracking-tight">Tasks</h2>
 
 					<Link
 						className={buttonVariants({ size: "sm" })}
-						href={`/${params.tenant}/projects/${projectId}/tasklists/new`}
-						prefetch={false}
+						href={`/${tenant}/projects/${projectId}/tasklists?create=true`}
 					>
 						<ListPlusIcon className="mr-1 h-5 w-5" /> New
 						<span className="sr-only">, task list</span>
 					</Link>
 				</div>
 
-				{project.taskLists.length ? (
-					<ul className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2 mt-4">
-						{project.taskLists.map((taskList) => {
+				{taskLists.length ? (
+					<ul className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2">
+						{taskLists.map((taskList) => {
 							return (
 								<div
 									key={taskList.id}
 									className="overflow-hidden rounded-lg border"
 								>
 									<TaskListHeader
-										orgSlug={params.tenant}
 										taskList={taskList}
 										totalCount={taskList.tasks.length}
 										doneCount={
@@ -156,98 +204,33 @@ export default async function ProjectDetails(props: Props) {
 				) : null}
 
 				<EmptyState
-					show={!project.taskLists.length}
+					show={!taskLists.length}
 					label="task list"
-					createLink={`/${params.tenant}/projects/${projectId}/tasklists/new`}
-				/>
-			</div>
-
-			<div className="mx-auto flex max-w-7xl flex-col space-y-4 mt-8 p-4 xl:p-0 lg:pb-12">
-				<div className="flex justify-between flex-row items-center">
-					<h2 className="text-2xl font-bold leading-7 tracking-tight">
-						Docs &amp; Files
-					</h2>
-
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button size="sm">
-								<PlusIcon className="mr-1 h-5 w-5" />
-								New
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent>
-							<DropdownMenuItem>
-								<Link
-									className="w-full"
-									href={`/${params.tenant}/projects/${projectId}/documents/new`}
-									prefetch={false}
-								>
-									Document
-								</Link>
-							</DropdownMenuItem>
-							<DropdownMenuItem>
-								<Link
-									className="w-full"
-									href={`/${params.tenant}/projects/${projectId}/documents/folders/new`}
-									prefetch={false}
-								>
-									Folder
-								</Link>
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
-				</div>
-
-				{project.documents.length || project.documentFolders.length ? (
-					<ul className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-4 lg:grid-cols-6">
-						{project.documents.map((document) => (
-							<div key={document.id}>
-								<DocumentHeader document={document} />
-							</div>
-						))}
-						{project.documentFolders.map((folder) => (
-							<div key={folder.id}>
-								<DocumentFolderHeader documentFolder={folder} />
-							</div>
-						))}
-					</ul>
-				) : null}
-
-				<EmptyState
-					show={!project.documents.length && !project.documentFolders.length}
-					label="document"
-					createLink={`/${params.tenant}/projects/${projectId}/documents/new`}
+					createLink={`/${tenant}/projects/${projectId}/tasklists?create=true`}
 				/>
 			</div>
 
 			<div className="mx-auto flex max-w-7xl flex-col mt-8 space-y-4 p-4 xl:p-0">
 				<div className="flex justify-between flex-row items-center">
 					<h2 className="text-2xl font-bold leading-7 tracking-tight">
-						Events
+						Events this week
 					</h2>
 
 					<Link
 						className={buttonVariants({ size: "sm" })}
-						href={`/${params.tenant}/projects/${projectId}/events/new`}
-						prefetch={false}
+						href={`/${tenant}/projects/${projectId}/events?create=true`}
 					>
 						<CalendarPlusIcon className="mr-1 h-5 w-5" /> New
 						<span className="sr-only">, event</span>
 					</Link>
 				</div>
 
-				<div className="flex w-full rounded-lg border bg-card">
-					<EventsCalendar timezone={timezone} compact />
-				</div>
+				<WeekCalendar timezone={timezone} compact />
 			</div>
 
 			<div className="mx-auto max-w-7xl p-4 lg:py-8">
-				<CommentsSection
-					type="project"
-					parentId={project.id}
-					projectId={projectId}
-				/>
+				<CommentsSection roomId={`project/${project.id}`} />
 			</div>
-		</>
+		</Suspense>
 	);
 }

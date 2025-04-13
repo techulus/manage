@@ -1,41 +1,53 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import * as Dialog from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
+import { Edit, X } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
+import { Spinner } from "../core/loaders";
 import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
-export default function InlineTaskForm({
-	action,
+export default function EditableText({
+	value,
+	onChange,
+	textClassName = "",
+	type = "text",
+	label,
 }: {
-	action: (name: string) => Promise<void>;
+	value: string;
+	onChange: (value: string) => Promise<void>;
+	textClassName?: string;
+	type?: "text" | "number";
+	label: string;
 }) {
-	const [isCreating, setIsCreating] = useState(false);
-	const [value, setValue] = useState("");
+	const [isEditing, setIsEditing] = useState(false);
+	const [isSaving, setIsSaving] = useState(false);
+	const [inputValue, setInputValue] = useState(value);
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	const handleSubmit = useCallback(async () => {
-		await action(value);
-		setValue("");
-		setIsCreating(false);
-	}, [action, value]);
+	const handleSave = useCallback(async () => {
+		if (isSaving) return;
+		setIsSaving(true);
+		await onChange(inputValue);
+		setIsSaving(false);
+		setIsEditing(false);
+	}, [isSaving, onChange, inputValue]);
 
 	return (
 		<>
-			<Dialog.Root open={isCreating} onOpenChange={setIsCreating}>
+			<Dialog.Root open={isEditing} onOpenChange={setIsEditing}>
 				<Dialog.Trigger asChild>
-					<Button
+					<button
 						type="button"
-						size="sm"
-						onClick={(e) => {
-							e.preventDefault();
-							setIsCreating(true);
-						}}
+						className={cn(
+							"outline-none hover:bg-muted p-1 px-2 rounded-md -mx-2 group flex items-center gap-1",
+							textClassName,
+						)}
 					>
-						Add task
-					</Button>
+						<span>{value}</span>
+						<Edit className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity ml-1.5" />
+					</button>
 				</Dialog.Trigger>
 
 				<Dialog.Portal>
@@ -49,6 +61,7 @@ export default function InlineTaskForm({
 							e.preventDefault();
 							if (inputRef.current) {
 								inputRef.current.focus();
+								inputRef.current.select();
 							}
 						}}
 						className={cn(
@@ -56,7 +69,7 @@ export default function InlineTaskForm({
 						)}
 					>
 						<Dialog.Title className="p-2 bg-background rounded-md text-sm font-semibold inline-block">
-							Create Task
+							Update {label}
 						</Dialog.Title>
 						<div className="relative px-3 py-2 mt-2 bg-background rounded-md space-y-2">
 							<Dialog.Close asChild className="absolute right-0 top-1 -mt-12">
@@ -67,21 +80,20 @@ export default function InlineTaskForm({
 
 							<Input
 								ref={inputRef}
-								name="name"
-								type="text"
-								value={value}
-								onChange={(e) => setValue(e.target.value)}
+								type={type}
+								value={inputValue}
+								onChange={(e) => setInputValue(e.target.value)}
 								onKeyDown={(e) => {
 									if (e.key === "Enter" && !e.shiftKey) {
 										e.preventDefault();
-										handleSubmit();
+										handleSave();
 									}
 								}}
 							/>
 
 							<div className="flex justify-end">
-								<Button type="button" onClick={handleSubmit}>
-									Save
+								<Button type="button" disabled={isSaving} onClick={handleSave}>
+									{isSaving ? <Spinner /> : "Save"}
 								</Button>
 							</div>
 						</div>

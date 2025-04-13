@@ -1,32 +1,43 @@
 "use client";
 
-import { addComment } from "@/app/(dashboard)/[tenant]/projects/actions";
+import { Spinner } from "@/components/core/loaders";
 import { UserAvatar } from "@/components/core/user-avatar";
 import Editor from "@/components/editor";
-import { ActionButton } from "@/components/form/button";
-import type { User } from "@/drizzle/types";
-import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { useTRPC } from "@/trpc/client";
+import { useUser } from "@clerk/nextjs";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
 
 export default function CommentForm({
-	type,
-	parentId,
-	projectId,
-	creator,
+	roomId,
 }: {
-	type: string;
-	parentId: string | number;
-	projectId: string | number;
-	creator: User;
+	roomId: string;
 }) {
-	const pathname = usePathname();
+	const { projectId } = useParams();
+	const { user: creator } = useUser();
+
+	const trpc = useTRPC();
+	const queryClient = useQueryClient();
+	const addComment = useMutation(trpc.projects.addComment.mutationOptions());
 
 	return (
-		<form className="pb-12" action={addComment}>
-			<input value={pathname} type="hidden" name="currentPath" />
-			<input value={parentId} type="hidden" name="parentId" />
-			<input value={projectId} type="hidden" name="projectId" />
-			<input value={type} type="hidden" name="type" />
-
+		<form
+			className="pb-12"
+			action={async (formData: FormData) => {
+				await addComment.mutateAsync({
+					roomId,
+					content: formData.get("content") as string,
+					metadata: formData.get("metadata") as string,
+					projectId: +projectId!,
+				});
+				queryClient.invalidateQueries({
+					queryKey: trpc.projects.getComments.queryKey({
+						roomId,
+					}),
+				});
+			}}
+		>
 			<div className="flex w-full flex-row space-x-4">
 				<div className="hidden w-[160px] md:block" />
 
@@ -34,11 +45,14 @@ export default function CommentForm({
 
 				<div className="relative flex-grow">
 					<Editor name="content" />
-					<ActionButton
+					<Button
 						size="sm"
 						className="absolute -bottom-12 left-0"
-						label="Comment"
-					/>
+						type="submit"
+					>
+						{addComment.isPending ? <Spinner className="mr-2 h-4 w-4" /> : null}
+						Comment
+					</Button>
 				</div>
 			</div>
 		</form>

@@ -13,7 +13,7 @@ export function Spinner({
 	return (
 		<div className="flex items-center justify-center">
 			<svg
-				className={cn("h-5 w-5 animate-spin text-muted", className)}
+				className={cn("h-5 w-5 animate-spin text-white", className)}
 				xmlns="http://www.w3.org/2000/svg"
 				fill="none"
 				viewBox="0 0 24 24"
@@ -40,7 +40,7 @@ export function Spinner({
 export function SpinnerWithSpacing() {
 	return (
 		<div className="relative flex h-48 items-center justify-center py-3 pl-4 pr-4 sm:pl-6 lg:pl-8 xl:pl-6">
-			<Spinner />
+			<Spinner className="text-primary" />
 		</div>
 	);
 }
@@ -49,13 +49,13 @@ export function PageLoading() {
 	return (
 		<>
 			<PageTitle title="">
-				<div className="-mt-6 flex w-full max-w-7xl flex-col justify-center space-y-2">
+				<div className="flex w-full max-w-7xl flex-col justify-center space-y-2">
 					<Skeleton className="h-[20px] w-[300px] rounded-md bg-muted-foreground/20" />
 					<Skeleton className="h-[20px] w-[300px] rounded-md bg-muted-foreground/20" />
 				</div>
 			</PageTitle>
 
-			<PageSection topInset bottomMargin>
+			<PageSection bottomMargin>
 				<div className="flex flex-col space-y-2 p-4">
 					<Skeleton className="h-[20px] w-full rounded-md bg-muted-foreground/20" />
 					<Skeleton className="h-[20px] w-full rounded-md bg-muted-foreground/20" />

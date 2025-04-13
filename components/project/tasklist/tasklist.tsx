@@ -1,8 +1,8 @@
 "use client";
 
-import { repositionTask } from "@/app/(dashboard)/[tenant]/projects/[projectId]/tasklists/actions";
-import type { TaskList, TaskListWithTasks, User } from "@/drizzle/types";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { useTRPC } from "@/trpc/client";
 import {
 	DndContext,
 	type DragEndEvent,
@@ -17,45 +17,54 @@ import {
 	arrayMove,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { HtmlPreview } from "../../core/html-view";
+import {
+	useMutation,
+	useQueryClient,
+	useSuspenseQuery,
+} from "@tanstack/react-query";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import InlineTaskForm from "../../form/task";
 import { TaskItem } from "./task/task-item";
 import { TaskListHeader } from "./tasklist-header";
 
 export const TaskListItem = ({
-	taskList,
-	userId,
-	projectId,
-	orgSlug,
-	createTask,
-	partialUpdateTaskList,
-	timezone,
-	taskListsPromise,
-	usersPromise,
+	id,
 	hideHeader = false,
 	compact = false,
 }: {
-	taskList: TaskListWithTasks;
-	userId: string;
-	projectId: number;
-	orgSlug: string;
-	timezone: string;
-	taskListsPromise: Promise<TaskList[]>;
-	usersPromise: Promise<User[]>;
-	createTask: (data: {
-		name: string;
-		userId: string;
-		taskListId: number;
-		projectId: number;
-	}) => Promise<void>;
-	partialUpdateTaskList: (
-		id: number,
-		data: { status: string },
-	) => Promise<void>;
+	id: number;
 	hideHeader?: boolean;
 	compact?: boolean;
 }) => {
+	const trpc = useTRPC();
+	const { data: taskList } = useSuspenseQuery(
+		trpc.tasks.getListById.queryOptions({
+			id,
+		}),
+	);
+
+	const queryClient = useQueryClient();
+	const createTask = useMutation(
+		trpc.tasks.createTask.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: trpc.tasks.getListById.queryKey({ id }),
+				});
+			},
+		}),
+	);
+	const updateTask = useMutation(
+		trpc.tasks.updateTask.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: trpc.tasks.getListById.queryKey({
+						id,
+					}),
+				});
+			},
+		}),
+	);
+
 	const todoItems = useMemo(
 		() => taskList.tasks.filter((task) => task.status === "todo"),
 		[taskList.tasks],
@@ -93,92 +102,81 @@ export const TaskListItem = ({
 								localTodoItems[overTaskIndex].position) /
 							2;
 
-			repositionTask(movedTask.id, projectId, newPosition);
+			updateTask.mutateAsync({
+				id: movedTask.id,
+				position: newPosition,
+			});
 
 			setLocalTodoItems((items) =>
 				arrayMove(items, movedTaskIndex, overTaskIndex),
 			);
 		},
-		[localTodoItems, projectId],
+		[localTodoItems, updateTask],
 	);
 
 	return (
-		<div className="rounded-lg border bg-card">
-			{!hideHeader ? (
-				<TaskListHeader
-					taskList={taskList}
-					totalCount={taskList.tasks.length}
-					doneCount={doneItems.length}
-					orgSlug={orgSlug}
-					partialUpdateTaskList={partialUpdateTaskList}
-				/>
-			) : null}
-
-			{taskList.description ? (
-				<div className="border-b px-4 py-2">
-					<HtmlPreview content={taskList.description ?? ""} />
+		<Suspense
+			fallback={
+				<div className="max-h-96 w-full rounded-lg border p-4 bg-card">
+					<Skeleton className="h-4 w-3/4 mb-4" />
+					<Skeleton className="h-4 w-1/2 mb-2" />
+					<div className="space-y-3 mt-6">
+						<Skeleton className="h-4 w-full" />
+						<Skeleton className="h-4 w-full" />
+						<Skeleton className="h-4 w-full" />
+					</div>
 				</div>
-			) : null}
-
-			<div
-				className={cn(
-					"flex flex-col justify-center",
-					compact ? "max-h-96 overflow-y-auto" : "",
-				)}
-			>
-				<DndContext
-					id="tasklist-dnd"
-					sensors={sensors}
-					collisionDetection={closestCenter}
-					onDragEnd={handleDragEnd}
-				>
-					<SortableContext
-						items={localTodoItems}
-						strategy={verticalListSortingStrategy}
-					>
-						{localTodoItems.map((task) => (
-							<TaskItem
-								timezone={timezone}
-								key={task.id}
-								task={task}
-								projectId={+projectId}
-								taskListsPromise={taskListsPromise}
-								usersPromise={usersPromise}
-								compact={compact}
-							/>
-						))}
-					</SortableContext>
-				</DndContext>
-
-				{!compact ? (
-					<form
-						className="px-6 py-2"
-						action={async (formData: FormData) => {
-							const name = formData.get("name") as string;
-							await createTask({
-								name,
-								userId,
-								taskListId: taskList.id,
-								projectId,
-							});
-						}}
-					>
-						<InlineTaskForm />
-					</form>
+			}
+		>
+			<div className="rounded-lg border bg-card overflow-hidden">
+				{!hideHeader ? (
+					<TaskListHeader
+						taskList={taskList}
+						totalCount={taskList.tasks.length}
+						doneCount={doneItems.length}
+					/>
 				) : null}
 
-				{compact
-					? null
-					: doneItems.map((task) => (
-							<TaskItem
-								key={task.id}
-								task={task}
-								projectId={+projectId}
-								timezone={timezone}
-								usersPromise={usersPromise}
+				<div
+					className={cn(
+						"flex flex-col justify-center",
+						compact ? "max-h-96 overflow-y-auto" : "",
+					)}
+				>
+					<DndContext
+						id="tasklist-dnd"
+						sensors={sensors}
+						collisionDetection={closestCenter}
+						onDragEnd={handleDragEnd}
+					>
+						<SortableContext
+							items={localTodoItems}
+							strategy={verticalListSortingStrategy}
+						>
+							{localTodoItems.map((task) => (
+								<TaskItem key={task.id} task={task} compact={compact} />
+							))}
+						</SortableContext>
+					</DndContext>
+
+					{!compact ? (
+						<div className="px-6 py-2">
+							<InlineTaskForm
+								action={async (name) => {
+									await createTask.mutateAsync({
+										name,
+										taskListId: taskList.id,
+									});
+								}}
 							/>
-						))}
+						</div>
+					) : null}
+
+					{compact
+						? null
+						: doneItems.map((task) => <TaskItem key={task.id} task={task} />)}
+				</div>
 			</div>
-		</div>
+		</Suspense>
 	);
 };

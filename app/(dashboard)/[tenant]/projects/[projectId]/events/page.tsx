@@ -1,53 +1,71 @@
-import { SpinnerWithSpacing } from "@/components/core/loaders";
+"use client";
+
+import { Panel } from "@/components/core/panel";
 import PageSection from "@/components/core/section";
+import EventForm from "@/components/form/event";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import EventsCalendar from "@/components/project/events/events-calendar";
 import { buttonVariants } from "@/components/ui/button";
 import { toDateStringWithDay } from "@/lib/utils/date";
-import { getOwner, getTimezone } from "@/lib/utils/useOwner";
+import { useTRPC } from "@/trpc/client";
+import { useUser } from "@clerk/nextjs";
+import { Title } from "@radix-ui/react-dialog";
+import { useQuery } from "@tanstack/react-query";
 import { RssIcon } from "lucide-react";
 import Link from "next/link";
-import { Suspense } from "react";
+import { useParams } from "next/navigation";
+import { parseAsBoolean, useQueryState } from "nuqs";
+import { useMemo } from "react";
 
-type Props = {
-	params: Promise<{
-		projectId: string;
-		tenant: string;
-	}>;
-	searchParams: Promise<{
-		on: string;
-	}>;
-};
+export default function EventDetails() {
+	const { projectId, tenant } = useParams();
+	const { user } = useUser();
 
-export default async function EventDetails(props: Props) {
-	const searchParams = await props.searchParams;
-	const params = await props.params;
-	const { projectId, tenant } = params;
-	const { on } = searchParams;
-	const { userId, ownerId } = await getOwner();
-
-	const timezone = await getTimezone();
+	const [on] = useQueryState("on");
+	const [create, setCreate] = useQueryState(
+		"create",
+		parseAsBoolean.withDefault(false),
+	);
+	const [editing] = useQueryState("editing", parseAsBoolean.withDefault(false));
 	const selectedDate = on ? new Date(on) : new Date();
 
-	const dayCommentId = `${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDay()}`;
-	const calendarSubscriptionUrl = `/api/calendar/${ownerId}/${projectId}/calendar.ics?userId=${userId}`;
+	const dayCommentId = useMemo(
+		() =>
+			`${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDay()}`,
+		[projectId, selectedDate],
+	);
+	const calendarSubscriptionUrl = useMemo(
+		() =>
+			`/api/calendar/${tenant}/${projectId}/calendar.ics?userId=${user?.id}`,
+		[tenant, projectId, user?.id],
+	);
+
+	const trpc = useTRPC();
+	const { data: timezone, isLoading } = useQuery(
+		trpc.settings.getTimezone.queryOptions(),
+	);
 
 	return (
 		<>
 			<PageTitle
 				title="Events"
-				actionLabel="New"
-				actionLink={`/${tenant}/projects/${projectId}/events/new`}
+				actions={
+					<Link
+						href={`/${tenant}/projects/${projectId}/events?create=true`}
+						className={buttonVariants()}
+					>
+						New
+					</Link>
+				}
 			>
 				<div className="font-medium text-gray-500">
-					{toDateStringWithDay(selectedDate, timezone)}
+					{isLoading ? null : toDateStringWithDay(selectedDate, timezone!)}
 				</div>
 			</PageTitle>
 
-			<PageSection topInset>
+			<PageSection>
 				<div className="flex justify-between p-1">
-					{/* Left buttons */}
 					<div className="isolate inline-flex sm:space-x-3">
 						<span className="inline-flex space-x-1">
 							<Link
@@ -64,26 +82,29 @@ export default async function EventDetails(props: Props) {
 
 			<PageSection>
 				<div className="flex w-full rounded-lg">
-					<Suspense
-						key={`events-${projectId}-${selectedDate.toISOString()}`}
-						fallback={<SpinnerWithSpacing />}
-					>
-						<EventsCalendar
-							selectedDate={selectedDate.toISOString()}
-							timezone={timezone}
-						/>
-					</Suspense>
+					<EventsCalendar timezone={timezone!} />
 				</div>
 			</PageSection>
 
 			<div className="mx-auto max-w-7xl p-4 lg:p-0">
-				{/* @ts-ignore */}
 				<CommentsSection
-					type="event"
-					parentId={dayCommentId}
-					projectId={+projectId}
+					roomId={`project/${projectId}/event/${dayCommentId}`}
 				/>
 			</div>
+
+			<Panel open={editing}>
+				<Title>
+					<PageTitle title="Edit Event" compact />
+				</Title>
+				<EventForm />
+			</Panel>
+
+			<Panel open={create} setOpen={setCreate}>
+				<Title>
+					<PageTitle title="Create Event" compact />
+				</Title>
+				<EventForm />
+			</Panel>
 		</>
 	);
 }

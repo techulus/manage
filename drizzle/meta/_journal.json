@@ -15,6 +15,27 @@
       "when": 1744007560006,
       "tag": "0001_striped_blizzard",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1744244303500,
+      "tag": "0002_warm_rocket_racer",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1744282160497,
+      "tag": "0003_condemned_mysterio",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1744362631104,
+      "tag": "0004_true_kingpin",
+      "breakpoints": true
     }
   ]
 }

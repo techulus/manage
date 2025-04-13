@@ -1,3 +1,4 @@
+import { toMs } from "@/lib/utils/date";
 import {
 	QueryClient,
 	defaultShouldDehydrateQuery,
@@ -8,7 +9,7 @@ export function makeQueryClient() {
 	return new QueryClient({
 		defaultOptions: {
 			queries: {
-				staleTime: 30 * 1000,
+				staleTime: toMs(15),
 			},
 			dehydrate: {
 				serializeData: superjson.serialize,

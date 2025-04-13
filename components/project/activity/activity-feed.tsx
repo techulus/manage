@@ -1,14 +1,16 @@
 "use client";
 
-import { fetchActivities } from "@/app/(dashboard)/[tenant]/projects/actions";
-import { HtmlPreview } from "@/components/core/html-view";
-import { Spinner } from "@/components/core/loaders";
+import { Spinner, SpinnerWithSpacing } from "@/components/core/loaders";
 import { UserAvatar } from "@/components/core/user-avatar";
 import { Button } from "@/components/ui/button";
 import type { ActivityWithActor } from "@/drizzle/types";
+import { generateObjectDiffMessage } from "@/lib/activity/message";
 import { guessTimezone, toDateTimeString } from "@/lib/utils/date";
+import { useTRPC } from "@/trpc/client";
+import { useQuery } from "@tanstack/react-query";
 import { PencilIcon, PlusCircleIcon, TrashIcon } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export function ActivityItem({
 	item,
@@ -73,9 +75,9 @@ export function ActivityItem({
 								{toDateTimeString(item.createdAt, guessTimezone)}
 							</span>
 						</div>
-						{item.message ? (
+						{item.oldValue && item.newValue ? (
 							<div className="mt-1">
-								<HtmlPreview content={item.message} />
+								{generateObjectDiffMessage(item.oldValue, item.newValue)}
 							</div>
 						) : null}
 					</div>
@@ -85,41 +87,53 @@ export function ActivityItem({
 	);
 }
 
-export function ActivityFeed({
-	activities,
-	projectId,
-}: { activities: ActivityWithActor[]; projectId: string }) {
+export function ActivityFeed() {
+	const { projectId } = useParams();
 	const [hasMore, setHasMore] = useState(true);
-	const [isLoading, setIsLoading] = useState(false);
-	const [initialActivities, setInitialActivities] =
-		useState<ActivityWithActor[]>(activities);
+	const [offset, setOffset] = useState(0);
+	const [allActivities, setAllActivities] = useState<ActivityWithActor[]>([]);
 
-	const loadMore = useCallback(async () => {
-		setIsLoading(true);
-		const activities = await fetchActivities(
-			projectId,
-			initialActivities.length,
-		);
-		setInitialActivities([...initialActivities, ...activities]);
-		setHasMore(activities.length === 50);
-		setIsLoading(false);
-	}, [projectId, initialActivities]);
+	const trpc = useTRPC();
+	// Use useInfiniteQuery to fetch activities
+	const { data: activities = [], isLoading } = useQuery(
+		trpc.projects.getActivities.queryOptions({
+			projectId: +projectId!,
+			offset,
+		}),
+	);
+
+	useEffect(() => {
+		if (activities.length > 0) {
+			setAllActivities((prev) => [...prev, ...activities]);
+			setHasMore(activities.length === 25);
+		} else {
+			setHasMore(false);
+		}
+	}, [activities]);
+
+	const loadMore = () => {
+		setOffset((prev) => prev + 25);
+	};
+
+	if (isLoading && !allActivities.length) {
+		return <SpinnerWithSpacing />;
+	}
 
 	return (
 		<div className="flex flex-col w-full rounded-lg border bg-card">
-			{activities.length ? (
+			{allActivities.length ? (
 				<>
 					<ul className="w-full">
-						{initialActivities.map((activityItem, activityItemIdx) => (
+						{allActivities.map((activityItem, activityItemIdx) => (
 							<ActivityItem
 								key={activityItem.id}
 								item={activityItem}
-								isLast={activityItemIdx === initialActivities.length - 1}
+								isLast={activityItemIdx === allActivities.length - 1}
 							/>
 						))}
 					</ul>
-					<div className="flex justify-center p-4 border-t">
-						{hasMore && !isLoading ? (
+					{hasMore && !isLoading ? (
+						<div className="flex justify-center p-4 border-t">
 							<Button
 								onClick={loadMore}
 								variant="outline"
@@ -128,9 +142,9 @@ export function ActivityFeed({
 							>
 								Load more
 							</Button>
-						) : null}
-						{isLoading ? <Spinner className="mx-auto" /> : null}
-					</div>
+						</div>
+					) : null}
+					{isLoading ? <Spinner className="mx-auto" /> : null}
 				</>
 			) : (
 				<div className="flex flex-col items-center justify-center py-8 px-4 text-center">

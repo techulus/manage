@@ -21,7 +21,7 @@ export function FeaturesSection() {
 		{
 			title: "Ease of use",
 			description:
-				"Easily manage your tasks, events, documents & more with a single click.",
+				"Easily manage your tasks, events, files & more with a single click.",
 			icon: <ShieldQuestion />,
 		},
 		{

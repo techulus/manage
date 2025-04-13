@@ -1,148 +1,57 @@
+"use client";
+
+import EmptyState from "@/components/core/empty-state";
 import { Greeting } from "@/components/core/greeting";
+import { PageLoading } from "@/components/core/loaders";
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
+import { ProjecItem } from "@/components/project/project-item";
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { calendarEvent, task } from "@/drizzle/schema";
 import { toDateStringWithDay, toDateTimeString } from "@/lib/utils/date";
-import { database } from "@/lib/utils/useDatabase";
-import {
-	filterByRepeatRule,
-	getStartEndDateRangeInUtc,
-} from "@/lib/utils/useEvents";
-import { getTimezone } from "@/lib/utils/useOwner";
-import {
-	and,
-	asc,
-	between,
-	desc,
-	eq,
-	gt,
-	isNotNull,
-	lt,
-	ne,
-	or,
-} from "drizzle-orm";
+import { useTRPC } from "@/trpc/client";
+import { useSuspenseQueries } from "@tanstack/react-query";
 import { AlertTriangleIcon, CalendarClockIcon, InfoIcon } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useQueryState } from "nuqs";
+import { Suspense } from "react";
 import { rrulestr } from "rrule";
 
-export default async function Today(props: {
-	params: Promise<{
-		tenant: string;
-	}>;
-}) {
-	const db = await database();
+export default function Today() {
+	const params = useParams();
+	const tenant = params.tenant as string;
 
-	const timezone = await getTimezone();
-	const today = new Date();
+	const trpc = useTRPC();
+	const [statuses] = useQueryState("status", {
+		defaultValue: "active",
+	});
 
-	const { startOfDay, endOfDay } = getStartEndDateRangeInUtc(timezone, today);
-
-	const [tasksDueToday, overDueTasks, events] = await Promise.all([
-		db.query.task.findMany({
-			where: and(
-				between(task.dueDate, startOfDay, endOfDay),
-				ne(task.status, "done"),
-				isNotNull(task.dueDate),
-			),
-			orderBy: [asc(task.position)],
-			columns: {
-				name: true,
-				dueDate: true,
-				id: true,
+	const [
+		{
+			data: { dueToday, overDue, events },
+		},
+		{ data: projects },
+		{ data: timezone },
+	] = useSuspenseQueries({
+		queries: [
+			{
+				...trpc.user.getTodayData.queryOptions(),
+				staleTime: 0,
 			},
-			with: {
-				taskList: {
-					columns: {
-						id: true,
-						status: true,
-						name: true,
-					},
-					with: {
-						project: {
-							columns: {
-								id: true,
-								name: true,
-							},
-						},
-					},
-				},
-			},
-		}),
-		db.query.task.findMany({
-			where: and(
-				lt(task.dueDate, startOfDay),
-				ne(task.status, "done"),
-				isNotNull(task.dueDate),
-			),
-			orderBy: [asc(task.position)],
-			columns: {
-				name: true,
-				dueDate: true,
-				id: true,
-			},
-			with: {
-				taskList: {
-					columns: {
-						id: true,
-						status: true,
-						name: true,
-					},
-					with: {
-						project: {
-							columns: {
-								id: true,
-								name: true,
-							},
-						},
-					},
-				},
-			},
-		}),
-		db.query.calendarEvent.findMany({
-			where: and(
-				or(
-					between(calendarEvent.start, startOfDay, endOfDay),
-					between(calendarEvent.end, startOfDay, endOfDay),
-					and(
-						lt(calendarEvent.start, startOfDay),
-						gt(calendarEvent.end, endOfDay),
-					),
-					isNotNull(calendarEvent.repeatRule),
-					eq(calendarEvent.start, startOfDay),
-					eq(calendarEvent.end, endOfDay),
-				),
-			),
-			orderBy: [desc(calendarEvent.start), asc(calendarEvent.allDay)],
-			with: {
-				project: {
-					columns: {
-						id: true,
-						name: true,
-					},
-				},
-			},
-		}),
-	]);
-
-	const dueToday = tasksDueToday.filter(
-		(t) => t.taskList?.status !== "archived",
-	);
-
-	const overDue = overDueTasks.filter((t) => t.taskList?.status !== "archived");
-
-	const filteredEvents = events.filter((event) =>
-		filterByRepeatRule(event, new Date(today), timezone),
-	);
-
-	const { tenant } = await props.params;
+			trpc.user.getProjects.queryOptions({
+				statuses: statuses.split(","),
+			}),
+			trpc.settings.getTimezone.queryOptions(),
+		],
+	});
 
 	return (
-		<>
-			<PageTitle title={toDateStringWithDay(today, timezone)} />
+		<Suspense fallback={<PageLoading />}>
+			<PageTitle title={toDateStringWithDay(new Date(), timezone)} />
 
-			<div className="max-w-7xl mx-auto -mt-10 bg-background px-6 lg:px-0 pb-6">
+			<div className="max-w-7xl mx-auto -mt-4 bg-background px-6 lg:px-0 pb-6">
 				<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
 					<Card className="col-span-2 md:col-span-1 p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-none">
 						<h2 className="text-2xl font-semibold">
@@ -172,7 +81,7 @@ export default async function Today(props: {
 				</div>
 			</div>
 
-			{filteredEvents.length ? (
+			{events.length ? (
 				<PageSection>
 					<div className="flex items-center justify-between p-4">
 						<h3 className="flex items-center text-lg font-medium text-primary">
@@ -181,7 +90,7 @@ export default async function Today(props: {
 						</h3>
 					</div>
 					<div className="space-y-3">
-						{filteredEvents.map((event) => (
+						{events.map((event) => (
 							<Link
 								href={`/${tenant}/projects/${event.project.id}/events`}
 								key={event.id}
@@ -257,7 +166,43 @@ export default async function Today(props: {
 					) : null}
 				</PageSection>
 			) : null}
-		</>
+
+			<div className="mx-auto mt-8 flex max-w-7xl flex-col">
+				<EmptyState
+					show={!projects.length}
+					label="projects"
+					createLink={`/${tenant}/projects/new`}
+				/>
+
+				<div className="grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:px-0">
+					{projects.map((project) => (
+						<ProjecItem
+							key={project.id}
+							project={project}
+							timezone={timezone || ""}
+						/>
+					))}
+				</div>
+
+				<div className="mx-auto mt-6 flex w-full max-w-7xl flex-grow items-center border-t border-muted">
+					{statuses.includes("archived") ? (
+						<Link
+							href={`/${tenant}/today`}
+							className={buttonVariants({ variant: "link" })}
+						>
+							Hide Archived
+						</Link>
+					) : (
+						<Link
+							href={`/${tenant}/today?status=active,archived`}
+							className={buttonVariants({ variant: "link" })}
+						>
+							Show Archived
+						</Link>
+					)}
+				</div>
+			</div>
+		</Suspense>
 	);
 }
 

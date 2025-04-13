@@ -16,6 +16,8 @@ import { CalendarIcon } from "lucide-react";
 
 type Props = {
 	name: string;
+	placeholder?: string;
+	buttonClassName?: string;
 	defaultValue?: Date | string;
 	onSelect?: (date: Date) => void;
 };
@@ -76,11 +78,12 @@ function TimePicker(props: Props) {
 					<Button
 						variant="outline"
 						className={cn(
-							"w-full justify-start text-left font-normal",
+							"w-full justify-start text-left font-normal space-x-1",
 							!date && "text-muted-foreground",
+							props.buttonClassName,
 						)}
 					>
-						<CalendarIcon className="mr-2 h-4 w-4" />
+						<CalendarIcon className="h-4 w-4" />
 						{date ? (
 							format(date, "MM/dd/yyyy hh:mm aa")
 						) : (
@@ -185,12 +188,17 @@ function DatePicker(props: Props) {
 					<Button
 						variant={"outline"}
 						className={cn(
-							"w-full justify-start text-left font-normal",
+							"w-full justify-start text-left font-normal space-x-1",
 							!date && "text-muted-foreground",
+							props.buttonClassName,
 						)}
 					>
-						<CalendarIcon className="mr-2 h-4 w-4" />
-						{date ? format(date, "PPP") : <span>Pick a date</span>}
+						<CalendarIcon className="h-4 w-4" />
+						{date ? (
+							format(date, "PPP")
+						) : (
+							<span>{props.placeholder ?? "Pick a date"}</span>
+						)}
 					</Button>
 				</PopoverTrigger>
 				<PopoverContent className="w-auto p-0" align="start">
