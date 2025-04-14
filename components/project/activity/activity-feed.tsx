@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { PencilIcon, PlusCircleIcon, TrashIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import Markdown from "react-markdown";
 
 export function ActivityItem({
 	item,
@@ -76,8 +77,10 @@ export function ActivityItem({
 							</span>
 						</div>
 						{item.oldValue && item.newValue ? (
-							<div className="mt-1">
-								{generateObjectDiffMessage(item.oldValue, item.newValue)}
+							<div className="mt-1 prose dark:prose-invert">
+								<Markdown>
+									{generateObjectDiffMessage(item.oldValue, item.newValue)}
+								</Markdown>
 							</div>
 						) : null}
 					</div>

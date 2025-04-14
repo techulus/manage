@@ -55,7 +55,9 @@ export function Comments({
 							{comment.creator ? <UserAvatar user={comment.creator} /> : null}
 							<div>
 								<div className="font-semibold">
-									{comment.creator?.firstName ?? "User"}
+									<span className="text-primary">
+										{comment.creator?.firstName ?? "User"}
+									</span>
 									<span className="ml-2 text-xs text-muted-foreground md:hidden">
 										{new Date(comment.createdAt).toLocaleString()}
 									</span>

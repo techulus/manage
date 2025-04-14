@@ -70,6 +70,7 @@
 		"react-day-picker": "^8.10.1",
 		"react-dom": "19.1.0",
 		"react-dropzone": "^14.2.3",
+		"react-markdown": "^10.1.0",
 		"resend": "^4.1.2",
 		"rrule": "^2.8.1",
 		"server-only": "^0.0.1",
