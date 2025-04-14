@@ -128,7 +128,7 @@ export const TaskListItem = ({
 				</div>
 			}
 		>
-			<div className="rounded-lg border bg-card overflow-hidden">
+			<div className="rounded-lg bg-muted overflow-hidden">
 				{!hideHeader ? (
 					<TaskListHeader
 						taskList={taskList}

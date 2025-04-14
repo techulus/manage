@@ -17,11 +17,11 @@ export const ProjecItem = ({
 		<div
 			key={id}
 			className={cn(
-				"relative flex h-[120px] justify-between space-x-3 rounded-lg border bg-card px-3 py-2 shadow-sm hover:border-foreground/20",
+				"relative flex h-[100px] justify-between space-x-3 rounded-lg bg-muted px-3 py-2 shadow-sm hover:border-foreground/20",
 			)}
 		>
 			<div>
-				<h3 className="text-2xl tracking-tight">
+				<h3 className="text-2xl">
 					<Link href={`./projects/${id}`} className="focus:outline-none">
 						<span className="absolute inset-0" aria-hidden="true" />
 						{name}

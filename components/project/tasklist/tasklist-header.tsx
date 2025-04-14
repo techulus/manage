@@ -45,14 +45,14 @@ export const TaskListHeader = ({
 	);
 
 	return (
-		<div className="group relative flex items-center gap-x-4 rounded-tl-lg rounded-tr-lg bg-card p-3">
+		<div className="group relative flex items-center gap-x-4 rounded-tl-lg rounded-tr-lg bg-muted p-3">
 			<Link
 				href={`/${tenant}/projects/${taskList.projectId}/tasklists/${taskList.id}`}
 				className="text-sm font-medium flex-grow flex-auto"
 			>
 				<span className="absolute inset-0" aria-hidden="true" />
 				<div className="mb-2 flex">
-					<div className="text-xl leading-6">
+					<div className="text-2xl tracking-tighter leading-6">
 						{taskList.name}
 						{taskList.status === "archived" ? " (Archived)" : null}
 					</div>
@@ -60,20 +60,14 @@ export const TaskListHeader = ({
 
 				<div className="flex flex-col space-y-2 text-gray-500 dark:text-gray-400">
 					{totalCount && doneCount ? (
-						<div className="flex flex-row items-center space-x-2">
+						<div className="flex flex-row items-center space-x-1">
 							<CheckCircle className="w-4 h-4" />
 							<p className="block">
 								{doneCount} of {totalCount}
 							</p>
 
 							{completedPercent ? (
-								<>
-									<Progress
-										className="h-3 max-w-[120px]"
-										value={completedPercent}
-									/>
-									<span className="ml-2">{completedPercent}%</span>
-								</>
+								<span className="ml-2 text-sm">({completedPercent}%)</span>
 							) : null}
 						</div>
 					) : null}

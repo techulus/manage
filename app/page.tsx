@@ -93,7 +93,7 @@ export default async function Home() {
 					<div className="mx-auto max-w-7xl px-6 lg:px-8">
 						{features.map((feature) => (
 							<div key={feature.name} className="mb-24 last:mb-0">
-								<p className="max-w-2xl text-pretty text-5xl font-semibold tracking-tight text-gray-900 dark:text-gray-100 sm:text-balance sm:text-6xl">
+								<p className="max-w-2xl text-pretty text-5xl font-semibold tracking-tighter text-gray-900 dark:text-gray-100 sm:text-balance sm:text-6xl">
 									{feature.title
 										.split(feature.highlight)
 										.map((part, i, arr) => (

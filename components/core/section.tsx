@@ -12,7 +12,7 @@ export default function PageSection({
 	return (
 		<div
 			className={cn(
-				"mx-4 flex max-w-7xl flex-col divide-y rounded-lg border bg-card xl:mx-auto",
+				"mx-4 flex max-w-7xl flex-col divide-y rounded-lg bg-muted xl:mx-auto",
 				bottomMargin ? "mb-6" : "",
 				className,
 			)}

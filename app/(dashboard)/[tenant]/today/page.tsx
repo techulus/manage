@@ -51,7 +51,7 @@ export default function Today() {
 		<Suspense fallback={<PageLoading />}>
 			<PageTitle title={toDateStringWithDay(new Date(), timezone)} />
 
-			<div className="max-w-7xl mx-auto -mt-4 bg-background px-6 lg:px-0 pb-6">
+			<div className="max-w-7xl mx-4 xl:mx-auto -mt-4 bg-background pb-6">
 				<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
 					<Card className="col-span-2 md:col-span-1 p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-none">
 						<h2 className="text-2xl font-semibold">
@@ -95,7 +95,7 @@ export default function Today() {
 								href={`/${tenant}/projects/${event.project.id}/events`}
 								key={event.id}
 							>
-								<Card className="p-4 hover:bg-muted/50 transition-colors border-none">
+								<div className="p-4 hover:bg-muted/50 transition-colors border-none">
 									<div className="flex flex-col space-y-2">
 										<div className="flex items-start justify-between">
 											<h4 className="font-medium">{event.name}</h4>
@@ -132,7 +132,7 @@ export default function Today() {
 											{event.project.name}
 										</div>
 									</div>
-								</Card>
+								</div>
 							</Link>
 						))}
 					</div>
@@ -224,7 +224,7 @@ function TaskItem(
 			href={`/${tenant}/projects/${task.taskList.project.id}/tasklists/${task.taskList.id}`}
 			key={task.id}
 		>
-			<Card className="px-4 py-2 hover:bg-muted/50 transition-colors border-none">
+			<div className="px-4 py-2 hover:bg-muted/50 transition-colors border-none">
 				<div className="flex items-start justify-between">
 					<div className="space-y-1">
 						<h4 className="font-medium">{task.name}</h4>
@@ -234,7 +234,7 @@ function TaskItem(
 						</div>
 					</div>
 				</div>
-			</Card>
+			</div>
 		</Link>
 	);
 }

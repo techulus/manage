@@ -98,7 +98,7 @@ export const TaskItem = ({
 
 	return (
 		<>
-			<Card
+			<div
 				className={cn(
 					"flex scale-100 rounded-lg shadow-none",
 					"flex-row items-center justify-center space-x-2 border-none",
@@ -176,7 +176,7 @@ export const TaskItem = ({
 						<AlignJustifyIcon className="h-5 w-5 opacity-40" />
 					</div>
 				) : null}
-			</Card>
+			</div>
 
 			<Panel open={detailsOpen} setOpen={setDetailsOpen}>
 				<Title>
