@@ -1,6 +1,7 @@
 "use client";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTasks } from "@/hooks/use-tasks";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
 import {
@@ -17,11 +18,7 @@ import {
 	arrayMove,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import {
-	useMutation,
-	useQueryClient,
-	useSuspenseQuery,
-} from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import InlineTaskForm from "../../form/task";
 import { TaskItem } from "./task/task-item";
@@ -43,27 +40,7 @@ export const TaskListItem = ({
 		}),
 	);
 
-	const queryClient = useQueryClient();
-	const createTask = useMutation(
-		trpc.tasks.createTask.mutationOptions({
-			onSuccess: () => {
-				queryClient.invalidateQueries({
-					queryKey: trpc.tasks.getListById.queryKey({ id }),
-				});
-			},
-		}),
-	);
-	const updateTask = useMutation(
-		trpc.tasks.updateTask.mutationOptions({
-			onSuccess: () => {
-				queryClient.invalidateQueries({
-					queryKey: trpc.tasks.getListById.queryKey({
-						id,
-					}),
-				});
-			},
-		}),
-	);
+	const { createTask, updateTask } = useTasks();
 
 	const todoItems = useMemo(
 		() => taskList.tasks.filter((task) => task.status === "todo"),
@@ -102,7 +79,7 @@ export const TaskListItem = ({
 								localTodoItems[overTaskIndex].position) /
 							2;
 
-			updateTask.mutateAsync({
+			updateTask.mutate({
 				id: movedTask.id,
 				position: newPosition,
 			});
@@ -163,7 +140,7 @@ export const TaskListItem = ({
 						<div className="px-6 py-2">
 							<InlineTaskForm
 								action={async (name) => {
-									await createTask.mutateAsync({
+									createTask.mutate({
 										name,
 										taskListId: taskList.id,
 									});

@@ -171,7 +171,7 @@ export default function Today() {
 					createLink={`/${tenant}/projects/new`}
 				/>
 
-				<div className="grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:px-0">
+				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 					{projects.map((project) => (
 						<ProjecItem
 							key={project.id}

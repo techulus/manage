@@ -7,6 +7,7 @@ import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { Progress } from "@/components/ui/progress";
+import { TasksProvider } from "@/hooks/use-tasks";
 import { toStartOfDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import {
@@ -111,7 +112,9 @@ export default function TaskLists() {
 			</PageSection>
 
 			<PageSection transparent>
-				<TaskListItem key={list.id} id={list.id} hideHeader />
+				<TasksProvider projectId={+projectId!} taskListId={+tasklistId!}>
+					<TaskListItem key={list.id} id={list.id} hideHeader />
+				</TasksProvider>
 
 				<div className="py-8">
 					<CommentsSection

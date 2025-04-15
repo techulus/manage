@@ -1,7 +1,7 @@
 "use client";
 
 import { DeleteButton } from "@/components/form/button";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -76,18 +76,6 @@ export const TaskListHeader = ({
 					<CircleEllipsisIcon className="h-6 w-6" />
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end">
-					<DropdownMenuItem className="w-full p-0">
-						<Link
-							href={`/${tenant}/projects/${taskList.projectId}/tasklists/${taskList.id}/edit`}
-							className={buttonVariants({
-								variant: "ghost",
-								className: "w-full",
-								size: "sm",
-							})}
-						>
-							Edit
-						</Link>
-					</DropdownMenuItem>
 					<DropdownMenuItem className="w-full p-0">
 						<Button
 							variant="ghost"

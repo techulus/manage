@@ -11,22 +11,18 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type {
-	TaskList,
-	TaskListWithTasks,
-	TaskWithDetails,
-} from "@/drizzle/types";
+import type { TaskList, TaskWithDetails } from "@/drizzle/types";
+import { useTasks } from "@/hooks/use-tasks";
 import { cn } from "@/lib/utils";
 import { toDateStringWithDay, toStartOfDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
-import { useUser } from "@clerk/nextjs";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Close, Title } from "@radix-ui/react-dialog";
-import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { AlignJustifyIcon, CalendarClock, FileIcon, X } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Checkbox } from "../../../ui/checkbox";
 import { DateTimePicker } from "../../events/date-time-picker";
@@ -40,7 +36,6 @@ export const TaskItem = ({
 	task: TaskWithDetails;
 	compact?: boolean;
 }) => {
-	const { user } = useUser();
 	const { projectId } = useParams();
 	const [detailsOpen, setDetailsOpen] = useState(false);
 	const { attributes, listeners, setNodeRef, transform, transition } =
@@ -63,172 +58,7 @@ export const TaskItem = ({
 			],
 		});
 
-	const invalidateData = useCallback(() => {
-		queryClient.invalidateQueries({
-			queryKey: trpc.tasks.getListById.queryKey({ id: task.taskListId }),
-		});
-		queryClient.invalidateQueries({
-			queryKey: trpc.tasks.getTaskLists.queryKey({
-				projectId: +projectId!,
-			}),
-		});
-	}, [
-		projectId,
-		task.taskListId,
-		trpc.tasks.getListById.queryKey,
-		trpc.tasks.getTaskLists.queryKey,
-	]);
-
-	const queryClient = useQueryClient();
-	const createTask = useMutation(
-		trpc.tasks.createTask.mutationOptions({
-			onSuccess: invalidateData,
-			onMutate: async (newTask) => {
-				await queryClient.cancelQueries({
-					queryKey: trpc.tasks.getListById.queryKey({ id: newTask.taskListId }),
-				});
-
-				const previousTasks = queryClient.getQueryData<TaskListWithTasks>(
-					trpc.tasks.getListById.queryKey({ id: newTask.taskListId }),
-				);
-
-				queryClient.setQueryData<TaskListWithTasks>(
-					trpc.tasks.getListById.queryKey({ id: newTask.taskListId }),
-					(tasklist) => {
-						if (!tasklist) return tasklist;
-
-						const createdTask: TaskWithDetails = {
-							id: Date.now(),
-							taskListId: newTask.taskListId || 0,
-							name: newTask.name || "",
-							description: null,
-							status: newTask.status || "todo",
-							dueDate: null,
-							createdAt: new Date(),
-							updatedAt: new Date(),
-							createdByUser: "",
-							position: 0,
-							assignedToUser: null,
-							creator: {
-								firstName: user?.firstName || null,
-								imageUrl: user?.imageUrl || null,
-							},
-							assignee: null,
-						};
-
-						return {
-							...tasklist,
-							tasks: [...(tasklist.tasks || []), createdTask],
-						};
-					},
-				);
-
-				return { previousTasks };
-			},
-			onError: (error, newTask, context) => {
-				console.error(error);
-				toast.error("Oops, something went wrong, please try again.");
-				if (context?.previousTasks) {
-					queryClient.setQueryData<TaskListWithTasks>(
-						trpc.tasks.getListById.queryKey({ id: newTask.taskListId }),
-						context.previousTasks,
-					);
-				}
-			},
-		}),
-	);
-	const updateTask = useMutation(
-		trpc.tasks.updateTask.mutationOptions({
-			onSuccess: invalidateData,
-			onMutate: async (updatedTask) => {
-				await queryClient.cancelQueries({
-					queryKey: trpc.tasks.getListById.queryKey({ id: task.taskListId }),
-				});
-
-				const previousTasks = queryClient.getQueryData<TaskListWithTasks>(
-					trpc.tasks.getListById.queryKey({ id: task.taskListId }),
-				);
-
-				queryClient.setQueryData<TaskListWithTasks>(
-					trpc.tasks.getListById.queryKey({ id: task.taskListId }),
-					(tasklist) => {
-						if (!tasklist) return tasklist;
-
-						const updatedTaskWithDate = {
-							...updatedTask,
-							dueDate:
-								"dueDate" in updatedTask && updatedTask.dueDate
-									? new Date(updatedTask.dueDate)
-									: null,
-							updatedAt: new Date(),
-						};
-
-						return {
-							...tasklist,
-							tasks: tasklist.tasks.map((t) =>
-								t.id === updatedTask.id
-									? ({
-											...t,
-											...updatedTaskWithDate,
-										} as unknown as TaskWithDetails)
-									: t,
-							),
-						};
-					},
-				);
-
-				return { previousTasks };
-			},
-			onError: (err, _, context) => {
-				console.error(err);
-				toast.error("Oops, something went wrong, please try again.");
-				if (context?.previousTasks) {
-					queryClient.setQueryData<TaskListWithTasks>(
-						trpc.tasks.getListById.queryKey({ id: task.taskListId }),
-						context.previousTasks,
-					);
-				}
-			},
-		}),
-	);
-
-	const deleteTask = useMutation(
-		trpc.tasks.deleteTask.mutationOptions({
-			onSuccess: invalidateData,
-			onMutate: async (deletedTask) => {
-				await queryClient.cancelQueries({
-					queryKey: trpc.tasks.getListById.queryKey({ id: task.taskListId }),
-				});
-
-				const previousTasks = queryClient.getQueryData<TaskListWithTasks>(
-					trpc.tasks.getListById.queryKey({ id: task.taskListId }),
-				);
-
-				queryClient.setQueryData<TaskListWithTasks>(
-					trpc.tasks.getListById.queryKey({ id: task.taskListId }),
-					(tasklist) => {
-						if (!tasklist) return tasklist;
-						return {
-							...tasklist,
-							tasks: tasklist.tasks.filter((t) => t.id !== deletedTask.id),
-						};
-					},
-				);
-
-				return { previousTasks };
-			},
-			onError: (error, _, context) => {
-				console.error(error);
-				toast.error("Oops, something went wrong, please try again.");
-				if (context?.previousTasks) {
-					queryClient.setQueryData<TaskListWithTasks>(
-						trpc.tasks.getListById.queryKey({ id: task.taskListId }),
-						context.previousTasks,
-					);
-				}
-			},
-		}),
-	);
+	const { createTask, updateTask, deleteTask } = useTasks();
 
 	return (
 		<>
@@ -481,19 +311,10 @@ export const TaskItem = ({
 															className="w-full"
 															action={() => {
 																toast.promise(
-																	updateTask
-																		.mutateAsync({
-																			id: task.id,
-																			taskListId: list.id,
-																		})
-																		.then(() => {
-																			queryClient.invalidateQueries({
-																				queryKey:
-																					trpc.tasks.getListById.queryKey({
-																						id: list.id,
-																					}),
-																			});
-																		}),
+																	updateTask.mutateAsync({
+																		id: task.id,
+																		taskListId: list.id,
+																	}),
 																	{
 																		loading: "Moving...",
 																		success: "Moved!",
@@ -534,20 +355,11 @@ export const TaskItem = ({
 															className="w-full"
 															action={() => {
 																toast.promise(
-																	createTask
-																		.mutateAsync({
-																			name: task.name,
-																			taskListId: list.id,
-																			status: "todo",
-																		})
-																		.then(() => {
-																			queryClient.invalidateQueries({
-																				queryKey:
-																					trpc.tasks.getListById.queryKey({
-																						id: list.id,
-																					}),
-																			});
-																		}),
+																	createTask.mutateAsync({
+																		name: task.name,
+																		taskListId: list.id,
+																		status: "todo",
+																	}),
 																	{
 																		loading: "Copying...",
 																		success: "Copied!",

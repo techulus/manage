@@ -7,6 +7,7 @@ import SharedForm from "@/components/form/shared";
 import PageTitle from "@/components/layout/page-title";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { TasksProvider } from "@/hooks/use-tasks";
 import { useTRPC } from "@/trpc/client";
 import { Title } from "@radix-ui/react-dialog";
 import {
@@ -73,7 +74,13 @@ export default function TaskLists() {
 
 				<ul className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2">
 					{taskLists.map((taskList) => (
-						<TaskListItem key={taskList.id} id={taskList.id} compact />
+						<TasksProvider
+							key={taskList.id}
+							projectId={+projectId!}
+							taskListId={taskList.id}
+						>
+							<TaskListItem id={taskList.id} compact />
+						</TasksProvider>
 					))}
 				</ul>
 
