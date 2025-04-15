@@ -60,7 +60,7 @@ export const TaskListHeader = ({
 				<div className="flex flex-col space-y-2 text-gray-500 dark:text-gray-400">
 					<div className="flex flex-row items-center space-x-1">
 						<CheckCircle className="w-4 h-4" />
-						<p className="block">
+						<p className="block text-primary font-semibold">
 							{doneCount} of {totalCount}
 						</p>
 

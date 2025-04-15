@@ -69,7 +69,7 @@ export default function EditableDate({
 				className="outline-none hover:bg-destructive/40 p-1 px-2 rounded-md group flex items-center gap-1"
 				onClick={() => setIsDeleting(true)}
 			>
-				<span suppressHydrationWarning>
+				<span suppressHydrationWarning className="text-primary font-semibold">
 					{toDateStringWithDay(value, timezone)}
 				</span>
 				<TrashIcon className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity ml-1.5" />

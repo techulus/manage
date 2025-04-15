@@ -72,7 +72,7 @@ export default function TaskLists() {
 					{totalCount != null && doneCount != null ? (
 						<div className="inline-flex flex-row items-center space-x-1">
 							<CheckCircle className="w-4 h-4" />
-							<p className="block">
+							<p className="block text-primary font-semibold">
 								{doneCount} of {totalCount}
 							</p>
 

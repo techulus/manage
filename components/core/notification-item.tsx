@@ -28,7 +28,7 @@ export function NotificationItem({
 						className="text-left text-foreground/80 after:absolute after:inset-0"
 					>
 						{notification.fromUser ? (
-							<span className="font-medium text-foreground hover:underline">
+							<span className="font-semibold text-primary hover:underline">
 								{notification.fromUser.firstName}
 							</span>
 						) : null}{" "}

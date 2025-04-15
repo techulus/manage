@@ -10,14 +10,7 @@ import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import WeekCalendar from "@/components/project/events/week-calendar";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
-import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { toStartOfDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import {
@@ -25,7 +18,7 @@ import {
 	useQueryClient,
 	useSuspenseQueries,
 } from "@tanstack/react-query";
-import { CalendarIcon, ListIcon, MenuSquare } from "lucide-react";
+import { CalendarIcon, ListIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
@@ -93,10 +86,6 @@ export default function ProjectDetails() {
 				}}
 			>
 				<div className="flex flex-col pr-4 md:pr-0 space-y-1 space-x-0 md:flex-row md:space-y-0 md:space-x-2 text-gray-500 dark:text-gray-400">
-					{project.status === "archived" ? (
-						<Badge variant="outline">Archived</Badge>
-					) : null}
-
 					<EditableDate
 						value={project.dueDate}
 						timezone={timezone}
@@ -110,7 +99,7 @@ export default function ProjectDetails() {
 					/>
 
 					{project.status === "archived" ? (
-						<>
+						<div className="flex flex-row gap-2">
 							<form
 								action={async () => {
 									await updateProject.mutateAsync({
@@ -121,7 +110,7 @@ export default function ProjectDetails() {
 							>
 								<ActionButton
 									label="Unarchive"
-									variant="ghost"
+									variant="outline"
 									className="h-8"
 								/>
 							</form>
@@ -133,9 +122,14 @@ export default function ProjectDetails() {
 									router.push(`/${tenant}/today`);
 								}}
 							>
-								<DeleteButton action="Delete" className="h-8" compact />
+								<DeleteButton
+									action="Delete"
+									className="h-8"
+									variant="outline"
+									compact
+								/>
 							</form>
-						</>
+						</div>
 					) : (
 						<form
 							action={async () => {
@@ -145,7 +139,12 @@ export default function ProjectDetails() {
 								});
 							}}
 						>
-							<DeleteButton action="Archive" className="h-8" compact />
+							<DeleteButton
+								action="Archive"
+								className="h-8"
+								variant="outline"
+								compact
+							/>
 						</form>
 					)}
 				</div>

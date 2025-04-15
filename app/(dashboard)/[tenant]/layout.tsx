@@ -29,25 +29,11 @@ export default async function ConsoleLayout(props: {
 
 	const queryClient = getQueryClient();
 
-	const [notificationsWire, userProjects] = await Promise.all([
+	const [notificationsWire] = await Promise.all([
 		caller.user.getNotificationsWire(),
-		caller.user.getProjects({
-			statuses: ["active"],
-		}),
-	]);
-
-	void Promise.all([
 		queryClient.prefetchQuery(trpc.settings.getTimezone.queryOptions()),
 		queryClient.prefetchQuery(trpc.user.getTodayData.queryOptions()),
 		queryClient.prefetchQuery(trpc.user.getUserNotifications.queryOptions()),
-		queryClient.prefetchQuery(
-			trpc.user.getProjects.queryOptions({ statuses: ["active"] }),
-		),
-		...userProjects.map((project) =>
-			queryClient.prefetchQuery(
-				trpc.projects.getProjectById.queryOptions({ id: project.id }),
-			),
-		),
 	]);
 
 	return (

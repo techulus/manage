@@ -12,10 +12,12 @@ export default function Editor({
 	defaultValue,
 	metadata = undefined,
 	name = "description",
+	allowImageUpload = false,
 }: {
 	defaultValue?: string;
 	name?: string;
 	metadata?: PartialBlock[] | undefined;
+	allowImageUpload?: boolean;
 }) {
 	const { pending } = useFormStatus();
 	const [value, onChange] = useState(defaultValue ?? "");
@@ -45,19 +47,21 @@ export default function Editor({
 		}
 		return BlockNoteEditor.create({
 			initialContent,
-			uploadFile: async (file, blockId) => {
-				console.log(file, blockId);
-				const result: { url: string } = await fetch(
-					`/api/blob?name=${file.name}`,
-					{
-						method: "PUT",
-						body: file,
-					},
-				).then((res) => res.json());
-				return result.url;
-			},
+			uploadFile: allowImageUpload
+				? async (file, blockId) => {
+						console.log(file, blockId);
+						const result: { url: string } = await fetch(
+							`/api/blob?name=${file.name}`,
+							{
+								method: "PUT",
+								body: file,
+							},
+						).then((res) => res.json());
+						return result.url;
+					}
+				: undefined,
 		});
-	}, [initialContent, metadata]);
+	}, [initialContent, metadata, allowImageUpload]);
 
 	useEffect(() => {
 		if (defaultValue) {
