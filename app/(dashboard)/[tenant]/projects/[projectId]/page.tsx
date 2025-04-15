@@ -25,13 +25,7 @@ import {
 	useQueryClient,
 	useSuspenseQueries,
 } from "@tanstack/react-query";
-import {
-	CalendarIcon,
-	CalendarPlusIcon,
-	CircleEllipsisIcon,
-	ListIcon,
-	ListPlusIcon,
-} from "lucide-react";
+import { CalendarIcon, ListIcon, MenuSquare } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
@@ -115,60 +109,45 @@ export default function ProjectDetails() {
 						label="Due"
 					/>
 
-					<DropdownMenu>
-						<DropdownMenuTrigger>
-							<CircleEllipsisIcon className="h-6 w-6" />
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end">
-							{project.status === "archived" ? (
-								<>
-									<DropdownMenuItem className="w-full p-0">
-										<form
-											action={async () => {
-												await updateProject.mutateAsync({
-													id: project.id,
-													status: "active",
-												});
-											}}
-											className="w-full"
-										>
-											<ActionButton
-												label="Unarchive"
-												variant="ghost"
-												className="w-full"
-											/>
-										</form>
-									</DropdownMenuItem>
-									<DropdownMenuItem className="w-full p-0">
-										<form
-											action={async () => {
-												await deleteProject.mutateAsync({
-													id: project.id,
-												});
-												router.push(`/${tenant}/today`);
-											}}
-											className="w-full"
-										>
-											<DeleteButton action="Delete" />
-										</form>
-									</DropdownMenuItem>
-								</>
-							) : (
-								<DropdownMenuItem className="w-full p-0">
-									<form
-										action={async () => {
-											await updateProject.mutateAsync({
-												id: project.id,
-												status: "archived",
-											});
-										}}
-									>
-										<DeleteButton action="Archive" />
-									</form>
-								</DropdownMenuItem>
-							)}
-						</DropdownMenuContent>
-					</DropdownMenu>
+					{project.status === "archived" ? (
+						<>
+							<form
+								action={async () => {
+									await updateProject.mutateAsync({
+										id: project.id,
+										status: "active",
+									});
+								}}
+							>
+								<ActionButton
+									label="Unarchive"
+									variant="ghost"
+									className="h-8"
+								/>
+							</form>
+							<form
+								action={async () => {
+									await deleteProject.mutateAsync({
+										id: project.id,
+									});
+									router.push(`/${tenant}/today`);
+								}}
+							>
+								<DeleteButton action="Delete" className="h-8" compact />
+							</form>
+						</>
+					) : (
+						<form
+							action={async () => {
+								await updateProject.mutateAsync({
+									id: project.id,
+									status: "archived",
+								});
+							}}
+						>
+							<DeleteButton action="Archive" className="h-8" compact />
+						</form>
+					)}
 				</div>
 			</PageTitle>
 
