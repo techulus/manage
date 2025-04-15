@@ -85,9 +85,19 @@ export default function Editor({
 			<BlockNoteView
 				editor={editor}
 				onChange={async () => {
+					const isEmpty =
+						editor.document.length === 1 &&
+						editor.document[0].type === "paragraph" &&
+						editor.document[0].content?.length === 0 &&
+						editor.document[0].children?.length === 0;
+
 					setBlocks(editor.document);
-					const html = await editor.blocksToFullHTML(editor.document);
-					onChange(html);
+					if (isEmpty) {
+						onChange("");
+					} else {
+						const html = await editor.blocksToFullHTML(editor.document);
+						onChange(html);
+					}
 				}}
 			/>
 		</>

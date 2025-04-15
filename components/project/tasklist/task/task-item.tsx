@@ -1,6 +1,7 @@
 "use client";
 
 import { Panel } from "@/components/core/panel";
+import { UserAvatar } from "@/components/core/user-avatar";
 import EditableText from "@/components/form/editable-text";
 import NotesForm from "@/components/form/notes-form";
 import { Button } from "@/components/ui/button";
@@ -10,10 +11,15 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { TaskList, TaskWithDetails } from "@/drizzle/types";
+import type {
+	TaskList,
+	TaskListWithTasks,
+	TaskWithDetails,
+} from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { toDateStringWithDay, toStartOfDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
+import { useUser } from "@clerk/nextjs";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Close, Title } from "@radix-ui/react-dialog";
@@ -22,7 +28,6 @@ import { AlignJustifyIcon, CalendarClock, FileIcon, X } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { Card } from "../../../ui/card";
 import { Checkbox } from "../../../ui/checkbox";
 import { DateTimePicker } from "../../events/date-time-picker";
 import { Assignee } from "../../shared/assigee";
@@ -35,6 +40,7 @@ export const TaskItem = ({
 	task: TaskWithDetails;
 	compact?: boolean;
 }) => {
+	const { user } = useUser();
 	const { projectId } = useParams();
 	const [detailsOpen, setDetailsOpen] = useState(false);
 	const { attributes, listeners, setNodeRef, transform, transition } =
@@ -43,12 +49,6 @@ export const TaskItem = ({
 	const style = {
 		transform: CSS.Transform.toString(transform),
 		transition,
-	};
-
-	const updateTaskToastOptions = {
-		loading: "Saving...",
-		success: "Done!",
-		error: "Error while saving, please try again.",
 	};
 
 	const trpc = useTRPC();
@@ -83,16 +83,150 @@ export const TaskItem = ({
 	const createTask = useMutation(
 		trpc.tasks.createTask.mutationOptions({
 			onSuccess: invalidateData,
+			onMutate: async (newTask) => {
+				await queryClient.cancelQueries({
+					queryKey: trpc.tasks.getListById.queryKey({ id: newTask.taskListId }),
+				});
+
+				const previousTasks = queryClient.getQueryData<TaskListWithTasks>(
+					trpc.tasks.getListById.queryKey({ id: newTask.taskListId }),
+				);
+
+				queryClient.setQueryData<TaskListWithTasks>(
+					trpc.tasks.getListById.queryKey({ id: newTask.taskListId }),
+					(tasklist) => {
+						if (!tasklist) return tasklist;
+
+						const createdTask: TaskWithDetails = {
+							id: Date.now(),
+							taskListId: newTask.taskListId || 0,
+							name: newTask.name || "",
+							description: null,
+							status: newTask.status || "todo",
+							dueDate: null,
+							createdAt: new Date(),
+							updatedAt: new Date(),
+							createdByUser: "",
+							position: 0,
+							assignedToUser: null,
+							creator: {
+								firstName: user?.firstName || null,
+								imageUrl: user?.imageUrl || null,
+							},
+							assignee: null,
+						};
+
+						return {
+							...tasklist,
+							tasks: [...(tasklist.tasks || []), createdTask],
+						};
+					},
+				);
+
+				return { previousTasks };
+			},
+			onError: (error, newTask, context) => {
+				console.error(error);
+				toast.error("Oops, something went wrong, please try again.");
+				if (context?.previousTasks) {
+					queryClient.setQueryData<TaskListWithTasks>(
+						trpc.tasks.getListById.queryKey({ id: newTask.taskListId }),
+						context.previousTasks,
+					);
+				}
+			},
 		}),
 	);
 	const updateTask = useMutation(
 		trpc.tasks.updateTask.mutationOptions({
 			onSuccess: invalidateData,
+			onMutate: async (updatedTask) => {
+				await queryClient.cancelQueries({
+					queryKey: trpc.tasks.getListById.queryKey({ id: task.taskListId }),
+				});
+
+				const previousTasks = queryClient.getQueryData<TaskListWithTasks>(
+					trpc.tasks.getListById.queryKey({ id: task.taskListId }),
+				);
+
+				queryClient.setQueryData<TaskListWithTasks>(
+					trpc.tasks.getListById.queryKey({ id: task.taskListId }),
+					(tasklist) => {
+						if (!tasklist) return tasklist;
+
+						const updatedTaskWithDate = {
+							...updatedTask,
+							dueDate:
+								"dueDate" in updatedTask && updatedTask.dueDate
+									? new Date(updatedTask.dueDate)
+									: null,
+							updatedAt: new Date(),
+						};
+
+						return {
+							...tasklist,
+							tasks: tasklist.tasks.map((t) =>
+								t.id === updatedTask.id
+									? ({
+											...t,
+											...updatedTaskWithDate,
+										} as unknown as TaskWithDetails)
+									: t,
+							),
+						};
+					},
+				);
+
+				return { previousTasks };
+			},
+			onError: (err, _, context) => {
+				console.error(err);
+				toast.error("Oops, something went wrong, please try again.");
+				if (context?.previousTasks) {
+					queryClient.setQueryData<TaskListWithTasks>(
+						trpc.tasks.getListById.queryKey({ id: task.taskListId }),
+						context.previousTasks,
+					);
+				}
+			},
 		}),
 	);
+
 	const deleteTask = useMutation(
 		trpc.tasks.deleteTask.mutationOptions({
 			onSuccess: invalidateData,
+			onMutate: async (deletedTask) => {
+				await queryClient.cancelQueries({
+					queryKey: trpc.tasks.getListById.queryKey({ id: task.taskListId }),
+				});
+
+				const previousTasks = queryClient.getQueryData<TaskListWithTasks>(
+					trpc.tasks.getListById.queryKey({ id: task.taskListId }),
+				);
+
+				queryClient.setQueryData<TaskListWithTasks>(
+					trpc.tasks.getListById.queryKey({ id: task.taskListId }),
+					(tasklist) => {
+						if (!tasklist) return tasklist;
+						return {
+							...tasklist,
+							tasks: tasklist.tasks.filter((t) => t.id !== deletedTask.id),
+						};
+					},
+				);
+
+				return { previousTasks };
+			},
+			onError: (error, _, context) => {
+				console.error(error);
+				toast.error("Oops, something went wrong, please try again.");
+				if (context?.previousTasks) {
+					queryClient.setQueryData<TaskListWithTasks>(
+						trpc.tasks.getListById.queryKey({ id: task.taskListId }),
+						context.previousTasks,
+					);
+				}
+			},
 		}),
 	);
 
@@ -117,14 +251,10 @@ export const TaskItem = ({
 						onCheckedChange={async (checked) => {
 							if (compact) return;
 							const status = checked ? "done" : "todo";
-
-							toast.promise(
-								updateTask.mutateAsync({
-									id: task.id,
-									status,
-								}),
-								updateTaskToastOptions,
-							);
+							updateTask.mutate({
+								id: task.id,
+								status,
+							});
 						}}
 					/>
 				) : null}
@@ -142,7 +272,7 @@ export const TaskItem = ({
 					<div
 						className={cn(
 							"flex w-full items-center py-2",
-							task.status !== "done" ? "border-b" : "",
+							task.status !== "done" ? "border-b dark:border-white/10" : "",
 						)}
 					>
 						{task.assignee ? (
@@ -190,14 +320,10 @@ export const TaskItem = ({
 								)}
 								onCheckedChange={async (checked) => {
 									const status = checked ? "done" : "todo";
-
-									toast.promise(
-										updateTask.mutateAsync({
-											id: task.id,
-											status,
-										}),
-										updateTaskToastOptions,
-									);
+									updateTask.mutate({
+										id: task.id,
+										status,
+									});
 								}}
 							/>
 
@@ -249,13 +375,10 @@ export const TaskItem = ({
 											variant="outline"
 											className="text-primary hover:text-red-500"
 											onClick={() => {
-												toast.promise(
-													updateTask.mutateAsync({
-														id: task.id,
-														assignedToUser: null,
-													}),
-													updateTaskToastOptions,
-												);
+												updateTask.mutate({
+													id: task.id,
+													assignedToUser: null,
+												});
 											}}
 										>
 											Unassign
@@ -265,13 +388,10 @@ export const TaskItem = ({
 									<AssignToUser
 										users={users}
 										onUpdate={(userId) => {
-											toast.promise(
-												updateTask.mutateAsync({
-													id: task.id,
-													assignedToUser: userId,
-												}),
-												updateTaskToastOptions,
-											);
+											updateTask.mutate({
+												id: task.id,
+												assignedToUser: userId,
+											});
 										}}
 									/>
 								)}
@@ -290,13 +410,10 @@ export const TaskItem = ({
 										variant="outline"
 										className="text-primary hover:text-red-500"
 										onClick={() => {
-											toast.promise(
-												updateTask.mutateAsync({
-													id: task.id,
-													dueDate: null,
-												}),
-												updateTaskToastOptions,
-											);
+											updateTask.mutate({
+												id: task.id,
+												dueDate: null,
+											});
 										}}
 									>
 										Remove
@@ -308,13 +425,10 @@ export const TaskItem = ({
 										dateOnly
 										name="dueDate"
 										onSelect={(dueDate) => {
-											toast.promise(
-												updateTask.mutateAsync({
-													id: task.id,
-													dueDate: toStartOfDay(dueDate).toISOString(),
-												}),
-												updateTaskToastOptions,
-											);
+											updateTask.mutate({
+												id: task.id,
+												dueDate: toStartOfDay(dueDate).toISOString(),
+											});
 										}}
 									/>
 								</div>
@@ -324,9 +438,9 @@ export const TaskItem = ({
 						<div className="space-y-1">
 							<div className="flex items-center justify-between">
 								<h4 className="text-sm font-medium">Created By</h4>
-								<div className="space-x-2"></div>
 							</div>
-							<p className="text-sm text-muted-foreground">
+							<p className="text-sm text-muted-foreground flex items-center gap-2">
+								<UserAvatar user={task.creator} compact />{" "}
 								{task.creator?.firstName}
 							</p>
 						</div>
@@ -340,16 +454,9 @@ export const TaskItem = ({
 										variant="outline"
 										className="text-primary hover:text-red-500"
 										onClick={() => {
-											toast.promise(
-												deleteTask.mutateAsync({
-													id: task.id,
-												}),
-												{
-													loading: "Deleting...",
-													success: "Deleted!",
-													error: "Error while deleting, please try again.",
-												},
-											);
+											deleteTask.mutate({
+												id: task.id,
+											});
 										}}
 									>
 										Delete

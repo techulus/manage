@@ -15,12 +15,11 @@ export default async function Settings() {
 		<>
 			<PageTitle title="Settings" />
 
-			<PageSection bottomMargin>
-				<h2 className="flex items-center text-xl font-semibold leading-7 text-gray-900 dark:text-gray-200 p-4">
-					<HardDrive className="mr-2 inline-block h-6 w-6" />
-					Storage
-				</h2>
-
+			<PageSection
+				title="Storage"
+				titleIcon={<HardDrive className="w-5 h-5" />}
+				bottomMargin
+			>
 				<div className="p-4 sm:flex">
 					<dt className="font-semibold text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
 						Usage
@@ -36,12 +35,11 @@ export default async function Settings() {
 			</PageSection>
 
 			{user ? (
-				<PageSection>
-					<h2 className="flex items-center text-xl font-semibold leading-7 text-gray-900 dark:text-gray-200 p-4">
-						<User2 className="mr-2 inline-block h-6 w-6" />
-						Profile ({user.email})
-					</h2>
-
+				<PageSection
+					title="Profile"
+					titleIcon={<User2 className="w-5 h-5" />}
+					bottomMargin
+				>
 					<div className="p-4 sm:flex items-center">
 						<p className="font-semibold text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
 							Name

@@ -110,7 +110,7 @@ export default function TaskLists() {
 				</form>
 			</PageSection>
 
-			<div className="mx-auto max-w-7xl">
+			<PageSection transparent>
 				<TaskListItem key={list.id} id={list.id} hideHeader />
 
 				<div className="py-8">
@@ -118,7 +118,7 @@ export default function TaskLists() {
 						roomId={`project/${projectId}/tasklist/${tasklistId}`}
 					/>
 				</div>
-			</div>
+			</PageSection>
 		</Suspense>
 	);
 }

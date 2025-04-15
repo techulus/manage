@@ -39,11 +39,11 @@ export default function CommentForm({
 			}}
 		>
 			<div className="flex w-full flex-row space-x-4">
-				<div className="hidden w-[160px] md:block" />
+				<div className="hidden min-w-[160px] md:block" />
 
 				{creator ? <UserAvatar user={creator} /> : null}
 
-				<div className="relative flex-grow">
+				<div className="relative w-full">
 					<Editor name="content" />
 					<Button
 						size="sm"

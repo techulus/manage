@@ -8,7 +8,6 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Progress } from "@/components/ui/progress";
 import type { TaskList } from "@/drizzle/types";
 import { useTRPC } from "@/trpc/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -59,18 +58,16 @@ export const TaskListHeader = ({
 				</div>
 
 				<div className="flex flex-col space-y-2 text-gray-500 dark:text-gray-400">
-					{totalCount && doneCount ? (
-						<div className="flex flex-row items-center space-x-1">
-							<CheckCircle className="w-4 h-4" />
-							<p className="block">
-								{doneCount} of {totalCount}
-							</p>
+					<div className="flex flex-row items-center space-x-1">
+						<CheckCircle className="w-4 h-4" />
+						<p className="block">
+							{doneCount} of {totalCount}
+						</p>
 
-							{completedPercent ? (
-								<span className="ml-2 text-sm">({completedPercent}%)</span>
-							) : null}
-						</div>
-					) : null}
+						{completedPercent ? (
+							<span className="ml-2 text-sm">({completedPercent}%)</span>
+						) : null}
+					</div>
 				</div>
 			</Link>
 

@@ -26,8 +26,10 @@ import {
 	useSuspenseQueries,
 } from "@tanstack/react-query";
 import {
+	CalendarIcon,
 	CalendarPlusIcon,
 	CircleEllipsisIcon,
+	ListIcon,
 	ListPlusIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -184,18 +186,20 @@ export default function ProjectDetails() {
 				</form>
 			</PageSection>
 
-			<div className="mx-auto flex max-w-7xl flex-col p-4 xl:p-0 lg:pb-12">
-				<div className="flex justify-between flex-row items-center my-4">
-					<h2 className="text-2xl font-bold leading-7">Tasks</h2>
+			<PageSection
+				title="Tasks"
+				titleIcon={<ListIcon className="w-5 h-5" />}
+				titleAction={
 					<Link
 						className={buttonVariants({ size: "sm" })}
 						href={`/${tenant}/projects/${projectId}/tasklists?create=true`}
 					>
-						<ListPlusIcon className="mr-1 h-5 w-5" /> New
+						New
 						<span className="sr-only">, task list</span>
 					</Link>
-				</div>
-
+				}
+				transparent
+			>
 				{taskLists.length ? (
 					<ul className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2">
 						{taskLists.map((taskList) => {
@@ -220,23 +224,24 @@ export default function ProjectDetails() {
 					label="task list"
 					createLink={`/${tenant}/projects/${projectId}/tasklists?create=true`}
 				/>
-			</div>
+			</PageSection>
 
-			<div className="mx-auto flex max-w-7xl flex-col mt-8 space-y-4 p-4 xl:p-0">
-				<div className="flex justify-between flex-row items-center">
-					<h2 className="text-2xl font-bold leading-7">Events this week</h2>
-
+			<PageSection
+				title="Events this week"
+				titleIcon={<CalendarIcon className="w-5 h-5" />}
+				titleAction={
 					<Link
 						className={buttonVariants({ size: "sm" })}
 						href={`/${tenant}/projects/${projectId}/events?create=true`}
 					>
-						<CalendarPlusIcon className="mr-1 h-5 w-5" /> New
+						New
 						<span className="sr-only">, event</span>
 					</Link>
-				</div>
-
+				}
+				className="p-2"
+			>
 				<WeekCalendar timezone={timezone} compact />
-			</div>
+			</PageSection>
 
 			<div className="mx-auto max-w-7xl p-4 lg:py-8">
 				<CommentsSection roomId={`project/${project.id}`} />

@@ -45,17 +45,19 @@ export function Comments({
 
 	return (
 		<Suspense fallback={<SpinnerWithSpacing />}>
-			<div className={cn("flex flex-col divide-y", className)}>
+			<div
+				className={cn("flex flex-col divide-y dark:divide-white/10", className)}
+			>
 				{comments.map((comment) => (
 					<div key={comment.id} className="relative flex pt-2">
 						<div className="flex space-x-4">
-							<div className="hidden w-[160px] text-xs text-muted-foreground md:block">
+							<div className="hidden min-w-[160px] text-xs text-muted-foreground md:block">
 								{new Date(comment.createdAt).toLocaleString()}
 							</div>
 							{comment.creator ? <UserAvatar user={comment.creator} /> : null}
-							<div>
+							<div className="w-full">
 								<div className="font-semibold">
-									<span className="text-primary">
+									<span className="text-primary text-sm">
 										{comment.creator?.firstName ?? "User"}
 									</span>
 									<span className="ml-2 text-xs text-muted-foreground md:hidden">
@@ -66,8 +68,8 @@ export function Comments({
 
 								{comment.creator?.id === user?.id ? (
 									<DropdownMenu>
-										<DropdownMenuTrigger className="absolute right-2 top-4">
-											<CircleEllipsisIcon className="h-6 w-6" />
+										<DropdownMenuTrigger className="absolute right-2 top-[8px]">
+											<CircleEllipsisIcon className="h-5 w-5" />
 										</DropdownMenuTrigger>
 										<DropdownMenuContent align="end">
 											<DropdownMenuItem className="m-0 p-0">

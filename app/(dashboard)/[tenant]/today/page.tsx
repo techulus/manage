@@ -12,7 +12,12 @@ import { Card } from "@/components/ui/card";
 import { toDateStringWithDay, toDateTimeString } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useSuspenseQueries } from "@tanstack/react-query";
-import { AlertTriangleIcon, CalendarClockIcon, InfoIcon } from "lucide-react";
+import {
+	AlertTriangleIcon,
+	CalendarClockIcon,
+	FolderIcon,
+	InfoIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
@@ -60,22 +65,18 @@ export default function Today() {
 					</Card>
 					<Card className="p-6 bg-gradient-to-br from-orange-500/10 to-orange-500/5 border-none h-32">
 						<div className="flex flex-col items-center justify-center h-full">
-							<span className="text-3xl font-bold text-orange-500">
+							<span className="text-5xl font-bold text-orange-500">
 								{dueToday.length}
 							</span>
-							<span className="text-sm text-muted-foreground mt-1">
-								Due Today
-							</span>
+							<span className="text-muted-foreground mt-1">Due Today</span>
 						</div>
 					</Card>
 					<Card className="p-6 bg-gradient-to-br from-red-500/10 to-red-500/5 border-none h-32">
 						<div className="flex flex-col items-center justify-center h-full">
-							<span className="text-3xl font-bold text-red-500">
+							<span className="text-5xl font-bold text-red-500">
 								{overDue.length}
 							</span>
-							<span className="text-sm text-muted-foreground mt-1">
-								Overdue
-							</span>
+							<span className="text-muted-foreground mt-1">Overdue</span>
 						</div>
 					</Card>
 				</div>
@@ -139,35 +140,31 @@ export default function Today() {
 				</PageSection>
 			) : null}
 
-			{overDue.length || dueToday.length ? (
-				<PageSection>
-					{overDue.length ? (
-						<>
-							<div className="flex items-center justify-between p-4">
-								<h3 className="flex items-center text-lg font-medium text-red-600 dark:text-red-500">
-									<AlertTriangleIcon className="w-6 h-6 mr-2" />
-									Overdue
-								</h3>
-							</div>
-							{overDue.map((task) => TaskItem(tenant, task))}
-						</>
-					) : null}
-
-					{dueToday.length ? (
-						<>
-							<div className="flex items-center justify-between p-4">
-								<h3 className="flex items-center text-lg font-medium text-orange-600">
-									<InfoIcon className="w-6 h-6 mr-2" />
-									Due Today
-								</h3>
-							</div>
-							{dueToday.map((task) => TaskItem(tenant, task))}
-						</>
-					) : null}
+			{overDue.length ? (
+				<PageSection
+					title="Overdue"
+					titleClassName="text-red-600 dark:text-red-500"
+					titleIcon={<AlertTriangleIcon className="w-5 h-5" />}
+				>
+					{overDue.map((task) => TaskItem(tenant, task))}
 				</PageSection>
 			) : null}
 
-			<div className="mx-auto mt-8 flex max-w-7xl flex-col">
+			{dueToday.length ? (
+				<PageSection
+					title="Due Today"
+					titleClassName="text-orange-600 dark:text-orange-500"
+					titleIcon={<InfoIcon className="w-5 h-5" />}
+				>
+					{dueToday.map((task) => TaskItem(tenant, task))}
+				</PageSection>
+			) : null}
+
+			<PageSection
+				title="Projects"
+				titleIcon={<FolderIcon className="w-5 h-5" />}
+				transparent
+			>
 				<EmptyState
 					show={!projects.length}
 					label="projects"
@@ -201,7 +198,7 @@ export default function Today() {
 						</Link>
 					)}
 				</div>
-			</div>
+			</PageSection>
 		</Suspense>
 	);
 }

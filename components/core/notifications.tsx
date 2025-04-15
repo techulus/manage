@@ -67,7 +67,7 @@ export function Notifications({
 					<div className="flex flex-col">
 						<h3 className="font-medium px-4 py-2">Notifications</h3>
 						{notifications?.length && timezone ? (
-							<div className="flex flex-col divide-y">
+							<div className="flex flex-col divide-y dark:divide-white/10">
 								{notifications.map((notification) => (
 									<NotificationItem
 										key={notification.id}

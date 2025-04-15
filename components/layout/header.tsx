@@ -30,7 +30,11 @@ export async function Header() {
 				</div>
 
 				<Link
-					className={buttonVariants({ size: "sm", variant: "outline" })}
+					className={buttonVariants({
+						size: "sm",
+						variant: "outline",
+						className: "hidden",
+					})}
 					href="/start"
 				>
 					Console
