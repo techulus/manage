@@ -5,12 +5,14 @@ import { cn } from "@/lib/utils";
 export const UserAvatar = ({
 	user,
 	className,
+	compact = false,
 }: {
 	user: Pick<User, "firstName" | "imageUrl">;
 	className?: string;
+	compact?: boolean;
 }) => {
 	return (
-		<Avatar className={cn("h-8 w-8", className)}>
+		<Avatar className={cn(compact ? "h-5 w-5" : "h-7 w-7", className)}>
 			<AvatarImage
 				src={
 					user.imageUrl ??

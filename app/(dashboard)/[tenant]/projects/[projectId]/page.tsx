@@ -1,7 +1,6 @@
 "use client";
 
 import EmptyState from "@/components/core/empty-state";
-import { HtmlPreview } from "@/components/core/html-view";
 import { PageLoading } from "@/components/core/loaders";
 import PageSection from "@/components/core/section";
 import { ActionButton, DeleteButton } from "@/components/form/button";
@@ -13,14 +12,26 @@ import WeekCalendar from "@/components/project/events/week-calendar";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { toDateStringWithDay, toStartOfDay } from "@/lib/utils/date";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toStartOfDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import {
 	useMutation,
 	useQueryClient,
 	useSuspenseQueries,
 } from "@tanstack/react-query";
-import { CalendarPlusIcon, ListPlusIcon } from "lucide-react";
+import {
+	CalendarIcon,
+	CalendarPlusIcon,
+	CircleEllipsisIcon,
+	ListIcon,
+	ListPlusIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
@@ -89,7 +100,7 @@ export default function ProjectDetails() {
 			>
 				<div className="flex flex-col pr-4 md:pr-0 space-y-1 space-x-0 md:flex-row md:space-y-0 md:space-x-2 text-gray-500 dark:text-gray-400">
 					{project.status === "archived" ? (
-						<Badge variant="secondary">Archived</Badge>
+						<Badge variant="outline">Archived</Badge>
 					) : null}
 
 					<EditableDate
@@ -103,6 +114,61 @@ export default function ProjectDetails() {
 						}}
 						label="Due"
 					/>
+
+					<DropdownMenu>
+						<DropdownMenuTrigger>
+							<CircleEllipsisIcon className="h-6 w-6" />
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							{project.status === "archived" ? (
+								<>
+									<DropdownMenuItem className="w-full p-0">
+										<form
+											action={async () => {
+												await updateProject.mutateAsync({
+													id: project.id,
+													status: "active",
+												});
+											}}
+											className="w-full"
+										>
+											<ActionButton
+												label="Unarchive"
+												variant="ghost"
+												className="w-full"
+											/>
+										</form>
+									</DropdownMenuItem>
+									<DropdownMenuItem className="w-full p-0">
+										<form
+											action={async () => {
+												await deleteProject.mutateAsync({
+													id: project.id,
+												});
+												router.push(`/${tenant}/today`);
+											}}
+											className="w-full"
+										>
+											<DeleteButton action="Delete" />
+										</form>
+									</DropdownMenuItem>
+								</>
+							) : (
+								<DropdownMenuItem className="w-full p-0">
+									<form
+										action={async () => {
+											await updateProject.mutateAsync({
+												id: project.id,
+												status: "archived",
+											});
+										}}
+									>
+										<DeleteButton action="Archive" />
+									</form>
+								</DropdownMenuItem>
+							)}
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 			</PageTitle>
 
@@ -118,77 +184,27 @@ export default function ProjectDetails() {
 				>
 					<NotesForm value={project.description ?? ""} name="description" />
 				</form>
-
-				<div className="flex h-12 flex-col justify-center">
-					<div className="flex justify-between px-4 py-3">
-						{/* Left buttons */}
-						<div className="isolate inline-flex sm:space-x-3">
-							<span className="inline-flex space-x-1" />
-						</div>
-
-						{/* Right buttons */}
-						<span className="isolate inline-flex">
-							{project.status === "archived" ? (
-								<>
-									<form
-										action={async () => {
-											await updateProject.mutateAsync({
-												id: project.id,
-												status: "active",
-											});
-										}}
-									>
-										<ActionButton label="Unarchive" variant="link" />
-									</form>
-									<form
-										action={async () => {
-											await deleteProject.mutateAsync({
-												id: project.id,
-											});
-											router.push(`/${tenant}/today`);
-										}}
-									>
-										<DeleteButton action="Delete" />
-									</form>
-								</>
-							) : (
-								<form
-									action={async () => {
-										await updateProject.mutateAsync({
-											id: project.id,
-											status: "archived",
-										});
-									}}
-								>
-									<DeleteButton action="Archive" />
-								</form>
-							)}
-						</span>
-					</div>
-				</div>
 			</PageSection>
 
-			<div className="mx-auto flex max-w-7xl flex-col p-4 xl:p-0 lg:pb-12">
-				<div className="flex justify-between flex-row items-center my-4">
-					<h2 className="text-2xl font-bold leading-7 tracking-tight">Tasks</h2>
-
+			<PageSection
+				title="Tasks"
+				titleIcon={<ListIcon className="w-5 h-5" />}
+				titleAction={
 					<Link
 						className={buttonVariants({ size: "sm" })}
 						href={`/${tenant}/projects/${projectId}/tasklists?create=true`}
 					>
-						<ListPlusIcon className="mr-1 h-5 w-5" /> New
+						New
 						<span className="sr-only">, task list</span>
 					</Link>
-				</div>
-
+				}
+				transparent
+			>
 				{taskLists.length ? (
 					<ul className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2">
 						{taskLists.map((taskList) => {
 							return (
-								<div
-									key={taskList.id}
-									className="overflow-hidden rounded-lg border"
-								>
+								<div key={taskList.id} className="overflow-hidden rounded-lg ">
 									<TaskListHeader
 										taskList={taskList}
 										totalCount={taskList.tasks.length}
@@ -208,25 +224,24 @@ export default function ProjectDetails() {
 					label="task list"
 					createLink={`/${tenant}/projects/${projectId}/tasklists?create=true`}
 				/>
-			</div>
+			</PageSection>
 
-			<div className="mx-auto flex max-w-7xl flex-col mt-8 space-y-4 p-4 xl:p-0">
-				<div className="flex justify-between flex-row items-center">
-					<h2 className="text-2xl font-bold leading-7 tracking-tight">
-						Events this week
-					</h2>
-
+			<PageSection
+				title="Events this week"
+				titleIcon={<CalendarIcon className="w-5 h-5" />}
+				titleAction={
 					<Link
 						className={buttonVariants({ size: "sm" })}
 						href={`/${tenant}/projects/${projectId}/events?create=true`}
 					>
-						<CalendarPlusIcon className="mr-1 h-5 w-5" /> New
+						New
 						<span className="sr-only">, event</span>
 					</Link>
-				</div>
-
+				}
+				className="p-2"
+			>
 				<WeekCalendar timezone={timezone} compact />
-			</div>
+			</PageSection>
 
 			<div className="mx-auto max-w-7xl p-4 lg:py-8">
 				<CommentsSection roomId={`project/${project.id}`} />

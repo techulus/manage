@@ -12,7 +12,12 @@ import { Card } from "@/components/ui/card";
 import { toDateStringWithDay, toDateTimeString } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useSuspenseQueries } from "@tanstack/react-query";
-import { AlertTriangleIcon, CalendarClockIcon, InfoIcon } from "lucide-react";
+import {
+	AlertTriangleIcon,
+	CalendarClockIcon,
+	FolderIcon,
+	InfoIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
@@ -51,7 +56,7 @@ export default function Today() {
 		<Suspense fallback={<PageLoading />}>
 			<PageTitle title={toDateStringWithDay(new Date(), timezone)} />
 
-			<div className="max-w-7xl mx-auto -mt-4 bg-background px-6 lg:px-0 pb-6">
+			<div className="max-w-7xl mx-4 xl:mx-auto -mt-4 bg-background pb-6">
 				<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
 					<Card className="col-span-2 md:col-span-1 p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-none">
 						<h2 className="text-2xl font-semibold">
@@ -60,22 +65,18 @@ export default function Today() {
 					</Card>
 					<Card className="p-6 bg-gradient-to-br from-orange-500/10 to-orange-500/5 border-none h-32">
 						<div className="flex flex-col items-center justify-center h-full">
-							<span className="text-3xl font-bold text-orange-500">
+							<span className="text-5xl font-bold text-orange-500">
 								{dueToday.length}
 							</span>
-							<span className="text-sm text-muted-foreground mt-1">
-								Due Today
-							</span>
+							<span className="text-muted-foreground mt-1">Due Today</span>
 						</div>
 					</Card>
 					<Card className="p-6 bg-gradient-to-br from-red-500/10 to-red-500/5 border-none h-32">
 						<div className="flex flex-col items-center justify-center h-full">
-							<span className="text-3xl font-bold text-red-500">
+							<span className="text-5xl font-bold text-red-500">
 								{overDue.length}
 							</span>
-							<span className="text-sm text-muted-foreground mt-1">
-								Overdue
-							</span>
+							<span className="text-muted-foreground mt-1">Overdue</span>
 						</div>
 					</Card>
 				</div>
@@ -95,7 +96,7 @@ export default function Today() {
 								href={`/${tenant}/projects/${event.project.id}/events`}
 								key={event.id}
 							>
-								<Card className="p-4 hover:bg-muted/50 transition-colors border-none">
+								<div className="p-4 hover:bg-muted/50 transition-colors border-none">
 									<div className="flex flex-col space-y-2">
 										<div className="flex items-start justify-between">
 											<h4 className="font-medium">{event.name}</h4>
@@ -132,49 +133,45 @@ export default function Today() {
 											{event.project.name}
 										</div>
 									</div>
-								</Card>
+								</div>
 							</Link>
 						))}
 					</div>
 				</PageSection>
 			) : null}
 
-			{overDue.length || dueToday.length ? (
-				<PageSection>
-					{overDue.length ? (
-						<>
-							<div className="flex items-center justify-between p-4">
-								<h3 className="flex items-center text-lg font-medium text-red-600 dark:text-red-500">
-									<AlertTriangleIcon className="w-6 h-6 mr-2" />
-									Overdue
-								</h3>
-							</div>
-							{overDue.map((task) => TaskItem(tenant, task))}
-						</>
-					) : null}
-
-					{dueToday.length ? (
-						<>
-							<div className="flex items-center justify-between p-4">
-								<h3 className="flex items-center text-lg font-medium text-orange-600">
-									<InfoIcon className="w-6 h-6 mr-2" />
-									Due Today
-								</h3>
-							</div>
-							{dueToday.map((task) => TaskItem(tenant, task))}
-						</>
-					) : null}
+			{overDue.length ? (
+				<PageSection
+					title="Overdue"
+					titleClassName="text-red-600 dark:text-red-500"
+					titleIcon={<AlertTriangleIcon className="w-5 h-5" />}
+				>
+					{overDue.map((task) => TaskItem(tenant, task))}
 				</PageSection>
 			) : null}
 
-			<div className="mx-auto mt-8 flex max-w-7xl flex-col">
+			{dueToday.length ? (
+				<PageSection
+					title="Due Today"
+					titleClassName="text-orange-600 dark:text-orange-500"
+					titleIcon={<InfoIcon className="w-5 h-5" />}
+				>
+					{dueToday.map((task) => TaskItem(tenant, task))}
+				</PageSection>
+			) : null}
+
+			<PageSection
+				title="Projects"
+				titleIcon={<FolderIcon className="w-5 h-5" />}
+				transparent
+			>
 				<EmptyState
 					show={!projects.length}
 					label="projects"
 					createLink={`/${tenant}/projects/new`}
 				/>
 
-				<div className="grid grid-cols-1 gap-4 px-4 sm:grid-cols-2 lg:px-0">
+				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 					{projects.map((project) => (
 						<ProjecItem
 							key={project.id}
@@ -201,7 +198,7 @@ export default function Today() {
 						</Link>
 					)}
 				</div>
-			</div>
+			</PageSection>
 		</Suspense>
 	);
 }
@@ -224,7 +221,7 @@ function TaskItem(
 			href={`/${tenant}/projects/${task.taskList.project.id}/tasklists/${task.taskList.id}`}
 			key={task.id}
 		>
-			<Card className="px-4 py-2 hover:bg-muted/50 transition-colors border-none">
+			<div className="px-4 py-2 hover:bg-muted/50 transition-colors border-none">
 				<div className="flex items-start justify-between">
 					<div className="space-y-1">
 						<h4 className="font-medium">{task.name}</h4>
@@ -234,7 +231,7 @@ function TaskItem(
 						</div>
 					</div>
 				</div>
-			</Card>
+			</div>
 		</Link>
 	);
 }

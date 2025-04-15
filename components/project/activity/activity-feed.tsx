@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { PencilIcon, PlusCircleIcon, TrashIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import Markdown from "react-markdown";
 
 export function ActivityItem({
 	item,
@@ -76,8 +77,10 @@ export function ActivityItem({
 							</span>
 						</div>
 						{item.oldValue && item.newValue ? (
-							<div className="mt-1">
-								{generateObjectDiffMessage(item.oldValue, item.newValue)}
+							<div className="mt-1 prose dark:prose-invert">
+								<Markdown>
+									{generateObjectDiffMessage(item.oldValue, item.newValue)}
+								</Markdown>
 							</div>
 						) : null}
 					</div>
@@ -94,13 +97,14 @@ export function ActivityFeed() {
 	const [allActivities, setAllActivities] = useState<ActivityWithActor[]>([]);
 
 	const trpc = useTRPC();
-	// Use useInfiniteQuery to fetch activities
-	const { data: activities = [], isLoading } = useQuery(
-		trpc.projects.getActivities.queryOptions({
+	const { data: activities = [], isLoading } = useQuery({
+		...trpc.projects.getActivities.queryOptions({
 			projectId: +projectId!,
 			offset,
 		}),
-	);
+		staleTime: 0,
+		gcTime: 0,
+	});
 
 	useEffect(() => {
 		if (activities.length > 0) {
@@ -120,7 +124,7 @@ export function ActivityFeed() {
 	}
 
 	return (
-		<div className="flex flex-col w-full rounded-lg border bg-card">
+		<div className="flex flex-col w-full">
 			{allActivities.length ? (
 				<>
 					<ul className="w-full">

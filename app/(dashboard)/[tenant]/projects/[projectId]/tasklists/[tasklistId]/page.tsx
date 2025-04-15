@@ -7,6 +7,7 @@ import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { Progress } from "@/components/ui/progress";
+import { TasksProvider } from "@/hooks/use-tasks";
 import { toStartOfDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import {
@@ -68,22 +69,16 @@ export default function TaskLists() {
 					});
 				}}
 			>
-				<div className="flex flex-col pr-4 md:pr-0 space-y-1 space-x-0 md:flex-row md:space-y-0 md:space-x-2 text-gray-500 dark:text-gray-400">
+				<div className="flex flex-col pr-4 md:pr-0 space-y-1 space-x-0 md:flex-row md:space-y-0 md:space-x-3 text-gray-500 dark:text-gray-400">
 					{totalCount != null && doneCount != null ? (
-						<div className="flex w-[280px] flex-row items-center space-x-2">
+						<div className="inline-flex flex-row items-center space-x-1">
 							<CheckCircle className="w-4 h-4" />
 							<p className="block">
 								{doneCount} of {totalCount}
 							</p>
 
 							{completedPercent ? (
-								<>
-									<Progress
-										className="h-3 max-w-[130px]"
-										value={completedPercent}
-									/>
-									<span className="ml-2">{completedPercent}%</span>
-								</>
+								<span className="text-sm">({completedPercent}%)</span>
 							) : null}
 						</div>
 					) : null}
@@ -116,15 +111,17 @@ export default function TaskLists() {
 				</form>
 			</PageSection>
 
-			<div className="mx-auto max-w-7xl">
-				<TaskListItem key={list.id} id={list.id} hideHeader />
+			<PageSection transparent>
+				<TasksProvider projectId={+projectId!} taskListId={+tasklistId!}>
+					<TaskListItem key={list.id} id={list.id} hideHeader />
+				</TasksProvider>
 
 				<div className="py-8">
 					<CommentsSection
 						roomId={`project/${projectId}/tasklist/${tasklistId}`}
 					/>
 				</div>
-			</div>
+			</PageSection>
 		</Suspense>
 	);
 }

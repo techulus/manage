@@ -20,7 +20,7 @@ export async function Header() {
 					/>
 
 					<Link href="/" className="-m-1.5 p-1.5">
-						<p className="relative tracking-tight">
+						<p className="relative">
 							Manage
 							<sup className="absolute left-[calc(100%+.1rem)] top-0 text-xs">
 								[beta]
@@ -30,7 +30,11 @@ export async function Header() {
 				</div>
 
 				<Link
-					className={buttonVariants({ size: "sm", variant: "outline" })}
+					className={buttonVariants({
+						size: "sm",
+						variant: "outline",
+						className: "hidden",
+					})}
 					href="/start"
 				>
 					Console

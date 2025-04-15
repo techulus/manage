@@ -5,6 +5,7 @@ import { BlockNoteView } from "@blocknote/mantine";
 import { useEffect, useMemo, useState } from "react";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
+import { useFormStatus } from "react-dom";
 import { Spinner } from "../core/loaders";
 
 export default function Editor({
@@ -16,6 +17,7 @@ export default function Editor({
 	name?: string;
 	metadata?: PartialBlock[] | undefined;
 }) {
+	const { pending } = useFormStatus();
 	const [value, onChange] = useState(defaultValue ?? "");
 	const [blocks, setBlocks] = useState<PartialBlock[]>([]);
 	const [initialContent, setInitialContent] = useState<
@@ -57,6 +59,17 @@ export default function Editor({
 		});
 	}, [initialContent, metadata]);
 
+	useEffect(() => {
+		if (defaultValue) {
+			return;
+		}
+
+		if (editor && !pending) {
+			const allBlockIds = editor.document.map((block) => block.id);
+			editor.removeBlocks(allBlockIds);
+		}
+	}, [editor, pending, defaultValue]);
+
 	if (editor === undefined) {
 		return <Spinner />;
 	}
@@ -72,9 +85,19 @@ export default function Editor({
 			<BlockNoteView
 				editor={editor}
 				onChange={async () => {
+					const isEmpty =
+						editor.document.length === 1 &&
+						editor.document[0].type === "paragraph" &&
+						editor.document[0].content?.length === 0 &&
+						editor.document[0].children?.length === 0;
+
 					setBlocks(editor.document);
-					const html = await editor.blocksToFullHTML(editor.document);
-					onChange(html);
+					if (isEmpty) {
+						onChange("");
+					} else {
+						const html = await editor.blocksToFullHTML(editor.document);
+						onChange(html);
+					}
 				}}
 			/>
 		</>

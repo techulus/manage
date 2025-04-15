@@ -1,14 +1,13 @@
 "use client";
 
 import { DeleteButton } from "@/components/form/button";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Progress } from "@/components/ui/progress";
 import type { TaskList } from "@/drizzle/types";
 import { useTRPC } from "@/trpc/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -45,38 +44,30 @@ export const TaskListHeader = ({
 	);
 
 	return (
-		<div className="group relative flex items-center gap-x-4 rounded-tl-lg rounded-tr-lg bg-card p-3">
+		<div className="group relative flex items-center gap-x-4 rounded-tl-lg rounded-tr-lg bg-muted p-3">
 			<Link
 				href={`/${tenant}/projects/${taskList.projectId}/tasklists/${taskList.id}`}
 				className="text-sm font-medium flex-grow flex-auto"
 			>
 				<span className="absolute inset-0" aria-hidden="true" />
 				<div className="mb-2 flex">
-					<div className="text-xl leading-6">
+					<div className="text-2xl tracking-tighter leading-6">
 						{taskList.name}
 						{taskList.status === "archived" ? " (Archived)" : null}
 					</div>
 				</div>
 
 				<div className="flex flex-col space-y-2 text-gray-500 dark:text-gray-400">
-					{totalCount && doneCount ? (
-						<div className="flex flex-row items-center space-x-2">
-							<CheckCircle className="w-4 h-4" />
-							<p className="block">
-								{doneCount} of {totalCount}
-							</p>
+					<div className="flex flex-row items-center space-x-1">
+						<CheckCircle className="w-4 h-4" />
+						<p className="block">
+							{doneCount} of {totalCount}
+						</p>
 
-							{completedPercent ? (
-								<>
-									<Progress
-										className="h-3 max-w-[120px]"
-										value={completedPercent}
-									/>
-									<span className="ml-2">{completedPercent}%</span>
-								</>
-							) : null}
-						</div>
-					) : null}
+						{completedPercent ? (
+							<span className="ml-2 text-sm">({completedPercent}%)</span>
+						) : null}
+					</div>
 				</div>
 			</Link>
 
@@ -85,18 +76,6 @@ export const TaskListHeader = ({
 					<CircleEllipsisIcon className="h-6 w-6" />
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end">
-					<DropdownMenuItem className="w-full p-0">
-						<Link
-							href={`/${tenant}/projects/${taskList.projectId}/tasklists/${taskList.id}/edit`}
-							className={buttonVariants({
-								variant: "ghost",
-								className: "w-full",
-								size: "sm",
-							})}
-						>
-							Edit
-						</Link>
-					</DropdownMenuItem>
 					<DropdownMenuItem className="w-full p-0">
 						<Button
 							variant="ghost"
