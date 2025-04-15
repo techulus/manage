@@ -160,8 +160,8 @@ export const TaskItem = ({
 							<EditableText
 								value={task.name}
 								label="task"
-								onChange={async (val) => {
-									await updateTask.mutateAsync({
+								onChange={(val) => {
+									updateTask.mutate({
 										id: task.id,
 										name: val,
 									});
@@ -184,8 +184,8 @@ export const TaskItem = ({
 				<div className="flex-1 overflow-hidden overflow-y-scroll">
 					<div className="space-y-6 p-6">
 						<form
-							action={async (formData) => {
-								await updateTask.mutateAsync({
+							action={(formData) => {
+								updateTask.mutate({
 									id: task.id,
 									description: formData.get("description") as string,
 								});

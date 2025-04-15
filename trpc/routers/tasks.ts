@@ -215,9 +215,7 @@ export const tasksRouter = createTRPCRouter({
 				.or(
 					z.object({
 						id: z.number(),
-						description: z.string().min(2, {
-							message: "Description must be at least 2 characters.",
-						}),
+						description: z.string(),
 					}),
 				)
 				.or(

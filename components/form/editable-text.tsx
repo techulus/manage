@@ -16,7 +16,7 @@ export default function EditableText({
 	label,
 }: {
 	value: string;
-	onChange: (value: string) => Promise<void>;
+	onChange: (value: string) => Promise<void> | void;
 	textClassName?: string;
 	type?: "text" | "number";
 	label: string;

@@ -101,6 +101,8 @@ export function TasksProvider({
 		trpc.tasks.updateTask.mutationOptions({
 			onSuccess: invalidateData,
 			onMutate: async (updatedTask) => {
+				if ("position" in updatedTask) return;
+
 				await queryClient.cancelQueries({
 					queryKey: trpc.tasks.getListById.queryKey({ id: taskListId }),
 				});
