@@ -1,6 +1,7 @@
 import type { ProjectWithCreator } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { toDateStringWithDay } from "@/lib/utils/date";
+import { CalendarClock } from "lucide-react";
 import Link from "next/link";
 import { HtmlPreview } from "../core/html-view";
 import { UserAvatar } from "../core/user-avatar";
@@ -17,7 +18,7 @@ export const ProjecItem = ({
 		<div
 			key={id}
 			className={cn(
-				"relative flex h-[100px] justify-between space-x-3 rounded-lg bg-muted px-3 py-2 shadow-sm hover:border-foreground/20",
+				"relative flex h-[140px] justify-between space-x-3 rounded-lg bg-muted px-3 py-2 shadow-sm hover:border-foreground/20",
 			)}
 		>
 			<div>
@@ -33,9 +34,10 @@ export const ProjecItem = ({
 					</div>
 				) : null}
 				{dueDate ? (
-					<Badge className="mt-2" variant="outline">
+					<div className="mt-1 text-muted-foreground text-sm">
+						<CalendarClock className="w-4 h-4 inline-block text-primary -mt-1 mr-1" />
 						Due {toDateStringWithDay(dueDate, timezone)}
-					</Badge>
+					</div>
 				) : null}
 			</div>
 			<span

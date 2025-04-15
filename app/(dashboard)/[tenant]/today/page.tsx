@@ -65,7 +65,7 @@ export default function Today() {
 					</Card>
 					<Card className="p-6 bg-gradient-to-br from-orange-500/10 to-orange-500/5 border-none h-32">
 						<div className="flex flex-col items-center justify-center h-full">
-							<span className="text-5xl font-bold text-orange-500">
+							<span className="text-4xl font-bold text-orange-500">
 								{dueToday.length}
 							</span>
 							<span className="text-muted-foreground mt-1">Due Today</span>
@@ -73,7 +73,7 @@ export default function Today() {
 					</Card>
 					<Card className="p-6 bg-gradient-to-br from-red-500/10 to-red-500/5 border-none h-32">
 						<div className="flex flex-col items-center justify-center h-full">
-							<span className="text-5xl font-bold text-red-500">
+							<span className="text-4xl font-bold text-red-500">
 								{overDue.length}
 							</span>
 							<span className="text-muted-foreground mt-1">Overdue</span>
