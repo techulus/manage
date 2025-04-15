@@ -101,7 +101,7 @@ export const TaskItem = ({
 				>
 					<div
 						className={cn(
-							"flex w-full items-center py-2",
+							"flex w-full items-center py-2 tracking-tight",
 							task.status !== "done" ? "border-b dark:border-white/10" : "",
 						)}
 					>
