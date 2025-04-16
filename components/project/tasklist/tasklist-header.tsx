@@ -9,8 +9,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { TaskList } from "@/drizzle/types";
-import { useTRPC } from "@/trpc/client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTaskLists } from "@/hooks/use-tasklist";
 import { CheckCircle, CircleEllipsisIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -32,16 +31,7 @@ export const TaskListHeader = ({
 			? Math.round((doneCount / totalCount) * 100)
 			: undefined;
 
-	const trpc = useTRPC();
-	const queryClient = useQueryClient();
-
-	const updateTaskList = useMutation(
-		trpc.tasks.updateTaskList.mutationOptions(),
-	);
-
-	const deleteTaskList = useMutation(
-		trpc.tasks.deleteTaskList.mutationOptions(),
-	);
+	const { updateTaskList, deleteTaskList } = useTaskLists();
 
 	return (
 		<div className="group relative flex items-center gap-x-4 rounded-tl-lg rounded-tr-lg bg-muted p-3">
@@ -58,7 +48,7 @@ export const TaskListHeader = ({
 				</div>
 
 				<div className="flex flex-col space-y-2 text-gray-500 dark:text-gray-400">
-					<div className="flex flex-row items-center space-x-1">
+					<div className="flex flex-row items-center space-x-2">
 						<CheckCircle className="w-4 h-4" />
 						<p className="block text-primary font-semibold">
 							{doneCount} of {totalCount}
@@ -83,24 +73,11 @@ export const TaskListHeader = ({
 							size="sm"
 							onClick={async () => {
 								toast.promise(
-									updateTaskList
-										.mutateAsync({
-											id: taskList.id,
-											status:
-												taskList.status === "active" ? "archived" : "active",
-										})
-										.then(() => {
-											queryClient.invalidateQueries({
-												queryKey: trpc.tasks.getTaskLists.queryKey({
-													projectId: taskList.projectId,
-												}),
-											});
-											queryClient.invalidateQueries({
-												queryKey: trpc.tasks.getListById.queryKey({
-													id: taskList.id,
-												}),
-											});
-										}),
+									updateTaskList.mutateAsync({
+										id: taskList.id,
+										status:
+											taskList.status === "active" ? "archived" : "active",
+									}),
 									{
 										loading: "Updating task list...",
 										success: "Task list updated.",
@@ -117,13 +94,7 @@ export const TaskListHeader = ({
 							<form
 								action={() => {
 									toast.promise(
-										deleteTaskList.mutateAsync({ id: taskList.id }).then(() => {
-											queryClient.invalidateQueries({
-												queryKey: trpc.tasks.getTaskLists.queryKey({
-													projectId: taskList.projectId,
-												}),
-											});
-										}),
+										deleteTaskList.mutateAsync({ id: taskList.id }),
 										{
 											loading: "Deleting task list...",
 											success: "Task list deleted.",

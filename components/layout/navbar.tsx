@@ -5,7 +5,6 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -212,7 +211,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 			</div>
 
 			<nav
-				className="flex px-4 overflow-x-auto text-sm"
+				className="flex px-4 overflow-x-auto text-sm border-b"
 				suppressHydrationWarning
 			>
 				{navLinks.map((link) => (
@@ -220,7 +219,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 						key={link.href}
 						href={link.href}
 						className={cn(
-							"flex h-10 items-center px-4 text-sm font-medium border-b-2 transition-colors hover:text-primary",
+							"flex h-8 items-center px-4 text-sm font-medium border-b-2 transition-colors hover:text-primary",
 							link.active
 								? "border-primary text-primary"
 								: "border-transparent text-muted-foreground hover:border-muted",

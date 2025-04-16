@@ -61,7 +61,7 @@ export const tasksRouter = createTRPCRouter({
 				})
 				.returning();
 
-			return data;
+			return data?.[0];
 		}),
 	updateTaskList: protectedProcedure
 		.input(
@@ -109,7 +109,7 @@ export const tasksRouter = createTRPCRouter({
 				.where(eq(taskList.id, input.id))
 				.returning();
 
-			return data;
+			return data?.[0];
 		}),
 	deleteTaskList: protectedProcedure
 		.input(z.object({ id: z.number() }))
