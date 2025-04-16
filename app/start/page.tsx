@@ -1,5 +1,6 @@
 import { isDatabaseReady } from "@/lib/utils/useDatabase";
 import { auth } from "@clerk/nextjs/server";
+import { useQueryClient } from "@tanstack/react-query";
 import { RedirectType, redirect } from "next/navigation";
 
 export const fetchCache = "force-no-store";
@@ -33,6 +34,9 @@ export default async function Start() {
 		console.error("Database not ready after maximum retries");
 		redirect("/error");
 	}
+
+	const queryClient = useQueryClient();
+	queryClient.invalidateQueries();
 
 	redirect(`/${orgSlug ?? "me"}/today`, RedirectType.replace);
 }

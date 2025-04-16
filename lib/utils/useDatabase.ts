@@ -64,3 +64,16 @@ export async function getDatabaseForOwner(
 
 	return tenantDb;
 }
+
+export async function deleteDatabase(ownerId: string) {
+	const databaseName = getDatabaseName(ownerId);
+
+	const ownerDb = drizzle(
+		`${process.env.DATABASE_URL}/manage?sslmode=require`,
+		{
+			schema,
+		},
+	);
+
+	await ownerDb.execute(sql`DROP DATABASE ${sql.identifier(databaseName)}`);
+}

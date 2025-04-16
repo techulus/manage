@@ -1,4 +1,14 @@
+import { deleteDatabase } from "@/lib/utils/useDatabase";
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
+
+enum WebhookEventType {
+	organizationCreated = "organization.created",
+	organizationDeleted = "organization.deleted",
+	organizationUpdated = "organization.updated",
+	userCreated = "user.created",
+	userDeleted = "user.deleted",
+	userUpdated = "user.updated",
+}
 
 export async function POST(req: Request) {
 	try {
@@ -11,7 +21,20 @@ export async function POST(req: Request) {
 		);
 		console.log("Webhook payload:", evt.data);
 
-		return new Response("Webhook received", { status: 200 });
+		if (!id) {
+			console.error("Webhook received with no ID");
+			return new Response("Webhook received with no ID", { status: 400 });
+		}
+
+		switch (eventType) {
+			case WebhookEventType.userDeleted:
+			case WebhookEventType.organizationDeleted:
+				await deleteDatabase(id);
+				break;
+			default:
+				console.log("Unhandled webhook event type:", eventType);
+				break;
+		}
 	} catch (err) {
 		console.error("Error verifying webhook:", err);
 		return new Response("Error verifying webhook", { status: 400 });
