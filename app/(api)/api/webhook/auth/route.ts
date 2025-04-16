@@ -29,7 +29,12 @@ export async function POST(req: Request) {
 		switch (eventType) {
 			case WebhookEventType.userDeleted:
 			case WebhookEventType.organizationDeleted:
-				await deleteDatabase(id);
+				try {
+					await deleteDatabase(id);
+					console.log("Database deleted successfully");
+				} catch (err) {
+					console.error("Error deleting database:", err);
+				}
 				break;
 			default:
 				console.log("Unhandled webhook event type:", eventType);
