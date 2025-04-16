@@ -35,6 +35,8 @@ export async function POST(req: Request) {
 				console.log("Unhandled webhook event type:", eventType);
 				break;
 		}
+
+		return new Response("ok", { status: 200 });
 	} catch (err) {
 		console.error("Error verifying webhook:", err);
 		return new Response("Error verifying webhook", { status: 400 });
