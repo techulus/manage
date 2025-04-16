@@ -32,8 +32,6 @@ export default async function ConsoleLayout(props: {
 	const [notificationsWire] = await Promise.all([
 		caller.user.getNotificationsWire(),
 		queryClient.prefetchQuery(trpc.settings.getTimezone.queryOptions()),
-		queryClient.prefetchQuery(trpc.user.getTodayData.queryOptions()),
-		queryClient.prefetchQuery(trpc.user.getUserNotifications.queryOptions()),
 	]);
 
 	return (

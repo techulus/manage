@@ -15,13 +15,13 @@ import logo from "@/public/images/logo.png";
 import { useTRPC } from "@/trpc/client";
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
-import { useQueries } from "@tanstack/react-query";
+import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Notifications } from "../core/notifications";
 
 interface NavLink {
@@ -37,6 +37,11 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 	const router = useRouter();
 	const { tenant, projectId } = useParams();
 	const pathname = usePathname();
+
+	const queryClient = useQueryClient();
+	useEffect(() => {
+		queryClient.invalidateQueries();
+	}, [queryClient]);
 
 	const trpc = useTRPC();
 	const [{ data: projects = [] }, { data: timezone }] = useQueries({
