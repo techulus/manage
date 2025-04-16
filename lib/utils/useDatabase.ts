@@ -7,6 +7,9 @@ import { getOwner } from "./useOwner";
 import { addUserToTenantDb } from "./useUser";
 
 function getDatabaseName(ownerId: string) {
+	if (!ownerId.startsWith("org_") && !ownerId.startsWith("user_")) {
+		throw new Error("Invalid owner ID");
+	}
 	return ownerId.toLowerCase().replace(/ /g, "_");
 }
 
@@ -40,6 +43,9 @@ export async function getDatabaseForOwner(
 	ownerId: string,
 ): Promise<NodePgDatabase<typeof schema>> {
 	const databaseName = getDatabaseName(ownerId);
+	if (!databaseName) {
+		throw new Error("Database name not found");
+	}
 
 	const ownerDb = drizzle(
 		`${process.env.DATABASE_URL}/manage?sslmode=require`,
@@ -63,4 +69,17 @@ export async function getDatabaseForOwner(
 	);
 
 	return tenantDb;
+}
+
+export async function deleteDatabase(ownerId: string) {
+	const databaseName = getDatabaseName(ownerId);
+
+	const ownerDb = drizzle(
+		`${process.env.DATABASE_URL}/manage?sslmode=require`,
+		{
+			schema,
+		},
+	);
+
+	await ownerDb.execute(sql`DROP DATABASE ${sql.identifier(databaseName)}`);
 }

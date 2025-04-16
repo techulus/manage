@@ -7,14 +7,11 @@ import SharedForm from "@/components/form/shared";
 import PageTitle from "@/components/layout/page-title";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { useTaskLists } from "@/hooks/use-tasklist";
 import { TasksProvider } from "@/hooks/use-tasks";
 import { useTRPC } from "@/trpc/client";
 import { Title } from "@radix-ui/react-dialog";
-import {
-	useMutation,
-	useQueryClient,
-	useSuspenseQuery,
-} from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
@@ -38,18 +35,7 @@ export default function TaskLists() {
 		}),
 	);
 
-	const queryClient = useQueryClient();
-	const createTaskList = useMutation(
-		trpc.tasks.createTaskList.mutationOptions({
-			onSuccess: () => {
-				queryClient.invalidateQueries({
-					queryKey: trpc.tasks.getTaskLists.queryKey({
-						projectId: +projectId!,
-					}),
-				});
-			},
-		}),
-	);
+	const { createTaskList } = useTaskLists();
 
 	return (
 		<>

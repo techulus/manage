@@ -6,14 +6,11 @@ import NotesForm from "@/components/form/notes-form";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
+import { useTaskLists } from "@/hooks/use-tasklist";
 import { TasksProvider } from "@/hooks/use-tasks";
 import { toStartOfDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
-import {
-	useMutation,
-	useQueryClient,
-	useSuspenseQueries,
-} from "@tanstack/react-query";
+import { useSuspenseQueries } from "@tanstack/react-query";
 import { CheckCircle } from "lucide-react";
 import { useParams } from "next/navigation";
 import { Suspense } from "react";
@@ -23,7 +20,6 @@ export default function TaskLists() {
 	const { projectId, tasklistId } = useParams();
 
 	const trpc = useTRPC();
-	const queryClient = useQueryClient();
 	const [{ data: list }, { data: timezone }] = useSuspenseQueries({
 		queries: [
 			trpc.tasks.getListById.queryOptions({
@@ -33,20 +29,7 @@ export default function TaskLists() {
 		],
 	});
 
-	const updateTaskList = useMutation(
-		trpc.tasks.updateTaskList.mutationOptions({
-			onSuccess: () => {
-				queryClient.invalidateQueries({
-					queryKey: trpc.tasks.getListById.queryKey({ id: +tasklistId! }),
-				});
-				queryClient.invalidateQueries({
-					queryKey: trpc.tasks.getTaskLists.queryKey({
-						projectId: +projectId!,
-					}),
-				});
-			},
-		}),
-	);
+	const { updateTaskList } = useTaskLists();
 
 	const totalCount = list?.tasks.length;
 	const doneCount = list?.tasks.filter((task) => task.status === "done").length;
@@ -70,9 +53,9 @@ export default function TaskLists() {
 			>
 				<div className="flex flex-col pr-4 md:pr-0 space-y-1 space-x-0 md:flex-row md:space-y-0 md:space-x-3 text-gray-500 dark:text-gray-400">
 					{totalCount != null && doneCount != null ? (
-						<div className="inline-flex flex-row items-center space-x-1">
+						<div className="inline-flex flex-row items-center space-x-2">
 							<CheckCircle className="w-4 h-4" />
-							<p className="block">
+							<p className="block text-primary font-semibold">
 								{doneCount} of {totalCount}
 							</p>
 
@@ -110,7 +93,7 @@ export default function TaskLists() {
 				</form>
 			</PageSection>
 
-			<PageSection transparent>
+			<PageSection className="divide-y-0" transparent>
 				<TasksProvider projectId={+projectId!} taskListId={+tasklistId!}>
 					<TaskListItem key={list.id} id={list.id} hideHeader />
 				</TasksProvider>

@@ -27,7 +27,7 @@ export default function NotesForm({
 	if (isEditing)
 		return (
 			<div className="flex-grow">
-				<Editor defaultValue={value ?? ""} name={name} />
+				<Editor defaultValue={value ?? ""} name={name} allowImageUpload />
 				<div className="mt-2">
 					<Button
 						type="button"

@@ -1,4 +1,5 @@
 import { isDatabaseReady } from "@/lib/utils/useDatabase";
+import { getQueryClient } from "@/trpc/server";
 import { auth } from "@clerk/nextjs/server";
 import { RedirectType, redirect } from "next/navigation";
 
@@ -33,6 +34,9 @@ export default async function Start() {
 		console.error("Database not ready after maximum retries");
 		redirect("/error");
 	}
+
+	const queryClient = getQueryClient();
+	queryClient.invalidateQueries();
 
 	redirect(`/${orgSlug ?? "me"}/today`, RedirectType.replace);
 }

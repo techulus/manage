@@ -12,10 +12,12 @@ import { Button } from "../ui/button";
 export const DeleteButton = ({
 	action = "Delete",
 	className = "",
+	variant = "ghost",
 	compact = false,
 }: {
 	action?: string;
 	className?: string;
+	variant?: "outline" | "ghost";
 	compact?: boolean;
 }) => {
 	const pathname = usePathname();
@@ -55,7 +57,7 @@ export const DeleteButton = ({
 				e.preventDefault();
 				setShowConfirmDelete(true);
 			}}
-			variant="ghost"
+			variant={variant}
 			size={compact ? "sm" : "default"}
 			className={className}
 		>

@@ -262,7 +262,7 @@ export default function RootLayout({
 			<body className="min-h-full min-w-full flex-1">
 				<ClerkProvider>
 					<ThemeProvider>
-						<div className="fixed top-0 left-0 right-0 h-32 bg-gradient-to-b from-primary/10 to-transparent -z-0" />
+						<div className="fixed top-0 left-0 right-0 h-64 bg-gradient-to-b from-primary/10 to-transparent -z-0" />
 						<Toaster position="top-center" />
 						{children}
 					</ThemeProvider>

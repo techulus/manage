@@ -44,7 +44,7 @@ export default function CommentForm({
 				{creator ? <UserAvatar user={creator} /> : null}
 
 				<div className="relative w-full">
-					<Editor name="content" />
+					<Editor name="content" allowImageUpload />
 					<Button
 						size="sm"
 						className="absolute -bottom-12 left-0"
