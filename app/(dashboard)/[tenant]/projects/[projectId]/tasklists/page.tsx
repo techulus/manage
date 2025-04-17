@@ -2,6 +2,7 @@
 
 import EmptyState from "@/components/core/empty-state";
 import { Panel } from "@/components/core/panel";
+import PageSection from "@/components/core/section";
 import { SaveButton } from "@/components/form/button";
 import SharedForm from "@/components/form/shared";
 import PageTitle from "@/components/layout/page-title";
@@ -51,7 +52,7 @@ export default function TaskLists() {
 				}
 			/>
 
-			<div className="mx-4 sm:mx-auto max-w-7xl">
+			<PageSection transparent>
 				<EmptyState
 					show={!taskLists.length}
 					label="task list"
@@ -87,7 +88,7 @@ export default function TaskLists() {
 						</Link>
 					)}
 				</div>
-			</div>
+			</PageSection>
 
 			<Panel open={create} setOpen={setCreate}>
 				<Title>

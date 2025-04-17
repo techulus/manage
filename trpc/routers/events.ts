@@ -1,4 +1,5 @@
 import { calendarEvent, eventInvite } from "@/drizzle/schema";
+import { logActivity } from "@/lib/activity";
 import { toEndOfDay } from "@/lib/utils/date";
 import {
 	getStartEndDateRangeInUtc,
@@ -170,10 +171,19 @@ export const eventsRouter = createTRPCRouter({
 		.mutation(async ({ ctx, input }) => {
 			const { id } = input;
 
-			await ctx.db
+			const event = await ctx.db
 				.delete(calendarEvent)
 				.where(and(eq(calendarEvent.id, id)))
-				.execute();
+				.returning();
+
+			if (event.length) {
+				await logActivity({
+					action: "deleted",
+					type: "event",
+					projectId: event[0].projectId,
+					oldValue: event[0],
+				});
+			}
 		}),
 	upsert: protectedProcedure
 		.input(
@@ -237,30 +247,48 @@ export const eventsRouter = createTRPCRouter({
 			let eventId: number;
 
 			if (id) {
-				await ctx.db
+				eventId = id;
+				const oldEvent = await ctx.db.query.calendarEvent.findFirst({
+					where: eq(calendarEvent.id, id),
+				});
+
+				const updatedEvent = await ctx.db
 					.update(calendarEvent)
 					.set(eventData)
 					.where(eq(calendarEvent.id, id))
-					.execute();
-
-				eventId = id;
+					.returning();
 
 				await ctx.db
 					.delete(eventInvite)
 					.where(eq(eventInvite.eventId, id))
 					.execute();
+
+				await logActivity({
+					action: "updated",
+					type: "event",
+					projectId,
+					oldValue: oldEvent,
+					newValue: updatedEvent[0],
+				});
 			} else {
-				const result = await ctx.db
+				const newEvent = await ctx.db
 					.insert(calendarEvent)
 					.values({
 						...eventData,
 						createdByUser: ctx.userId,
 						createdAt: new Date(),
 					})
-					.returning({ id: calendarEvent.id })
+					.returning()
 					.execute();
 
-				eventId = result[0].id;
+				eventId = newEvent[0].id;
+
+				await logActivity({
+					action: "created",
+					type: "event",
+					projectId,
+					newValue: newEvent[0],
+				});
 			}
 
 			for (const userId of invites) {

@@ -4,8 +4,6 @@ import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SITE_METADATA } from "@/data/marketing";
 import events from "@/public/screenshots/events.png";
-import files from "@/public/screenshots/files.png";
-import overviewDark from "@/public/screenshots/overview-dark.png";
 import overview from "@/public/screenshots/overview.png";
 import tasks from "@/public/screenshots/tasks.png";
 import Image from "next/image";
@@ -16,12 +14,6 @@ const features = [
 		image: tasks,
 		title: "Everything you need to manage your tasks",
 		highlight: "manage",
-	},
-	{
-		name: "files",
-		image: files,
-		title: "Keep your files organized and accessible",
-		highlight: "organized",
 	},
 	{
 		name: "events",
@@ -64,13 +56,8 @@ export default async function Home() {
 								<div className="absolute -inset-2 rounded-[calc(theme(borderRadius.xl)+theme(spacing.2))] shadow-sm ring-1 ring-black/5 dark:ring-gray-50/10" />
 								<Image
 									alt="App screenshot"
-									src={overviewDark}
-									className="rounded-md shadow-2xl ring-1 ring-gray-900/10 hidden dark:block"
-								/>
-								<Image
-									alt="App screenshot"
 									src={overview}
-									className="rounded-md shadow-2xl ring-1 ring-gray-900/10 dark:hidden"
+									className="rounded-md shadow-2xl ring-1 ring-green-900/10"
 								/>
 							</div>
 						</div>
@@ -112,7 +99,7 @@ export default async function Home() {
 									<Image
 										alt={`${feature.name} screenshot`}
 										src={feature.image}
-										className="rounded-md shadow-2xl ring-1 ring-gray-900/10"
+										className="rounded-md shadow-2xl ring-1 ring-green-900/10 dark:ring-green-50/10"
 									/>
 								</div>
 							</div>

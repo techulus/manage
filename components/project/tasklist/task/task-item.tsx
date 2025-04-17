@@ -218,10 +218,12 @@ export const TaskItem = ({
 									<AssignToUser
 										users={users}
 										onUpdate={(userId) => {
-											updateTask.mutate({
-												id: task.id,
-												assignedToUser: userId,
-											});
+											if (userId) {
+												updateTask.mutate({
+													id: task.id,
+													assignedToUser: userId,
+												});
+											}
 										}}
 									/>
 								)}
