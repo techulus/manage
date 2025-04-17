@@ -74,7 +74,7 @@ export default function TaskLists() {
 								dueDate: dueDate ? toStartOfDay(dueDate).toISOString() : null,
 							});
 						}}
-						label="Due"
+						label="due"
 					/>
 				</div>
 			</PageTitle>

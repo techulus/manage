@@ -22,7 +22,7 @@ export function ActivityItem({
 			<div className="relative px-4 pt-4">
 				{!isLast ? (
 					<span
-						className="absolute left-[2.25rem] top-12 -ml-px h-[calc(100%-2rem)] w-[2px] bg-border"
+						className="absolute left-[2.25rem] top-12 h-[3rem] w-[2px] bg-border"
 						aria-hidden="true"
 					/>
 				) : null}
@@ -76,13 +76,9 @@ export function ActivityItem({
 								{toDateTimeString(item.createdAt, guessTimezone)}
 							</span>
 						</div>
-						{item.oldValue && item.newValue ? (
-							<div className="mt-1 prose dark:prose-invert">
-								<Markdown>
-									{generateObjectDiffMessage(item.oldValue, item.newValue)}
-								</Markdown>
-							</div>
-						) : null}
+						<div className="mt-1 prose dark:prose-invert max-w-none">
+							<Markdown>{generateObjectDiffMessage(item)}</Markdown>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -107,13 +103,17 @@ export function ActivityFeed() {
 	});
 
 	useEffect(() => {
-		if (activities.length > 0) {
-			setAllActivities((prev) => [...prev, ...activities]);
-			setHasMore(activities.length === 25);
+		const existingActivityIds = allActivities.map((activity) => activity.id);
+		const newActivities = activities.filter(
+			(activity) => !existingActivityIds.includes(activity.id),
+		);
+		if (newActivities.length > 0) {
+			setAllActivities((prev) => [...prev, ...newActivities]);
+			setHasMore(newActivities.length === 25);
 		} else {
 			setHasMore(false);
 		}
-	}, [activities]);
+	}, [activities, allActivities]);
 
 	const loadMore = () => {
 		setOffset((prev) => prev + 25);
@@ -127,7 +127,7 @@ export function ActivityFeed() {
 		<div className="flex flex-col w-full">
 			{allActivities.length ? (
 				<>
-					<ul className="w-full">
+					<ul className="w-full space-y-4">
 						{allActivities.map((activityItem, activityItemIdx) => (
 							<ActivityItem
 								key={activityItem.id}
@@ -136,16 +136,22 @@ export function ActivityFeed() {
 							/>
 						))}
 					</ul>
-					{hasMore && !isLoading ? (
+					{!isLoading ? (
 						<div className="flex justify-center p-4 border-t">
-							<Button
-								onClick={loadMore}
-								variant="outline"
-								size="sm"
-								className="w-full max-w-xs"
-							>
-								Load more
-							</Button>
+							{hasMore ? (
+								<Button
+									onClick={loadMore}
+									variant="outline"
+									size="sm"
+									className="w-full max-w-xs"
+								>
+									Load more
+								</Button>
+							) : (
+								<p className="text-muted-foreground text-sm">
+									No more activities
+								</p>
+							)}
 						</div>
 					) : null}
 					{isLoading ? <Spinner className="mx-auto" /> : null}

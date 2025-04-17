@@ -73,11 +73,8 @@ export function AssignToUser({
 								key={user.id}
 								value={user.id}
 								onSelect={async (currentValue) => {
-									const actualValue =
-										users.find((user) => user.id.toLowerCase() === currentValue)
-											?.id ?? "";
-									onUpdate(actualValue);
-									setValue(actualValue === value ? "" : currentValue);
+									onUpdate(currentValue);
+									setValue(currentValue);
 									setOpen(false);
 									setIsAssigning(false);
 								}}

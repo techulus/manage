@@ -28,7 +28,7 @@ export default function EditableDate({
 
 	if (!value) {
 		return (
-			<div className="inline-block">
+			<div className="inline-block max-w-[140px]">
 				<DateTimePicker
 					dateOnly
 					name="dueDate"

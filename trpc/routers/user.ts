@@ -20,7 +20,6 @@ import {
 	eq,
 	gt,
 	isNotNull,
-	like,
 	lt,
 	ne,
 	or,

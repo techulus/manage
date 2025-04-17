@@ -95,7 +95,17 @@ export const projectsRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			await ctx.db.delete(project).where(eq(project.id, input.id));
+			const deletedProject = await ctx.db
+				.delete(project)
+				.where(eq(project.id, input.id))
+				.returning();
+
+			await logActivity({
+				action: "deleted",
+				type: "project",
+				projectId: input.id,
+				oldValue: deletedProject[0],
+			});
 		}),
 	getProjectById: protectedProcedure
 		.input(

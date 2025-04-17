@@ -1,4 +1,5 @@
 import { task, taskList } from "@/drizzle/schema";
+import { logActivity } from "@/lib/activity";
 import { and, asc, desc, eq, or } from "drizzle-orm";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
@@ -49,7 +50,7 @@ export const tasksRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const data = await ctx.db
+			const createdTaskList = await ctx.db
 				.insert(taskList)
 				.values({
 					name: input.name,
@@ -61,7 +62,14 @@ export const tasksRouter = createTRPCRouter({
 				})
 				.returning();
 
-			return data?.[0];
+			await logActivity({
+				action: "created",
+				type: "tasklist",
+				projectId: input.projectId,
+				newValue: createdTaskList[0],
+			});
+
+			return createdTaskList?.[0];
 		}),
 	updateTaskList: protectedProcedure
 		.input(
@@ -103,11 +111,25 @@ export const tasksRouter = createTRPCRouter({
 				Object.entries(input).filter(([key]) => key !== "id"),
 			);
 
+			const oldTaskList = await ctx.db.query.taskList.findFirst({
+				where: eq(taskList.id, input.id),
+			});
+
 			const data = await ctx.db
 				.update(taskList)
 				.set(filteredInput)
 				.where(eq(taskList.id, input.id))
 				.returning();
+
+			if (oldTaskList) {
+				await logActivity({
+					action: "updated",
+					type: "tasklist",
+					projectId: oldTaskList.projectId,
+					oldValue: oldTaskList,
+					newValue: data[0],
+				});
+			}
 
 			return data?.[0];
 		}),
@@ -117,8 +139,16 @@ export const tasksRouter = createTRPCRouter({
 			const data = await ctx.db
 				.delete(taskList)
 				.where(eq(taskList.id, input.id))
-				.returning({ name: taskList.name })
-				.execute();
+				.returning();
+
+			if (data.length) {
+				await logActivity({
+					action: "deleted",
+					type: "tasklist",
+					projectId: data[0].projectId,
+					oldValue: data[0],
+				});
+			}
 
 			return data?.[0];
 		}),
@@ -186,6 +216,22 @@ export const tasksRouter = createTRPCRouter({
 				})
 				.returning();
 
+			const taskListDetails = await ctx.db.query.taskList.findFirst({
+				where: eq(taskList.id, input.taskListId),
+				columns: {
+					projectId: true,
+				},
+			});
+
+			if (taskListDetails) {
+				await logActivity({
+					action: "created",
+					type: "task",
+					projectId: taskListDetails.projectId,
+					newValue: createdTask[0],
+				});
+			}
+
 			return createdTask?.[0];
 		}),
 	updateTask: protectedProcedure
@@ -242,22 +288,60 @@ export const tasksRouter = createTRPCRouter({
 				Object.entries(input).filter(([key]) => key !== "id"),
 			);
 
+			const oldTask = await ctx.db.query.task.findFirst({
+				where: eq(task.id, input.id),
+				with: {
+					taskList: {
+						columns: {
+							projectId: true,
+						},
+					},
+				},
+			});
+
 			const updatedTask = await ctx.db
 				.update(task)
 				.set(filteredInput)
 				.where(eq(task.id, input.id))
 				.returning();
 
+			if (oldTask) {
+				await logActivity({
+					action: "updated",
+					type: "task",
+					projectId: oldTask.taskList.projectId,
+					oldValue: oldTask,
+					newValue: updatedTask[0],
+				});
+			}
+
 			return updatedTask?.[0];
 		}),
 	deleteTask: protectedProcedure
 		.input(z.object({ id: z.number() }))
 		.mutation(async ({ ctx, input }) => {
-			const data = await ctx.db
-				.delete(task)
-				.where(eq(task.id, input.id))
-				.returning();
+			const currentTask = await ctx.db.query.task.findFirst({
+				where: eq(task.id, input.id),
+				with: {
+					taskList: {
+						columns: {
+							projectId: true,
+						},
+					},
+				},
+			});
 
-			return data?.[0];
+			await ctx.db.delete(task).where(eq(task.id, input.id)).returning();
+
+			if (currentTask) {
+				await logActivity({
+					action: "deleted",
+					type: "task",
+					projectId: currentTask.taskList.projectId,
+					oldValue: currentTask,
+				});
+			}
+
+			return currentTask;
 		}),
 });
