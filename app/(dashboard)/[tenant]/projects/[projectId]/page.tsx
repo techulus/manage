@@ -195,15 +195,15 @@ export default function ProjectDetails() {
 							);
 						})}
 					</ul>
-				) : null}
-
-				<div className="p-2">
-					<EmptyState
-						show={!taskLists.length}
-						label="list"
-						createLink={`/${tenant}/projects/${projectId}/tasklists?create=true`}
-					/>
-				</div>
+				) : (
+					<div className="p-2">
+						<EmptyState
+							show={!taskLists.length}
+							label="list"
+							createLink={`/${tenant}/projects/${projectId}/tasklists?create=true`}
+						/>
+					</div>
+				)}
 			</PageSection>
 
 			<PageSection

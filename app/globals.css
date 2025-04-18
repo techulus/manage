@@ -14,7 +14,7 @@
     --primary-foreground: 0 0% 100%;
     --secondary: 124.62 39.39% 93.53%;
     --secondary-foreground: 124.48 55.37% 23.73%;
-    --muted: 33.75 34.78% 90.98%;
+    --muted: 33.75 44.44% 92.94%;
     --muted-foreground: 15.00 25.29% 34.12%;
     --accent: 122 37.50% 84.31%;
     --accent-foreground: 124.48 55.37% 23.73%;
@@ -42,7 +42,7 @@
     --primary-foreground: 144.9 80.4% 10%;
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 15%;
+    --muted: 0 0% 12%;
     --muted-foreground: 240 5% 64.9%;
     --accent: 12 6.5% 15.1%;
     --accent-foreground: 0 0% 98%;
@@ -99,8 +99,6 @@ textarea {
   font-weight: 800;
 }
 
-@media (max-width: 768px) {
-  .cl-userPreviewTextContainer {
-    display: none;
-  }
+.bn-editor {
+  background-color: transparent !important;
 }

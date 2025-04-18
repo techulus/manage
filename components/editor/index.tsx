@@ -79,7 +79,7 @@ const Editor = memo(function Editor({
 	}
 
 	return (
-		<>
+		<div className="bg-muted rounded-md">
 			<input type="hidden" name={name} defaultValue={value} />
 			<input
 				type="hidden"
@@ -104,7 +104,7 @@ const Editor = memo(function Editor({
 					}
 				}}
 			/>
-		</>
+		</div>
 	);
 });
 

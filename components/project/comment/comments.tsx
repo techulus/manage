@@ -85,6 +85,7 @@ export function Comments({
 															}),
 														});
 													}}
+													className="w-full"
 												>
 													<DeleteButton
 														action="Delete"

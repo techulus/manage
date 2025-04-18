@@ -165,21 +165,23 @@ export default function Today() {
 				titleIcon={<FolderIcon className="w-5 h-5" />}
 				transparent
 			>
-				<EmptyState
-					show={!projects.length}
-					label="projects"
-					createLink={`/${tenant}/projects/new`}
-				/>
-
-				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-					{projects.map((project) => (
-						<ProjecItem
-							key={project.id}
-							project={project}
-							timezone={timezone || ""}
-						/>
-					))}
-				</div>
+				{projects?.length ? (
+					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+						{projects.map((project) => (
+							<ProjecItem
+								key={project.id}
+								project={project}
+								timezone={timezone || ""}
+							/>
+						))}
+					</div>
+				) : (
+					<EmptyState
+						show={!projects.length}
+						label="projects"
+						createLink={`/${tenant}/projects/new`}
+					/>
+				)}
 
 				<div className="mx-auto mt-6 flex w-full max-w-7xl flex-grow items-center border-t border-muted">
 					{statuses.includes("archived") ? (

@@ -9,7 +9,7 @@ import EventsCalendar from "@/components/project/events/events-calendar";
 import { buttonVariants } from "@/components/ui/button";
 import { toDateStringWithDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "@clerk/nextjs";
 import { Title } from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { RssIcon } from "lucide-react";
@@ -19,8 +19,13 @@ import { parseAsBoolean, useQueryState } from "nuqs";
 import { useMemo } from "react";
 
 export default function EventDetails() {
+	const { session } = useSession();
+	if (!session) {
+		return null;
+	}
+
 	const { projectId, tenant } = useParams();
-	const { user } = useUser();
+	const { user, lastActiveOrganizationId } = session;
 
 	const [on] = useQueryState("on");
 	const [create, setCreate] = useQueryState(
@@ -37,8 +42,8 @@ export default function EventDetails() {
 	);
 	const calendarSubscriptionUrl = useMemo(
 		() =>
-			`/api/calendar/${tenant}/${projectId}/calendar.ics?userId=${user?.id}`,
-		[tenant, projectId, user?.id],
+			`/api/calendar/${lastActiveOrganizationId ?? user?.id}/${projectId}/calendar.ics?userId=${user?.id}`,
+		[lastActiveOrganizationId, projectId, user?.id],
 	);
 
 	const trpc = useTRPC();
