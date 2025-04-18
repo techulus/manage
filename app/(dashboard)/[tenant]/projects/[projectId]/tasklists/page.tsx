@@ -41,7 +41,7 @@ export default function TaskLists() {
 	return (
 		<>
 			<PageTitle
-				title="Task Lists"
+				title="Tasks"
 				actions={
 					<Link
 						href={`/${tenant}/projects/${projectId}/tasklists?create=true`}
@@ -55,7 +55,7 @@ export default function TaskLists() {
 			<PageSection transparent>
 				<EmptyState
 					show={!taskLists.length}
-					label="task list"
+					label="list"
 					createLink={`/${tenant}/projects/${projectId}/tasklists?create=true`}
 				/>
 
@@ -92,7 +92,7 @@ export default function TaskLists() {
 
 			<Panel open={create} setOpen={setCreate}>
 				<Title>
-					<PageTitle title="Create Task List" compact />
+					<PageTitle title="Create List" compact />
 				</Title>
 				<form
 					action={async (formData) => {

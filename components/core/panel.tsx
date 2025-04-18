@@ -2,8 +2,9 @@
 
 import { cn } from "@/lib/utils";
 import * as Dialog from "@radix-ui/react-dialog";
+import { memo } from "react";
 
-export function Panel({
+export const Panel = memo(function Panel({
 	open,
 	setOpen,
 	children,
@@ -26,4 +27,4 @@ export function Panel({
 			</Dialog.Portal>
 		</Dialog.Root>
 	);
-}
+});

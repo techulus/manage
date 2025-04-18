@@ -3,11 +3,12 @@ import { Toaster } from "@/components/ui/sonner";
 import { SITE_METADATA } from "@/data/marketing";
 import { cn } from "@/lib/utils";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Inter } from "next/font/google";
+import { IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 
-const mainFont = Inter({
+const mainFont = IBM_Plex_Sans({
 	subsets: ["latin"],
+	weight: ["400", "500", "600", "700"],
 });
 
 export const metadata = {

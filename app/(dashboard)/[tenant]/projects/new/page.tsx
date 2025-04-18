@@ -9,12 +9,13 @@ import { CardContent, CardFooter } from "@/components/ui/card";
 import { useTRPC } from "@/trpc/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 export default function CreateProject() {
 	const { tenant } = useParams();
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
+	const router = useRouter();
 
 	const createProject = useMutation(
 		trpc.projects.createProject.mutationOptions(),
@@ -38,6 +39,7 @@ export default function CreateProject() {
 								statuses: ["active"],
 							}),
 						});
+						router.push(`/${tenant}/today`);
 					}}
 				>
 					<CardContent>

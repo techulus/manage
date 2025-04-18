@@ -2,13 +2,13 @@
 
 import { BlockNoteEditor, type PartialBlock } from "@blocknote/core";
 import { BlockNoteView } from "@blocknote/mantine";
-import { useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 import { useFormStatus } from "react-dom";
 import { Spinner } from "../core/loaders";
 
-export default function Editor({
+const Editor = memo(function Editor({
 	defaultValue,
 	metadata = undefined,
 	name = "description",
@@ -106,4 +106,6 @@ export default function Editor({
 			/>
 		</>
 	);
-}
+});
+
+export default Editor;
