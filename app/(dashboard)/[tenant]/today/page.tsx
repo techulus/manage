@@ -91,43 +91,42 @@ export default function Today() {
 						<Link
 							href={`/${tenant}/projects/${event.project.id}/events`}
 							key={event.id}
+							className="px-4 py-2 hover:bg-muted/50 transition-colors border-none"
 						>
-							<div className="p-4 hover:bg-muted/50 transition-colors border-none">
-								<div className="flex flex-col space-y-2">
-									<div className="flex items-start justify-between">
-										<h4 className="font-medium">{event.name}</h4>
-										{event.allDay ? (
-											<Badge variant="outline">All Day</Badge>
-										) : null}
+							<div className="flex flex-col space-y-2">
+								<div className="flex items-start justify-between">
+									<h4 className="font-medium">{event.name}</h4>
+									{event.allDay ? (
+										<Badge variant="outline">All Day</Badge>
+									) : null}
+								</div>
+								<div
+									className="text-sm text-muted-foreground"
+									suppressHydrationWarning
+								>
+									{event.allDay
+										? toDateStringWithDay(event.start, timezone)
+										: toDateTimeString(event.start, timezone)}
+									{event.end
+										? ` - ${
+												event.allDay
+													? toDateStringWithDay(event.end, timezone)
+													: toDateTimeString(event.end, timezone)
+											}`
+										: null}
+								</div>
+								{event.repeatRule && (
+									<div className="text-xs text-muted-foreground">
+										↻ {rrulestr(event.repeatRule).toText()}
 									</div>
-									<div
-										className="text-sm text-muted-foreground"
-										suppressHydrationWarning
-									>
-										{event.allDay
-											? toDateStringWithDay(event.start, timezone)
-											: toDateTimeString(event.start, timezone)}
-										{event.end
-											? ` - ${
-													event.allDay
-														? toDateStringWithDay(event.end, timezone)
-														: toDateTimeString(event.end, timezone)
-												}`
-											: null}
-									</div>
-									{event.repeatRule && (
-										<div className="text-xs text-muted-foreground">
-											↻ {rrulestr(event.repeatRule).toText()}
-										</div>
-									)}
-									{event.description && (
-										<p className="text-sm mt-2 text-muted-foreground">
-											{event.description}
-										</p>
-									)}
-									<div className="text-xs text-primary mt-2">
-										{event.project.name}
-									</div>
+								)}
+								{event.description && (
+									<p className="text-sm mt-2 text-muted-foreground">
+										{event.description}
+									</p>
+								)}
+								<div className="text-xs text-primary mt-2">
+									{event.project.name}
 								</div>
 							</div>
 						</Link>
