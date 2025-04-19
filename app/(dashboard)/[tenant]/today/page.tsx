@@ -83,60 +83,55 @@ export default function Today() {
 			</div>
 
 			{events.length ? (
-				<PageSection>
-					<div className="flex items-center justify-between p-4">
-						<h3 className="flex items-center text-lg font-medium text-primary">
-							<CalendarClockIcon className="w-6 h-6 mr-2" />
-							Events
-						</h3>
-					</div>
-					<div className="space-y-3">
-						{events.map((event) => (
-							<Link
-								href={`/${tenant}/projects/${event.project.id}/events`}
-								key={event.id}
-							>
-								<div className="p-4 hover:bg-muted/50 transition-colors border-none">
-									<div className="flex flex-col space-y-2">
-										<div className="flex items-start justify-between">
-											<h4 className="font-medium">{event.name}</h4>
-											<Badge variant={event.allDay ? "outline" : "secondary"}>
-												{event.allDay ? "All Day" : "Timed"}
-											</Badge>
+				<PageSection
+					title="Events"
+					titleIcon={<CalendarClockIcon className="w-5 h-5" />}
+				>
+					{events.map((event) => (
+						<Link
+							href={`/${tenant}/projects/${event.project.id}/events`}
+							key={event.id}
+						>
+							<div className="p-4 hover:bg-muted/50 transition-colors border-none">
+								<div className="flex flex-col space-y-2">
+									<div className="flex items-start justify-between">
+										<h4 className="font-medium">{event.name}</h4>
+										{event.allDay ? (
+											<Badge variant="outline">All Day</Badge>
+										) : null}
+									</div>
+									<div
+										className="text-sm text-muted-foreground"
+										suppressHydrationWarning
+									>
+										{event.allDay
+											? toDateStringWithDay(event.start, timezone)
+											: toDateTimeString(event.start, timezone)}
+										{event.end
+											? ` - ${
+													event.allDay
+														? toDateStringWithDay(event.end, timezone)
+														: toDateTimeString(event.end, timezone)
+												}`
+											: null}
+									</div>
+									{event.repeatRule && (
+										<div className="text-xs text-muted-foreground">
+											↻ {rrulestr(event.repeatRule).toText()}
 										</div>
-										<div
-											className="text-sm text-muted-foreground"
-											suppressHydrationWarning
-										>
-											{event.allDay
-												? toDateStringWithDay(event.start, timezone)
-												: toDateTimeString(event.start, timezone)}
-											{event.end
-												? ` - ${
-														event.allDay
-															? toDateStringWithDay(event.end, timezone)
-															: toDateTimeString(event.end, timezone)
-													}`
-												: null}
-										</div>
-										{event.repeatRule && (
-											<div className="text-xs text-muted-foreground">
-												↻ {rrulestr(event.repeatRule).toText()}
-											</div>
-										)}
-										{event.description && (
-											<p className="text-sm mt-2 text-muted-foreground">
-												{event.description}
-											</p>
-										)}
-										<div className="text-xs text-primary mt-2">
-											{event.project.name}
-										</div>
+									)}
+									{event.description && (
+										<p className="text-sm mt-2 text-muted-foreground">
+											{event.description}
+										</p>
+									)}
+									<div className="text-xs text-primary mt-2">
+										{event.project.name}
 									</div>
 								</div>
-							</Link>
-						))}
-					</div>
+							</div>
+						</Link>
+					))}
 				</PageSection>
 			) : null}
 
