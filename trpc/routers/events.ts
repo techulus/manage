@@ -190,7 +190,7 @@ export const eventsRouter = createTRPCRouter({
 			z.object({
 				id: z.number().optional(),
 				projectId: z.number(),
-				name: z.string(),
+				name: z.string().min(2),
 				description: z.string().optional(),
 				start: z.date(),
 				end: z.date().optional(),

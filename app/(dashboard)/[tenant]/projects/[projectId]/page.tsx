@@ -95,7 +95,7 @@ export default function ProjectDetails() {
 								dueDate: date ? toStartOfDay(date) : null,
 							});
 						}}
-						label="Due"
+						label="due"
 					/>
 
 					{project.status === "archived" ? (

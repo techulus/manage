@@ -8,7 +8,6 @@ import { getOwner } from "./useOwner";
 
 export async function addUserToTenantDb() {
 	const userData = await currentUser();
-	console.log(userData);
 	if (!userData) {
 		throw new Error("No user found");
 	}

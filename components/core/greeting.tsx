@@ -13,7 +13,5 @@ export function Greeting({ timezone }: { timezone: string }) {
 				? "Good afternoon ☀️"
 				: "Good evening 🌙";
 
-	return (
-		<span className="text-3xl font-semibold tracking-tighter">{greeting}</span>
-	);
+	return <span className="font-semibold tracking-tighter">{greeting}</span>;
 }
