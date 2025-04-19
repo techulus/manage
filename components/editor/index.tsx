@@ -48,8 +48,7 @@ const Editor = memo(function Editor({
 		return BlockNoteEditor.create({
 			initialContent,
 			uploadFile: allowImageUpload
-				? async (file, blockId) => {
-						console.log(file, blockId);
+				? async (file) => {
 						const result: { url: string } = await fetch(
 							`/api/blob?name=${file.name}`,
 							{

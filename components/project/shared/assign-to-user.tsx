@@ -17,7 +17,7 @@ import type { User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { useMemo, useState } from "react";
-import { Assignee } from "./assigee";
+import { UserBadge } from "./user-badge";
 
 export function AssignToUser({
 	users = [],
@@ -85,7 +85,7 @@ export function AssignToUser({
 										value === user.id ? "opacity-100" : "opacity-0",
 									)}
 								/>
-								<Assignee user={user} />
+								<UserBadge user={user} />
 							</CommandItem>
 						))}
 					</CommandGroup>

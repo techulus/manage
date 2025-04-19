@@ -56,14 +56,14 @@ export default function Today() {
 		<Suspense fallback={<PageLoading />}>
 			<PageTitle title={toDateStringWithDay(new Date(), timezone)} />
 
-			<div className="max-w-7xl mx-4 xl:mx-auto -mt-4 pb-6">
+			<div className="max-w-7xl mx-4 xl:mx-auto -mt-4 pb-4">
 				<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
 					<Card className="col-span-2 md:col-span-1 p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-none">
 						<h2 className="text-2xl font-semibold">
 							<Greeting timezone={timezone} />
 						</h2>
 					</Card>
-					<Card className="p-6 bg-gradient-to-br from-orange-500/10 to-orange-500/5 border-none h-32">
+					<Card className="p-2 bg-gradient-to-br from-orange-500/10 to-orange-500/5 border-none">
 						<div className="flex flex-col items-center justify-center h-full">
 							<span className="text-4xl font-bold text-orange-500">
 								{dueToday.length}
@@ -71,7 +71,7 @@ export default function Today() {
 							<span className="text-muted-foreground mt-1">Due Today</span>
 						</div>
 					</Card>
-					<Card className="p-6 bg-gradient-to-br from-red-500/10 to-red-500/5 border-none h-32">
+					<Card className="p-2 bg-gradient-to-br from-red-500/10 to-red-500/5 border-none">
 						<div className="flex flex-col items-center justify-center h-full">
 							<span className="text-4xl font-bold text-red-500">
 								{overDue.length}

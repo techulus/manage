@@ -44,8 +44,11 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 
 	const queryClient = useQueryClient();
 	useEffect(() => {
-		queryClient.invalidateQueries();
-	}, [queryClient]);
+		if (tenant) {
+			console.log(">>>>> Invalidating all queries");
+			queryClient.invalidateQueries();
+		}
+	}, [queryClient, tenant]);
 
 	const trpc = useTRPC();
 	const [
@@ -219,7 +222,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 						})}
 						asChild
 					>
-						<Link href="/help">
+						<Link href="mailto:support@managee.xyz">
 							<HelpCircle className="h-5 w-5" />
 							<span className="sr-only">Help</span>
 						</Link>

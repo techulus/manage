@@ -15,11 +15,11 @@ export const UserAvatar = ({
 		<Avatar className={cn(compact ? "h-5 w-5" : "h-7 w-7", className)}>
 			<AvatarImage
 				src={
-					user.imageUrl ??
-					`https://api.dicebear.com/9.x/avataaars-neutral/svg?seed=${user.firstName}`
+					user?.imageUrl ??
+					`https://api.dicebear.com/9.x/avataaars-neutral/svg?seed=${user?.firstName}`
 				}
 			/>
-			<AvatarFallback>{user.firstName ?? "User"}</AvatarFallback>
+			<AvatarFallback>{user?.firstName ?? "User"}</AvatarFallback>
 		</Avatar>
 	);
 };

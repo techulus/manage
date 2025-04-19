@@ -26,8 +26,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Checkbox } from "../../../ui/checkbox";
 import { DateTimePicker } from "../../events/date-time-picker";
-import { Assignee } from "../../shared/assigee";
 import { AssignToUser } from "../../shared/assign-to-user";
+import { UserBadge } from "../../shared/user-badge";
 
 export const TaskItem = ({
 	task,
@@ -106,7 +106,7 @@ export const TaskItem = ({
 						)}
 					>
 						{task.assignee ? (
-							<Assignee className="mr-2" user={task.assignee} imageOnly />
+							<UserBadge className="mr-2" user={task.assignee} imageOnly />
 						) : null}
 						{task.name}
 						{task.dueDate ? (
@@ -199,7 +199,7 @@ export const TaskItem = ({
 							<div className="flex items-center justify-between">
 								{task.assignee ? (
 									<>
-										<Assignee user={task.assignee} />
+										<UserBadge user={task.assignee} />
 										<Button
 											size="sm"
 											variant="outline"
@@ -271,10 +271,7 @@ export const TaskItem = ({
 							<div className="flex items-center justify-between">
 								<h4 className="text-sm font-medium">Created By</h4>
 							</div>
-							<p className="text-sm text-muted-foreground flex items-center gap-2">
-								<UserAvatar user={task.creator} compact />{" "}
-								{task.creator?.firstName}
-							</p>
+							<UserBadge user={task.creator} />
 						</div>
 
 						{taskLists?.filter((x) => x.id !== task.taskListId)?.length ? (

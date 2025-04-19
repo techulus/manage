@@ -16,8 +16,8 @@ import { useMemo, useState } from "react";
 import { type Frequency, RRule, rrulestr } from "rrule";
 import Editor from "../editor";
 import { DateTimePicker } from "../project/events/date-time-picker";
-import { Assignee } from "../project/shared/assigee";
 import { MultiUserSelect } from "../project/shared/multi-user-select";
+import { UserBadge } from "../project/shared/user-badge";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import {
@@ -212,7 +212,7 @@ export default function EventForm() {
 								<div className="mb-2 flex space-x-2">
 									{invites.map((userId) => (
 										<div key={userId} className="flex items-center">
-											<Assignee
+											<UserBadge
 												user={users.find((user) => user.id === userId)!}
 											/>
 											<Button

@@ -23,7 +23,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CircleEllipsisIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { Assignee } from "../shared/assigee";
+import { UserBadge } from "../shared/user-badge";
 
 export default function EventsList({
 	date,
@@ -102,7 +102,7 @@ export default function EventsList({
 								<div className="my-2 flex space-x-2">
 									{event.invites.map((invite) => (
 										<div key={invite.userId} className="flex items-center">
-											<Assignee user={invite.user} imageOnly={compact} />
+											<UserBadge user={invite.user} imageOnly={compact} />
 										</div>
 									))}
 								</div>
