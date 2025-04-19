@@ -106,7 +106,7 @@ export default function EventDetails() {
 
 			<Panel open={create} setOpen={setCreate}>
 				<Title>
-					<PageTitle title="Create Event" compact />
+					<PageTitle title="New Event" compact />
 				</Title>
 				<EventForm />
 			</Panel>

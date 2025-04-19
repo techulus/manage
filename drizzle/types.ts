@@ -3,7 +3,6 @@ import type {
 	activity,
 	blob,
 	calendarEvent,
-	eventInvite,
 	notification,
 	project,
 	task,
@@ -17,7 +16,6 @@ export type TaskList = InferSelectModel<typeof taskList>;
 export type Task = InferSelectModel<typeof task>;
 export type Blob = InferSelectModel<typeof blob>;
 export type CalendarEvent = InferSelectModel<typeof calendarEvent>;
-export type EventInvite = InferSelectModel<typeof eventInvite>;
 export type Activity = InferSelectModel<typeof activity>;
 export type Notification = InferSelectModel<typeof notification>;
 
@@ -44,14 +42,6 @@ export type BlobWithCreater = Blob & {
 
 export type EventWithCreator = CalendarEvent & {
 	creator: Pick<User, "id" | "firstName" | "imageUrl">;
-};
-
-export type EventInviteWithUser = EventInvite & {
-	user: Pick<User, "firstName" | "imageUrl">;
-};
-
-export type EventWithInvites = EventWithCreator & {
-	invites: EventInviteWithUser[];
 };
 
 export type ActivityWithActor = Activity & {

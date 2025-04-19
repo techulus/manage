@@ -2,7 +2,7 @@
 
 import { Calendar } from "@/components/ui/calendar";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { EventWithInvites } from "@/drizzle/types";
+import type { EventWithCreator } from "@/drizzle/types";
 import { toMachineDateString } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useQuery } from "@tanstack/react-query";
@@ -53,7 +53,7 @@ export default function EventsCalendar({
 			) : (
 				<div className="flex w-full p-4">
 					<EventsList
-						events={(events as EventWithInvites[]) ?? []}
+						events={(events as EventWithCreator[]) ?? []}
 						projectId={+projectId!}
 						date={currentDate}
 						compact={compact}

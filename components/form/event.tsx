@@ -2,6 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import { toMachineDateString } from "@/lib/utils/date";
+import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
 import {
 	useMutation,
@@ -9,15 +10,12 @@ import {
 	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query";
-import { Trash2Icon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { parseAsBoolean, parseAsInteger, useQueryState } from "nuqs";
-import { useMemo, useState } from "react";
+import { memo, useState } from "react";
 import { type Frequency, RRule, rrulestr } from "rrule";
 import Editor from "../editor";
 import { DateTimePicker } from "../project/events/date-time-picker";
-import { MultiUserSelect } from "../project/shared/multi-user-select";
-import { UserBadge } from "../project/shared/user-badge";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import {
@@ -30,8 +28,9 @@ import {
 import { Switch } from "../ui/switch";
 import { SaveButton } from "./button";
 
-export default function EventForm() {
+const EventForm = memo(() => {
 	const { projectId } = useParams();
+
 	const [on, setOn] = useQueryState("on");
 	const [_, setCreate] = useQueryState(
 		"create",
@@ -41,70 +40,15 @@ export default function EventForm() {
 		"editing",
 		parseAsInteger.withDefault(0),
 	);
+
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
-	const upsertEvent = useMutation(trpc.events.upsert.mutationOptions());
-
-	const [{ data: timezone }, { data: users = [] }] = useQueries({
-		queries: [
-			trpc.settings.getTimezone.queryOptions(),
-			trpc.settings.getAllUsers.queryOptions(),
-		],
-	});
-
-	const { data: item } = useQuery({
-		...trpc.events.getById.queryOptions({
-			id: editingEventId,
-		}),
-		enabled: !!editingEventId,
-		staleTime: 0,
-	});
-
-	const [allDay, setAllDay] = useState(item?.allDay ?? false);
-	const [invites, setInvites] = useState<string[]>(
-		item?.invites?.map((invite) => invite.userId) ?? [],
-	);
-
-	const end = useMemo(
-		() => (item?.end ? new Date(item.end) : undefined),
-		[item?.end],
-	);
-	const rrule = useMemo(
-		() => (item?.repeatRule ? rrulestr(item.repeatRule) : null),
-		[item?.repeatRule],
-	);
-
-	let start: Date;
-	start = item?.start ? new Date(item.start) : new Date();
-	if (on) {
-		const date = new Date(on);
-		start = new Date(date.setHours(start.getHours(), start.getMinutes()));
-	}
-
-	return (
-		<form
-			className="flex-1 overflow-hidden overflow-y-auto"
-			action={async (formData: FormData) => {
-				const event = await upsertEvent.mutateAsync({
-					name: formData.get("name") as string,
-					start: new Date(formData.get("start") as string),
-					allDay: formData.get("allDay") === "on",
-					projectId: +(formData.get("projectId") as string),
-					id: +(formData.get("id") as string),
-					repeat: formData.get("repeat")
-						? (Number(formData.get("repeat")) as Frequency)
-						: undefined,
-					description: formData.get("description") as string,
-					end: formData.get("end")
-						? new Date(formData.get("end") as string)
-						: undefined,
-					invites: formData.get("invites")
-						? (formData.get("invites") as string).split(",")
-						: [],
-					repeatUntil: formData.get("repeatUntil")
-						? new Date(formData.get("repeatUntil") as string)
-						: undefined,
-				});
+	const upsertEvent = useMutation(
+		trpc.events.upsert.mutationOptions({
+			onSuccess: (event) => {
+				setOn(toMachineDateString(event.start, timezone!));
+				setCreate(null);
+				setEditing(null);
 
 				queryClient.invalidateQueries({
 					queryKey: trpc.events.getByDate.queryKey({
@@ -117,15 +61,51 @@ export default function EventForm() {
 						projectId: +projectId!,
 					}),
 				});
+			},
+			onError: displayMutationError,
+		}),
+	);
 
-				setOn(toMachineDateString(event.start, timezone!));
-				setCreate(null);
-				setEditing(null);
+	const [{ data: timezone }] = useQueries({
+		queries: [trpc.settings.getTimezone.queryOptions()],
+	});
+
+	const { data: item } = useQuery({
+		...trpc.events.getById.queryOptions({
+			id: editingEventId,
+		}),
+		enabled: !!editingEventId,
+		staleTime: 0,
+	});
+
+	const [name, setName] = useState(item?.name ?? "");
+	const [start, setStart] = useState(item?.start ?? new Date(on ?? new Date()));
+	const [end, setEnd] = useState(item?.end ?? undefined);
+	const [allDay, setAllDay] = useState(item?.allDay ?? false);
+	const [repeat, setRepeat] = useState<Frequency | undefined>(
+		item?.repeatRule ? rrulestr(item.repeatRule).options.freq : undefined,
+	);
+
+	return (
+		<form
+			className="flex-1 overflow-hidden overflow-y-auto"
+			action={(formData: FormData) => {
+				upsertEvent.mutate({
+					name,
+					start,
+					end,
+					allDay,
+					projectId: +projectId!,
+					id: item?.id ?? undefined,
+					repeat,
+					description: formData.get("description") as string,
+					repeatUntil: formData.get("repeatUntil")
+						? new Date(formData.get("repeatUntil") as string)
+						: undefined,
+				});
 			}}
 		>
 			<div className="px-6 space-y-4">
-				{item ? <input type="hidden" name="id" defaultValue={item.id} /> : null}
-				<input type="hidden" name="projectId" defaultValue={projectId} />
 				<div className="space-y-2">
 					<label
 						htmlFor="name"
@@ -134,7 +114,12 @@ export default function EventForm() {
 						Name
 					</label>
 					<div className="mt-2 sm:col-span-2 sm:mt-0">
-						<Input type="text" name="name" defaultValue={item?.name ?? ""} />
+						<Input
+							type="text"
+							name="name"
+							value={name}
+							onChange={(e) => setName(e.target.value)}
+						/>
 					</div>
 				</div>
 
@@ -145,6 +130,7 @@ export default function EventForm() {
 							name="start"
 							defaultValue={start.toISOString()}
 							dateOnly={allDay}
+							onSelect={(date) => setStart(date)}
 						/>
 					</div>
 					<div className="flex flex-col space-y-2">
@@ -153,6 +139,7 @@ export default function EventForm() {
 							name="end"
 							defaultValue={end?.toISOString()}
 							dateOnly={allDay}
+							onSelect={(date) => setEnd(date)}
 						/>
 					</div>
 				</div>
@@ -177,9 +164,8 @@ export default function EventForm() {
 						<Label htmlFor="repeat">Repeat</Label>
 						<Select
 							name="repeat"
-							defaultValue={
-								rrule?.options.freq ? String(rrule?.options.freq) : undefined
-							}
+							value={repeat ? String(repeat) : undefined}
+							onValueChange={(value) => setRepeat(+value as Frequency)}
 						>
 							<SelectTrigger id="repeat">
 								<SelectValue placeholder="Select repeat option" />
@@ -197,51 +183,6 @@ export default function EventForm() {
 						<DateTimePicker name="repeatUntil" dateOnly />
 					</div>
 				</div>
-
-				{users.length ? (
-					<div className="space-y-2">
-						<label
-							htmlFor="invite"
-							className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5 lg:text-left"
-						>
-							Invite
-						</label>
-						<div className="mt-2 sm:col-span-2 sm:mt-0">
-							<input type="hidden" name="invites" value={invites.join(",")} />
-							{invites.length ? (
-								<div className="mb-2 flex space-x-2">
-									{invites.map((userId) => (
-										<div key={userId} className="flex items-center">
-											<UserBadge
-												user={users.find((user) => user.id === userId)!}
-											/>
-											<Button
-												variant="link"
-												size="sm"
-												onClick={() => {
-													setInvites((invites) => [
-														...invites.filter((x) => x !== userId),
-													]);
-												}}
-											>
-												<Trash2Icon className="h-5 w-5" />
-											</Button>
-										</div>
-									))}
-								</div>
-							) : null}
-
-							{users.filter((user) => !invites.includes(user.id)).length ? (
-								<MultiUserSelect
-									users={users}
-									onUpdate={(userId) => {
-										setInvites((invites) => [...invites, userId]);
-									}}
-								/>
-							) : null}
-						</div>
-					</div>
-				) : null}
 
 				<div className="space-y-2">
 					<label
@@ -270,4 +211,6 @@ export default function EventForm() {
 			</div>
 		</form>
 	);
-}
+});
+
+export default EventForm;

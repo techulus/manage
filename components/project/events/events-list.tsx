@@ -11,7 +11,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { EventWithInvites } from "@/drizzle/types";
+import type { EventWithCreator } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import {
 	eventToHumanReadableString,
@@ -23,7 +23,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CircleEllipsisIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { UserBadge } from "../shared/user-badge";
 
 export default function EventsList({
 	date,
@@ -34,7 +33,7 @@ export default function EventsList({
 }: {
 	date: string;
 	projectId: number;
-	events: EventWithInvites[];
+	events: EventWithCreator[];
 	timezone: string;
 	compact?: boolean;
 }) {
@@ -88,7 +87,7 @@ export default function EventsList({
 					)}
 				>
 					<div className="flex space-x-4">
-						<UserAvatar user={event.creator} />
+						<UserAvatar user={event.creator} className="mt-1" />
 						<div className="flex-grow">
 							<div className="text-lg font-semibold">{event.name}</div>
 							<div
@@ -97,16 +96,6 @@ export default function EventsList({
 							>
 								{eventToHumanReadableString(event, timezone)}
 							</div>
-
-							{event.invites.length ? (
-								<div className="my-2 flex space-x-2">
-									{event.invites.map((invite) => (
-										<div key={invite.userId} className="flex items-center">
-											<UserBadge user={invite.user} imageOnly={compact} />
-										</div>
-									))}
-								</div>
-							) : null}
 
 							{event.description && !compact ? (
 								<div className="pb-2">

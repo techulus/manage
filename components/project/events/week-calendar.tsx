@@ -1,7 +1,7 @@
 "use client";
 
 import { Skeleton } from "@/components/ui/skeleton";
-import type { EventWithInvites } from "@/drizzle/types";
+import type { EventWithCreator } from "@/drizzle/types";
 import { toMachineDateString } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useQuery } from "@tanstack/react-query";
@@ -35,7 +35,7 @@ export default function WeekCalendar({
 				</div>
 			) : (
 				<EventsList
-					events={(events as EventWithInvites[]) ?? []}
+					events={(events as EventWithCreator[]) ?? []}
 					projectId={+projectId!}
 					date={currentDate}
 					compact={compact}
