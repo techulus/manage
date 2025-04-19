@@ -32,7 +32,6 @@ export default function EventDetails() {
 		"create",
 		parseAsBoolean.withDefault(false),
 	);
-	const [editing] = useQueryState("editing", parseAsBoolean.withDefault(false));
 	const selectedDate = on ? new Date(on) : new Date();
 
 	const dayCommentId = useMemo(
@@ -96,13 +95,6 @@ export default function EventDetails() {
 					roomId={`project/${projectId}/event/${dayCommentId}`}
 				/>
 			</div>
-
-			<Panel open={editing}>
-				<Title>
-					<PageTitle title="Edit Event" compact />
-				</Title>
-				<EventForm />
-			</Panel>
 
 			<Panel open={create} setOpen={setCreate}>
 				<Title>

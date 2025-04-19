@@ -2,8 +2,11 @@
 
 import EmptyState from "@/components/core/empty-state";
 import { HtmlPreview } from "@/components/core/html-view";
+import { Panel } from "@/components/core/panel";
 import { UserAvatar } from "@/components/core/user-avatar";
 import { DeleteButton } from "@/components/form/button";
+import EventForm from "@/components/form/event";
+import PageTitle from "@/components/layout/page-title";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -19,10 +22,11 @@ import {
 } from "@/lib/utils/useEvents";
 import { useTRPC } from "@/trpc/client";
 import { useUser } from "@clerk/nextjs";
+import { Title } from "@radix-ui/react-dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CircleEllipsisIcon } from "lucide-react";
 import { useParams } from "next/navigation";
-import { parseAsInteger, useQueryState } from "nuqs";
+import { useState } from "react";
 
 export default function EventsList({
 	date,
@@ -43,10 +47,7 @@ export default function EventsList({
 		filterByRepeatRule(x, new Date(date), timezone),
 	);
 
-	const [_, setEditing] = useQueryState(
-		"editing",
-		parseAsInteger.withDefault(0),
-	);
+	const [editing, setEditing] = useState<number | null>(null);
 
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
@@ -140,6 +141,12 @@ export default function EventsList({
 							) : null}
 						</div>
 					</div>
+					<Panel open={editing === event.id}>
+						<Title>
+							<PageTitle title="Edit Event" compact />
+						</Title>
+						<EventForm item={event} setEditing={setEditing} />
+					</Panel>
 				</div>
 			))}
 		</div>
