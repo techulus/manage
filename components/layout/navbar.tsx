@@ -22,6 +22,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
+import { CommandMenu } from "../core/cmd-menu";
 import { Notifications } from "../core/notifications";
 
 interface NavLink {
@@ -133,6 +134,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 
 	return (
 		<>
+			<CommandMenu tenant={tenant as string} projectId={+projectId!} />
 			<div className="flex h-14 items-center px-4">
 				<div className="flex items-center">
 					<Link href={`/${tenant}/today`} className="flex items-center mr-2">
