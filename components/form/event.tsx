@@ -2,7 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import type { EventWithCreator } from "@/drizzle/types";
-import { toMachineDateString } from "@/lib/utils/date";
+import { toMachineDateString, toStartOfHour } from "@/lib/utils/date";
 import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
 import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
@@ -71,7 +71,7 @@ const EventForm = memo(
 
 		const [name, setName] = useState(item?.name ?? "");
 		const [start, setStart] = useState(
-			item?.start ?? new Date(on ?? new Date()),
+			toStartOfHour(item?.start ?? new Date(on ?? new Date())),
 		);
 		const [end, setEnd] = useState(item?.end ?? undefined);
 		const [allDay, setAllDay] = useState(item?.allDay ?? false);
@@ -98,7 +98,7 @@ const EventForm = memo(
 					});
 				}}
 			>
-				<div className="px-6 space-y-4">
+				<div className="px-6 space-y-6">
 					<div className="space-y-2">
 						<label
 							htmlFor="name"
@@ -116,7 +116,7 @@ const EventForm = memo(
 						</div>
 					</div>
 
-					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+					<div className="relative grid grid-cols-1 gap-4 sm:grid-cols-2 border rounded-md p-4 pb-8">
 						<div className="flex flex-col space-y-2">
 							<Label>Start</Label>
 							<DateTimePicker
@@ -135,24 +135,23 @@ const EventForm = memo(
 								onSelect={(date) => setEnd(date)}
 							/>
 						</div>
+
+						<Label
+							htmlFor="all-day"
+							className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-background/50 dark:bg-background/80 px-3"
+						>
+							<Switch
+								name="allDay"
+								id="all-day"
+								aria-label="All day event"
+								defaultChecked={item?.allDay ?? false}
+								onCheckedChange={(checked) => setAllDay(checked)}
+							/>
+							All Day Event
+						</Label>
 					</div>
 
-					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-						<div className="flex flex-col justify-center space-y-2">
-							<Label htmlFor="all-day" className="flex items-center gap-2">
-								<Switch
-									name="allDay"
-									id="all-day"
-									aria-label="All day event"
-									defaultChecked={item?.allDay ?? false}
-									onCheckedChange={(checked) => setAllDay(checked)}
-								/>
-								All Day Event
-							</Label>
-						</div>
-					</div>
-
-					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-4">
 						<div className="flex flex-col space-y-2">
 							<Label htmlFor="repeat">Repeat</Label>
 							<Select
@@ -182,7 +181,7 @@ const EventForm = memo(
 							htmlFor="htmlContent"
 							className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5 lg:text-left"
 						>
-							Description
+							Notes
 						</label>
 						<div className="mt-2 sm:col-span-2 sm:mt-0">
 							<Editor

@@ -176,7 +176,7 @@ export const eventsRouter = createTRPCRouter({
 				}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const {
+			let {
 				id,
 				projectId,
 				name,
@@ -188,13 +188,8 @@ export const eventsRouter = createTRPCRouter({
 				repeatUntil,
 			} = input;
 
-			if (end && isAfter(start, end)) {
-				throw new Error("End date must be after start date");
-			}
-
-			let finalEnd = end;
 			if (allDay && end) {
-				finalEnd = toEndOfDay(end);
+				end = toEndOfDay(end);
 			}
 
 			let repeatRule: string | undefined;
@@ -211,11 +206,10 @@ export const eventsRouter = createTRPCRouter({
 				name,
 				description,
 				start,
-				end: finalEnd,
+				end,
 				allDay,
 				repeatRule,
 				projectId,
-				updatedAt: new Date(),
 			};
 
 			let eventId: number;
@@ -245,7 +239,6 @@ export const eventsRouter = createTRPCRouter({
 					.values({
 						...eventData,
 						createdByUser: ctx.userId,
-						createdAt: new Date(),
 					})
 					.returning()
 					.execute();

@@ -63,6 +63,7 @@ function TimePicker(props: Props) {
 				);
 			}
 			setDate(newDate);
+			props.onSelect?.(newDate);
 		}
 	};
 
