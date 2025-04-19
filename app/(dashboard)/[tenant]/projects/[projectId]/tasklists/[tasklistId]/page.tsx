@@ -1,5 +1,6 @@
 "use client";
 
+import { PageLoading } from "@/components/core/loaders";
 import PageSection from "@/components/core/section";
 import EditableDate from "@/components/form/editable-date";
 import NotesForm from "@/components/form/notes-form";
@@ -14,7 +15,6 @@ import { useSuspenseQueries } from "@tanstack/react-query";
 import { CheckCircle } from "lucide-react";
 import { useParams } from "next/navigation";
 import { Suspense } from "react";
-import PageLoading from "../loading";
 
 export default function TaskLists() {
 	const { projectId, tasklistId } = useParams();

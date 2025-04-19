@@ -18,14 +18,10 @@ import { useParams } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useMemo } from "react";
 
-export default function EventDetails() {
+export default function Events() {
 	const { session } = useSession();
-	if (!session) {
-		return null;
-	}
-
 	const { projectId, tenant } = useParams();
-	const { user, lastActiveOrganizationId } = session;
+	const { user, lastActiveOrganizationId } = session ?? {};
 
 	const [on] = useQueryState("on");
 	const [create, setCreate] = useQueryState(
