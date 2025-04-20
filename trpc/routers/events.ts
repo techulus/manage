@@ -1,6 +1,6 @@
 import { calendarEvent } from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
-import { toEndOfDay } from "@/lib/utils/date";
+import { toEndOfDay, toStartOfDay, toTimeZone, toUTC } from "@/lib/utils/date";
 import {
 	getStartEndDateRangeInUtc,
 	getStartEndWeekRangeInUtc,
@@ -168,8 +168,8 @@ export const eventsRouter = createTRPCRouter({
 					start: z.date({ message: "Start date is required" }),
 					end: z.date().optional(),
 					allDay: z.boolean(),
-					repeat: z.nativeEnum(Frequency).optional(),
-					repeatUntil: z.date().optional(),
+					repeat: z.nativeEnum(Frequency).optional().nullable(),
+					repeatUntil: z.date().optional().nullable(),
 				})
 				.refine((data) => (data.end ? isAfter(data.end, data.start) : true), {
 					message: "End date must be after start date",
@@ -188,16 +188,27 @@ export const eventsRouter = createTRPCRouter({
 				repeatUntil,
 			} = input;
 
-			if (allDay && end) {
-				end = toEndOfDay(end);
+			if (allDay) {
+				start = toUTC(
+					toStartOfDay(toTimeZone(start, ctx.timezone)),
+					ctx.timezone,
+				);
+				end = end
+					? toUTC(toEndOfDay(toTimeZone(end, ctx.timezone)), ctx.timezone)
+					: undefined;
 			}
 
-			let repeatRule: string | undefined;
+			let repeatRule: string | null = null;
 			if (repeat) {
 				repeatRule = new RRule({
 					freq: repeat,
 					dtstart: start,
-					until: repeatUntil ? toEndOfDay(repeatUntil) : undefined,
+					until: repeatUntil
+						? toUTC(
+								toEndOfDay(toTimeZone(repeatUntil, ctx.timezone)),
+								ctx.timezone,
+							)
+						: undefined,
 					tzid: "UTC",
 				}).toString();
 			}
