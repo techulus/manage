@@ -58,7 +58,7 @@ export function TasksProvider({
 						if (!tasklist) return tasklist;
 
 						const createdTask: TaskWithDetails = {
-							id: Date.now(),
+							id: Number.MAX_SAFE_INTEGER - Date.now(),
 							taskListId: newTask.taskListId || 0,
 							name: newTask.name || "",
 							description: null,
