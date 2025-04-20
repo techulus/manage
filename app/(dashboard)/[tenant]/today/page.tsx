@@ -1,18 +1,24 @@
 "use client";
 
-import EmptyState from "@/components/core/empty-state";
 import { Greeting } from "@/components/core/greeting";
 import { PageLoading } from "@/components/core/loaders";
+import { Panel } from "@/components/core/panel";
 import PageSection from "@/components/core/section";
+import { SaveButton } from "@/components/form/button";
+import SharedForm from "@/components/form/shared";
 import PageTitle from "@/components/layout/page-title";
 import { ProjecItem } from "@/components/project/project-item";
-import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { toDateStringWithDay, toDateTimeString } from "@/lib/utils/date";
+import { toDateStringWithDay } from "@/lib/utils/date";
 import { eventToHumanReadableString } from "@/lib/utils/useEvents";
 import { useTRPC } from "@/trpc/client";
-import { useSuspenseQueries } from "@tanstack/react-query";
+import { Title } from "@radix-ui/react-dialog";
+import {
+	useMutation,
+	useQueryClient,
+	useSuspenseQueries,
+} from "@tanstack/react-query";
 import {
 	AlertTriangleIcon,
 	CalendarClockIcon,
@@ -22,14 +28,14 @@ import {
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { Suspense } from "react";
-import { rrulestr } from "rrule";
+import { Suspense, useState } from "react";
 
 export default function Today() {
 	const params = useParams();
 	const tenant = params.tenant as string;
 
 	const trpc = useTRPC();
+	const queryClient = useQueryClient();
 	const [statuses] = useQueryState("status", {
 		defaultValue: "active",
 	});
@@ -52,6 +58,22 @@ export default function Today() {
 			trpc.settings.getTimezone.queryOptions(),
 		],
 	});
+
+	const createProject = useMutation(
+		trpc.projects.createProject.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: trpc.user.getProjects.queryKey({
+						statuses: ["active"],
+					}),
+				});
+
+				setCreate(false);
+			},
+		}),
+	);
+
+	const [create, setCreate] = useState(false);
 
 	return (
 		<Suspense fallback={<PageLoading />}>
@@ -92,10 +114,10 @@ export default function Today() {
 						<Link
 							href={`/${tenant}/projects/${event.project.id}/events`}
 							key={event.id}
-							className="px-4 py-2 hover:bg-muted/50 transition-colors border-none"
+							className="px-4 py-2 hover:bg-muted/50 transition-colors"
 						>
 							<div className="flex flex-col">
-								<div className="text-lg font-semibold">{event.name}</div>
+								<h4 className="font-medium">{event.name}</h4>
 								<div
 									className="pb-1 text-xs text-gray-500 dark:text-gray-400"
 									suppressHydrationWarning
@@ -134,6 +156,11 @@ export default function Today() {
 			<PageSection
 				title="Projects"
 				titleIcon={<FolderIcon className="w-5 h-5" />}
+				titleAction={
+					<Button size="sm" onClick={() => setCreate(true)}>
+						New
+					</Button>
+				}
 				transparent
 			>
 				{projects?.length ? (
@@ -147,11 +174,29 @@ export default function Today() {
 						))}
 					</div>
 				) : (
-					<EmptyState
-						show={!projects.length}
-						label="projects"
-						createLink={`/${tenant}/projects/new`}
-					/>
+					<div className="p-2">
+						<svg
+							className="mx-auto h-12 w-12 text-muted-foreground"
+							stroke="currentColor"
+							fill="none"
+							viewBox="0 0 48 48"
+							aria-hidden="true"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M8 14v20c0 4.418 7.163 8 16 8 1.381 0 2.721-.087 4-.252M8 14c0 4.418 7.163 8 16 8s16-3.582 16-8M8 14c0-4.418 7.163-8 16-8s16 3.582 16 8m0 0v14m0-4c0 4.418-7.163 8-16 8S8 28.418 8 24m32 10v6m0 0v6m0-6h6m-6 0h-6"
+							/>
+						</svg>
+						<button
+							type="button"
+							className="mt-2 block text-sm font-semibold text-muted-foreground"
+							onClick={() => setCreate(true)}
+						>
+							Create new project
+						</button>
+					</div>
 				)}
 
 				<div className="mx-auto mt-6 flex w-full max-w-7xl flex-grow items-center border-t border-muted">
@@ -172,6 +217,38 @@ export default function Today() {
 					)}
 				</div>
 			</PageSection>
+
+			<Panel open={create} setOpen={setCreate}>
+				<Title>
+					<PageTitle title="Create Project" compact />
+				</Title>
+
+				<form
+					action={async (formData) => {
+						await createProject.mutateAsync({
+							name: formData.get("name") as string,
+							description: formData.get("description") as string,
+							dueDate: formData.get("dueDate")
+								? new Date(formData.get("dueDate") as string)
+								: undefined,
+						});
+					}}
+					className="px-6"
+				>
+					<SharedForm />
+
+					<div className="mt-6 flex items-center justify-end gap-x-6">
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => setCreate(false)}
+						>
+							Cancel
+						</Button>
+						<SaveButton />
+					</div>
+				</form>
+			</Panel>
 		</Suspense>
 	);
 }

@@ -59,19 +59,21 @@ export default function TaskLists() {
 					createLink={`/${tenant}/projects/${projectId}/tasklists?create=true`}
 				/>
 
-				<ul className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2">
-					{taskLists.map((taskList) => (
-						<TasksProvider
-							key={taskList.id}
-							projectId={+projectId!}
-							taskListId={taskList.id}
-						>
-							<TaskListItem id={taskList.id} compact />
-						</TasksProvider>
-					))}
-				</ul>
+				{taskLists?.length ? (
+					<ul className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2">
+						{taskLists.map((taskList) => (
+							<TasksProvider
+								key={taskList.id}
+								projectId={+projectId!}
+								taskListId={taskList.id}
+							>
+								<TaskListItem id={taskList.id} compact />
+							</TasksProvider>
+						))}
+					</ul>
+				) : null}
 
-				<div className="mx-auto mt-12 flex w-full max-w-7xl flex-grow items-center border-t border-muted">
+				<div className="mx-auto flex w-full max-w-7xl flex-grow items-center">
 					{statuses.includes("archived") ? (
 						<Link
 							href={`/${tenant}/projects/${projectId}/tasklists`}

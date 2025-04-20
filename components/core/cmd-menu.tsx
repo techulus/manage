@@ -82,15 +82,6 @@ export function CommandMenu({
 							{project.name}
 						</CommandItem>
 					))}
-					<CommandItem
-						onSelect={() => {
-							router.push(`/${tenant}/projects/new`);
-							setOpen(false);
-						}}
-					>
-						<Plus />
-						Create new project
-					</CommandItem>
 				</CommandGroup>
 				<CommandGroup heading="Tasklists">
 					{tasklists.map((tasklist) => (

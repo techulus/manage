@@ -5,7 +5,6 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -204,13 +203,6 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 									<span>{project.name}</span>
 								</DropdownMenuItem>
 							))}
-							<DropdownMenuSeparator />
-							<DropdownMenuItem
-								className="cursor-pointer"
-								onClick={() => router.push(`/${tenant}/projects/new`)}
-							>
-								Create Project
-							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
 				</div>
