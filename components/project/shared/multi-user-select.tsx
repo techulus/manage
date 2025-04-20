@@ -16,7 +16,7 @@ import {
 import type { User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import { useMemo, useState } from "react";
-import { Assignee } from "./assigee";
+import { UserBadge } from "./user-badge";
 
 export function MultiUserSelect({
 	users,
@@ -71,7 +71,7 @@ export function MultiUserSelect({
 										value === user.id ? "opacity-100" : "opacity-0",
 									)}
 								/>
-								<Assignee user={user} />
+								<UserBadge user={user} />
 							</CommandItem>
 						))}
 					</CommandGroup>

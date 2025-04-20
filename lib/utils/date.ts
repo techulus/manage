@@ -1,4 +1,10 @@
-import { endOfDay, endOfWeek, startOfDay, startOfWeek } from "date-fns";
+import {
+	endOfDay,
+	endOfWeek,
+	startOfDay,
+	startOfHour,
+	startOfWeek,
+} from "date-fns";
 import { fromZonedTime, toZonedTime } from "date-fns-tz";
 
 export function toTimeZone(date: Date | string, timeZone: string) {
@@ -73,6 +79,10 @@ export function getStartOfWeek(date: Date) {
 
 export function getEndOfWeek(date: Date) {
 	return endOfWeek(date, { weekStartsOn: 1 });
+}
+
+export function toStartOfHour(date: Date) {
+	return startOfHour(date);
 }
 
 export function toMs(durationInMinutes: number) {

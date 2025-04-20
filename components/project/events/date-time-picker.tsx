@@ -63,6 +63,7 @@ function TimePicker(props: Props) {
 				);
 			}
 			setDate(newDate);
+			props.onSelect?.(newDate);
 		}
 	};
 
@@ -85,9 +86,9 @@ function TimePicker(props: Props) {
 					>
 						<CalendarIcon className="h-4 w-4" />
 						{date ? (
-							format(date, "MM/dd/yyyy hh:mm aa")
+							format(date, "d MMM yyyy hh:mm aa")
 						) : (
-							<span>MM/DD/YYYY hh:mm aa</span>
+							<span>dd MMM yyyy hh:mm aa</span>
 						)}
 					</Button>
 				</PopoverTrigger>

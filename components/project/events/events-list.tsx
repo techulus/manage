@@ -2,8 +2,11 @@
 
 import EmptyState from "@/components/core/empty-state";
 import { HtmlPreview } from "@/components/core/html-view";
+import { Panel } from "@/components/core/panel";
 import { UserAvatar } from "@/components/core/user-avatar";
 import { DeleteButton } from "@/components/form/button";
+import EventForm from "@/components/form/event";
+import PageTitle from "@/components/layout/page-title";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -11,7 +14,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { EventWithInvites } from "@/drizzle/types";
+import type { EventWithCreator } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 import {
 	eventToHumanReadableString,
@@ -19,11 +22,11 @@ import {
 } from "@/lib/utils/useEvents";
 import { useTRPC } from "@/trpc/client";
 import { useUser } from "@clerk/nextjs";
+import { Title } from "@radix-ui/react-dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CircleEllipsisIcon } from "lucide-react";
 import { useParams } from "next/navigation";
-import { parseAsInteger, useQueryState } from "nuqs";
-import { Assignee } from "../shared/assigee";
+import { useState } from "react";
 
 export default function EventsList({
 	date,
@@ -34,7 +37,7 @@ export default function EventsList({
 }: {
 	date: string;
 	projectId: number;
-	events: EventWithInvites[];
+	events: EventWithCreator[];
 	timezone: string;
 	compact?: boolean;
 }) {
@@ -44,10 +47,7 @@ export default function EventsList({
 		filterByRepeatRule(x, new Date(date), timezone),
 	);
 
-	const [_, setEditing] = useQueryState(
-		"editing",
-		parseAsInteger.withDefault(0),
-	);
+	const [editing, setEditing] = useState<number | null>(null);
 
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
@@ -88,7 +88,7 @@ export default function EventsList({
 					)}
 				>
 					<div className="flex space-x-4">
-						<UserAvatar user={event.creator} />
+						<UserAvatar user={event.creator} className="mt-1" />
 						<div className="flex-grow">
 							<div className="text-lg font-semibold">{event.name}</div>
 							<div
@@ -97,16 +97,6 @@ export default function EventsList({
 							>
 								{eventToHumanReadableString(event, timezone)}
 							</div>
-
-							{event.invites.length ? (
-								<div className="my-2 flex space-x-2">
-									{event.invites.map((invite) => (
-										<div key={invite.userId} className="flex items-center">
-											<Assignee user={invite.user} imageOnly={compact} />
-										</div>
-									))}
-								</div>
-							) : null}
 
 							{event.description && !compact ? (
 								<div className="pb-2">
@@ -151,6 +141,12 @@ export default function EventsList({
 							) : null}
 						</div>
 					</div>
+					<Panel open={editing === event.id}>
+						<Title>
+							<PageTitle title="Edit Event" compact />
+						</Title>
+						<EventForm item={event} setEditing={setEditing} />
+					</Panel>
 				</div>
 			))}
 		</div>

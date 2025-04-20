@@ -16,10 +16,7 @@ export async function POST(req: Request) {
 
 		const { id } = evt.data;
 		const eventType = evt.type;
-		console.log(
-			`Received webhook with ID ${id} and event type of ${eventType}`,
-		);
-		console.log("Webhook payload:", evt.data);
+		console.log("Webhook payload:", id, evt.data);
 
 		if (!id) {
 			console.error("Webhook received with no ID");

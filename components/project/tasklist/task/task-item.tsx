@@ -26,8 +26,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Checkbox } from "../../../ui/checkbox";
 import { DateTimePicker } from "../../events/date-time-picker";
-import { Assignee } from "../../shared/assigee";
 import { AssignToUser } from "../../shared/assign-to-user";
+import { UserBadge } from "../../shared/user-badge";
 
 export const TaskItem = ({
 	task,
@@ -106,7 +106,7 @@ export const TaskItem = ({
 						)}
 					>
 						{task.assignee ? (
-							<Assignee className="mr-2" user={task.assignee} imageOnly />
+							<UserBadge className="mr-2" user={task.assignee} imageOnly />
 						) : null}
 						{task.name}
 						{task.dueDate ? (
@@ -199,7 +199,7 @@ export const TaskItem = ({
 							<div className="flex items-center justify-between">
 								{task.assignee ? (
 									<>
-										<Assignee user={task.assignee} />
+										<UserBadge user={task.assignee} />
 										<Button
 											size="sm"
 											variant="outline"
@@ -271,120 +271,119 @@ export const TaskItem = ({
 							<div className="flex items-center justify-between">
 								<h4 className="text-sm font-medium">Created By</h4>
 							</div>
-							<p className="text-sm text-muted-foreground flex items-center gap-2">
-								<UserAvatar user={task.creator} compact />{" "}
-								{task.creator?.firstName}
-							</p>
+							<UserBadge user={task.creator} />
 						</div>
 
-						{taskLists?.filter((x) => x.id !== task.taskListId)?.length ? (
-							<div className="space-y-1">
-								<h4 className="text-sm font-medium">Actions</h4>
-								<div className="flex items-center space-x-2">
-									<Button
-										size="sm"
-										variant="outline"
-										className="text-primary hover:text-red-500"
-										onClick={() => {
-											deleteTask.mutate({
-												id: task.id,
-											});
-										}}
-									>
-										Delete
-									</Button>
+						<div className="space-y-1">
+							<h4 className="text-sm font-medium">Actions</h4>
+							<div className="flex items-center space-x-2">
+								<Button
+									size="sm"
+									variant="outline"
+									className="text-primary hover:text-red-500"
+									onClick={() => {
+										deleteTask.mutate({
+											id: task.id,
+										});
+									}}
+								>
+									Delete
+								</Button>
 
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>
-											<Button
-												variant="outline"
-												size="sm"
-												className="text-primary"
-											>
-												Move to...
-											</Button>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent>
-											{taskLists
-												.filter((x) => x.id !== task.taskListId)
-												.map((list) => (
-													<DropdownMenuItem key={list.id} className="w-full">
-														<form
-															className="w-full"
-															action={() => {
-																toast.promise(
-																	updateTask.mutateAsync({
-																		id: task.id,
-																		taskListId: list.id,
-																	}),
-																	{
-																		loading: "Moving...",
-																		success: "Moved!",
-																		error:
-																			"Error while moving, please try again.",
-																	},
-																);
-															}}
-														>
-															<button
-																type="submit"
-																className="w-full text-left"
+								{taskLists?.filter((x) => x.id !== task.taskListId)?.length ? (
+									<>
+										<DropdownMenu>
+											<DropdownMenuTrigger asChild>
+												<Button
+													variant="outline"
+													size="sm"
+													className="text-primary"
+												>
+													Move to...
+												</Button>
+											</DropdownMenuTrigger>
+											<DropdownMenuContent>
+												{taskLists
+													.filter((x) => x.id !== task.taskListId)
+													.map((list) => (
+														<DropdownMenuItem key={list.id} className="w-full">
+															<form
+																className="w-full"
+																action={() => {
+																	toast.promise(
+																		updateTask.mutateAsync({
+																			id: task.id,
+																			taskListId: list.id,
+																		}),
+																		{
+																			loading: "Moving...",
+																			success: "Moved!",
+																			error:
+																				"Error while moving, please try again.",
+																		},
+																	);
+																}}
 															>
-																{list.name}
-															</button>
-														</form>
-													</DropdownMenuItem>
-												))}
-										</DropdownMenuContent>
-									</DropdownMenu>
+																<button
+																	type="submit"
+																	className="w-full text-left"
+																>
+																	{list.name}
+																</button>
+															</form>
+														</DropdownMenuItem>
+													))}
+											</DropdownMenuContent>
+										</DropdownMenu>
 
-									<DropdownMenu>
-										<DropdownMenuTrigger asChild>
-											<Button
-												variant="outline"
-												size="sm"
-												className="text-primary"
-											>
-												Copy to...
-											</Button>
-										</DropdownMenuTrigger>
-										<DropdownMenuContent>
-											{taskLists
-												.filter((x) => x.id !== task.taskListId)
-												.map((list: TaskList) => (
-													<DropdownMenuItem key={list.id} className="w-full">
-														<form
-															className="w-full"
-															action={() => {
-																toast.promise(
-																	createTask.mutateAsync({
-																		name: task.name,
-																		taskListId: list.id,
-																		status: "todo",
-																	}),
-																	{
-																		loading: "Copying...",
-																		success: "Copied!",
-																		error:
-																			"Error while copying, please try again.",
-																	},
-																);
-															}}
-														>
-															<button
-																type="submit"
-																className="w-full text-left"
+										<DropdownMenu>
+											<DropdownMenuTrigger asChild>
+												<Button
+													variant="outline"
+													size="sm"
+													className="text-primary"
+												>
+													Copy to...
+												</Button>
+											</DropdownMenuTrigger>
+											<DropdownMenuContent>
+												{taskLists
+													.filter((x) => x.id !== task.taskListId)
+													.map((list: TaskList) => (
+														<DropdownMenuItem key={list.id} className="w-full">
+															<form
+																className="w-full"
+																action={() => {
+																	toast.promise(
+																		createTask.mutateAsync({
+																			name: task.name,
+																			taskListId: list.id,
+																			status: "todo",
+																		}),
+																		{
+																			loading: "Copying...",
+																			success: "Copied!",
+																			error:
+																				"Error while copying, please try again.",
+																		},
+																	);
+																}}
 															>
-																{list.name}
-															</button>
-														</form>
-													</DropdownMenuItem>
-												))}
-										</DropdownMenuContent>
-									</DropdownMenu>
-								</div>
+																<button
+																	type="submit"
+																	className="w-full text-left"
+																>
+																	{list.name}
+																</button>
+															</form>
+														</DropdownMenuItem>
+													))}
+											</DropdownMenuContent>
+										</DropdownMenu>
+									</>
+								) : null}
 							</div>
-						) : null}
+						</div>
 					</div>
 				</div>
 			</Panel>

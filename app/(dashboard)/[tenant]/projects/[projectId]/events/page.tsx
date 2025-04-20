@@ -9,7 +9,7 @@ import EventsCalendar from "@/components/project/events/events-calendar";
 import { buttonVariants } from "@/components/ui/button";
 import { toDateStringWithDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "@clerk/nextjs";
 import { Title } from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { RssIcon } from "lucide-react";
@@ -18,16 +18,16 @@ import { useParams } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useMemo } from "react";
 
-export default function EventDetails() {
+export default function Events() {
+	const { session } = useSession();
 	const { projectId, tenant } = useParams();
-	const { user } = useUser();
+	const { user, lastActiveOrganizationId } = session ?? {};
 
 	const [on] = useQueryState("on");
 	const [create, setCreate] = useQueryState(
 		"create",
 		parseAsBoolean.withDefault(false),
 	);
-	const [editing] = useQueryState("editing", parseAsBoolean.withDefault(false));
 	const selectedDate = on ? new Date(on) : new Date();
 
 	const dayCommentId = useMemo(
@@ -37,8 +37,8 @@ export default function EventDetails() {
 	);
 	const calendarSubscriptionUrl = useMemo(
 		() =>
-			`/api/calendar/${tenant}/${projectId}/calendar.ics?userId=${user?.id}`,
-		[tenant, projectId, user?.id],
+			`/api/calendar/${lastActiveOrganizationId ?? user?.id}/${projectId}/calendar.ics?userId=${user?.id}`,
+		[lastActiveOrganizationId, projectId, user?.id],
 	);
 
 	const trpc = useTRPC();
@@ -92,16 +92,9 @@ export default function EventDetails() {
 				/>
 			</div>
 
-			<Panel open={editing}>
-				<Title>
-					<PageTitle title="Edit Event" compact />
-				</Title>
-				<EventForm />
-			</Panel>
-
 			<Panel open={create} setOpen={setCreate}>
 				<Title>
-					<PageTitle title="Create Event" compact />
+					<PageTitle title="New Event" compact />
 				</Title>
 				<EventForm />
 			</Panel>

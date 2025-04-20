@@ -33,7 +33,6 @@ export function generateObjectDiffMessage(item: ActivityWithActor) {
 	}
 
 	if (newValue && oldValue) {
-		console.log(oldValue, newValue);
 		const ignoreKeys = ["updatedAt", "createdAt", "repeatRule", "creatorId"];
 
 		for (const key in oldValue) {

@@ -1,4 +1,4 @@
-FROM oven/bun:1.2.9-slim AS base
+FROM oven/bun:slim AS base
 
 ARG NEXT_PUBLIC_APP_URL
 ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY

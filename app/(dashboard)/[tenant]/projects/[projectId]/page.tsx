@@ -95,7 +95,7 @@ export default function ProjectDetails() {
 								dueDate: date ? toStartOfDay(date) : null,
 							});
 						}}
-						label="Due"
+						label="due"
 					/>
 
 					{project.status === "archived" ? (
@@ -173,10 +173,10 @@ export default function ProjectDetails() {
 						href={`/${tenant}/projects/${projectId}/tasklists?create=true`}
 					>
 						New
-						<span className="sr-only">, task list</span>
+						<span className="sr-only">, list</span>
 					</Link>
 				}
-				transparent
+				transparent={!!taskLists.length}
 			>
 				{taskLists.length ? (
 					<ul className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2">
@@ -195,13 +195,15 @@ export default function ProjectDetails() {
 							);
 						})}
 					</ul>
-				) : null}
-
-				<EmptyState
-					show={!taskLists.length}
-					label="task list"
-					createLink={`/${tenant}/projects/${projectId}/tasklists?create=true`}
-				/>
+				) : (
+					<div className="p-2">
+						<EmptyState
+							show={!taskLists.length}
+							label="list"
+							createLink={`/${tenant}/projects/${projectId}/tasklists?create=true`}
+						/>
+					</div>
+				)}
 			</PageSection>
 
 			<PageSection

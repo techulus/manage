@@ -1,4 +1,4 @@
-import type { CalendarEvent, EventWithInvites } from "@/drizzle/types";
+import type { CalendarEvent, EventWithCreator } from "@/drizzle/types";
 import { isSameDay } from "date-fns";
 import { rrulestr } from "rrule";
 import {
@@ -14,7 +14,7 @@ import {
 } from "./date";
 
 export const filterByRepeatRule = (
-	event: CalendarEvent | EventWithInvites,
+	event: CalendarEvent | EventWithCreator,
 	date: Date,
 	timezone: string,
 ) => {
@@ -57,7 +57,7 @@ export const getStartEndWeekRangeInUtc = (timezone: string, date: Date) => {
 };
 
 export const eventToHumanReadableString = (
-	event: CalendarEvent | EventWithInvites,
+	event: CalendarEvent | EventWithCreator,
 	timezone: string,
 ) => {
 	if (event.repeatRule) {

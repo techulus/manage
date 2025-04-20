@@ -1,4 +1,4 @@
-import { calendarEvent, eventInvite } from "@/drizzle/schema";
+import { calendarEvent } from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
 import { toEndOfDay } from "@/lib/utils/date";
 import {
@@ -35,16 +35,6 @@ export const eventsRouter = createTRPCRouter({
 							id: true,
 							firstName: true,
 							imageUrl: true,
-						},
-					},
-					invites: {
-						with: {
-							user: {
-								columns: {
-									firstName: true,
-									imageUrl: true,
-								},
-							},
 						},
 					},
 				},
@@ -89,16 +79,6 @@ export const eventsRouter = createTRPCRouter({
 								id: true,
 								firstName: true,
 								imageUrl: true,
-							},
-						},
-						invites: {
-							with: {
-								user: {
-									columns: {
-										firstName: true,
-										imageUrl: true,
-									},
-								},
 							},
 						},
 					},
@@ -146,16 +126,6 @@ export const eventsRouter = createTRPCRouter({
 								imageUrl: true,
 							},
 						},
-						invites: {
-							with: {
-								user: {
-									columns: {
-										firstName: true,
-										imageUrl: true,
-									},
-								},
-							},
-						},
 					},
 				})
 				.execute();
@@ -187,21 +157,26 @@ export const eventsRouter = createTRPCRouter({
 		}),
 	upsert: protectedProcedure
 		.input(
-			z.object({
-				id: z.number().optional(),
-				projectId: z.number(),
-				name: z.string(),
-				description: z.string().optional(),
-				start: z.date(),
-				end: z.date().optional(),
-				allDay: z.boolean(),
-				repeat: z.nativeEnum(Frequency).optional(),
-				repeatUntil: z.date().optional(),
-				invites: z.array(z.string()).optional(),
-			}),
+			z
+				.object({
+					id: z.number().optional(),
+					projectId: z.number(),
+					name: z
+						.string()
+						.min(2, { message: "Name must be at least 2 characters" }),
+					description: z.string().optional(),
+					start: z.date({ message: "Start date is required" }),
+					end: z.date().optional(),
+					allDay: z.boolean(),
+					repeat: z.nativeEnum(Frequency).optional(),
+					repeatUntil: z.date().optional(),
+				})
+				.refine((data) => (data.end ? isAfter(data.end, data.start) : true), {
+					message: "End date must be after start date",
+				}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const {
+			let {
 				id,
 				projectId,
 				name,
@@ -211,16 +186,10 @@ export const eventsRouter = createTRPCRouter({
 				allDay,
 				repeat,
 				repeatUntil,
-				invites = [],
 			} = input;
 
-			if (end && isAfter(start, end)) {
-				throw new Error("End date must be after start date");
-			}
-
-			let finalEnd = end;
 			if (allDay && end) {
-				finalEnd = toEndOfDay(end);
+				end = toEndOfDay(end);
 			}
 
 			let repeatRule: string | undefined;
@@ -237,11 +206,10 @@ export const eventsRouter = createTRPCRouter({
 				name,
 				description,
 				start,
-				end: finalEnd,
+				end,
 				allDay,
 				repeatRule,
 				projectId,
-				updatedAt: new Date(),
 			};
 
 			let eventId: number;
@@ -258,11 +226,6 @@ export const eventsRouter = createTRPCRouter({
 					.where(eq(calendarEvent.id, id))
 					.returning();
 
-				await ctx.db
-					.delete(eventInvite)
-					.where(eq(eventInvite.eventId, id))
-					.execute();
-
 				await logActivity({
 					action: "updated",
 					type: "event",
@@ -276,7 +239,6 @@ export const eventsRouter = createTRPCRouter({
 					.values({
 						...eventData,
 						createdByUser: ctx.userId,
-						createdAt: new Date(),
 					})
 					.returning()
 					.execute();
@@ -289,17 +251,6 @@ export const eventsRouter = createTRPCRouter({
 					projectId,
 					newValue: newEvent[0],
 				});
-			}
-
-			for (const userId of invites) {
-				await ctx.db
-					.insert(eventInvite)
-					.values({
-						eventId,
-						userId,
-						status: "invited",
-					})
-					.execute();
 			}
 
 			return { id: eventId, ...eventData };

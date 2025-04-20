@@ -1,23 +1,17 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { toMachineDateString } from "@/lib/utils/date";
+import type { EventWithCreator } from "@/drizzle/types";
+import { toMachineDateString, toStartOfHour } from "@/lib/utils/date";
+import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
-import {
-	useMutation,
-	useQueries,
-	useQuery,
-	useQueryClient,
-} from "@tanstack/react-query";
-import { Trash2Icon } from "lucide-react";
+import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { parseAsBoolean, parseAsInteger, useQueryState } from "nuqs";
-import { useMemo, useState } from "react";
+import { parseAsBoolean, useQueryState } from "nuqs";
+import { type Dispatch, type SetStateAction, memo, useState } from "react";
 import { type Frequency, RRule, rrulestr } from "rrule";
 import Editor from "../editor";
 import { DateTimePicker } from "../project/events/date-time-picker";
-import { Assignee } from "../project/shared/assigee";
-import { MultiUserSelect } from "../project/shared/multi-user-select";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import {
@@ -30,136 +24,122 @@ import {
 import { Switch } from "../ui/switch";
 import { SaveButton } from "./button";
 
-export default function EventForm() {
-	const { projectId } = useParams();
-	const [on, setOn] = useQueryState("on");
-	const [_, setCreate] = useQueryState(
-		"create",
-		parseAsBoolean.withDefault(false),
-	);
-	const [editingEventId, setEditing] = useQueryState(
-		"editing",
-		parseAsInteger.withDefault(0),
-	);
-	const trpc = useTRPC();
-	const queryClient = useQueryClient();
-	const upsertEvent = useMutation(trpc.events.upsert.mutationOptions());
+const EventForm = memo(
+	({
+		item,
+		setEditing,
+	}: {
+		item?: EventWithCreator;
+		setEditing?: Dispatch<SetStateAction<number | null>>;
+	}) => {
+		const { projectId } = useParams();
 
-	const [{ data: timezone }, { data: users = [] }] = useQueries({
-		queries: [
-			trpc.settings.getTimezone.queryOptions(),
-			trpc.settings.getAllUsers.queryOptions(),
-		],
-	});
+		const [on, setOn] = useQueryState("on");
+		const [_, setCreate] = useQueryState(
+			"create",
+			parseAsBoolean.withDefault(false),
+		);
 
-	const { data: item } = useQuery({
-		...trpc.events.getById.queryOptions({
-			id: editingEventId,
-		}),
-		enabled: !!editingEventId,
-		staleTime: 0,
-	});
+		const trpc = useTRPC();
+		const queryClient = useQueryClient();
+		const upsertEvent = useMutation(
+			trpc.events.upsert.mutationOptions({
+				onSuccess: (event) => {
+					setOn(toMachineDateString(event.start, timezone!));
+					setCreate(null);
+					setEditing?.(null);
 
-	const [allDay, setAllDay] = useState(item?.allDay ?? false);
-	const [invites, setInvites] = useState<string[]>(
-		item?.invites?.map((invite) => invite.userId) ?? [],
-	);
+					queryClient.invalidateQueries({
+						queryKey: trpc.events.getByDate.queryKey({
+							date: event.start,
+							projectId: +projectId!,
+						}),
+					});
+					queryClient.invalidateQueries({
+						queryKey: trpc.events.getByWeek.queryKey({
+							projectId: +projectId!,
+						}),
+					});
+				},
+				onError: displayMutationError,
+			}),
+		);
 
-	const end = useMemo(
-		() => (item?.end ? new Date(item.end) : undefined),
-		[item?.end],
-	);
-	const rrule = useMemo(
-		() => (item?.repeatRule ? rrulestr(item.repeatRule) : null),
-		[item?.repeatRule],
-	);
+		const [{ data: timezone }] = useQueries({
+			queries: [trpc.settings.getTimezone.queryOptions()],
+		});
 
-	let start: Date;
-	start = item?.start ? new Date(item.start) : new Date();
-	if (on) {
-		const date = new Date(on);
-		start = new Date(date.setHours(start.getHours(), start.getMinutes()));
-	}
+		const [name, setName] = useState(item?.name ?? "");
+		const [start, setStart] = useState(
+			toStartOfHour(item?.start ?? new Date(on ?? new Date())),
+		);
+		const [end, setEnd] = useState(item?.end ?? undefined);
+		const [allDay, setAllDay] = useState(item?.allDay ?? false);
+		const [repeat, setRepeat] = useState<Frequency | undefined>(
+			item?.repeatRule ? rrulestr(item.repeatRule).options.freq : undefined,
+		);
 
-	return (
-		<form
-			className="flex-1 overflow-hidden overflow-y-auto"
-			action={async (formData: FormData) => {
-				const event = await upsertEvent.mutateAsync({
-					name: formData.get("name") as string,
-					start: new Date(formData.get("start") as string),
-					allDay: formData.get("allDay") === "on",
-					projectId: +(formData.get("projectId") as string),
-					id: +(formData.get("id") as string),
-					repeat: formData.get("repeat")
-						? (Number(formData.get("repeat")) as Frequency)
-						: undefined,
-					description: formData.get("description") as string,
-					end: formData.get("end")
-						? new Date(formData.get("end") as string)
-						: undefined,
-					invites: formData.get("invites")
-						? (formData.get("invites") as string).split(",")
-						: [],
-					repeatUntil: formData.get("repeatUntil")
-						? new Date(formData.get("repeatUntil") as string)
-						: undefined,
-				});
-
-				queryClient.invalidateQueries({
-					queryKey: trpc.events.getByDate.queryKey({
-						date: event.start,
+		return (
+			<form
+				className="flex-1 overflow-hidden overflow-y-auto"
+				action={(formData: FormData) => {
+					upsertEvent.mutate({
+						name,
+						start,
+						end,
+						allDay,
 						projectId: +projectId!,
-					}),
-				});
-				queryClient.invalidateQueries({
-					queryKey: trpc.events.getByWeek.queryKey({
-						projectId: +projectId!,
-					}),
-				});
-
-				setOn(toMachineDateString(event.start, timezone!));
-				setCreate(null);
-				setEditing(null);
-			}}
-		>
-			<div className="px-6 space-y-4">
-				{item ? <input type="hidden" name="id" defaultValue={item.id} /> : null}
-				<input type="hidden" name="projectId" defaultValue={projectId} />
-				<div className="space-y-2">
-					<label
-						htmlFor="name"
-						className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5 lg:text-left"
-					>
-						Name
-					</label>
-					<div className="mt-2 sm:col-span-2 sm:mt-0">
-						<Input type="text" name="name" defaultValue={item?.name ?? ""} />
+						id: item?.id ?? undefined,
+						repeat,
+						description: formData.get("description") as string,
+						repeatUntil: formData.get("repeatUntil")
+							? new Date(formData.get("repeatUntil") as string)
+							: undefined,
+					});
+				}}
+			>
+				<div className="px-6 space-y-6">
+					<div className="space-y-2">
+						<label
+							htmlFor="name"
+							className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5 lg:text-left"
+						>
+							Name
+						</label>
+						<div className="mt-2 sm:col-span-2 sm:mt-0">
+							<Input
+								type="text"
+								name="name"
+								value={name}
+								onChange={(e) => setName(e.target.value)}
+							/>
+						</div>
 					</div>
-				</div>
 
-				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-					<div className="flex flex-col space-y-2">
-						<Label>Start</Label>
-						<DateTimePicker
-							name="start"
-							defaultValue={start.toISOString()}
-							dateOnly={allDay}
-						/>
-					</div>
-					<div className="flex flex-col space-y-2">
-						<Label>End</Label>
-						<DateTimePicker
-							name="end"
-							defaultValue={end?.toISOString()}
-							dateOnly={allDay}
-						/>
-					</div>
-				</div>
+					<div className="relative grid grid-cols-1 gap-4 sm:grid-cols-2 border rounded-md p-4 pb-8">
+						<div className="flex flex-col space-y-2">
+							<Label>Start</Label>
+							<DateTimePicker
+								name="start"
+								defaultValue={start.toISOString()}
+								dateOnly={allDay}
+								onSelect={(date) => setStart(date)}
+							/>
+						</div>
+						<div className="flex flex-col space-y-2">
+							<Label>End</Label>
+							<DateTimePicker
+								name="end"
+								defaultValue={end?.toISOString()}
+								dateOnly={allDay}
+								onSelect={(date) => setEnd(date)}
+							/>
+						</div>
 
-				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-					<div className="flex flex-col justify-center space-y-2">
-						<Label htmlFor="all-day" className="flex items-center gap-2">
+						<Label
+							htmlFor="all-day"
+							className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-background/50 dark:bg-background/80 px-3"
+						>
 							<Switch
 								name="allDay"
 								id="all-day"
@@ -170,104 +150,63 @@ export default function EventForm() {
 							All Day Event
 						</Label>
 					</div>
-				</div>
 
-				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-					<div className="flex flex-col space-y-2">
-						<Label htmlFor="repeat">Repeat</Label>
-						<Select
-							name="repeat"
-							defaultValue={
-								rrule?.options.freq ? String(rrule?.options.freq) : undefined
-							}
-						>
-							<SelectTrigger id="repeat">
-								<SelectValue placeholder="Select repeat option" />
-							</SelectTrigger>
-							<SelectContent position="popper">
-								<SelectItem value={String(RRule.DAILY)}>Daily</SelectItem>
-								<SelectItem value={String(RRule.WEEKLY)}>Weekly</SelectItem>
-								<SelectItem value={String(RRule.MONTHLY)}>Monthly</SelectItem>
-								<SelectItem value={String(RRule.YEARLY)}>Yearly</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
-					<div className="flex flex-col space-y-2">
-						<Label>Until</Label>
-						<DateTimePicker name="repeatUntil" dateOnly />
-					</div>
-				</div>
-
-				{users.length ? (
-					<div className="space-y-2">
-						<label
-							htmlFor="invite"
-							className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5 lg:text-left"
-						>
-							Invite
-						</label>
-						<div className="mt-2 sm:col-span-2 sm:mt-0">
-							<input type="hidden" name="invites" value={invites.join(",")} />
-							{invites.length ? (
-								<div className="mb-2 flex space-x-2">
-									{invites.map((userId) => (
-										<div key={userId} className="flex items-center">
-											<Assignee
-												user={users.find((user) => user.id === userId)!}
-											/>
-											<Button
-												variant="link"
-												size="sm"
-												onClick={() => {
-													setInvites((invites) => [
-														...invites.filter((x) => x !== userId),
-													]);
-												}}
-											>
-												<Trash2Icon className="h-5 w-5" />
-											</Button>
-										</div>
-									))}
-								</div>
-							) : null}
-
-							{users.filter((user) => !invites.includes(user.id)).length ? (
-								<MultiUserSelect
-									users={users}
-									onUpdate={(userId) => {
-										setInvites((invites) => [...invites, userId]);
-									}}
-								/>
-							) : null}
+					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-4">
+						<div className="flex flex-col space-y-2">
+							<Label htmlFor="repeat">Repeat</Label>
+							<Select
+								name="repeat"
+								value={repeat ? String(repeat) : undefined}
+								onValueChange={(value) => setRepeat(+value as Frequency)}
+							>
+								<SelectTrigger id="repeat">
+									<SelectValue placeholder="Select repeat option" />
+								</SelectTrigger>
+								<SelectContent position="popper">
+									<SelectItem value={String(RRule.DAILY)}>Daily</SelectItem>
+									<SelectItem value={String(RRule.WEEKLY)}>Weekly</SelectItem>
+									<SelectItem value={String(RRule.MONTHLY)}>Monthly</SelectItem>
+									<SelectItem value={String(RRule.YEARLY)}>Yearly</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+						<div className="flex flex-col space-y-2">
+							<Label>Until</Label>
+							<DateTimePicker name="repeatUntil" dateOnly />
 						</div>
 					</div>
-				) : null}
 
-				<div className="space-y-2">
-					<label
-						htmlFor="htmlContent"
-						className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5 lg:text-left"
-					>
-						Description
-					</label>
-					<div className="mt-2 sm:col-span-2 sm:mt-0">
-						<Editor defaultValue={item?.description ?? ""} name="description" />
+					<div className="space-y-2">
+						<label
+							htmlFor="htmlContent"
+							className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200 sm:pt-1.5 lg:text-left"
+						>
+							Notes
+						</label>
+						<div className="mt-2 sm:col-span-2 sm:mt-0">
+							<Editor
+								defaultValue={item?.description ?? ""}
+								name="description"
+							/>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div className="ml-auto flex items-center justify-end gap-x-6 p-4">
-				<Button
-					type="button"
-					variant="ghost"
-					onClick={() => {
-						setCreate(null);
-						setEditing(null);
-					}}
-				>
-					Cancel
-				</Button>
-				<SaveButton label={item ? "Update" : "Create"} />
-			</div>
-		</form>
-	);
-}
+				<div className="ml-auto flex items-center justify-end gap-x-6 p-4">
+					<Button
+						type="button"
+						variant="ghost"
+						onClick={() => {
+							setCreate(null);
+							setEditing?.(null);
+						}}
+					>
+						Cancel
+					</Button>
+					<SaveButton label={item ? "Update" : "Create"} />
+				</div>
+			</form>
+		);
+	},
+);
+
+export default EventForm;

@@ -79,9 +79,9 @@ export const TaskListHeader = ({
 											taskList.status === "active" ? "archived" : "active",
 									}),
 									{
-										loading: "Updating task list...",
-										success: "Task list updated.",
-										error: "Failed to update task list.",
+										loading: "Updating list...",
+										success: "List updated.",
+										error: "Failed to update list.",
 									},
 								);
 							}}
@@ -96,9 +96,9 @@ export const TaskListHeader = ({
 									toast.promise(
 										deleteTaskList.mutateAsync({ id: taskList.id }),
 										{
-											loading: "Deleting task list...",
-											success: "Task list deleted.",
-											error: "Failed to delete task list.",
+											loading: "Deleting list...",
+											success: "List deleted.",
+											error: "Failed to delete list.",
 										},
 									);
 								}}

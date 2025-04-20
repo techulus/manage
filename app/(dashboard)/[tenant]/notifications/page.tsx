@@ -7,15 +7,13 @@ import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { Button } from "@/components/ui/button";
 import { useTRPC } from "@/trpc/client";
-import { useMutation, useQueries } from "@tanstack/react-query";
+import { useMutation, useSuspenseQueries } from "@tanstack/react-query";
+import { Suspense } from "react";
 
 export default function Notifications() {
 	const trpc = useTRPC();
 
-	const [
-		{ data: notifications, isLoading: notificationsLoading },
-		{ data: timezone, isLoading: timezoneLoading },
-	] = useQueries({
+	const [{ data: notifications }, { data: timezone }] = useSuspenseQueries({
 		queries: [
 			trpc.user.getUserNotifications.queryOptions(),
 			trpc.settings.getTimezone.queryOptions(),
@@ -26,12 +24,8 @@ export default function Notifications() {
 		trpc.user.markNotificationsAsRead.mutationOptions(),
 	);
 
-	if (notificationsLoading || timezoneLoading || !timezone) {
-		return <PageLoading />;
-	}
-
 	return (
-		<>
+		<Suspense fallback={<PageLoading />}>
 			<PageTitle title="Notifications">
 				<Button
 					variant="outline"
@@ -62,6 +56,6 @@ export default function Notifications() {
 					/>
 				))}
 			</PageSection>
-		</>
+		</Suspense>
 	);
 }

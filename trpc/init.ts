@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { TRPCError, initTRPC } from "@trpc/server";
 import { cache } from "react";
 import superjson from "superjson";
+import { ZodError } from "zod";
 
 export const createTRPCContext = cache(async () => {
 	/**
@@ -25,6 +26,19 @@ const t = initTRPC.context<Context>().create({
 	 * @see https://trpc.io/docs/server/data-transformers
 	 */
 	transformer: superjson,
+	errorFormatter(opts) {
+		const { shape, error } = opts;
+		return {
+			...shape,
+			data: {
+				...shape.data,
+				zodError:
+					error.code === "BAD_REQUEST" && error.cause instanceof ZodError
+						? error.cause.flatten()
+						: null,
+			},
+		};
+	},
 });
 
 export const createTRPCRouter = t.router;

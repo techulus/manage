@@ -3,10 +3,10 @@ import { Toaster } from "@/components/ui/sonner";
 import { SITE_METADATA } from "@/data/marketing";
 import { cn } from "@/lib/utils";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Inter } from "next/font/google";
+import { Geist } from "next/font/google";
 import "./globals.css";
 
-const mainFont = Inter({
+const mainFont = Geist({
 	subsets: ["latin"],
 });
 
@@ -262,7 +262,7 @@ export default function RootLayout({
 			<body className="min-h-full min-w-full flex-1">
 				<ClerkProvider>
 					<ThemeProvider>
-						<div className="fixed top-0 left-0 right-0 h-64 bg-gradient-to-b from-primary/10 to-transparent -z-0" />
+						<div className="fixed top-0 left-0 right-0 h-32 bg-gradient-to-b from-primary/10 to-transparent -z-0" />
 						<Toaster position="top-center" />
 						{children}
 					</ThemeProvider>

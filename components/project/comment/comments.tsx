@@ -40,7 +40,15 @@ export function Comments({
 		}),
 	);
 	const deleteComment = useMutation(
-		trpc.projects.deleteComment.mutationOptions(),
+		trpc.projects.deleteComment.mutationOptions({
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: trpc.projects.getComments.queryKey({
+						roomId,
+					}),
+				});
+			},
+		}),
 	);
 
 	return (
@@ -79,12 +87,8 @@ export function Comments({
 															id: comment.id,
 															projectId: +projectId!,
 														});
-														queryClient.invalidateQueries({
-															queryKey: trpc.projects.getComments.queryKey({
-																roomId,
-															}),
-														});
 													}}
+													className="w-full"
 												>
 													<DeleteButton
 														action="Delete"

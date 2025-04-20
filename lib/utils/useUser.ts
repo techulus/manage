@@ -23,6 +23,7 @@ export async function addUserToTenantDb() {
 			email: userData.emailAddresses?.[0].emailAddress,
 			firstName: userData.firstName,
 			lastName: userData.lastName,
+			imageUrl: userData.imageUrl,
 			rawData: userData,
 		})
 		.onConflictDoUpdate({
@@ -31,6 +32,7 @@ export async function addUserToTenantDb() {
 				email: userData.emailAddresses?.[0].emailAddress,
 				firstName: userData.firstName,
 				lastName: userData.lastName,
+				imageUrl: userData.imageUrl,
 				rawData: userData,
 			},
 		})

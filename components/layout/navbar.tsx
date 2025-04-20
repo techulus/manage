@@ -5,7 +5,6 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -22,12 +21,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
+import { CommandMenu } from "../core/cmd-menu";
 import { Notifications } from "../core/notifications";
 
 interface NavLink {
 	href: string;
 	label: string;
 	active?: boolean;
+	subItems?: {
+		href: string;
+		label: string;
+	}[];
 }
 
 export function Navbar({ notificationsWire }: { notificationsWire: string }) {
@@ -40,15 +44,28 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 
 	const queryClient = useQueryClient();
 	useEffect(() => {
-		queryClient.invalidateQueries();
-	}, [queryClient]);
+		if (tenant) {
+			console.log(">>>>> Invalidating all queries");
+			queryClient.invalidateQueries();
+		}
+	}, [queryClient, tenant]);
 
 	const trpc = useTRPC();
-	const [{ data: projects = [] }, { data: timezone }] = useQueries({
+	const [
+		{ data: projects = [] },
+		{ data: tasklists = [] },
+		{ data: timezone },
+	] = useQueries({
 		queries: [
 			trpc.user.getProjects.queryOptions({
 				statuses: ["active"],
 			}),
+			{
+				...trpc.tasks.getTaskLists.queryOptions({
+					projectId: +projectId!,
+				}),
+				enabled: !!projectId,
+			},
 			trpc.settings.getTimezone.queryOptions(),
 		],
 	});
@@ -75,6 +92,10 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 					active: pathname.startsWith(
 						`/${tenant}/projects/${projectId}/tasklists`,
 					),
+					subItems: tasklists.map((tasklist) => ({
+						href: `/${tenant}/projects/${projectId}/tasklists/${tasklist.id}`,
+						label: tasklist.name,
+					})),
 				},
 				{
 					href: `/${tenant}/projects/${projectId}/events?on=${toMachineDateString(new Date(), timezone!)}`,
@@ -108,10 +129,11 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				active: pathname === `/${tenant}/settings`,
 			},
 		];
-	}, [tenant, projectId, pathname, timezone]);
+	}, [tenant, projectId, pathname, timezone, tasklists]);
 
 	return (
 		<>
+			<CommandMenu tenant={tenant as string} projectId={+projectId!} />
 			<div className="flex h-14 items-center px-4">
 				<div className="flex items-center">
 					<Link href={`/${tenant}/today`} className="flex items-center mr-2">
@@ -181,13 +203,6 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 									<span>{project.name}</span>
 								</DropdownMenuItem>
 							))}
-							<DropdownMenuSeparator />
-							<DropdownMenuItem
-								className="cursor-pointer"
-								onClick={() => router.push(`/${tenant}/projects/new`)}
-							>
-								Create Project
-							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
 				</div>
@@ -201,7 +216,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 						})}
 						asChild
 					>
-						<Link href="/help">
+						<Link href="mailto:support@managee.xyz">
 							<HelpCircle className="h-5 w-5" />
 							<span className="sr-only">Help</span>
 						</Link>
@@ -219,20 +234,52 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				className="flex px-4 overflow-x-auto text-sm border-b"
 				suppressHydrationWarning
 			>
-				{navLinks.map((link) => (
-					<Link
-						key={link.href}
-						href={link.href}
-						className={cn(
-							"flex h-8 items-center px-4 text-sm font-medium border-b-2 transition-colors hover:text-primary",
-							link.active
-								? "border-primary text-primary"
-								: "border-transparent text-muted-foreground hover:border-muted",
-						)}
-					>
-						{link.label}
-					</Link>
-				))}
+				{navLinks.map((link) =>
+					link.subItems?.length ? (
+						<DropdownMenu key={link.href}>
+							<DropdownMenuTrigger asChild>
+								<div
+									className={cn(
+										"flex h-8 items-center px-4 text-sm font-medium border-b-2 transition-colors hover:text-primary space-x-1 cursor-pointer",
+										link.active
+											? "border-primary text-primary"
+											: "border-transparent text-muted-foreground hover:border-muted",
+									)}
+								>
+									<span>{link.label}</span>
+									<ChevronDown className="h-4 w-4" />
+								</div>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="start" className="w-56">
+								<DropdownMenuItem asChild>
+									<Link className="cursor-pointer" href={link.href}>
+										Overview
+									</Link>
+								</DropdownMenuItem>
+								{link.subItems.map((subItem) => (
+									<DropdownMenuItem key={subItem.href} asChild>
+										<Link className="cursor-pointer" href={subItem.href}>
+											{subItem.label}
+										</Link>
+									</DropdownMenuItem>
+								))}
+							</DropdownMenuContent>
+						</DropdownMenu>
+					) : (
+						<Link
+							key={link.href}
+							href={link.href}
+							className={cn(
+								"flex h-8 items-center px-4 text-sm font-medium border-b-2 transition-colors hover:text-primary",
+								link.active
+									? "border-primary text-primary"
+									: "border-transparent text-muted-foreground hover:border-muted",
+							)}
+						>
+							{link.label}
+						</Link>
+					),
+				)}
 			</nav>
 		</>
 	);

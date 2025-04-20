@@ -2,7 +2,7 @@ import { UserAvatar } from "@/components/core/user-avatar";
 import type { User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
 
-export function Assignee({
+export function UserBadge({
 	className,
 	user,
 	imageOnly = false,

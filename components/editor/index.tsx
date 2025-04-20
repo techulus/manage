@@ -2,13 +2,13 @@
 
 import { BlockNoteEditor, type PartialBlock } from "@blocknote/core";
 import { BlockNoteView } from "@blocknote/mantine";
-import { useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 import { useFormStatus } from "react-dom";
 import { Spinner } from "../core/loaders";
 
-export default function Editor({
+const Editor = memo(function Editor({
 	defaultValue,
 	metadata = undefined,
 	name = "description",
@@ -48,8 +48,7 @@ export default function Editor({
 		return BlockNoteEditor.create({
 			initialContent,
 			uploadFile: allowImageUpload
-				? async (file, blockId) => {
-						console.log(file, blockId);
+				? async (file) => {
 						const result: { url: string } = await fetch(
 							`/api/blob?name=${file.name}`,
 							{
@@ -79,7 +78,7 @@ export default function Editor({
 	}
 
 	return (
-		<>
+		<div className="bg-muted rounded-md">
 			<input type="hidden" name={name} defaultValue={value} />
 			<input
 				type="hidden"
@@ -104,6 +103,8 @@ export default function Editor({
 					}
 				}}
 			/>
-		</>
+		</div>
 	);
-}
+});
+
+export default Editor;

@@ -25,7 +25,6 @@ export const userRelations = relations(user, ({ many }) => ({
 	projects: many(project),
 	taskLists: many(taskList),
 	events: many(calendarEvent),
-	eventInvites: many(eventInvite),
 }));
 
 export const project = pgTable("Project", {
@@ -193,35 +192,8 @@ export const calendarEventRelations = relations(
 			fields: [calendarEvent.projectId],
 			references: [project.id],
 		}),
-		invites: many(eventInvite),
 	}),
 );
-
-export const eventInvite = pgTable("CalendarEventInvite", {
-	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-	eventId: integer("eventId")
-		.notNull()
-		.references(() => calendarEvent.id, {
-			onDelete: "cascade",
-			onUpdate: "cascade",
-		}),
-	userId: text("userId")
-		.notNull()
-		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
-	status: text("status"),
-	invitedAt: timestamp().notNull().defaultNow(),
-});
-
-export const eventInviteRelations = relations(eventInvite, ({ one }) => ({
-	event: one(calendarEvent, {
-		fields: [eventInvite.eventId],
-		references: [calendarEvent.id],
-	}),
-	user: one(user, {
-		fields: [eventInvite.userId],
-		references: [user.id],
-	}),
-}));
 
 export const comment = pgTable("Comment", {
 	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
