@@ -53,7 +53,7 @@ export default async function Home() {
 							</p>
 						</div>
 						<div className="mt-16 flow-root sm:mt-24">
-							<div className="relative mt-16 h-[36rem] sm:h-auto sm:w-[calc(theme(maxWidth.7xl)-theme(spacing.16))]">
+							<div className="relative mt-16 h-auto w-[calc(theme(maxWidth.7xl)-theme(spacing.16))]">
 								<Image
 									alt="App screenshot"
 									src={overview}
@@ -94,7 +94,7 @@ export default async function Home() {
 											</span>
 										))}
 								</p>
-								<div className="relative mt-16 h-[36rem] sm:h-auto sm:w-[calc(theme(maxWidth.7xl)-theme(spacing.16))]">
+								<div className="relative mt-16 h-auto w-[calc(theme(maxWidth.7xl)-theme(spacing.16))]">
 									<Image
 										alt={`${feature.name} screenshot`}
 										src={feature.image}
