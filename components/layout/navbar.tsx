@@ -216,7 +216,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 						})}
 						asChild
 					>
-						<Link href="mailto:support@managee.xyz">
+						<Link href="https://github.com/techulus/manage/issues">
 							<HelpCircle className="h-5 w-5" />
 							<span className="sr-only">Help</span>
 						</Link>
