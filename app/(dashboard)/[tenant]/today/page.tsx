@@ -11,6 +11,7 @@ import { ProjecItem } from "@/components/project/project-item";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toDateStringWithDay } from "@/lib/utils/date";
+import { displayMutationError } from "@/lib/utils/error";
 import { eventToHumanReadableString } from "@/lib/utils/useEvents";
 import { useTRPC } from "@/trpc/client";
 import { Title } from "@radix-ui/react-dialog";
@@ -70,6 +71,7 @@ export default function Today() {
 
 				setCreate(false);
 			},
+			onError: displayMutationError,
 		}),
 	);
 

@@ -4,6 +4,7 @@ import { Spinner } from "@/components/core/loaders";
 import { UserAvatar } from "@/components/core/user-avatar";
 import Editor from "@/components/editor";
 import { Button } from "@/components/ui/button";
+import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -19,7 +20,11 @@ export default function CommentForm({
 
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
-	const addComment = useMutation(trpc.projects.addComment.mutationOptions());
+	const addComment = useMutation(
+		trpc.projects.addComment.mutationOptions({
+			onError: displayMutationError,
+		}),
+	);
 
 	return (
 		<form

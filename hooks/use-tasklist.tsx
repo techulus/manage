@@ -1,5 +1,6 @@
 "use client";
 
+import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type ReactNode, createContext, useCallback, useContext } from "react";
@@ -41,6 +42,7 @@ export function TaskListsProvider({
 			onSuccess: (data) => {
 				invalidateData(data.id);
 			},
+			onError: displayMutationError,
 		}),
 	);
 
@@ -49,6 +51,7 @@ export function TaskListsProvider({
 			onSuccess: (data) => {
 				invalidateData(data.id);
 			},
+			onError: displayMutationError,
 		}),
 	);
 
@@ -61,6 +64,7 @@ export function TaskListsProvider({
 					}),
 				});
 			},
+			onError: displayMutationError,
 		}),
 	);
 
