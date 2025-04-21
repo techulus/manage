@@ -12,6 +12,7 @@ import WeekCalendar from "@/components/project/events/week-calendar";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
 import { buttonVariants } from "@/components/ui/button";
 import { toStartOfDay } from "@/lib/utils/date";
+import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
 import {
 	useMutation,
@@ -58,6 +59,7 @@ export default function ProjectDetails() {
 					}),
 				});
 			},
+			onError: displayMutationError,
 		}),
 	);
 
@@ -70,6 +72,7 @@ export default function ProjectDetails() {
 					}),
 				});
 			},
+			onError: displayMutationError,
 		}),
 	);
 

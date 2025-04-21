@@ -6,6 +6,7 @@ import { NotificationItem } from "@/components/core/notification-item";
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { Button } from "@/components/ui/button";
+import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
 import { useMutation, useSuspenseQueries } from "@tanstack/react-query";
 import { Suspense } from "react";
@@ -21,7 +22,9 @@ export default function Notifications() {
 	});
 
 	const markNotificationsAsRead = useMutation(
-		trpc.user.markNotificationsAsRead.mutationOptions(),
+		trpc.user.markNotificationsAsRead.mutationOptions({
+			onError: displayMutationError,
+		}),
 	);
 
 	return (

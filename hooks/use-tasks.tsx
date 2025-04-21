@@ -1,11 +1,11 @@
 "use client";
 
 import type { TaskListWithTasks, TaskWithDetails } from "@/drizzle/types";
+import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type ReactNode, createContext, useCallback, useContext } from "react";
-import { toast } from "sonner";
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 const TasksContext = createContext<any>(undefined);
@@ -86,8 +86,7 @@ export function TasksProvider({
 				return { previousTasks };
 			},
 			onError: (error, newTask, context) => {
-				console.error(error);
-				toast.error("Oops, something went wrong, please try again.");
+				displayMutationError(error);
 				if (context?.previousTasks) {
 					queryClient.setQueryData<TaskListWithTasks>(
 						trpc.tasks.getListById.queryKey({ id: newTask.taskListId }),
@@ -141,9 +140,8 @@ export function TasksProvider({
 
 				return { previousTasks };
 			},
-			onError: (err, _, context) => {
-				console.error(err);
-				toast.error("Oops, something went wrong, please try again.");
+			onError: (error, _, context) => {
+				displayMutationError(error);
 				if (context?.previousTasks) {
 					queryClient.setQueryData<TaskListWithTasks>(
 						trpc.tasks.getListById.queryKey({ id: taskListId }),
@@ -180,8 +178,7 @@ export function TasksProvider({
 				return { previousTasks };
 			},
 			onError: (error, _, context) => {
-				console.error(error);
-				toast.error("Oops, something went wrong, please try again.");
+				displayMutationError(error);
 				if (context?.previousTasks) {
 					queryClient.setQueryData<TaskListWithTasks>(
 						trpc.tasks.getListById.queryKey({ id: taskListId }),

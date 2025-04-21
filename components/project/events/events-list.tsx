@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { EventWithCreator } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
+import { displayMutationError } from "@/lib/utils/error";
 import {
 	eventToHumanReadableString,
 	filterByRepeatRule,
@@ -66,6 +67,7 @@ export default function EventsList({
 					}),
 				});
 			},
+			onError: displayMutationError,
 		}),
 	);
 
