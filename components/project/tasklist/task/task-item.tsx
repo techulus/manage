@@ -49,7 +49,7 @@ export const TaskItem = ({
 	const [{ data: users = [] }, { data: taskLists = [] }, { data: timezone }] =
 		useQueries({
 			queries: [
-				trpc.settings.getAllUsers.queryOptions(),
+				trpc.settings.getAllUsers.queryOptions(true),
 				trpc.tasks.getTaskLists.queryOptions({
 					projectId: +projectId!,
 				}),

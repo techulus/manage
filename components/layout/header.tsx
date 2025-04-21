@@ -1,9 +1,14 @@
+"use client";
+
+import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "../../public/images/logo.png";
 import { buttonVariants } from "../ui/button";
 
-export async function Header() {
+export function Header() {
+	const user = useUser();
+
 	return (
 		<header className="absolute inset-x-0 top-0 z-50 text-black dark:text-white">
 			<nav
@@ -29,15 +34,8 @@ export async function Header() {
 					</Link>
 				</div>
 
-				<Link
-					className={buttonVariants({
-						size: "sm",
-						variant: "outline",
-						className: "hidden",
-					})}
-					href="/start"
-				>
-					Console
+				<Link className={buttonVariants()} href="/start">
+					{user ? "Console" : "Sign in"}
 				</Link>
 			</nav>
 		</header>
