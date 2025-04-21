@@ -87,7 +87,7 @@ export default async function Home() {
 											<span key={part}>
 												{part}
 												{i < arr.length - 1 && (
-													<span className="text-primary">
+													<span className="text-primary font-extrabold">
 														{feature.highlight}
 													</span>
 												)}
@@ -106,11 +106,13 @@ export default async function Home() {
 					</div>
 				</div>
 
-				<FeaturesSection />
+				<div className="space-y-8">
+					<FeaturesSection />
 
-				<PricingSection />
+					<PricingSection />
 
-				<CTA />
+					<CTA />
+				</div>
 			</div>
 
 			<Footer />

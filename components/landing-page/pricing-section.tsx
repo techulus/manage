@@ -4,12 +4,13 @@ import { buttonVariants } from "../ui/button";
 
 export function PricingSection() {
 	return (
-		<div className="py-24">
+		<div className="py-12">
 			<div className="mx-auto max-w-7xl px-6 lg:px-8">
 				<div className="mx-auto mt-16 max-w-2xl rounded-3xl sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
 					<div className="p-8 sm:p-10 lg:flex-auto">
 						<h3 className="text-4xl font-bold tracking-tighter">
-							Free during public beta
+							<span className="text-primary font-extrabold">Free</span> during
+							public beta
 						</h3>
 						<div className="mt-10 flex items-center gap-x-4">
 							<h4 className="flex-none text-lg font-semibold leading-6">
