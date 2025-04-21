@@ -49,31 +49,6 @@ export const projectRelations = relations(project, ({ many, one }) => ({
 	events: many(calendarEvent),
 }));
 
-export const post = pgTable("Post", {
-	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-	content: text("content").notNull(),
-	metadata: jsonb("metadata").notNull(),
-	projectId: integer("projectId")
-		.notNull()
-		.references(() => project.id, { onDelete: "cascade", onUpdate: "cascade" }),
-	createdByUser: text("createdByUser")
-		.notNull()
-		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
-	createdAt: timestamp().notNull().defaultNow(),
-	updatedAt: timestamp().notNull().defaultNow(),
-});
-
-export const postRelations = relations(post, ({ one }) => ({
-	creator: one(user, {
-		fields: [post.createdByUser],
-		references: [user.id],
-	}),
-	project: one(project, {
-		fields: [post.projectId],
-		references: [project.id],
-	}),
-}));
-
 export const task = pgTable("Task", {
 	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	taskListId: integer("taskListId")

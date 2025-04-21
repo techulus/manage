@@ -36,6 +36,13 @@
       "when": 1744362631104,
       "tag": "0004_true_kingpin",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1745233997477,
+      "tag": "0005_fuzzy_onslaught",
+      "breakpoints": true
     }
   ]
 }
