@@ -98,7 +98,7 @@ export const TaskItem = ({
 						creating ? "text-muted-foreground" : "",
 					)}
 					onClick={() => {
-						if (!compact && !creating) setDetailsOpen(true);
+						if (!creating) setDetailsOpen(true);
 					}}
 				>
 					<div

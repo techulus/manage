@@ -36,7 +36,7 @@ export default function PageSection({
 			<div
 				className={cn(
 					"mx-4 flex max-w-7xl flex-col divide-y dark:divide-white/10 rounded-lg bg-muted xl:mx-auto",
-					transparent ? "bg-transparent" : "",
+					transparent ? "bg-transparent divide-none" : "",
 					bottomMargin ? "mb-6" : "",
 					className,
 				)}
