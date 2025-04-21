@@ -1,5 +1,6 @@
 "use client";
 
+import { PageLoading } from "@/components/core/loaders";
 import { Panel } from "@/components/core/panel";
 import PageSection from "@/components/core/section";
 import EventForm from "@/components/form/event";
@@ -11,23 +12,24 @@ import { toDateStringWithDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useSession } from "@clerk/nextjs";
 import { Title } from "@radix-ui/react-dialog";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { RssIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 
 export default function Events() {
 	const { session } = useSession();
 	const { projectId, tenant } = useParams();
 	const { user, lastActiveOrganizationId } = session ?? {};
 
-	const [on] = useQueryState("on");
 	const [create, setCreate] = useQueryState(
 		"create",
 		parseAsBoolean.withDefault(false),
 	);
+
+	const [on] = useQueryState("on");
 	const selectedDate = on ? new Date(on) : new Date();
 
 	const dayCommentId = useMemo(
@@ -35,6 +37,7 @@ export default function Events() {
 			`${projectId}${selectedDate.getFullYear()}${selectedDate.getMonth()}${selectedDate.getDay()}`,
 		[projectId, selectedDate],
 	);
+
 	const calendarSubscriptionUrl = useMemo(
 		() =>
 			`/api/calendar/${lastActiveOrganizationId ?? user?.id}/${projectId}/calendar.ics?userId=${user?.id}`,
@@ -42,12 +45,12 @@ export default function Events() {
 	);
 
 	const trpc = useTRPC();
-	const { data: timezone, isLoading } = useQuery(
+	const { data: timezone, isLoading } = useSuspenseQuery(
 		trpc.settings.getTimezone.queryOptions(),
 	);
 
 	return (
-		<>
+		<Suspense fallback={<PageLoading />}>
 			<PageTitle
 				title="Events"
 				actions={
@@ -98,6 +101,6 @@ export default function Events() {
 				</Title>
 				<EventForm />
 			</Panel>
-		</>
+		</Suspense>
 	);
 }

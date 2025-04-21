@@ -1,7 +1,6 @@
 "use client";
 
 import { Panel } from "@/components/core/panel";
-import { UserAvatar } from "@/components/core/user-avatar";
 import EditableText from "@/components/form/editable-text";
 import NotesForm from "@/components/form/notes-form";
 import { Button } from "@/components/ui/button";
@@ -22,7 +21,7 @@ import { Close, Title } from "@radix-ui/react-dialog";
 import { useQueries } from "@tanstack/react-query";
 import { AlignJustifyIcon, CalendarClock, FileIcon, X } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Checkbox } from "../../../ui/checkbox";
 import { DateTimePicker } from "../../events/date-time-picker";
@@ -50,7 +49,7 @@ export const TaskItem = ({
 	const [{ data: users = [] }, { data: taskLists = [] }, { data: timezone }] =
 		useQueries({
 			queries: [
-				trpc.settings.getAllUsers.queryOptions(),
+				trpc.settings.getAllUsers.queryOptions(true),
 				trpc.tasks.getTaskLists.queryOptions({
 					projectId: +projectId!,
 				}),
@@ -59,6 +58,8 @@ export const TaskItem = ({
 		});
 
 	const { createTask, updateTask, deleteTask } = useTasks();
+
+	const creating = useMemo(() => task.id > Date.now(), [task.id]);
 
 	return (
 		<>
@@ -94,14 +95,15 @@ export const TaskItem = ({
 						"text-md w-full py-1 text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
 						compact ? "ml-3 py-0" : "",
 						task.status === "done" ? "text-muted-foreground line-through" : "",
+						creating ? "text-muted-foreground" : "",
 					)}
 					onClick={() => {
-						if (!compact) setDetailsOpen(true);
+						if (!creating) setDetailsOpen(true);
 					}}
 				>
 					<div
 						className={cn(
-							"flex w-full items-center py-2 tracking-tight",
+							"flex w-full items-center py-2",
 							task.status !== "done" ? "border-b dark:border-white/10" : "",
 						)}
 					>
@@ -127,7 +129,7 @@ export const TaskItem = ({
 					</div>
 				</button>
 
-				{task.status !== "done" && !compact ? (
+				{task.status !== "done" && !compact && !creating ? (
 					<div
 						className="cursor-move touch-none p-1 pr-3"
 						{...attributes}

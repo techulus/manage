@@ -1,5 +1,6 @@
 import { CTA } from "@/components/landing-page/call-to-action";
 import { FeaturesSection } from "@/components/landing-page/feature-section";
+import { PricingSection } from "@/components/landing-page/pricing-section";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SITE_METADATA } from "@/data/marketing";
@@ -52,8 +53,7 @@ export default async function Home() {
 							</p>
 						</div>
 						<div className="mt-16 flow-root sm:mt-24">
-							<div className="relative mt-16 aspect-[2432/1442] h-[36rem] sm:h-auto sm:w-[calc(theme(maxWidth.7xl)-theme(spacing.16))]">
-								<div className="absolute -inset-2 rounded-[calc(theme(borderRadius.xl)+theme(spacing.2))] shadow-sm ring-1 ring-black/5 dark:ring-gray-50/10" />
+							<div className="relative mt-16 h-[36rem] sm:h-auto sm:w-[calc(theme(maxWidth.7xl)-theme(spacing.16))]">
 								<Image
 									alt="App screenshot"
 									src={overview}
@@ -94,8 +94,7 @@ export default async function Home() {
 											</span>
 										))}
 								</p>
-								<div className="relative mt-16 aspect-[2432/1442] h-[36rem] sm:h-auto sm:w-[calc(theme(maxWidth.7xl)-theme(spacing.16))]">
-									<div className="absolute -inset-2 rounded-[calc(theme(borderRadius.xl)+theme(spacing.2))] shadow-sm ring-1 ring-black/5 dark:ring-gray-50/10" />
+								<div className="relative mt-16 h-[36rem] sm:h-auto sm:w-[calc(theme(maxWidth.7xl)-theme(spacing.16))]">
 									<Image
 										alt={`${feature.name} screenshot`}
 										src={feature.image}
@@ -108,6 +107,8 @@ export default async function Home() {
 				</div>
 
 				<FeaturesSection />
+
+				<PricingSection />
 
 				<CTA />
 			</div>

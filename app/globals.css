@@ -102,3 +102,19 @@ textarea {
 .bn-editor {
   background-color: transparent !important;
 }
+
+@media screen and (max-width: 768px) {
+  .cl-userPreview {
+    gap: 0rem;
+  }
+  .cl-userPreviewMainIdentifier {
+    display: none;
+  }
+
+  .cl-organizationSwitcherPopoverCard .cl-userPreviewMainIdentifier {
+    display: flex;
+  }
+  .cl-organizationSwitcherPopoverCard .cl-userPreview {
+    gap: 1rem;
+  }
+}

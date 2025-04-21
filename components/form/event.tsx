@@ -75,8 +75,11 @@ const EventForm = memo(
 		);
 		const [end, setEnd] = useState(item?.end ?? undefined);
 		const [allDay, setAllDay] = useState(item?.allDay ?? false);
-		const [repeat, setRepeat] = useState<Frequency | undefined>(
-			item?.repeatRule ? rrulestr(item.repeatRule).options.freq : undefined,
+		const [repeat, setRepeat] = useState<Frequency | -1>(
+			item?.repeatRule ? rrulestr(item.repeatRule).options.freq : -1,
+		);
+		const [repeatUntil, setRepeatUntil] = useState<Date | null>(
+			item?.repeatRule ? rrulestr(item.repeatRule).options.until : null,
 		);
 
 		return (
@@ -90,11 +93,9 @@ const EventForm = memo(
 						allDay,
 						projectId: +projectId!,
 						id: item?.id ?? undefined,
-						repeat,
+						repeat: repeat === -1 ? undefined : repeat,
+						repeatUntil: repeat !== -1 ? repeatUntil : undefined,
 						description: formData.get("description") as string,
-						repeatUntil: formData.get("repeatUntil")
-							? new Date(formData.get("repeatUntil") as string)
-							: undefined,
 					});
 				}}
 			>
@@ -163,6 +164,7 @@ const EventForm = memo(
 									<SelectValue placeholder="Select repeat option" />
 								</SelectTrigger>
 								<SelectContent position="popper">
+									<SelectItem value={String("-1")}>None</SelectItem>
 									<SelectItem value={String(RRule.DAILY)}>Daily</SelectItem>
 									<SelectItem value={String(RRule.WEEKLY)}>Weekly</SelectItem>
 									<SelectItem value={String(RRule.MONTHLY)}>Monthly</SelectItem>
@@ -170,10 +172,17 @@ const EventForm = memo(
 								</SelectContent>
 							</Select>
 						</div>
-						<div className="flex flex-col space-y-2">
-							<Label>Until</Label>
-							<DateTimePicker name="repeatUntil" dateOnly />
-						</div>
+						{repeat !== -1 && (
+							<div className="flex flex-col space-y-2">
+								<Label>Until</Label>
+								<DateTimePicker
+									name="repeatUntil"
+									defaultValue={repeatUntil?.toISOString()}
+									dateOnly
+									onSelect={(date) => setRepeatUntil(date)}
+								/>
+							</div>
+						)}
 					</div>
 
 					<div className="space-y-2">
