@@ -18,7 +18,7 @@ export const Panel = memo(function Panel({
 			<Dialog.Portal>
 				<Dialog.Content
 					className={cn(
-						"fixed top-24 bottom-0 right-0 w-full md:max-w-[920px] bg-background/80 backdrop-blur-xl shadow-lg flex flex-col rounded-tl-lg rounded-tr-lg sm:rounded-tr-none sm:border-l border-t z-50",
+						"fixed top-24 bottom-0 right-0 w-full md:max-w-[60vw] bg-background/80 backdrop-blur-xl shadow-lg flex flex-col rounded-tl-lg rounded-tr-lg sm:rounded-tr-none sm:border-l border-t z-50",
 						"data-[state=open]:animate-in data-[state=open]:slide-in-from-right duration-300 data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right",
 					)}
 				>

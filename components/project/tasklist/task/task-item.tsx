@@ -312,18 +312,10 @@ export const TaskItem = ({
 															<form
 																className="w-full"
 																action={() => {
-																	toast.promise(
-																		updateTask.mutateAsync({
-																			id: task.id,
-																			taskListId: list.id,
-																		}),
-																		{
-																			loading: "Moving...",
-																			success: "Moved!",
-																			error:
-																				"Error while moving, please try again.",
-																		},
-																	);
+																	updateTask.mutate({
+																		id: task.id,
+																		taskListId: list.id,
+																	});
 																}}
 															>
 																<button
