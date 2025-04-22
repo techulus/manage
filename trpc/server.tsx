@@ -1,8 +1,10 @@
-import "server-only"; // <-- ensure this file cannot be imported from the client
-import { httpLink } from "@trpc/client";
+"use server";
+
+import { httpBatchLink } from "@trpc/client";
 import { createTRPCClient } from "@trpc/client";
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import { cache } from "react";
+import superjson from "superjson";
 import { createCallerFactory, createTRPCContext } from "./init";
 import { makeQueryClient } from "./query-client";
 import { appRouter } from "./routers/_app";
@@ -18,7 +20,13 @@ export const trpc = createTRPCOptionsProxy({
 
 createTRPCOptionsProxy({
 	client: createTRPCClient({
-		links: [httpLink({ url: `${process.env.NEXT_PUBLIC_APP_URL}/api/trpc` })],
+		links: [
+			httpBatchLink({
+				transformer: superjson,
+				url: `${process.env.NEXT_PUBLIC_APP_URL}/api/trpc`,
+				methodOverride: "POST",
+			}),
+		],
 	}),
 	queryClient: getQueryClient,
 });

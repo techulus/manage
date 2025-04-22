@@ -8,6 +8,7 @@ const handler = (req: Request) =>
 		req,
 		router: appRouter,
 		createContext: createTRPCContext,
+		allowMethodOverride: true,
 	});
 
-export { handler as GET, handler as POST };
+export { handler as POST };
