@@ -25,6 +25,9 @@ const t = initTRPC.context<Context>().create({
 	/**
 	 * @see https://trpc.io/docs/server/data-transformers
 	 */
+	jsonl: {
+		pingMs: 1000,
+	},
 	transformer: superjson,
 	errorFormatter(opts) {
 		const { shape, error } = opts;

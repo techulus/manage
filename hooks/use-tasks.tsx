@@ -23,26 +23,34 @@ export function TasksProvider({
 	const queryClient = useQueryClient();
 	const { user } = useUser();
 
-	const invalidateData = useCallback(() => {
-		queryClient.invalidateQueries({
-			queryKey: trpc.tasks.getListById.queryKey({ id: taskListId }),
-		});
-		queryClient.invalidateQueries({
-			queryKey: trpc.tasks.getTaskLists.queryKey({
-				projectId: +projectId!,
-			}),
-		});
-	}, [
-		projectId,
-		taskListId,
-		queryClient.invalidateQueries,
-		trpc.tasks.getListById.queryKey,
-		trpc.tasks.getTaskLists.queryKey,
-	]);
+	const invalidateData = useCallback(
+		(listId = -1) => {
+			queryClient.invalidateQueries({
+				queryKey: trpc.tasks.getListById.queryKey({ id: taskListId }),
+			});
+			if (listId && listId !== taskListId) {
+				queryClient.invalidateQueries({
+					queryKey: trpc.tasks.getListById.queryKey({ id: listId }),
+				});
+			}
+			queryClient.invalidateQueries({
+				queryKey: trpc.tasks.getTaskLists.queryKey({
+					projectId: +projectId!,
+				}),
+			});
+		},
+		[
+			projectId,
+			taskListId,
+			queryClient.invalidateQueries,
+			trpc.tasks.getListById.queryKey,
+			trpc.tasks.getTaskLists.queryKey,
+		],
+	);
 
 	const createTask = useMutation(
 		trpc.tasks.createTask.mutationOptions({
-			onSuccess: invalidateData,
+			onSuccess: () => invalidateData(),
 			onMutate: async (newTask) => {
 				await queryClient.cancelQueries({
 					queryKey: trpc.tasks.getListById.queryKey({ id: newTask.taskListId }),
@@ -98,7 +106,7 @@ export function TasksProvider({
 	);
 	const updateTask = useMutation(
 		trpc.tasks.updateTask.mutationOptions({
-			onSuccess: invalidateData,
+			onSuccess: (task) => invalidateData(task.taskListId),
 			onMutate: async (updatedTask) => {
 				if ("position" in updatedTask) return;
 
@@ -154,7 +162,7 @@ export function TasksProvider({
 
 	const deleteTask = useMutation(
 		trpc.tasks.deleteTask.mutationOptions({
-			onSuccess: invalidateData,
+			onSuccess: () => invalidateData(),
 			onMutate: async (deletedTask) => {
 				await queryClient.cancelQueries({
 					queryKey: trpc.tasks.getListById.queryKey({ id: taskListId }),

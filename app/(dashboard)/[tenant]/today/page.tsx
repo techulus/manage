@@ -15,11 +15,7 @@ import { displayMutationError } from "@/lib/utils/error";
 import { eventToHumanReadableString } from "@/lib/utils/useEvents";
 import { useTRPC } from "@/trpc/client";
 import { Title } from "@radix-ui/react-dialog";
-import {
-	useMutation,
-	useQueryClient,
-	useSuspenseQueries,
-} from "@tanstack/react-query";
+import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
 import {
 	AlertTriangleIcon,
 	CalendarClockIcon,
@@ -29,7 +25,7 @@ import {
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 
 export default function Today() {
 	const params = useParams();
@@ -41,24 +37,21 @@ export default function Today() {
 		defaultValue: "active",
 	});
 
-	const [
-		{
-			data: { dueToday, overDue, events },
-		},
-		{ data: projects },
-		{ data: timezone },
-	] = useSuspenseQueries({
-		queries: [
-			{
-				...trpc.user.getTodayData.queryOptions(),
-				staleTime: 0,
-			},
-			trpc.user.getProjects.queryOptions({
-				statuses: statuses.split(","),
-			}),
-			trpc.settings.getTimezone.queryOptions(),
-		],
-	});
+	const [{ data: todayData }, { data: projects }, { data: timezone }] =
+		useQueries({
+			queries: [
+				{
+					...trpc.user.getTodayData.queryOptions(),
+					staleTime: 0,
+				},
+				trpc.user.getProjects.queryOptions({
+					statuses: statuses.split(","),
+				}),
+				trpc.settings.getTimezone.queryOptions(),
+			],
+		});
+
+	const { dueToday = [], overDue = [], events = [] } = todayData ?? {};
 
 	const createProject = useMutation(
 		trpc.projects.createProject.mutationOptions({
@@ -77,8 +70,10 @@ export default function Today() {
 
 	const [create, setCreate] = useState(false);
 
+	if (!timezone) return <PageLoading />;
+
 	return (
-		<Suspense fallback={<PageLoading />}>
+		<>
 			<PageTitle title={toDateStringWithDay(new Date(), timezone)} />
 
 			<div className="max-w-7xl mx-4 xl:mx-auto -mt-4 pb-4">
@@ -251,7 +246,7 @@ export default function Today() {
 					</div>
 				</form>
 			</Panel>
-		</Suspense>
+		</>
 	);
 }
 

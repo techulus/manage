@@ -67,6 +67,7 @@ export const TaskItem = ({
 				className={cn(
 					"flex scale-100 rounded-lg shadow-none",
 					"flex-row items-center justify-center space-x-2 border-none",
+					"hover:bg-muted-foreground/10",
 				)}
 				ref={setNodeRef}
 				style={style}
@@ -312,18 +313,10 @@ export const TaskItem = ({
 															<form
 																className="w-full"
 																action={() => {
-																	toast.promise(
-																		updateTask.mutateAsync({
-																			id: task.id,
-																			taskListId: list.id,
-																		}),
-																		{
-																			loading: "Moving...",
-																			success: "Moved!",
-																			error:
-																				"Error while moving, please try again.",
-																		},
-																	);
+																	updateTask.mutate({
+																		id: task.id,
+																		taskListId: list.id,
+																	});
 																}}
 															>
 																<button

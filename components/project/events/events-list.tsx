@@ -72,7 +72,7 @@ export default function EventsList({
 	);
 
 	return (
-		<div className="flex w-full flex-col space-y-4">
+		<div className="flex w-full flex-col space-y-2 divide-y">
 			{!filteredEvents.length ? (
 				<EmptyState
 					show={!filteredEvents.length}
@@ -81,15 +81,12 @@ export default function EventsList({
 				/>
 			) : null}
 
-			{filteredEvents.map((event, idx) => (
+			{filteredEvents.map((event) => (
 				<div
 					key={event.id}
-					className={cn(
-						"relative flex items-center justify-between border-b",
-						idx === filteredEvents.length - 1 ? "border-b-0" : "",
-					)}
+					className={cn("relative flex items-center justify-between")}
 				>
-					<div className="flex space-x-4">
+					<div className="flex space-x-4 pt-1">
 						<UserAvatar user={event.creator} className="mt-1" />
 						<div className="flex-grow">
 							<div className="text-lg font-semibold">{event.name}</div>
@@ -108,7 +105,7 @@ export default function EventsList({
 
 							{event.creator.id === user?.id ? (
 								<DropdownMenu>
-									<DropdownMenuTrigger className="absolute right-0 top-0">
+									<DropdownMenuTrigger className="absolute right-0 top-1.5">
 										<CircleEllipsisIcon className="h-6 w-6" />
 									</DropdownMenuTrigger>
 									<DropdownMenuContent align="end">

@@ -16,7 +16,7 @@ export function NotificationItem({
 	return (
 		<div
 			key={notification.id}
-			className="px-3 py-2 text-sm transition-colors hover:bg-accent"
+			className="px-3 py-2 text-sm transition-colors hover:bg-muted-foreground/10"
 		>
 			<div className="relative flex items-start gap-3 pe-3">
 				{notification.fromUser ? (

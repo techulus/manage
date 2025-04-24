@@ -14,15 +14,10 @@ import { buttonVariants } from "@/components/ui/button";
 import { toStartOfDay } from "@/lib/utils/date";
 import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
-import {
-	useMutation,
-	useQueryClient,
-	useSuspenseQueries,
-} from "@tanstack/react-query";
+import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
 import { CalendarIcon, ListIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { Suspense } from "react";
 
 export default function ProjectDetails() {
 	const router = useRouter();
@@ -33,7 +28,7 @@ export default function ProjectDetails() {
 	const queryClient = useQueryClient();
 
 	const [{ data: timezone }, { data: project }, { data: taskLists }] =
-		useSuspenseQueries({
+		useQueries({
 			queries: [
 				trpc.settings.getTimezone.queryOptions(),
 				trpc.projects.getProjectById.queryOptions({
@@ -76,8 +71,10 @@ export default function ProjectDetails() {
 		}),
 	);
 
+	if (!project || !timezone || !taskLists) return <PageLoading />;
+
 	return (
-		<Suspense fallback={<PageLoading />}>
+		<>
 			<PageTitle
 				title={project.name}
 				editableTitle
@@ -229,6 +226,6 @@ export default function ProjectDetails() {
 			<div className="mx-auto max-w-7xl p-4 lg:py-8">
 				<CommentsSection roomId={`project/${project.id}`} />
 			</div>
-		</Suspense>
+		</>
 	);
 }
