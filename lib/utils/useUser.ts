@@ -1,5 +1,3 @@
-"use server";
-
 import { user } from "@/drizzle/schema";
 import type { User } from "@/drizzle/types";
 import { currentUser } from "@clerk/nextjs/server";

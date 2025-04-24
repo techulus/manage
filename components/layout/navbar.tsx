@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { toMachineDateString } from "@/lib/utils/date";
 import logo from "@/public/images/logo.png";
 import { useTRPC } from "@/trpc/client";
-import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
+import { OrganizationSwitcher, UserButton, useSession } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, HelpCircle } from "lucide-react";
@@ -44,10 +44,8 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 
 	const queryClient = useQueryClient();
 	useEffect(() => {
-		if (tenant) {
-			console.log(">>>>> Invalidating all queries");
-			queryClient.invalidateQueries();
-		}
+		console.log(">>>>> Invalidating all queries for tenant", tenant);
+		queryClient.invalidateQueries();
 	}, [queryClient, tenant]);
 
 	const trpc = useTRPC();

@@ -1,6 +1,5 @@
 import { blob } from "@/drizzle/schema";
 import { upload } from "@/lib/blobStore";
-import { getAppBaseUrl } from "@/lib/utils/url";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
 import mime from "mime-types";
@@ -46,7 +45,7 @@ export async function PUT(request: NextRequest) {
 
 		return NextResponse.json<BlobUploadResult>({
 			message: "ok",
-			url: `${getAppBaseUrl()}/api/blob/${fileId}/file.${extension}`,
+			url: `${process.env.NEXT_PUBLIC_APP_URL}/api/blob/${fileId}/file.${extension}`,
 		});
 	} catch (error) {
 		console.log("Error uploading file", error);

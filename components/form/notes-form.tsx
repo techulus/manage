@@ -33,13 +33,14 @@ export default function NotesForm({
 						type="button"
 						className="mr-2"
 						variant="ghost"
+						size="sm"
 						onClick={() => {
 							setIsEditing(false);
 						}}
 					>
 						Cancel
 					</Button>
-					<Button type="submit" disabled={pending}>
+					<Button type="submit" disabled={pending} size="sm">
 						{pending ? <Spinner /> : "Save"}
 					</Button>
 				</div>

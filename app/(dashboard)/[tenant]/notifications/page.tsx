@@ -1,20 +1,18 @@
 "use client";
 
-import { PageLoading } from "@/components/core/loaders";
-import { Spinner } from "@/components/core/loaders";
+import { PageLoading, Spinner } from "@/components/core/loaders";
 import { NotificationItem } from "@/components/core/notification-item";
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { Button } from "@/components/ui/button";
 import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
-import { useMutation, useSuspenseQueries } from "@tanstack/react-query";
-import { Suspense } from "react";
+import { useMutation, useQueries } from "@tanstack/react-query";
 
 export default function Notifications() {
 	const trpc = useTRPC();
 
-	const [{ data: notifications }, { data: timezone }] = useSuspenseQueries({
+	const [{ data: notifications = [] }, { data: timezone }] = useQueries({
 		queries: [
 			trpc.user.getUserNotifications.queryOptions(),
 			trpc.settings.getTimezone.queryOptions(),
@@ -27,8 +25,10 @@ export default function Notifications() {
 		}),
 	);
 
+	if (!timezone) return <PageLoading />;
+
 	return (
-		<Suspense fallback={<PageLoading />}>
+		<>
 			<PageTitle title="Notifications">
 				<Button
 					variant="outline"
@@ -59,6 +59,6 @@ export default function Notifications() {
 					/>
 				))}
 			</PageSection>
-		</Suspense>
+		</>
 	);
 }

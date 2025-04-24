@@ -12,7 +12,7 @@ import { useTaskLists } from "@/hooks/use-tasklist";
 import { TasksProvider } from "@/hooks/use-tasks";
 import { useTRPC } from "@/trpc/client";
 import { Title } from "@radix-ui/react-dialog";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
@@ -29,7 +29,7 @@ export default function TaskLists() {
 	);
 
 	const trpc = useTRPC();
-	const { data: taskLists } = useSuspenseQuery(
+	const { data: taskLists = [] } = useQuery(
 		trpc.tasks.getTaskLists.queryOptions({
 			projectId: +projectId!,
 			statuses: statuses.split(",") ?? ["active"],

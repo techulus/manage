@@ -12,12 +12,12 @@ import { toDateStringWithDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useSession } from "@clerk/nextjs";
 import { Title } from "@radix-ui/react-dialog";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { RssIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
-import { Suspense, useMemo } from "react";
+import { useMemo } from "react";
 
 export default function Events() {
 	const { session } = useSession();
@@ -45,12 +45,14 @@ export default function Events() {
 	);
 
 	const trpc = useTRPC();
-	const { data: timezone, isLoading } = useSuspenseQuery(
+	const { data: timezone, isLoading } = useQuery(
 		trpc.settings.getTimezone.queryOptions(),
 	);
 
+	if (!timezone) return <PageLoading />;
+
 	return (
-		<Suspense fallback={<PageLoading />}>
+		<>
 			<PageTitle
 				title="Events"
 				actions={
@@ -101,6 +103,6 @@ export default function Events() {
 				</Title>
 				<EventForm />
 			</Panel>
-		</Suspense>
+		</>
 	);
 }

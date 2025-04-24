@@ -11,16 +11,15 @@ import { useTaskLists } from "@/hooks/use-tasklist";
 import { TasksProvider } from "@/hooks/use-tasks";
 import { toStartOfDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
-import { useSuspenseQueries } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { CheckCircle } from "lucide-react";
 import { useParams } from "next/navigation";
-import { Suspense } from "react";
 
 export default function TaskLists() {
 	const { projectId, tasklistId } = useParams();
 
 	const trpc = useTRPC();
-	const [{ data: list }, { data: timezone }] = useSuspenseQueries({
+	const [{ data: list }, { data: timezone }] = useQueries({
 		queries: [
 			trpc.tasks.getListById.queryOptions({
 				id: +tasklistId!,
@@ -39,8 +38,10 @@ export default function TaskLists() {
 			? Math.round((doneCount / totalCount) * 100)
 			: undefined;
 
+	if (!list || !timezone) return <PageLoading />;
+
 	return (
-		<Suspense fallback={<PageLoading />}>
+		<>
 			<PageTitle
 				title={list.name}
 				editableTitle
@@ -104,6 +105,6 @@ export default function TaskLists() {
 					/>
 				</div>
 			</PageSection>
-		</Suspense>
+		</>
 	);
 }

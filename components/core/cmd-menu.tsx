@@ -1,3 +1,5 @@
+"use client";
+
 import { useTRPC } from "@/trpc/client";
 import { useQueries } from "@tanstack/react-query";
 import { Calendar, Plus, Settings } from "lucide-react";

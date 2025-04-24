@@ -2,6 +2,9 @@ import { createTRPCContext } from "@/trpc/init";
 import { appRouter } from "@/trpc/routers/_app";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 
+export const maxDuration = 60;
+export const dynamic = "force-dynamic";
+
 const handler = (req: Request) =>
 	fetchRequestHandler({
 		endpoint: "/api/trpc",
@@ -11,4 +14,4 @@ const handler = (req: Request) =>
 		allowMethodOverride: true,
 	});
 
-export { handler as POST };
+export const POST = handler;
