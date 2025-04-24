@@ -44,30 +44,36 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
+
 	useEffect(() => {
 		if (!tenant) {
 			return;
 		}
 
 		console.log(">>>>> Invalidating all queries for tenant", tenant);
-		queryClient.invalidateQueries();
+		queryClient.invalidateQueries().then(() => {
+			console.log(">>>>> Invalidated all queries for tenant", tenant);
+			Promise.all([
+				queryClient.prefetchQuery(trpc.user.getTodayData.queryOptions()),
+				queryClient.prefetchQuery(
+					trpc.user.getNotificationsWire.queryOptions(),
+				),
+				queryClient.prefetchQuery(
+					trpc.user.getProjects.queryOptions({
+						statuses: ["active"],
+					}),
+				),
+			])
+				.then(() => {
+					console.log(">>>>> Prefetched queries for tenant", tenant);
+				})
+				.catch((err) => {
+					console.error(">>>>> Error prefetching queries", err);
+				});
+		});
+	}, [queryClient, trpc, tenant]);
 
-		Promise.all([
-			queryClient.prefetchQuery(trpc.user.getTodayData.queryOptions()),
-			queryClient.prefetchQuery(trpc.user.getNotificationsWire.queryOptions()),
-			queryClient.prefetchQuery(
-				trpc.user.getProjects.queryOptions({
-					statuses: ["active"],
-				}),
-			),
-		])
-			.then(() => {
-				console.log(">>>>> Prefetched queries for tenant", tenant);
-			})
-			.catch((err) => {
-				console.error(">>>>> Error prefetching queries", err);
-			});
-
+	useEffect(() => {
 		if (projectId) {
 			Promise.all([
 				queryClient.prefetchQuery(
@@ -99,7 +105,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 					console.error(">>>>> Error prefetching queries", err);
 				});
 		}
-	}, [queryClient, trpc, projectId, tenant]);
+	}, [queryClient, trpc, projectId]);
 
 	const [
 		{ data: projects = [] },
