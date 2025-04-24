@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { toMachineDateString } from "@/lib/utils/date";
 import logo from "@/public/images/logo.png";
 import { useTRPC } from "@/trpc/client";
-import { OrganizationSwitcher, UserButton, useSession } from "@clerk/nextjs";
+import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, HelpCircle } from "lucide-react";
@@ -42,13 +42,71 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 	const { tenant, projectId } = useParams();
 	const pathname = usePathname();
 
-	const queryClient = useQueryClient();
-	useEffect(() => {
-		console.log(">>>>> Invalidating all queries for tenant", tenant);
-		queryClient.invalidateQueries();
-	}, [queryClient, tenant]);
-
 	const trpc = useTRPC();
+	const queryClient = useQueryClient();
+
+	useEffect(() => {
+		if (!tenant) {
+			return;
+		}
+
+		console.log(">>>>> Invalidating all queries for tenant", tenant);
+		queryClient.invalidateQueries().then(() => {
+			console.log(">>>>> Invalidated all queries for tenant", tenant);
+			Promise.all([
+				queryClient.prefetchQuery(trpc.user.getTodayData.queryOptions()),
+				queryClient.prefetchQuery(
+					trpc.user.getNotificationsWire.queryOptions(),
+				),
+				queryClient.prefetchQuery(
+					trpc.user.getProjects.queryOptions({
+						statuses: ["active"],
+					}),
+				),
+			])
+				.then(() => {
+					console.log(">>>>> Prefetched queries for tenant", tenant);
+				})
+				.catch((err) => {
+					console.error(">>>>> Error prefetching queries", err);
+				});
+		});
+	}, [queryClient, trpc, tenant]);
+
+	useEffect(() => {
+		if (projectId) {
+			Promise.all([
+				queryClient.prefetchQuery(
+					trpc.projects.getProjectById.queryOptions({
+						id: +projectId!,
+					}),
+				),
+				queryClient.prefetchQuery(
+					trpc.tasks.getTaskLists.queryOptions({
+						projectId: +projectId!,
+					}),
+				),
+				queryClient.prefetchQuery(
+					trpc.events.getByDate.queryOptions({
+						projectId: +projectId!,
+						date: new Date(),
+					}),
+				),
+				queryClient.prefetchQuery(
+					trpc.events.getByWeek.queryOptions({
+						projectId: +projectId!,
+					}),
+				),
+			])
+				.then(() => {
+					console.log(">>>>> Prefetched queries for project	", projectId);
+				})
+				.catch((err) => {
+					console.error(">>>>> Error prefetching queries", err);
+				});
+		}
+	}, [queryClient, trpc, projectId]);
+
 	const [
 		{ data: projects = [] },
 		{ data: tasklists = [] },

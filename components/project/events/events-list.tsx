@@ -3,6 +3,7 @@
 import EmptyState from "@/components/core/empty-state";
 import { HtmlPreview } from "@/components/core/html-view";
 import { Panel } from "@/components/core/panel";
+import PageSection from "@/components/core/section";
 import { UserAvatar } from "@/components/core/user-avatar";
 import { DeleteButton } from "@/components/form/button";
 import EventForm from "@/components/form/event";
@@ -72,7 +73,7 @@ export default function EventsList({
 	);
 
 	return (
-		<div className="flex w-full flex-col space-y-2 divide-y">
+		<PageSection className="w-full" bottomMargin={false}>
 			{!filteredEvents.length ? (
 				<EmptyState
 					show={!filteredEvents.length}
@@ -84,10 +85,10 @@ export default function EventsList({
 			{filteredEvents.map((event) => (
 				<div
 					key={event.id}
-					className={cn("relative flex items-center justify-between")}
+					className="relative flex items-center justify-between"
 				>
-					<div className="flex space-x-4 pt-1">
-						<UserAvatar user={event.creator} className="mt-1" />
+					<div className="flex space-x-4">
+						<UserAvatar user={event.creator} className="mt-1.5" />
 						<div className="flex-grow">
 							<div className="text-lg font-semibold">{event.name}</div>
 							<div
@@ -105,7 +106,7 @@ export default function EventsList({
 
 							{event.creator.id === user?.id ? (
 								<DropdownMenu>
-									<DropdownMenuTrigger className="absolute right-0 top-1.5">
+									<DropdownMenuTrigger className="absolute right-1 top-1.5">
 										<CircleEllipsisIcon className="h-6 w-6" />
 									</DropdownMenuTrigger>
 									<DropdownMenuContent align="end">
@@ -148,6 +149,6 @@ export default function EventsList({
 					</Panel>
 				</div>
 			))}
-		</div>
+		</PageSection>
 	);
 }

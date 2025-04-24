@@ -22,26 +22,6 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const eventsRouter = createTRPCRouter({
-	getById: protectedProcedure
-		.input(z.object({ id: z.number() }))
-		.query(async ({ ctx, input }) => {
-			const { id } = input;
-
-			const event = await ctx.db.query.calendarEvent.findFirst({
-				where: eq(calendarEvent.id, id),
-				with: {
-					creator: {
-						columns: {
-							id: true,
-							firstName: true,
-							imageUrl: true,
-						},
-					},
-				},
-			});
-
-			return event;
-		}),
 	getByDate: protectedProcedure
 		.input(
 			z.object({
