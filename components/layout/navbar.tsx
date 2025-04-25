@@ -54,6 +54,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 		queryClient.invalidateQueries().then(() => {
 			console.log(">>>>> Invalidated all queries for tenant", tenant);
 			Promise.all([
+				queryClient.prefetchQuery(trpc.settings.getTimezone.queryOptions()),
 				queryClient.prefetchQuery(trpc.user.getTodayData.queryOptions()),
 				queryClient.prefetchQuery(
 					trpc.user.getNotificationsWire.queryOptions(),
@@ -72,40 +73,6 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				});
 		});
 	}, [queryClient, trpc, tenant]);
-
-	useEffect(() => {
-		if (projectId) {
-			Promise.all([
-				queryClient.prefetchQuery(
-					trpc.projects.getProjectById.queryOptions({
-						id: +projectId!,
-					}),
-				),
-				queryClient.prefetchQuery(
-					trpc.tasks.getTaskLists.queryOptions({
-						projectId: +projectId!,
-					}),
-				),
-				queryClient.prefetchQuery(
-					trpc.events.getByDate.queryOptions({
-						projectId: +projectId!,
-						date: new Date(),
-					}),
-				),
-				queryClient.prefetchQuery(
-					trpc.events.getByWeek.queryOptions({
-						projectId: +projectId!,
-					}),
-				),
-			])
-				.then(() => {
-					console.log(">>>>> Prefetched queries for project	", projectId);
-				})
-				.catch((err) => {
-					console.error(">>>>> Error prefetching queries", err);
-				});
-		}
-	}, [queryClient, trpc, projectId]);
 
 	const [
 		{ data: projects = [] },
@@ -133,6 +100,64 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 
 		return projects.find((p) => p.id === +projectId);
 	}, [projects, projectId]);
+
+	useEffect(() => {
+		if (projects.length) {
+			for (const project of projects) {
+				console.log(">>>>> Prefetching queries for project", project.id);
+				Promise.all([
+					queryClient.prefetchQuery(
+						trpc.projects.getProjectById.queryOptions({
+							id: project.id,
+						}),
+					),
+					queryClient.prefetchQuery(
+						trpc.tasks.getTaskLists.queryOptions({
+							projectId: project.id,
+							statuses: ["active"],
+						}),
+					),
+					queryClient.prefetchQuery(
+						trpc.events.getByDate.queryOptions({
+							projectId: project.id,
+							date: new Date(),
+						}),
+					),
+					queryClient.prefetchQuery(
+						trpc.events.getByWeek.queryOptions({
+							projectId: project.id,
+						}),
+					),
+				])
+					.then(() => {
+						console.log(">>>>> Prefetched queries for project", project.id);
+					})
+					.catch((err) => {
+						console.error(">>>>> Error prefetching queries", err);
+					});
+			}
+		}
+	}, [queryClient, trpc, projects]);
+
+	useEffect(() => {
+		if (tasklists.length) {
+			for (const list of tasklists) {
+				console.log(">>>>> Prefetching queries for tasklist", list.id);
+				queryClient
+					.prefetchQuery(
+						trpc.tasks.getListById.queryOptions({
+							id: list.id,
+						}),
+					)
+					.then(() => {
+						console.log(">>>>> Prefetched queries for tasklist", list.id);
+					})
+					.catch((err) => {
+						console.error(">>>>> Error prefetching queries", err);
+					});
+			}
+		}
+	}, [queryClient, trpc, tasklists]);
 
 	const navLinks: NavLink[] = useMemo(() => {
 		if (projectId) {

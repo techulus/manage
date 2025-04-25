@@ -1,6 +1,7 @@
 import { task, taskList } from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
 import { broadcastEvent } from "@/lib/utils/turbowire";
+import { notifyUser } from "@/lib/utils/useNotification";
 import { and, asc, desc, eq, or } from "drizzle-orm";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
@@ -308,9 +309,15 @@ export const tasksRouter = createTRPCRouter({
 
 			if (oldTask) {
 				if (filteredInput.assignedToUser) {
-					await broadcastEvent("notifications", filteredInput.assignedToUser, {
-						message: `${oldTask.name} has been assigned to you`,
-					});
+					await notifyUser(
+						filteredInput.assignedToUser,
+						`${oldTask.name} has been assigned to you`,
+						{
+							type: "task",
+							fromUser: ctx.userId,
+							target: null,
+						},
+					);
 				}
 
 				await logActivity({

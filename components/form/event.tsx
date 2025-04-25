@@ -60,6 +60,9 @@ const EventForm = memo(
 							projectId: +projectId!,
 						}),
 					});
+					queryClient.invalidateQueries({
+						queryKey: trpc.user.getTodayData.queryKey(),
+					});
 				},
 				onError: displayMutationError,
 			}),

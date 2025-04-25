@@ -27,7 +27,7 @@ export default function WeekCalendar({
 	);
 
 	return (
-		<div className="flex w-full flex-col md:flex-row md:space-x-2">
+		<div className="flex w-full flex-col md:flex-row">
 			{isLoading ? (
 				<div className="flex h-full w-full flex-col space-y-2 p-4">
 					<Skeleton className="h-[60px] w-full rounded-md bg-muted-foreground/10" />

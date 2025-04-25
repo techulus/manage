@@ -16,7 +16,6 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { EventWithCreator } from "@/drizzle/types";
-import { cn } from "@/lib/utils";
 import { displayMutationError } from "@/lib/utils/error";
 import {
 	eventToHumanReadableString,
@@ -72,16 +71,16 @@ export default function EventsList({
 		}),
 	);
 
-	return (
+	return !filteredEvents.length ? (
+		<div className="w-full">
+			<EmptyState
+				show={!filteredEvents.length}
+				label="event"
+				createLink={`/${tenant}/projects/${projectId}/events?on=${date}&create=true`}
+			/>
+		</div>
+	) : (
 		<PageSection className="w-full" bottomMargin={false}>
-			{!filteredEvents.length ? (
-				<EmptyState
-					show={!filteredEvents.length}
-					label="event"
-					createLink={`/${tenant}/projects/${projectId}/events?on=${date}&create=true`}
-				/>
-			) : null}
-
 			{filteredEvents.map((event) => (
 				<div
 					key={event.id}
