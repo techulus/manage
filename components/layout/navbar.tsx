@@ -54,6 +54,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 		queryClient.invalidateQueries().then(() => {
 			console.log(">>>>> Invalidated all queries for tenant", tenant);
 			Promise.all([
+				queryClient.prefetchQuery(trpc.settings.getTimezone.queryOptions()),
 				queryClient.prefetchQuery(trpc.user.getTodayData.queryOptions()),
 				queryClient.prefetchQuery(
 					trpc.user.getNotificationsWire.queryOptions(),

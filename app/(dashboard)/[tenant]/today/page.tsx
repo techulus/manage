@@ -40,10 +40,7 @@ export default function Today() {
 	const [{ data: todayData }, { data: projects }, { data: timezone }] =
 		useQueries({
 			queries: [
-				{
-					...trpc.user.getTodayData.queryOptions(),
-					staleTime: 0,
-				},
+				trpc.user.getTodayData.queryOptions(),
 				trpc.user.getProjects.queryOptions({
 					statuses: statuses.split(","),
 				}),

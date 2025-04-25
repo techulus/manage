@@ -38,6 +38,9 @@ export function TasksProvider({
 					projectId: +projectId!,
 				}),
 			});
+			queryClient.invalidateQueries({
+				queryKey: trpc.user.getTodayData.queryKey(),
+			});
 		},
 		[
 			projectId,
@@ -45,6 +48,7 @@ export function TasksProvider({
 			queryClient.invalidateQueries,
 			trpc.tasks.getListById.queryKey,
 			trpc.tasks.getTaskLists.queryKey,
+			trpc.user.getTodayData.queryKey,
 		],
 	);
 
