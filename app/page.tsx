@@ -26,7 +26,6 @@ const features = [
 
 export const dynamic = "force-static";
 export const revalidate = 86400;
-export const prefferedRegion = "global";
 
 export default async function Home() {
 	return (
