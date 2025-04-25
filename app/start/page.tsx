@@ -24,7 +24,7 @@ export default async function Start() {
 			console.log(
 				`Database not ready, retrying (${retryCount + 1}/${maxRetries})...`,
 			);
-			await sleep(1500);
+			await sleep(500);
 			retryCount++;
 		}
 	}
