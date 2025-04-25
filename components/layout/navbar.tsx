@@ -139,6 +139,26 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 		}
 	}, [queryClient, trpc, projects]);
 
+	useEffect(() => {
+		if (tasklists.length) {
+			for (const list of tasklists) {
+				console.log(">>>>> Prefetching queries for tasklist", list.id);
+				queryClient
+					.prefetchQuery(
+						trpc.tasks.getListById.queryOptions({
+							id: list.id,
+						}),
+					)
+					.then(() => {
+						console.log(">>>>> Prefetched queries for tasklist", list.id);
+					})
+					.catch((err) => {
+						console.error(">>>>> Error prefetching queries", err);
+					});
+			}
+		}
+	}, [queryClient, trpc, tasklists]);
+
 	const navLinks: NavLink[] = useMemo(() => {
 		if (projectId) {
 			return [
