@@ -8,12 +8,12 @@ import NotesForm from "@/components/form/notes-form";
 import PageTitle from "@/components/layout/page-title";
 import { CommentsSection } from "@/components/project/comment/comments-section";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
+import { TaskStatus } from "@/drizzle/types";
 import { useTaskLists } from "@/hooks/use-tasklist";
 import { TasksProvider } from "@/hooks/use-tasks";
 import { toStartOfDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useQueries } from "@tanstack/react-query";
-import { CheckCircle } from "lucide-react";
 import { useParams } from "next/navigation";
 
 export default function TaskLists() {
@@ -32,7 +32,9 @@ export default function TaskLists() {
 	const { updateTaskList, tidyUpTaskList } = useTaskLists();
 
 	const totalCount = list?.tasks.length;
-	const doneCount = list?.tasks.filter((task) => task.status === "done").length;
+	const doneCount = list?.tasks.filter(
+		(task) => task.status === TaskStatus.DONE,
+	).length;
 
 	const completedPercent =
 		totalCount && doneCount
@@ -55,43 +57,44 @@ export default function TaskLists() {
 			>
 				<div className="flex flex-col pr-4 md:pr-0 space-y-1 space-x-0 md:flex-row md:space-y-0 md:space-x-3 text-gray-500 dark:text-gray-400">
 					{totalCount != null && doneCount != null ? (
-						<div className="inline-flex flex-row items-center space-x-2">
-							<CheckCircle className="w-4 h-4" />
+						<div className="inline-flex flex-row items-center space-x-2 text-sm">
 							<p className="block text-primary font-semibold">
 								{doneCount} of {totalCount}
 							</p>
 
-							{completedPercent ? (
-								<span className="text-sm">({completedPercent}%)</span>
-							) : null}
+							{completedPercent ? <span>({completedPercent}%)</span> : null}
 						</div>
 					) : null}
 
-					<EditableDate
-						value={list.dueDate}
-						timezone={timezone}
-						onChange={async (dueDate) => {
-							await updateTaskList.mutateAsync({
-								id: list.id,
-								dueDate: dueDate ? toStartOfDay(dueDate).toISOString() : null,
-							});
-						}}
-						label="due"
-					/>
+					<div className="flex flex-row items-center space-x-2 pt-2 sm:pt-0">
+						<EditableDate
+							value={list.dueDate}
+							timezone={timezone}
+							onChange={async (dueDate) => {
+								await updateTaskList.mutateAsync({
+									id: list.id,
+									dueDate: dueDate ? toStartOfDay(dueDate).toISOString() : null,
+								});
+							}}
+							label="due"
+						/>
 
-					<ConfirmButton
-						variant="outline"
-						size="sm"
-						label="Tidy up"
-						confirmLabel="Remove done tasks?"
-						confirmVariant="destructive"
-						className="inline-block max-w-[140px]"
-						onClick={() => {
-							tidyUpTaskList.mutate({
-								id: list.id,
-							});
-						}}
-					/>
+						{doneCount ? (
+							<ConfirmButton
+								variant="outline"
+								size="sm"
+								label="Tidy up"
+								confirmLabel="Remove done tasks?"
+								confirmVariant="destructive"
+								className="inline-block max-w-[140px]"
+								onClick={() => {
+									tidyUpTaskList.mutate({
+										id: list.id,
+									});
+								}}
+							/>
+						) : null}
+					</div>
 				</div>
 			</PageTitle>
 
