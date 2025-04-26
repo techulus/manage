@@ -1,6 +1,5 @@
 import { task, taskList } from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
-import { broadcastEvent } from "@/lib/utils/turbowire";
 import { notifyUser } from "@/lib/utils/useNotification";
 import { and, asc, desc, eq, or } from "drizzle-orm";
 import { z } from "zod";
@@ -357,5 +356,15 @@ export const tasksRouter = createTRPCRouter({
 			}
 
 			return currentTask;
+		}),
+	tidyUpTaskList: protectedProcedure
+		.input(z.object({ id: z.number() }))
+		.mutation(async ({ ctx, input }) => {
+			const data = await ctx.db
+				.delete(task)
+				.where(and(eq(task.taskListId, input.id), eq(task.status, "done")))
+				.returning();
+
+			return data;
 		}),
 });
