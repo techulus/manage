@@ -85,6 +85,7 @@ export default function TaskLists() {
 						label="Tidy up"
 						confirmLabel="Remove done tasks?"
 						confirmVariant="destructive"
+						className="inline-block max-w-[140px]"
 						onClick={() => {
 							tidyUpTaskList.mutate({
 								id: list.id,

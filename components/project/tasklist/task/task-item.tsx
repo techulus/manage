@@ -10,7 +10,11 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { TaskList, TaskWithDetails } from "@/drizzle/types";
+import {
+	type TaskList,
+	TaskStatus,
+	type TaskWithDetails,
+} from "@/drizzle/types";
 import { useTasks } from "@/hooks/use-tasks";
 import { cn } from "@/lib/utils";
 import { toDateStringWithDay, toStartOfDay } from "@/lib/utils/date";
@@ -60,6 +64,10 @@ export const TaskItem = ({
 	const { createTask, updateTask, deleteTask } = useTasks();
 
 	const creating = useMemo(() => task.id > Date.now(), [task.id]);
+	const isDone = useMemo(
+		() => task.status === TaskStatus.DONE || task.status === TaskStatus.DELETED,
+		[task.status],
+	);
 
 	return (
 		<>
@@ -74,15 +82,15 @@ export const TaskItem = ({
 			>
 				{!compact ? (
 					<Checkbox
-						checked={task.status === "done"}
+						checked={isDone}
 						className={cn(
 							"my-4 ml-6 mr-1 transition-all",
 							compact ? "py-0 my-0" : "",
-							task.status === "done" ? "my-2.5 opacity-50" : "scale-125",
+							isDone ? "my-2.5 opacity-50" : "scale-125",
 						)}
 						onCheckedChange={async (checked) => {
 							if (compact) return;
-							const status = checked ? "done" : "todo";
+							const status = checked ? TaskStatus.DONE : TaskStatus.TODO;
 							updateTask.mutate({
 								id: task.id,
 								status,
@@ -95,7 +103,7 @@ export const TaskItem = ({
 					className={cn(
 						"text-md w-full py-1 text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
 						compact ? "ml-3 py-0" : "",
-						task.status === "done" ? "text-muted-foreground line-through" : "",
+						isDone ? "text-muted-foreground line-through" : "",
 						creating ? "text-muted-foreground" : "",
 					)}
 					onClick={() => {
@@ -105,7 +113,7 @@ export const TaskItem = ({
 					<div
 						className={cn(
 							"flex w-full items-center py-2",
-							task.status !== "done" ? "border-b dark:border-white/10" : "",
+							isDone ? "border-b dark:border-white/10" : "",
 						)}
 					>
 						{task.assignee ? (
@@ -130,7 +138,7 @@ export const TaskItem = ({
 					</div>
 				</button>
 
-				{task.status !== "done" && !compact && !creating ? (
+				{isDone && !compact && !creating ? (
 					<div
 						className="cursor-move touch-none p-1 pr-3"
 						{...attributes}
@@ -146,13 +154,10 @@ export const TaskItem = ({
 					<div className="flex items-center px-4 h-14 border-b">
 						<div className="flex items-center flex-1">
 							<Checkbox
-								checked={task.status === "done"}
-								className={cn(
-									task.status === "done" ? "opacity-50" : "",
-									"mr-2",
-								)}
+								checked={isDone}
+								className={cn(isDone ? "opacity-50" : "", "mr-2")}
 								onCheckedChange={async (checked) => {
-									const status = checked ? "done" : "todo";
+									const status = checked ? TaskStatus.DONE : TaskStatus.TODO;
 									updateTask.mutate({
 										id: task.id,
 										status,

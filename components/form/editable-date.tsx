@@ -33,7 +33,7 @@ export default function EditableDate({
 					dateOnly
 					name="dueDate"
 					placeholder={`Add ${label} date`}
-					buttonClassName="text-muted-foreground border-none h-8 p-0 sm:p-2 shadow-none"
+					buttonClassName="text-muted-foreground h-8 p-0 p-2 shadow-none"
 					onSelect={async (date) => {
 						await onChange(date);
 					}}
