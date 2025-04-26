@@ -7,6 +7,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { TaskListStatus } from "@/drizzle/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { toMachineDateString } from "@/lib/utils/date";
@@ -114,7 +115,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 					queryClient.prefetchQuery(
 						trpc.tasks.getTaskLists.queryOptions({
 							projectId: project.id,
-							statuses: ["active"],
+							statuses: [TaskListStatus.ACTIVE],
 						}),
 					),
 					queryClient.prefetchQuery(
