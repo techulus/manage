@@ -1,6 +1,8 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TaskStatus } from "@/drizzle/types";
 import { useTasks } from "@/hooks/use-tasks";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
@@ -43,7 +45,8 @@ export const TaskListItem = ({
 	const { createTask, updateTask } = useTasks();
 
 	const todoItems = useMemo(
-		() => taskList?.tasks.filter((task) => task.status === "todo") ?? [],
+		() =>
+			taskList?.tasks.filter((task) => task.status === TaskStatus.TODO) ?? [],
 		[taskList?.tasks],
 	);
 
@@ -53,7 +56,16 @@ export const TaskListItem = ({
 	}, [todoItems]);
 
 	const doneItems = useMemo(
-		() => taskList?.tasks.filter((task) => task.status === "done") ?? [],
+		() =>
+			taskList?.tasks.filter((task) => task.status === TaskStatus.DONE) ?? [],
+		[taskList?.tasks],
+	);
+
+	const [showDeleted, setShowDeleted] = useState(false);
+	const deletedItems = useMemo(
+		() =>
+			taskList?.tasks.filter((task) => task.status === TaskStatus.DELETED) ??
+			[],
 		[taskList?.tasks],
 	);
 
@@ -153,6 +165,31 @@ export const TaskListItem = ({
 				{compact
 					? null
 					: doneItems.map((task) => <TaskItem key={task.id} task={task} />)}
+
+				{compact ? null : (
+					<>
+						{showDeleted
+							? deletedItems.map((task) => (
+									<TaskItem key={task.id} task={task} />
+								))
+							: null}
+
+						{deletedItems.length > 0 ? (
+							<div className="px-6 py-2">
+								<p className="text-sm text-muted-foreground">
+									{deletedItems.length} deleted task(s)
+									<Button
+										variant="ghost"
+										size="sm"
+										onClick={() => setShowDeleted((x) => !x)}
+									>
+										{showDeleted ? "Hide" : "Show"}
+									</Button>
+								</p>
+							</div>
+						) : null}
+					</>
+				)}
 			</div>
 		</div>
 	);

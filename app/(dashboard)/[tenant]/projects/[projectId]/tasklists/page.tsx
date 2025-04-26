@@ -8,6 +8,7 @@ import SharedForm from "@/components/form/shared";
 import PageTitle from "@/components/layout/page-title";
 import { TaskListItem } from "@/components/project/tasklist/tasklist";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { TaskListStatus } from "@/drizzle/types";
 import { useTaskLists } from "@/hooks/use-tasklist";
 import { TasksProvider } from "@/hooks/use-tasks";
 import { useTRPC } from "@/trpc/client";
@@ -32,7 +33,9 @@ export default function TaskLists() {
 	const { data: taskLists = [] } = useQuery(
 		trpc.tasks.getTaskLists.queryOptions({
 			projectId: +projectId!,
-			statuses: statuses.split(",") ?? ["active"],
+			statuses: statuses.split(",").map((s) => s as TaskListStatus) ?? [
+				TaskListStatus.ACTIVE,
+			],
 		}),
 	);
 

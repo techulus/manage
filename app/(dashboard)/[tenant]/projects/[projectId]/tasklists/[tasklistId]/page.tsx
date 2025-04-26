@@ -2,6 +2,7 @@
 
 import { PageLoading } from "@/components/core/loaders";
 import PageSection from "@/components/core/section";
+import { ConfirmButton } from "@/components/form/button";
 import EditableDate from "@/components/form/editable-date";
 import NotesForm from "@/components/form/notes-form";
 import PageTitle from "@/components/layout/page-title";
@@ -28,7 +29,7 @@ export default function TaskLists() {
 		],
 	});
 
-	const { updateTaskList } = useTaskLists();
+	const { updateTaskList, tidyUpTaskList } = useTaskLists();
 
 	const totalCount = list?.tasks.length;
 	const doneCount = list?.tasks.filter((task) => task.status === "done").length;
@@ -76,6 +77,20 @@ export default function TaskLists() {
 							});
 						}}
 						label="due"
+					/>
+
+					<ConfirmButton
+						variant="outline"
+						size="sm"
+						label="Tidy up"
+						confirmLabel="Remove done tasks?"
+						confirmVariant="destructive"
+						className="inline-block max-w-[140px]"
+						onClick={() => {
+							tidyUpTaskList.mutate({
+								id: list.id,
+							});
+						}}
 					/>
 				</div>
 			</PageTitle>

@@ -1,7 +1,6 @@
 "use client";
 
 import { CheckIcon, TrashIcon } from "lucide-react";
-// @ts-ignore
 import { usePathname } from "next/navigation";
 import type React from "react";
 import { useState } from "react";
@@ -131,6 +130,58 @@ export const ActionButton = ({
 					{label}
 				</>
 			)}
+		</Button>
+	);
+};
+
+export const ConfirmButton = ({
+	label = "",
+	confirmLabel = "",
+	variant = "outline",
+	confirmVariant = "destructive",
+	disabled = false,
+	className = "",
+	size = "sm",
+	onClick,
+}: {
+	label?: string;
+	variant?: "outline" | "default" | "destructive";
+	confirmLabel?: string;
+	confirmVariant?: "outline" | "default" | "destructive";
+	disabled?: boolean;
+	className?: string;
+	size?: "sm" | "default";
+	onClick: () => void;
+}) => {
+	const [showConfirm, setShowConfirm] = useState(false);
+
+	if (showConfirm) {
+		return (
+			<Button
+				variant={confirmVariant}
+				size={size}
+				className={className}
+				onClick={() => {
+					onClick();
+					setShowConfirm(false);
+				}}
+				disabled={disabled}
+			>
+				{confirmLabel}
+			</Button>
+		);
+	}
+
+	return (
+		<Button
+			type="button"
+			onClick={() => setShowConfirm(true)}
+			variant={variant}
+			size={size}
+			className={className}
+			disabled={disabled}
+		>
+			{label}
 		</Button>
 	);
 };

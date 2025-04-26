@@ -68,7 +68,21 @@ export function TaskListsProvider({
 		}),
 	);
 
-	const value = { createTaskList, updateTaskList, deleteTaskList };
+	const tidyUpTaskList = useMutation(
+		trpc.tasks.tidyUpTaskList.mutationOptions({
+			onSuccess: (data) => {
+				invalidateData(data[0].taskListId);
+			},
+			onError: displayMutationError,
+		}),
+	);
+
+	const value = {
+		createTaskList,
+		updateTaskList,
+		deleteTaskList,
+		tidyUpTaskList,
+	};
 
 	return (
 		<TaskListsContext.Provider value={value}>

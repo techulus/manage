@@ -19,6 +19,17 @@ export type CalendarEvent = InferSelectModel<typeof calendarEvent>;
 export type Activity = InferSelectModel<typeof activity>;
 export type Notification = InferSelectModel<typeof notification>;
 
+export enum TaskListStatus {
+	ACTIVE = "active",
+	ARCHIVED = "archived",
+}
+
+export enum TaskStatus {
+	TODO = "todo",
+	DONE = "done",
+	DELETED = "deleted",
+}
+
 export type ProjectWithCreator = Project & { creator: User };
 
 export type TaskWithDetails = Task & {

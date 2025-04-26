@@ -5,7 +5,11 @@ import {
 	task,
 	user,
 } from "@/drizzle/schema";
-import type { NotificationWithUser } from "@/drizzle/types";
+import {
+	type NotificationWithUser,
+	TaskListStatus,
+	TaskStatus,
+} from "@/drizzle/types";
 import { broadcastEvent, getSignedWireUrl } from "@/lib/utils/turbowire";
 import {
 	filterByRepeatRule,
@@ -77,7 +81,7 @@ export const userRouter = createTRPCRouter({
 			ctx.db.query.task.findMany({
 				where: and(
 					between(task.dueDate, startOfDay, endOfDay),
-					ne(task.status, "done"),
+					ne(task.status, TaskStatus.DONE),
 					isNotNull(task.dueDate),
 				),
 				orderBy: [asc(task.position)],
@@ -107,7 +111,7 @@ export const userRouter = createTRPCRouter({
 			ctx.db.query.task.findMany({
 				where: and(
 					lt(task.dueDate, startOfDay),
-					ne(task.status, "done"),
+					ne(task.status, TaskStatus.DONE),
 					isNotNull(task.dueDate),
 				),
 				orderBy: [asc(task.position)],
@@ -161,11 +165,11 @@ export const userRouter = createTRPCRouter({
 		]);
 
 		const dueToday = tasksDueToday.filter(
-			(t) => t.taskList?.status !== "archived",
+			(t) => t.taskList?.status !== TaskListStatus.ARCHIVED,
 		);
 
 		const overDue = overDueTasks.filter(
-			(t) => t.taskList?.status !== "archived",
+			(t) => t.taskList?.status !== TaskListStatus.ARCHIVED,
 		);
 
 		const filteredEvents = events.filter((event) =>

@@ -1,6 +1,6 @@
 import { task, taskList } from "@/drizzle/schema";
+import { TaskListStatus, TaskStatus } from "@/drizzle/types";
 import { logActivity } from "@/lib/activity";
-import { broadcastEvent } from "@/lib/utils/turbowire";
 import { notifyUser } from "@/lib/utils/useNotification";
 import { and, asc, desc, eq, or } from "drizzle-orm";
 import { z } from "zod";
@@ -13,7 +13,10 @@ export const tasksRouter = createTRPCRouter({
 		.input(
 			z.object({
 				projectId: z.number(),
-				statuses: z.array(z.string()).optional().default(["active"]),
+				statuses: z
+					.array(z.nativeEnum(TaskListStatus))
+					.optional()
+					.default([TaskListStatus.ACTIVE]),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
@@ -58,7 +61,7 @@ export const tasksRouter = createTRPCRouter({
 					name: input.name,
 					description: input.description,
 					dueDate: input.dueDate,
-					status: "active",
+					status: TaskListStatus.ACTIVE,
 					projectId: input.projectId,
 					createdByUser: ctx.userId,
 				})
@@ -104,7 +107,10 @@ export const tasksRouter = createTRPCRouter({
 				.or(
 					z.object({
 						id: z.number(),
-						status: z.string().optional().default("active"),
+						status: z
+							.nativeEnum(TaskListStatus)
+							.optional()
+							.default(TaskListStatus.ACTIVE),
 					}),
 				),
 		)
@@ -193,7 +199,7 @@ export const tasksRouter = createTRPCRouter({
 		.input(
 			z.object({
 				name: z.string().optional().default(""),
-				status: z.enum(["todo", "done"]).optional().default("todo"),
+				status: z.nativeEnum(TaskStatus).optional().default(TaskStatus.TODO),
 				taskListId: z.number().optional().default(0),
 			}),
 		)
@@ -248,7 +254,7 @@ export const tasksRouter = createTRPCRouter({
 				.or(
 					z.object({
 						id: z.number(),
-						status: z.enum(["todo", "done"]),
+						status: z.nativeEnum(TaskStatus),
 					}),
 				)
 				.or(
@@ -357,5 +363,18 @@ export const tasksRouter = createTRPCRouter({
 			}
 
 			return currentTask;
+		}),
+	tidyUpTaskList: protectedProcedure
+		.input(z.object({ id: z.number() }))
+		.mutation(async ({ ctx, input }) => {
+			const data = await ctx.db
+				.update(task)
+				.set({ status: TaskStatus.DELETED })
+				.where(
+					and(eq(task.taskListId, input.id), eq(task.status, TaskStatus.DONE)),
+				)
+				.returning();
+
+			return data;
 		}),
 });

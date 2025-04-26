@@ -1,6 +1,10 @@
 "use client";
 
-import type { TaskListWithTasks, TaskWithDetails } from "@/drizzle/types";
+import {
+	type TaskListWithTasks,
+	TaskStatus,
+	type TaskWithDetails,
+} from "@/drizzle/types";
 import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
 import { useUser } from "@clerk/nextjs";
@@ -74,7 +78,7 @@ export function TasksProvider({
 							taskListId: newTask.taskListId || 0,
 							name: newTask.name || "",
 							description: null,
-							status: newTask.status || "todo",
+							status: newTask.status || TaskStatus.TODO,
 							dueDate: null,
 							createdAt: new Date(),
 							updatedAt: new Date(),
