@@ -25,7 +25,6 @@ import {
 	gt,
 	isNotNull,
 	lt,
-	ne,
 	or,
 } from "drizzle-orm";
 import { z } from "zod";
@@ -81,7 +80,7 @@ export const userRouter = createTRPCRouter({
 			ctx.db.query.task.findMany({
 				where: and(
 					between(task.dueDate, startOfDay, endOfDay),
-					ne(task.status, TaskStatus.DONE),
+					eq(task.status, TaskStatus.TODO),
 					isNotNull(task.dueDate),
 				),
 				orderBy: [asc(task.position)],
@@ -111,7 +110,7 @@ export const userRouter = createTRPCRouter({
 			ctx.db.query.task.findMany({
 				where: and(
 					lt(task.dueDate, startOfDay),
-					ne(task.status, TaskStatus.DONE),
+					eq(task.status, TaskStatus.TODO),
 					isNotNull(task.dueDate),
 				),
 				orderBy: [asc(task.position)],

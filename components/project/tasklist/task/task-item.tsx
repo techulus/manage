@@ -113,7 +113,7 @@ export const TaskItem = ({
 					<div
 						className={cn(
 							"flex w-full items-center py-2",
-							isDone ? "border-b dark:border-white/10" : "",
+							!isDone ? "border-b dark:border-white/10" : "",
 						)}
 					>
 						{task.assignee ? (
@@ -138,7 +138,7 @@ export const TaskItem = ({
 					</div>
 				</button>
 
-				{isDone && !compact && !creating ? (
+				{!isDone && !compact && !creating ? (
 					<div
 						className="cursor-move touch-none p-1 pr-3"
 						{...attributes}

@@ -1,5 +1,8 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import type { JSX, PropsWithChildren } from "react";
+import { useEffect, useState } from "react";
 import EditableText from "../form/editable-text";
 
 interface Props {
@@ -20,9 +23,47 @@ export default function PageTitle({
 	editableTitle = false,
 	titleOnChange,
 }: PropsWithChildren<Props>) {
+	const [isSticky, setIsSticky] = useState(false);
+
+	useEffect(() => {
+		const handleScroll = () => {
+			const mainTitle = document.querySelector("[data-main-title]");
+			if (mainTitle) {
+				const rect = mainTitle.getBoundingClientRect();
+				setIsSticky(rect.top < 0);
+			}
+		};
+
+		window.addEventListener("scroll", handleScroll);
+		return () => window.removeEventListener("scroll", handleScroll);
+	}, []);
+
 	return (
 		<>
+			{isSticky && (
+				<div className="sticky top-0 z-50 block bg-background backdrop-blur-sm md:hidden border-b">
+					<div className="flex h-14 items-center justify-between px-4">
+						<h1 className="text-lg font-medium">
+							{editableTitle ? (
+								<EditableText
+									value={title}
+									label="name"
+									textClassName="tracking-tighter"
+									onChange={async (val) => {
+										await titleOnChange?.(val);
+									}}
+								/>
+							) : (
+								title
+							)}
+						</h1>
+						{actions}
+					</div>
+				</div>
+			)}
+
 			<div
+				data-main-title
 				className={cn(
 					"flex min-h-[160px] items-center justify-center pb-4 pl-4 pr-6 pt-4",
 					compact ? "min-h-0 h-[80px] overflow-y-auto pb-0" : "",

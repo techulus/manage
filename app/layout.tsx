@@ -250,19 +250,18 @@ export default function RootLayout({
 
 				<meta
 					name="theme-color"
-					content="#EBF6ED"
+					content="#FFFFFF"
 					media="(prefers-color-scheme: light)"
 				/>
 				<meta
 					name="theme-color"
-					content="#141D13"
+					content="#0C0A09"
 					media="(prefers-color-scheme: dark)"
 				/>
 			</head>
 			<body className="min-h-full min-w-full flex-1">
 				<ClerkProvider>
 					<ThemeProvider>
-						<div className="fixed top-0 left-0 right-0 h-32 bg-gradient-to-b from-primary/10 to-transparent -z-0" />
 						<Toaster position="top-center" />
 						{children}
 					</ThemeProvider>
