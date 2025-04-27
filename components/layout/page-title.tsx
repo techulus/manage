@@ -27,11 +27,7 @@ export default function PageTitle({
 
 	useEffect(() => {
 		const handleScroll = () => {
-			const mainTitle = document.querySelector("[data-main-title]");
-			if (mainTitle) {
-				const rect = mainTitle.getBoundingClientRect();
-				setIsSticky(rect.top < 0);
-			}
+			setIsSticky(window.scrollY > 120);
 		};
 
 		window.addEventListener("scroll", handleScroll);
@@ -43,7 +39,7 @@ export default function PageTitle({
 			{isSticky && (
 				<div className="sticky top-0 z-50 block bg-background backdrop-blur-sm md:hidden border-b">
 					<div className="flex h-14 items-center justify-between px-4">
-						<h1 className="text-lg font-medium">
+						<h1 className="text-lg font-semibold">
 							{editableTitle ? (
 								<EditableText
 									value={title}
@@ -63,7 +59,6 @@ export default function PageTitle({
 			)}
 
 			<div
-				data-main-title
 				className={cn(
 					"flex min-h-[160px] items-center justify-center pb-4 pl-4 pr-6 pt-4",
 					compact ? "min-h-0 h-[80px] overflow-y-auto pb-0" : "",
