@@ -2,7 +2,6 @@
 
 import { cn } from "@/lib/utils";
 import type { JSX, PropsWithChildren } from "react";
-import { useEffect, useState } from "react";
 import EditableText from "../form/editable-text";
 
 interface Props {
@@ -23,77 +22,42 @@ export default function PageTitle({
 	editableTitle = false,
 	titleOnChange,
 }: PropsWithChildren<Props>) {
-	const [isSticky, setIsSticky] = useState(false);
-
-	useEffect(() => {
-		const handleScroll = () => {
-			setIsSticky(window.scrollY > 120);
-		};
-
-		window.addEventListener("scroll", handleScroll);
-		return () => window.removeEventListener("scroll", handleScroll);
-	}, []);
-
 	return (
-		<>
-			{isSticky && (
-				<div className="sticky top-0 z-50 block bg-background backdrop-blur-sm md:hidden border-b">
-					<div className="flex h-14 items-center justify-between px-4">
-						<h1 className="text-lg font-semibold">
-							{editableTitle ? (
-								<EditableText
-									value={title}
-									label="name"
-									textClassName="tracking-tighter"
-									onChange={async (val) => {
-										await titleOnChange?.(val);
-									}}
-								/>
-							) : (
-								title
-							)}
-						</h1>
-						{actions}
-					</div>
-				</div>
+		<div
+			className={cn(
+				"flex min-h-[160px] items-center justify-center pb-4 pl-4 pr-6 pt-4",
+				compact ? "min-h-0 h-[80px] overflow-y-auto pb-0" : "",
 			)}
-
-			<div
-				className={cn(
-					"flex min-h-[160px] items-center justify-center pb-4 pl-4 pr-6 pt-4",
-					compact ? "min-h-0 h-[80px] overflow-y-auto pb-0" : "",
-				)}
-			>
-				<div className="flex w-full max-w-7xl items-center justify-between">
-					<div className="relative flex w-full flex-col">
-						<h1
-							className={cn(
-								"text-hero flex-1 text-3xl tracking-tighter lg:text-4xl",
-								compact ? "text-lg lg:text-2xl" : "",
-							)}
-						>
-							{editableTitle ? (
-								<EditableText
-									value={title}
-									label="name"
-									textClassName="tracking-tighter"
-									onChange={async (val) => {
-										await titleOnChange?.(val);
-									}}
-								/>
-							) : (
-								title
-							)}
-						</h1>
-						{subTitle ? (
-							<p className="text-gray-500 dark:text-gray-400">{subTitle}</p>
-						) : null}
-						<div className="block w-full pt-2">{children}</div>
-					</div>
-
-					{actions ?? null}
+		>
+			<div className="flex w-full max-w-7xl items-center justify-between">
+				<div className="relative flex w-full flex-col">
+					<h1
+						className={cn(
+							"text-hero flex-1 text-3xl tracking-tighter lg:text-4xl",
+							compact ? "text-lg lg:text-2xl" : "",
+						)}
+					>
+						{editableTitle ? (
+							<EditableText
+								value={title}
+								label="name"
+								textClassName="tracking-tighter"
+								onChange={async (val) => {
+									await titleOnChange?.(val);
+								}}
+							/>
+						) : (
+							title
+						)}
+					</h1>
+					{subTitle ? (
+						<p className="text-gray-500 dark:text-gray-400">{subTitle}</p>
+					) : null}
+					<div className="block w-full pt-2">{children}</div>
 				</div>
+
+				{actions ?? null}
 			</div>
-		</>
+		</div>
 	);
 }
