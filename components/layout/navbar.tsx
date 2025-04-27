@@ -313,7 +313,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 			</div>
 
 			<nav
-				className="flex px-4 overflow-x-auto text-sm border-b"
+				className="flex px-4 overflow-x-auto text-sm border-b sticky top-0 z-10 bg-background"
 				suppressHydrationWarning
 			>
 				{navLinks.map((link) =>
