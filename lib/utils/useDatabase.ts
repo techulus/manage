@@ -47,12 +47,11 @@ export async function getDatabaseForOwner(
 		throw new Error("Database name not found");
 	}
 
-	const ownerDb = drizzle(
-		`${process.env.DATABASE_URL}/manage?sslmode=require`,
-		{
-			schema,
-		},
-	);
+	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
+
+	const ownerDb = drizzle(`${process.env.DATABASE_URL}/manage${sslMode}`, {
+		schema,
+	});
 
 	const checkDb = await ownerDb.execute(
 		sql`SELECT 1 FROM pg_database WHERE datname = ${databaseName}`,
@@ -62,7 +61,7 @@ export async function getDatabaseForOwner(
 	}
 
 	const tenantDb = drizzle(
-		`${process.env.DATABASE_URL}/${databaseName}?sslmode=require`,
+		`${process.env.DATABASE_URL}/${databaseName}${sslMode}`,
 		{
 			schema,
 		},
@@ -73,13 +72,11 @@ export async function getDatabaseForOwner(
 
 export async function deleteDatabase(ownerId: string) {
 	const databaseName = getDatabaseName(ownerId);
+	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
 
-	const ownerDb = drizzle(
-		`${process.env.DATABASE_URL}/manage?sslmode=require`,
-		{
-			schema,
-		},
-	);
+	const ownerDb = drizzle(`${process.env.DATABASE_URL}/manage${sslMode}`, {
+		schema,
+	});
 
 	await ownerDb.execute(sql`DROP DATABASE ${sql.identifier(databaseName)}`);
 }
