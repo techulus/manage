@@ -10,7 +10,6 @@ import {
 import { TaskListStatus } from "@/drizzle/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import { toMachineDateString } from "@/lib/utils/date";
 import logo from "@/public/images/logo.png";
 import { useTRPC } from "@/trpc/client";
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
@@ -75,11 +74,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 		});
 	}, [queryClient, trpc, tenant]);
 
-	const [
-		{ data: projects = [] },
-		{ data: tasklists = [] },
-		{ data: timezone },
-	] = useQueries({
+	const [{ data: projects = [] }, { data: tasklists = [] }] = useQueries({
 		queries: [
 			trpc.user.getProjects.queryOptions({
 				statuses: ["active"],
@@ -90,7 +85,6 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				}),
 				enabled: !!projectId,
 			},
-			trpc.settings.getTimezone.queryOptions(),
 		],
 	});
 
@@ -180,7 +174,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 					})),
 				},
 				{
-					href: `/${tenant}/projects/${projectId}/events?on=${toMachineDateString(new Date(), timezone!)}`,
+					href: `/${tenant}/projects/${projectId}/events`,
 					label: "Events",
 					active: pathname.startsWith(
 						`/${tenant}/projects/${projectId}/events`,
@@ -211,7 +205,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				active: pathname === `/${tenant}/settings`,
 			},
 		];
-	}, [tenant, projectId, pathname, timezone, tasklists]);
+	}, [tenant, projectId, pathname, tasklists]);
 
 	return (
 		<>

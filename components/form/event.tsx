@@ -2,10 +2,10 @@
 
 import { Input } from "@/components/ui/input";
 import type { EventWithCreator } from "@/drizzle/types";
-import { toMachineDateString, toStartOfHour } from "@/lib/utils/date";
+import { toStartOfHour } from "@/lib/utils/date";
 import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
-import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { type Dispatch, type SetStateAction, memo, useState } from "react";
@@ -34,7 +34,6 @@ const EventForm = memo(
 	}) => {
 		const { projectId } = useParams();
 
-		const [on, setOn] = useQueryState("on");
 		const [_, setCreate] = useQueryState(
 			"create",
 			parseAsBoolean.withDefault(false),
@@ -45,7 +44,6 @@ const EventForm = memo(
 		const upsertEvent = useMutation(
 			trpc.events.upsert.mutationOptions({
 				onSuccess: (event) => {
-					setOn(toMachineDateString(event.start, timezone!));
 					setCreate(null);
 					setEditing?.(null);
 
@@ -61,6 +59,12 @@ const EventForm = memo(
 						}),
 					});
 					queryClient.invalidateQueries({
+						queryKey: trpc.events.getByMonth.queryKey({
+							projectId: +projectId!,
+							date: event.start,
+						}),
+					});
+					queryClient.invalidateQueries({
 						queryKey: trpc.user.getTodayData.queryKey(),
 					});
 				},
@@ -68,13 +72,9 @@ const EventForm = memo(
 			}),
 		);
 
-		const [{ data: timezone }] = useQueries({
-			queries: [trpc.settings.getTimezone.queryOptions()],
-		});
-
 		const [name, setName] = useState(item?.name ?? "");
 		const [start, setStart] = useState(
-			toStartOfHour(item?.start ?? new Date(on ?? new Date())),
+			toStartOfHour(item?.start ?? new Date(new Date())),
 		);
 		const [end, setEnd] = useState(item?.end ?? undefined);
 		const [allDay, setAllDay] = useState(item?.allDay ?? false);
