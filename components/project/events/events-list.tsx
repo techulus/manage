@@ -76,11 +76,11 @@ export default function EventsList({
 			<EmptyState
 				show={!filteredEvents.length}
 				label="event"
-				createLink={`/${tenant}/projects/${projectId}/events?on=${date}&create=true`}
+				createLink={`/${tenant}/projects/${projectId}/events?create=true`}
 			/>
 		</div>
 	) : (
-		<PageSection className="w-full" bottomMargin={false}>
+		<PageSection className="w-full" bottomMargin={false} transparent>
 			{filteredEvents.map((event) => (
 				<div
 					key={event.id}
