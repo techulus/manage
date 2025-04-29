@@ -313,7 +313,7 @@ export function FullCalendar({
 								</button>
 							) : (
 								<div
-									key={dayIdx}
+									key={day.toISOString()}
 									onClick={() => onSelect(day)}
 									onKeyUp={(e) => {
 										if (e.key === "Enter" || e.key === " ") {
