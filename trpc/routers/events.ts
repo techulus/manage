@@ -30,9 +30,13 @@ const buildEventsQuery = (projectId: number, start: Date, end: Date) => {
 				between(calendarEvent.start, start, end),
 				between(calendarEvent.end, start, end),
 				and(lt(calendarEvent.start, start), gt(calendarEvent.end, end)),
-				isNotNull(calendarEvent.repeatRule),
-				eq(calendarEvent.start, start),
-				eq(calendarEvent.end, end),
+				and(
+					isNotNull(calendarEvent.repeatRule),
+					or(
+						between(calendarEvent.start, start, end),
+						lt(calendarEvent.start, start),
+					),
+				),
 			),
 		),
 		orderBy: [desc(calendarEvent.start), asc(calendarEvent.allDay)],
@@ -92,7 +96,10 @@ export const eventsRouter = createTRPCRouter({
 	getByMonth: protectedProcedure
 		.input(
 			z.object({
-				date: z.date().optional().default(new Date()),
+				date: z
+					.date()
+					.optional()
+					.default(() => new Date()),
 				projectId: z.number(),
 			}),
 		)
@@ -129,6 +136,8 @@ export const eventsRouter = createTRPCRouter({
 					oldValue: event[0],
 				});
 			}
+
+			return event[0];
 		}),
 	upsert: protectedProcedure
 		.input(

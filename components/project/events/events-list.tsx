@@ -54,7 +54,7 @@ export default function EventsList({
 	const queryClient = useQueryClient();
 	const deleteEvent = useMutation(
 		trpc.events.delete.mutationOptions({
-			onSuccess: () => {
+			onSuccess: (event) => {
 				queryClient.invalidateQueries({
 					queryKey: trpc.events.getByDate.queryKey({
 						date: new Date(date),
@@ -64,6 +64,12 @@ export default function EventsList({
 				queryClient.invalidateQueries({
 					queryKey: trpc.events.getByWeek.queryKey({
 						projectId,
+					}),
+				});
+				queryClient.invalidateQueries({
+					queryKey: trpc.events.getByMonth.queryKey({
+						projectId,
+						date: event.start,
 					}),
 				});
 			},

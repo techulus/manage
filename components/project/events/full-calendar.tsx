@@ -5,14 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import type { CalendarEvent } from "@/drizzle/types";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
-import {
-	toDateString,
-	toDateStringWithDay,
-	toMachineDateString,
-	toTimeString,
-	toTimeZone,
-	toUTC,
-} from "@/lib/utils/date";
+import { toDateString, toTimeString, toTimeZone } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -27,6 +20,7 @@ import {
 	isSameMonth,
 	isToday,
 	parse,
+	startOfMonth,
 	startOfToday,
 	startOfWeek,
 } from "date-fns";
@@ -37,6 +31,7 @@ import {
 } from "lucide-react";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useCallback, useMemo, useState } from "react";
+import { rrulestr } from "rrule";
 
 interface Event {
 	id: number;
@@ -129,13 +124,37 @@ export function FullCalendar({
 	const eventsByDay = useMemo(() => {
 		return (monthEvents ?? []).reduce(
 			(acc, event) => {
-				const day = format(toTimeZone(event.start, timezone), "yyyy-MM-dd");
-				acc[day] = [...(acc[day] || []), event];
+				if (event.repeatRule) {
+					const rrule = rrulestr(event.repeatRule);
+					const monthStart = startOfMonth(firstDayCurrentMonth);
+					const monthEnd = endOfMonth(firstDayCurrentMonth);
+
+					const occurrences = rrule.between(monthStart, monthEnd, true);
+
+					for (const occurrence of occurrences) {
+						const day = format(toTimeZone(occurrence, timezone), "yyyy-MM-dd");
+						acc[day] = [...(acc[day] || []), event];
+					}
+				} else if (event.end) {
+					const range = eachDayOfInterval({
+						start: toTimeZone(event.start, timezone),
+						end: toTimeZone(event.end, timezone),
+					});
+
+					for (const date of range) {
+						const day = format(toTimeZone(date, timezone), "yyyy-MM-dd");
+						acc[day] = [...(acc[day] || []), event];
+					}
+				} else {
+					const day = format(toTimeZone(event.start, timezone), "yyyy-MM-dd");
+					acc[day] = [...(acc[day] || []), event];
+				}
+
 				return acc;
 			},
 			{} as Record<string, CalendarEvent[]>,
 		);
-	}, [monthEvents, timezone]);
+	}, [monthEvents, timezone, firstDayCurrentMonth]);
 
 	const data: CalendarData[] = useMemo(() => {
 		return Object.entries(eventsByDay).map(([day, events]) => ({
@@ -150,7 +169,7 @@ export function FullCalendar({
 	}, [eventsByDay, timezone]);
 
 	return (
-		<div className="flex flex-1 flex-col">
+		<div className="flex flex-1 flex-col" suppressHydrationWarning>
 			{/* Calendar Header */}
 			<div className="flex flex-col space-y-4 p-4 md:flex-row md:items-center md:justify-between md:space-y-0 lg:flex-none">
 				<div className="flex flex-auto">
@@ -296,6 +315,12 @@ export function FullCalendar({
 								<div
 									key={dayIdx}
 									onClick={() => onSelect(day)}
+									onKeyUp={(e) => {
+										if (e.key === "Enter" || e.key === " ") {
+											e.preventDefault();
+											onSelect(day);
+										}
+									}}
 									className={cn(
 										dayIdx === 0 && colStartClasses[getDay(day)],
 										!isEqual(day, selectedDay) &&
@@ -339,23 +364,23 @@ export function FullCalendar({
 										{data
 											.filter((event) => isSameDay(event.day, day))
 											.map((day) => (
-												<div key={day.day.toString()} className="space-y-1.5">
-													{day.events.slice(0, 1).map((event) => (
+												<div key={day.day.toString()} className="space-y-1">
+													{day.events.slice(0, 2).map((event) => (
 														<div
 															key={event.id}
 															className="flex flex-col items-start gap-1 rounded-lg border bg-muted/50 p-2 text-xs leading-tight"
 														>
 															<p className="font-medium leading-none">
+																<span className="leading-none text-muted-foreground mr-1">
+																	{event.time}
+																</span>
 																{event.name}
-															</p>
-															<p className="leading-none text-muted-foreground">
-																{event.time}
 															</p>
 														</div>
 													))}
-													{day.events.length > 1 && (
+													{day.events.length > 2 && (
 														<div className="text-xs text-muted-foreground">
-															+ {day.events.length - 1} more
+															+ {day.events.length - 2} more
 														</div>
 													)}
 												</div>
@@ -367,10 +392,10 @@ export function FullCalendar({
 					</div>
 
 					<div className="isolate grid w-full grid-cols-7 grid-rows-5 border-x lg:hidden">
-						{days.map((day, dayIdx) => (
+						{days.map((day) => (
 							<button
 								onClick={() => onSelect(day)}
-								key={dayIdx}
+								key={day.toISOString()}
 								type="button"
 								className={cn(
 									isEqual(day, selectedDay) && "text-primary-foreground",

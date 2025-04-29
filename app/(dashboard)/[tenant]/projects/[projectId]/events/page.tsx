@@ -1,5 +1,6 @@
 "use client";
 
+import { SpinnerWithSpacing } from "@/components/core/loaders";
 import { Panel } from "@/components/core/panel";
 import PageSection from "@/components/core/section";
 import EventForm from "@/components/form/event";
@@ -8,11 +9,11 @@ import EventsList from "@/components/project/events/events-list";
 import { FullCalendar } from "@/components/project/events/full-calendar";
 import { Button, buttonVariants } from "@/components/ui/button";
 import type { EventWithCreator } from "@/drizzle/types";
-import { toDateString } from "@/lib/utils/date";
+import { toDateString, toUTC } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { useSession } from "@clerk/nextjs";
 import { Title } from "@radix-ui/react-dialog";
-import { useQueries } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { RssIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -38,17 +39,16 @@ export default function Events() {
 	);
 
 	const trpc = useTRPC();
-	const [{ data: dayEvents = [] }, { data: timezone = "UTC" }] = useQueries({
-		queries: [
-			{
-				...trpc.events.getByDate.queryOptions({
-					projectId: +projectId!,
-					date: new Date(selectedDate ?? new Date()),
-				}),
-				enabled: !!selectedDate,
-			},
-			trpc.settings.getTimezone.queryOptions(),
-		],
+	const { data: timezone = "UTC" } = useQuery(
+		trpc.settings.getTimezone.queryOptions(),
+	);
+
+	const { data: dayEvents = [], isLoading: isLoadingDayEvents } = useQuery({
+		...trpc.events.getByDate.queryOptions({
+			projectId: +projectId!,
+			date: toUTC(new Date(selectedDate ?? new Date()), timezone),
+		}),
+		enabled: !!selectedDate,
 	});
 
 	return (
@@ -99,14 +99,16 @@ export default function Events() {
 					) : null}
 				</Title>
 				<div className="w-full p-6">
-					{selectedDate ? (
+					{!isLoadingDayEvents && selectedDate ? (
 						<EventsList
 							events={dayEvents as EventWithCreator[]}
 							projectId={+projectId!}
 							date={selectedDate}
 							timezone={timezone}
 						/>
-					) : null}
+					) : (
+						<SpinnerWithSpacing />
+					)}
 				</div>
 			</Panel>
 		</>

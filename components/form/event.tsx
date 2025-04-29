@@ -59,6 +59,12 @@ const EventForm = memo(
 						}),
 					});
 					queryClient.invalidateQueries({
+						queryKey: trpc.events.getByMonth.queryKey({
+							projectId: +projectId!,
+							date: event.start,
+						}),
+					});
+					queryClient.invalidateQueries({
 						queryKey: trpc.user.getTodayData.queryKey(),
 					});
 				},
