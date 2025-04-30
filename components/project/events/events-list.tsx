@@ -57,8 +57,8 @@ export default function EventsList({
 			onSuccess: (event) => {
 				queryClient.invalidateQueries({
 					queryKey: trpc.events.getByDate.queryKey({
-						date: new Date(date),
 						projectId,
+						date: event.start,
 					}),
 				});
 				queryClient.invalidateQueries({
@@ -86,7 +86,7 @@ export default function EventsList({
 			/>
 		</div>
 	) : (
-		<PageSection className="w-full" bottomMargin={false} transparent>
+		<div className="w-full space-y-4">
 			{filteredEvents.map((event) => (
 				<div
 					key={event.id}
@@ -154,6 +154,6 @@ export default function EventsList({
 					</Panel>
 				</div>
 			))}
-		</PageSection>
+		</div>
 	);
 }

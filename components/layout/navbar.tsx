@@ -113,13 +113,12 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 						}),
 					),
 					queryClient.prefetchQuery(
-						trpc.events.getByDate.queryOptions({
+						trpc.events.getByWeek.queryOptions({
 							projectId: project.id,
-							date: new Date(),
 						}),
 					),
 					queryClient.prefetchQuery(
-						trpc.events.getByWeek.queryOptions({
+						trpc.events.getByMonth.queryOptions({
 							projectId: project.id,
 						}),
 					),

@@ -39,7 +39,7 @@ const buildEventsQuery = (projectId: number, start: Date, end: Date) => {
 				),
 			),
 		),
-		orderBy: [desc(calendarEvent.start), asc(calendarEvent.allDay)],
+		orderBy: [desc(calendarEvent.allDay), asc(calendarEvent.start)],
 		with: {
 			creator: {
 				columns: {

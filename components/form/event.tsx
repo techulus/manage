@@ -46,7 +46,6 @@ const EventForm = memo(
 				onSuccess: (event) => {
 					setCreate(null);
 					setEditing?.(null);
-
 					queryClient.invalidateQueries({
 						queryKey: trpc.events.getByDate.queryKey({
 							date: event.start,

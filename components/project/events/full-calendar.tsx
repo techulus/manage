@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import type { CalendarEvent } from "@/drizzle/types";
-import { useMediaQuery } from "@/hooks/use-media-query";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { toDateString, toTimeString, toTimeZone } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
@@ -38,6 +38,9 @@ interface Event {
 	name: string;
 	time: string;
 	datetime: string;
+	start: Date;
+	end?: Date;
+	allDay: boolean;
 }
 
 interface CalendarData {
@@ -80,7 +83,7 @@ export function FullCalendar({
 		[currentMonth],
 	);
 
-	const isDesktop = useMediaQuery("(min-width: 1024px)");
+	const isMobile = useIsMobile();
 
 	const days = useMemo(
 		() =>
@@ -164,6 +167,9 @@ export function FullCalendar({
 				name: e.name,
 				time: e.allDay ? "All Day" : toTimeString(e.start, timezone),
 				datetime: toDateString(e.start, timezone),
+				start: toTimeZone(e.start, timezone),
+				end: e.end ? toTimeZone(e.end, timezone) : undefined,
+				allDay: e.allDay,
 			})),
 		}));
 	}, [eventsByDay, timezone]);
@@ -171,10 +177,10 @@ export function FullCalendar({
 	return (
 		<div className="flex flex-1 flex-col" suppressHydrationWarning>
 			{/* Calendar Header */}
-			<div className="flex flex-col space-y-4 p-4 md:flex-row md:items-center md:justify-between md:space-y-0 lg:flex-none">
+			<div className="flex flex-col space-y-4 pb-4 md:flex-row md:items-center md:justify-between md:space-y-0 lg:flex-none">
 				<div className="flex flex-auto">
 					<div className="flex items-center gap-4">
-						<div className="hidden w-20 flex-col items-center justify-center rounded-lg border bg-muted p-0.5 md:flex">
+						<div className="w-20 flex-col items-center justify-center rounded-lg border bg-muted p-0.5 flex">
 							<h1 className="p-1 text-xs uppercase text-muted-foreground">
 								{format(today, "MMM")}
 							</h1>
@@ -194,7 +200,7 @@ export function FullCalendar({
 					</div>
 				</div>
 
-				<div className="flex flex-col items-center gap-4 md:flex-row md:gap-6">
+				<div className="flex items-center gap-4 flex-row gap-6">
 					<div className="inline-flex w-full -space-x-px rounded-lg shadow-sm shadow-black/5 md:w-auto rtl:space-x-reverse">
 						<Button
 							onClick={previousMonth}
@@ -223,11 +229,7 @@ export function FullCalendar({
 						</Button>
 					</div>
 
-					<Separator orientation="vertical" className="hidden h-6 md:block" />
-					<Separator
-						orientation="horizontal"
-						className="block w-full md:hidden"
-					/>
+					<Separator orientation="vertical" className="h-6 block" />
 
 					<Button
 						className="w-full gap-2 md:w-auto"
@@ -242,7 +244,7 @@ export function FullCalendar({
 			{/* Calendar Grid */}
 			<div className="lg:flex lg:flex-auto lg:flex-col">
 				{/* Week Days Header */}
-				<div className="grid grid-cols-7 border text-center text-xs font-semibold leading-6 lg:flex-none">
+				<div className="grid grid-cols-7 border text-center text-xs font-semibold leading-6 lg:flex-none text-muted-foreground">
 					<div className="border-r py-2.5">Sun</div>
 					<div className="border-r py-2.5">Mon</div>
 					<div className="border-r py-2.5">Tue</div>
@@ -256,10 +258,10 @@ export function FullCalendar({
 				<div className="flex text-xs leading-6 lg:flex-auto">
 					<div className="hidden w-full border-x lg:grid lg:grid-cols-7 lg:grid-rows-5">
 						{days.map((day, dayIdx) =>
-							!isDesktop ? (
+							isMobile ? (
 								<button
 									onClick={() => onSelect(day)}
-									key={dayIdx}
+									key={day.toISOString()}
 									type="button"
 									className={cn(
 										isEqual(day, selectedDay) && "text-primary-foreground",
@@ -282,10 +284,10 @@ export function FullCalendar({
 											"ml-auto flex size-6 items-center justify-center rounded-full",
 											isEqual(day, selectedDay) &&
 												isToday(day) &&
-												"bg-primary text-primary-foreground",
+												"text-primary",
 											isEqual(day, selectedDay) &&
 												!isToday(day) &&
-												"bg-primary text-primary-foreground",
+												"text-primary",
 										)}
 									>
 										{format(day, "d")}
@@ -360,15 +362,18 @@ export function FullCalendar({
 											</time>
 										</button>
 									</header>
-									<div className="flex-1 p-2.5">
+									<div className="flex-1 p-1.5">
 										{data
 											.filter((event) => isSameDay(event.day, day))
 											.map((day) => (
 												<div key={day.day.toString()} className="space-y-1">
-													{day.events.slice(0, 2).map((event) => (
+													{day.events.slice(0, 3).map((event) => (
 														<div
 															key={event.id}
-															className="flex flex-col items-start gap-1 rounded-lg border bg-muted/50 p-2 text-xs leading-tight"
+															className={cn(
+																"flex flex-col items-start gap-1 bg-muted/50 p-1.5 text-xs leading-tight rounded-md border",
+																event.allDay ? "bg-primary/20" : "",
+															)}
 														>
 															<p className="font-medium leading-none">
 																<span className="leading-none text-muted-foreground mr-1">
@@ -378,9 +383,9 @@ export function FullCalendar({
 															</p>
 														</div>
 													))}
-													{day.events.length > 2 && (
+													{day.events.length > 3 && (
 														<div className="text-xs text-muted-foreground">
-															+ {day.events.length - 2} more
+															+ {day.events.length - 3} more
 														</div>
 													)}
 												</div>
@@ -416,12 +421,10 @@ export function FullCalendar({
 									dateTime={format(day, "yyyy-MM-dd")}
 									className={cn(
 										"ml-auto flex size-6 items-center justify-center rounded-full",
-										isEqual(day, selectedDay) &&
-											isToday(day) &&
-											"bg-primary text-primary-foreground",
+										isEqual(day, selectedDay) && isToday(day) && "text-primary",
 										isEqual(day, selectedDay) &&
 											!isToday(day) &&
-											"bg-primary text-primary-foreground",
+											"text-primary",
 									)}
 								>
 									{format(day, "d")}

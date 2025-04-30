@@ -49,11 +49,12 @@ export default function Events() {
 			date: toUTC(new Date(selectedDate ?? new Date()), timezone),
 		}),
 		enabled: !!selectedDate,
+		staleTime: 0,
 	});
 
 	return (
 		<>
-			<PageSection transparent className="pt-6 sm:pt-10 min-h-[70vh]">
+			<PageSection transparent className="pt-6 sm:pt-10 md:min-h-[80vh]">
 				<FullCalendar
 					projectId={+projectId!}
 					timezone={timezone}
@@ -98,7 +99,7 @@ export default function Events() {
 						/>
 					) : null}
 				</Title>
-				<div className="w-full p-6">
+				<div className="w-full px-4">
 					{!isLoadingDayEvents && selectedDate ? (
 						<EventsList
 							events={dayEvents as EventWithCreator[]}
