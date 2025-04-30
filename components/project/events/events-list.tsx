@@ -54,16 +54,22 @@ export default function EventsList({
 	const queryClient = useQueryClient();
 	const deleteEvent = useMutation(
 		trpc.events.delete.mutationOptions({
-			onSuccess: () => {
+			onSuccess: (event) => {
 				queryClient.invalidateQueries({
 					queryKey: trpc.events.getByDate.queryKey({
-						date: new Date(date),
 						projectId,
+						date: event.start,
 					}),
 				});
 				queryClient.invalidateQueries({
 					queryKey: trpc.events.getByWeek.queryKey({
 						projectId,
+					}),
+				});
+				queryClient.invalidateQueries({
+					queryKey: trpc.events.getByMonth.queryKey({
+						projectId,
+						date: event.start,
 					}),
 				});
 			},
@@ -76,11 +82,11 @@ export default function EventsList({
 			<EmptyState
 				show={!filteredEvents.length}
 				label="event"
-				createLink={`/${tenant}/projects/${projectId}/events?on=${date}&create=true`}
+				createLink={`/${tenant}/projects/${projectId}/events?create=true`}
 			/>
 		</div>
 	) : (
-		<PageSection className="w-full" bottomMargin={false}>
+		<div className="w-full space-y-4">
 			{filteredEvents.map((event) => (
 				<div
 					key={event.id}
@@ -148,6 +154,6 @@ export default function EventsList({
 					</Panel>
 				</div>
 			))}
-		</PageSection>
+		</div>
 	);
 }

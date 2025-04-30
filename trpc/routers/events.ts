@@ -3,6 +3,7 @@ import { logActivity } from "@/lib/activity";
 import { toEndOfDay, toStartOfDay, toTimeZone, toUTC } from "@/lib/utils/date";
 import {
 	getStartEndDateRangeInUtc,
+	getStartEndMonthRangeInUtc,
 	getStartEndWeekRangeInUtc,
 } from "@/lib/utils/useEvents";
 import { isAfter } from "date-fns";
@@ -21,6 +22,36 @@ import { Frequency, RRule } from "rrule";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
+const buildEventsQuery = (projectId: number, start: Date, end: Date) => {
+	return {
+		where: and(
+			eq(calendarEvent.projectId, projectId),
+			or(
+				between(calendarEvent.start, start, end),
+				between(calendarEvent.end, start, end),
+				and(lt(calendarEvent.start, start), gt(calendarEvent.end, end)),
+				and(
+					isNotNull(calendarEvent.repeatRule),
+					or(
+						between(calendarEvent.start, start, end),
+						lt(calendarEvent.start, start),
+					),
+				),
+			),
+		),
+		orderBy: [desc(calendarEvent.allDay), asc(calendarEvent.start)],
+		with: {
+			creator: {
+				columns: {
+					id: true,
+					firstName: true,
+					imageUrl: true,
+				},
+			},
+		},
+	};
+};
+
 export const eventsRouter = createTRPCRouter({
 	getByDate: protectedProcedure
 		.input(
@@ -37,32 +68,7 @@ export const eventsRouter = createTRPCRouter({
 			);
 
 			const events = await ctx.db.query.calendarEvent
-				.findMany({
-					where: and(
-						eq(calendarEvent.projectId, +projectId),
-						or(
-							between(calendarEvent.start, startOfDay, endOfDay),
-							between(calendarEvent.end, startOfDay, endOfDay),
-							and(
-								lt(calendarEvent.start, startOfDay),
-								gt(calendarEvent.end, endOfDay),
-							),
-							isNotNull(calendarEvent.repeatRule),
-							eq(calendarEvent.start, startOfDay),
-							eq(calendarEvent.end, endOfDay),
-						),
-					),
-					orderBy: [desc(calendarEvent.start), asc(calendarEvent.allDay)],
-					with: {
-						creator: {
-							columns: {
-								id: true,
-								firstName: true,
-								imageUrl: true,
-							},
-						},
-					},
-				})
+				.findMany(buildEventsQuery(projectId, startOfDay, endOfDay))
 				.execute();
 
 			return events;
@@ -76,38 +82,34 @@ export const eventsRouter = createTRPCRouter({
 		.query(async ({ ctx, input }) => {
 			const { projectId } = input;
 
-			const { startOfWeek, endOfWeek } = getStartEndWeekRangeInUtc(
+			const { start, end } = getStartEndWeekRangeInUtc(
 				ctx.timezone,
 				new Date(),
 			);
 
 			const events = await ctx.db.query.calendarEvent
-				.findMany({
-					where: and(
-						eq(calendarEvent.projectId, +projectId),
-						or(
-							between(calendarEvent.start, startOfWeek, endOfWeek),
-							between(calendarEvent.end, startOfWeek, endOfWeek),
-							and(
-								lt(calendarEvent.start, startOfWeek),
-								gt(calendarEvent.end, endOfWeek),
-							),
-							isNotNull(calendarEvent.repeatRule),
-							eq(calendarEvent.start, startOfWeek),
-							eq(calendarEvent.end, endOfWeek),
-						),
-					),
-					orderBy: [desc(calendarEvent.start), asc(calendarEvent.allDay)],
-					with: {
-						creator: {
-							columns: {
-								id: true,
-								firstName: true,
-								imageUrl: true,
-							},
-						},
-					},
-				})
+				.findMany(buildEventsQuery(projectId, start, end))
+				.execute();
+
+			return events;
+		}),
+	getByMonth: protectedProcedure
+		.input(
+			z.object({
+				date: z
+					.date()
+					.optional()
+					.default(() => new Date()),
+				projectId: z.number(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const { date, projectId } = input;
+
+			const { start, end } = getStartEndMonthRangeInUtc(ctx.timezone, date);
+
+			const events = await ctx.db.query.calendarEvent
+				.findMany(buildEventsQuery(projectId, start, end))
 				.execute();
 
 			return events;
@@ -134,6 +136,8 @@ export const eventsRouter = createTRPCRouter({
 					oldValue: event[0],
 				});
 			}
+
+			return event[0];
 		}),
 	upsert: protectedProcedure
 		.input(
