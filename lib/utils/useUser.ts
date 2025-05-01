@@ -23,6 +23,7 @@ export async function addUserToTenantDb() {
 			lastName: userData.lastName,
 			imageUrl: userData.imageUrl,
 			rawData: userData,
+			lastActiveAt: new Date(),
 		})
 		.onConflictDoUpdate({
 			target: user.id,
@@ -32,6 +33,7 @@ export async function addUserToTenantDb() {
 				lastName: userData.lastName,
 				imageUrl: userData.imageUrl,
 				rawData: userData,
+				lastActiveAt: new Date(),
 			},
 		})
 		.execute();

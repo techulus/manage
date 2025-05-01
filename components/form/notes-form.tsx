@@ -54,13 +54,8 @@ export default function NotesForm({
 					<HtmlPreview content={value ?? ""} />
 				</span>
 			) : null}
-			<Button
-				size="sm"
-				variant="outline"
-				className="text-primary"
-				onClick={() => setIsEditing(true)}
-			>
-				<Edit className="w-4 h-4" />
+			<Button size="sm" variant="outline" onClick={() => setIsEditing(true)}>
+				<Edit className="w-4 h-4 text-primary" />
 				Notes
 			</Button>
 		</div>

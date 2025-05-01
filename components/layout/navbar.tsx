@@ -211,7 +211,10 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 			<CommandMenu tenant={tenant as string} projectId={+projectId!} />
 			<div className="flex h-14 items-center px-4">
 				<div className="flex items-center">
-					<Link href={`/${tenant}/today`} className="flex items-center mr-2">
+					<Link
+						href={`/${tenant}/today`}
+						className="hidden md:flex items-center mr-2"
+					>
 						<Image src={logo} alt="Manage" width={24} height={24} />
 						<span className="sr-only">Manage</span>
 					</Link>
@@ -221,7 +224,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 						strokeLinejoin="round"
 						viewBox="0 0 16 16"
 						width="16"
-						className="text-neutral-300 dark:text-neutral-600 w-5 h-5 mr-1"
+						className="hidden md:block text-neutral-300 dark:text-neutral-600 w-5 h-5 mr-1"
 					>
 						<path
 							fillRule="evenodd"
@@ -243,7 +246,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 						strokeLinejoin="round"
 						viewBox="0 0 16 16"
 						width="16"
-						className="text-neutral-300 dark:text-neutral-600 w-5 h-5 mr-1"
+						className="hidden md:block text-neutral-300 dark:text-neutral-600 w-5 h-5 mr-1"
 					>
 						<path
 							fillRule="evenodd"

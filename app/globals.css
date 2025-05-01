@@ -114,6 +114,7 @@ textarea {
   .cl-organizationSwitcherPopoverCard .cl-userPreviewMainIdentifier {
     display: flex;
   }
+  .cl-userButtonPopoverMain .cl-userPreview,
   .cl-organizationSwitcherPopoverCard .cl-userPreview {
     gap: 1rem;
   }
