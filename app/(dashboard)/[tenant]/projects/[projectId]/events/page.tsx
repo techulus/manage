@@ -54,7 +54,7 @@ export default function Events() {
 
 	return (
 		<>
-			<PageSection transparent className="pt-6 sm:pt-10 md:min-h-[80vh]">
+			<PageSection transparent className="pt-10 md:min-h-[80vh]">
 				<FullCalendar
 					projectId={+projectId!}
 					timezone={timezone}

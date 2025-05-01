@@ -17,6 +17,7 @@ export const user = pgTable("User", {
 	imageUrl: text("imageUrl"),
 	timeZone: text("timeZone"),
 	rawData: jsonb("rawData").notNull(),
+	lastActiveAt: timestamp(),
 	createdAt: timestamp().notNull().defaultNow(),
 	updatedAt: timestamp().notNull().defaultNow(),
 });

@@ -1,6 +1,7 @@
 "use client";
 
 import { Panel } from "@/components/core/panel";
+import { ConfirmButton } from "@/components/form/button";
 import EditableText from "@/components/form/editable-text";
 import NotesForm from "@/components/form/notes-form";
 import { Button } from "@/components/ui/button";
@@ -285,28 +286,22 @@ export const TaskItem = ({
 						<div className="space-y-1">
 							<h4 className="text-sm font-medium">Actions</h4>
 							<div className="flex items-center space-x-2">
-								<Button
+								<ConfirmButton
+									label="Delete"
+									confirmLabel="Are you sure?"
 									size="sm"
-									variant="outline"
-									className="text-primary hover:text-red-500"
 									onClick={() => {
 										deleteTask.mutate({
 											id: task.id,
 										});
 									}}
-								>
-									Delete
-								</Button>
+								/>
 
 								{taskLists?.filter((x) => x.id !== task.taskListId)?.length ? (
 									<>
 										<DropdownMenu>
 											<DropdownMenuTrigger asChild>
-												<Button
-													variant="outline"
-													size="sm"
-													className="text-primary"
-												>
+												<Button variant="outline" size="sm">
 													Move to...
 												</Button>
 											</DropdownMenuTrigger>
@@ -338,11 +333,7 @@ export const TaskItem = ({
 
 										<DropdownMenu>
 											<DropdownMenuTrigger asChild>
-												<Button
-													variant="outline"
-													size="sm"
-													className="text-primary"
-												>
+												<Button variant="outline" size="sm">
 													Copy to...
 												</Button>
 											</DropdownMenuTrigger>

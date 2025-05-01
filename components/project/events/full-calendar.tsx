@@ -184,7 +184,7 @@ export function FullCalendar({
 							<h1 className="p-1 text-xs uppercase text-muted-foreground">
 								{format(today, "MMM")}
 							</h1>
-							<div className="flex w-full items-center justify-center rounded-lg border bg-background p-0.5 text-lg font-bold">
+							<div className="flex w-full text-primary items-center justify-center rounded-lg border bg-background p-0.5 text-lg font-bold">
 								<span>{format(today, "d")}</span>
 							</div>
 						</div>

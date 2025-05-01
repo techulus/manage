@@ -43,6 +43,13 @@
       "when": 1745233997477,
       "tag": "0005_fuzzy_onslaught",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1746078277188,
+      "tag": "0006_noisy_jack_murdock",
+      "breakpoints": true
     }
   ]
 }

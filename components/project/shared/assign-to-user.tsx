@@ -40,7 +40,7 @@ export function AssignToUser({
 			<Button
 				size="sm"
 				variant="outline"
-				className="mr-4 text-primary"
+				className="mr-4"
 				onClick={async () => {
 					setIsAssigning(true);
 				}}
