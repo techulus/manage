@@ -1,3 +1,4 @@
+import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 
 export default function TermsAndConditions() {
@@ -19,7 +20,9 @@ export default function TermsAndConditions() {
 					/>
 				</div>
 				<div className="mx-auto max-w-2xl py-32">
-					<h1 className="mb-4 text-2xl font-bold">Terms and Conditions</h1>
+					<h1 className="mb-4 text-4xl font-bold tracking-tighter">
+						Terms and Conditions
+					</h1>
 
 					<div className="mb-8">
 						<h2 className="mb-2 text-xl font-bold">1. Introduction</h2>
@@ -76,6 +79,8 @@ export default function TermsAndConditions() {
 					</p>
 				</div>
 			</div>
+
+			<Footer />
 		</div>
 	);
 }
