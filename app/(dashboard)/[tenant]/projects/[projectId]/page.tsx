@@ -85,68 +85,70 @@ export default function ProjectDetails() {
 					});
 				}}
 			>
-				<div className="flex flex-col pr-4 md:pr-0 space-y-1 space-x-0 md:flex-row md:space-y-0 md:space-x-2 text-gray-500 dark:text-gray-400">
-					<EditableDate
-						value={project.dueDate}
-						timezone={timezone}
-						onChange={async (date) => {
-							await updateProject.mutateAsync({
-								id: project.id,
-								dueDate: date ? toStartOfDay(date) : null,
-							});
-						}}
-						label="due"
-					/>
+				<div className="flex flex-col pr-4 md:pr-0 space-y-1 space-x-0 md:flex-row md:space-y-0 md:space-x-3 text-gray-500 dark:text-gray-400">
+					<div className="flex flex-row items-center space-x-2 pt-2 sm:pt-0">
+						<EditableDate
+							value={project.dueDate}
+							timezone={timezone}
+							onChange={async (date) => {
+								await updateProject.mutateAsync({
+									id: project.id,
+									dueDate: date ? toStartOfDay(date) : null,
+								});
+							}}
+							label="due"
+						/>
 
-					{project.status === "archived" ? (
-						<div className="flex flex-row gap-2">
+						{project.status === "archived" ? (
+							<div className="flex flex-row gap-2">
+								<form
+									action={async () => {
+										await updateProject.mutateAsync({
+											id: project.id,
+											status: "active",
+										});
+									}}
+								>
+									<ActionButton
+										label="Unarchive"
+										variant="outline"
+										className="h-8"
+									/>
+								</form>
+								<form
+									action={async () => {
+										await deleteProject.mutateAsync({
+											id: project.id,
+										});
+										router.push(`/${tenant}/today`);
+									}}
+								>
+									<DeleteButton
+										action="Delete"
+										className="h-8"
+										variant="outline"
+										compact
+									/>
+								</form>
+							</div>
+						) : (
 							<form
 								action={async () => {
 									await updateProject.mutateAsync({
 										id: project.id,
-										status: "active",
+										status: "archived",
 									});
-								}}
-							>
-								<ActionButton
-									label="Unarchive"
-									variant="outline"
-									className="h-8"
-								/>
-							</form>
-							<form
-								action={async () => {
-									await deleteProject.mutateAsync({
-										id: project.id,
-									});
-									router.push(`/${tenant}/today`);
 								}}
 							>
 								<DeleteButton
-									action="Delete"
+									action="Archive"
 									className="h-8"
 									variant="outline"
 									compact
 								/>
 							</form>
-						</div>
-					) : (
-						<form
-							action={async () => {
-								await updateProject.mutateAsync({
-									id: project.id,
-									status: "archived",
-								});
-							}}
-						>
-							<DeleteButton
-								action="Archive"
-								className="h-8"
-								variant="outline"
-								compact
-							/>
-						</form>
-					)}
+						)}
+					</div>
 				</div>
 			</PageTitle>
 
