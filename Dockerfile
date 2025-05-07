@@ -2,6 +2,7 @@ FROM oven/bun:slim AS base
 
 ARG NEXT_PUBLIC_APP_URL
 ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+ARG NEXT_PUBLIC_OPEN_PANEL_CLIENT_ID
 
 RUN apt-get update && apt-get install -y curl
 
