@@ -1,5 +1,6 @@
 import { deleteDatabase } from "@/lib/utils/useDatabase";
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
+import type { NextRequest } from "next/server";
 
 enum WebhookEventType {
 	organizationCreated = "organization.created",
@@ -10,7 +11,7 @@ enum WebhookEventType {
 	userUpdated = "user.updated",
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
 	try {
 		const evt = await verifyWebhook(req);
 
