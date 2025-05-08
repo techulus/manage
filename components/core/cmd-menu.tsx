@@ -51,7 +51,7 @@ export function CommandMenu({
 	return (
 		<>
 			<Button
-				className="fixed h-12 w-12 bottom-6 right-6 z-50 rounded-full shadow-lg md:hidden flex items-center justify-center"
+				className="fixed h-12 w-12 bottom-12 right-6 z-50 rounded-full shadow-lg md:hidden flex items-center justify-center"
 				onClick={() => setOpen(true)}
 				aria-label="Open command menu"
 				type="button"
