@@ -2,9 +2,10 @@
 
 import { useTRPC } from "@/trpc/client";
 import { useQueries } from "@tanstack/react-query";
-import { Calendar, Plus, Settings } from "lucide-react";
+import { Calendar, Menu, Plus, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Button } from "../ui/button";
 import {
 	CommandDialog,
 	CommandEmpty,
@@ -48,83 +49,93 @@ export function CommandMenu({
 	});
 
 	return (
-		<CommandDialog open={open} onOpenChange={setOpen}>
-			<CommandInput placeholder="Type a command or search..." />
-			<CommandList>
-				<CommandEmpty>No results found.</CommandEmpty>
-				<CommandGroup heading="Navigation">
-					<CommandItem
-						onSelect={() => {
-							router.push(`/${tenant}/today`);
-							setOpen(false);
-						}}
-					>
-						<Calendar />
-						<span>Today</span>
-					</CommandItem>
-					<CommandItem
-						onSelect={() => {
-							router.push(`/${tenant}/settings`);
-							setOpen(false);
-						}}
-					>
-						<Settings />
-						<span>Settings</span>
-					</CommandItem>
-				</CommandGroup>
-				<CommandGroup heading="Projects">
-					{projects.map((project) => (
+		<>
+			<Button
+				className="fixed h-12 w-12 bottom-6 right-6 z-50 rounded-full shadow-lg md:hidden flex items-center justify-center"
+				onClick={() => setOpen(true)}
+				aria-label="Open command menu"
+				type="button"
+			>
+				<Menu />
+			</Button>
+			<CommandDialog open={open} onOpenChange={setOpen}>
+				<CommandInput placeholder="Type a command or search..." />
+				<CommandList>
+					<CommandEmpty>No results found.</CommandEmpty>
+					<CommandGroup heading="Navigation">
 						<CommandItem
-							key={project.id}
 							onSelect={() => {
-								router.push(`/${tenant}/projects/${project.id}`);
+								router.push(`/${tenant}/today`);
 								setOpen(false);
 							}}
 						>
-							{project.name}
+							<Calendar />
+							<span>Today</span>
 						</CommandItem>
-					))}
-				</CommandGroup>
-				<CommandGroup heading="Tasklists">
-					{tasklists.map((tasklist) => (
 						<CommandItem
-							key={tasklist.id}
+							onSelect={() => {
+								router.push(`/${tenant}/settings`);
+								setOpen(false);
+							}}
+						>
+							<Settings />
+							<span>Settings</span>
+						</CommandItem>
+					</CommandGroup>
+					<CommandGroup heading="Projects">
+						{projects.map((project) => (
+							<CommandItem
+								key={project.id}
+								onSelect={() => {
+									router.push(`/${tenant}/projects/${project.id}`);
+									setOpen(false);
+								}}
+							>
+								{project.name}
+							</CommandItem>
+						))}
+					</CommandGroup>
+					<CommandGroup heading="Tasklists">
+						{tasklists.map((tasklist) => (
+							<CommandItem
+								key={tasklist.id}
+								onSelect={() => {
+									router.push(
+										`/${tenant}/projects/${projectId}/tasklists/${tasklist.id}`,
+									);
+									setOpen(false);
+								}}
+							>
+								{tasklist.name}
+							</CommandItem>
+						))}
+						<CommandItem
 							onSelect={() => {
 								router.push(
-									`/${tenant}/projects/${projectId}/tasklists/${tasklist.id}`,
+									`/${tenant}/projects/${projectId}/tasklists?create=true`,
 								);
 								setOpen(false);
 							}}
 						>
-							{tasklist.name}
+							<Plus />
+							Create new tasks list
 						</CommandItem>
-					))}
-					<CommandItem
-						onSelect={() => {
-							router.push(
-								`/${tenant}/projects/${projectId}/tasklists?create=true`,
-							);
-							setOpen(false);
-						}}
-					>
-						<Plus />
-						Create new tasks list
-					</CommandItem>
-				</CommandGroup>
-				<CommandGroup heading="Events">
-					<CommandItem
-						onSelect={() => {
-							router.push(
-								`/${tenant}/projects/${projectId}/events?create=true`,
-							);
-							setOpen(false);
-						}}
-					>
-						<Plus />
-						Create new event
-					</CommandItem>
-				</CommandGroup>
-			</CommandList>
-		</CommandDialog>
+					</CommandGroup>
+					<CommandGroup heading="Events">
+						<CommandItem
+							onSelect={() => {
+								router.push(
+									`/${tenant}/projects/${projectId}/events?create=true`,
+								);
+								setOpen(false);
+							}}
+						>
+							<Plus />
+							Create new event
+						</CommandItem>
+					</CommandGroup>
+				</CommandList>
+			</CommandDialog>
+		</>
 	);
 }
