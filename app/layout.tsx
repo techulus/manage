@@ -1,9 +1,9 @@
+import { PostHogProvider } from "@/components/core/posthog-provider";
 import { ThemeProvider } from "@/components/core/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SITE_METADATA } from "@/data/marketing";
 import { cn } from "@/lib/utils";
 import { ClerkProvider } from "@clerk/nextjs";
-import { OpenPanelComponent } from "@openpanel/nextjs";
 import { Geist } from "next/font/google";
 import "./globals.css";
 
@@ -261,20 +261,14 @@ export default function RootLayout({
 				/>
 			</head>
 			<body className="min-h-full min-w-full flex-1">
-				{process.env.NEXT_PUBLIC_OPEN_PANEL_CLIENT_ID ? (
-					<OpenPanelComponent
-						clientId={process.env.NEXT_PUBLIC_OPEN_PANEL_CLIENT_ID}
-						trackScreenViews
-						trackAttributes
-						trackOutgoingLinks
-					/>
-				) : null}
-				<ClerkProvider>
-					<ThemeProvider>
-						<Toaster position="top-center" />
-						{children}
-					</ThemeProvider>
-				</ClerkProvider>
+				<PostHogProvider>
+					<ClerkProvider>
+						<ThemeProvider>
+							<Toaster position="top-center" />
+							{children}
+						</ThemeProvider>
+					</ClerkProvider>
+				</PostHogProvider>
 			</body>
 		</html>
 	);
