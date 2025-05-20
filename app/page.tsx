@@ -4,21 +4,17 @@ import { PricingSection } from "@/components/landing-page/pricing-section";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SITE_METADATA } from "@/data/marketing";
-import events from "@/public/screenshots/events.png";
-import overview from "@/public/screenshots/overview.png";
-import tasks from "@/public/screenshots/tasks.png";
-import Image from "next/image";
 
 const features = [
 	{
 		name: "task",
-		image: tasks,
+		image: "screenshots/overview.png",
 		title: "Everything you need to manage your tasks",
 		highlight: "manage",
 	},
 	{
 		name: "events",
-		image: events,
+		image: "screenshots/tasks.png",
 		title: "Stay on top of important events",
 		highlight: "events",
 	},
@@ -57,9 +53,9 @@ export default async function Home() {
 						</div>
 						<div className="mt-16 flow-root sm:mt-24">
 							<div className="relative mt-16 h-auto w-[calc(theme(maxWidth.7xl)-theme(spacing.16))]">
-								<Image
+								<img
 									alt="App screenshot"
-									src={overview}
+									src="https://images.techulus.cloud/v1/next?url=https://managee.xyz/screenshots/overview.png&w=1500&h=800"
 									className="rounded-md shadow-2xl ring-1 ring-green-900/10"
 								/>
 							</div>
@@ -98,9 +94,9 @@ export default async function Home() {
 										))}
 								</p>
 								<div className="relative mt-16 h-auto w-[calc(theme(maxWidth.7xl)-theme(spacing.16))]">
-									<Image
+									<img
 										alt={`${feature.name} screenshot`}
-										src={feature.image}
+										src={`https://images.techulus.cloud/v1/next?url=https://managee.xyz/${feature.image}&w=1500&h=800`}
 										className="rounded-md shadow-2xl ring-1 ring-green-900/10 dark:ring-green-50/10"
 									/>
 								</div>
