@@ -1,4 +1,5 @@
 import path from "node:path";
+import { addUserToOpsDb } from "@/ops/useOps";
 import { sql } from "drizzle-orm";
 import { type NodePgDatabase, drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
@@ -17,6 +18,13 @@ export async function isDatabaseReady(): Promise<boolean> {
 	try {
 		await migrateDatabase();
 		await addUserToTenantDb();
+		addUserToOpsDb()
+			.then(() => {
+				console.log("User added to ops database");
+			})
+			.catch((error) => {
+				console.error("Failed to add user to ops database", error);
+			});
 		return true;
 	} catch (e) {
 		console.error("Database not ready", e);
