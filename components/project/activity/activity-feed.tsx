@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import type { ActivityWithActor } from "@/drizzle/types";
 import { generateObjectDiffMessage } from "@/lib/activity/message";
 import { guessTimezone, toDateTimeString } from "@/lib/utils/date";
+import { formatDistanceToNow } from "date-fns";
 import { useTRPC } from "@/trpc/client";
 import { useQuery } from "@tanstack/react-query";
 import { PencilIcon, PlusCircleIcon, TrashIcon } from "lucide-react";
@@ -18,8 +19,8 @@ export function ActivityItem({
 	isLast,
 }: { item: ActivityWithActor; isLast: boolean }) {
 	return (
-		<li key={item.id} className="hover:bg-muted/50 transition-colors">
-			<div className="relative px-4 pt-4">
+		<li key={item.id} className="hover:bg-muted/30 transition-colors rounded-lg">
+			<div className="relative px-4 py-4">
 				{!isLast ? (
 					<span
 						className="absolute left-[2.25rem] top-12 h-[3rem] w-[2px] bg-border"
@@ -65,19 +66,25 @@ export function ActivityItem({
 						</div>
 					</div>
 					<div className="min-w-0 flex-1">
-						<div className="flex flex-col text-sm sm:flex-row sm:items-center sm:gap-2">
-							<a
-								href={item.actor.id}
-								className="font-medium text-primary hover:underline"
-							>
+						<div className="flex flex-col text-sm sm:flex-row sm:items-baseline sm:gap-2">
+							<span className="font-medium text-primary">
 								{item.actor.firstName}
-							</a>
-							<span className="text-muted-foreground text-xs">
-								{toDateTimeString(item.createdAt, guessTimezone)}
+							</span>
+							<span className="text-muted-foreground text-xs" title={toDateTimeString(item.createdAt, guessTimezone)}>
+								{formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
 							</span>
 						</div>
-						<div className="mt-1 prose dark:prose-invert max-w-none">
-							<Markdown>{generateObjectDiffMessage(item)}</Markdown>
+						<div className="mt-1 prose dark:prose-invert max-w-none prose-sm text-sm leading-relaxed">
+							<Markdown 
+								components={{
+									p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+									strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+									ul: ({ children }) => <ul className="ml-4 mt-1 space-y-1">{children}</ul>,
+									li: ({ children }) => <li className="text-muted-foreground">{children}</li>
+								}}
+							>
+								{generateObjectDiffMessage(item)}
+							</Markdown>
 						</div>
 					</div>
 				</div>
@@ -127,7 +134,7 @@ export function ActivityFeed() {
 		<div className="flex flex-col w-full">
 			{allActivities.length ? (
 				<>
-					<ul className="w-full space-y-4">
+					<ul className="w-full space-y-2">
 						{allActivities.map((activityItem, activityItemIdx) => (
 							<ActivityItem
 								key={activityItem.id}
