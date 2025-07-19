@@ -31,7 +31,7 @@ export default function TaskLists() {
 
 	const { updateTaskList, tidyUpTaskList } = useTaskLists();
 
-	const totalCount = list?.tasks.length;
+	const totalCount = list?.tasks.filter(task => task.status !== TaskStatus.DELETED).length;
 	const doneCount = list?.tasks.filter(
 		(task) => task.status === TaskStatus.DONE,
 	).length;

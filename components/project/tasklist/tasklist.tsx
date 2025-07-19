@@ -122,7 +122,7 @@ export const TaskListItem = ({
 			{!hideHeader ? (
 				<TaskListHeader
 					taskList={taskList}
-					totalCount={taskList.tasks.length}
+					totalCount={taskList.tasks.filter(task => task.status !== TaskStatus.DELETED).length}
 					doneCount={doneItems.length}
 				/>
 			) : null}
