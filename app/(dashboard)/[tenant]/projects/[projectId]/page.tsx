@@ -187,7 +187,7 @@ export default function ProjectDetails() {
 								<div key={taskList.id} className="overflow-hidden rounded-lg ">
 									<TaskListHeader
 										taskList={taskList}
-										totalCount={taskList.tasks.length}
+										totalCount={taskList.tasks.filter(task => task.status !== "deleted").length}
 										doneCount={
 											taskList.tasks.filter((task) => task.status === "done")
 												.length
