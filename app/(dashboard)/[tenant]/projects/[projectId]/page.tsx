@@ -18,6 +18,7 @@ import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
 import { CalendarIcon, ListIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { TaskStatus } from "@/drizzle/types";
 
 export default function ProjectDetails() {
 	const router = useRouter();
@@ -187,9 +188,9 @@ export default function ProjectDetails() {
 								<div key={taskList.id} className="overflow-hidden rounded-lg ">
 									<TaskListHeader
 										taskList={taskList}
-										totalCount={taskList.tasks.filter(task => task.status !== "deleted").length}
+										totalCount={taskList.tasks.filter(task => task.status !== TaskStatus.DELETED).length}
 										doneCount={
-											taskList.tasks.filter((task) => task.status === "done")
+											taskList.tasks.filter((task) => task.status === TaskStatus.DONE)
 												.length
 										}
 									/>
