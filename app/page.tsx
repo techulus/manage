@@ -19,7 +19,7 @@ export default async function Home() {
 			{/* Hero Section */}
 			<section className="px-4 pt-32 pb-32 text-center">
 				<div className="mx-auto max-w-6xl">
-					<h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-[-0.02em] text-gray-900 dark:text-white leading-[0.9]">
+					<h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.02em] text-gray-900 dark:text-white leading-[0.9]">
 						The{" "}
 						<span className="text-green-600 dark:text-green-400">
 							project management
@@ -51,7 +51,7 @@ export default async function Home() {
 								<div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center shadow-sm shadow-green-200/50 group-hover:shadow-green-300/60 transition-shadow">
 									<ListTodoIcon className="w-6 h-6 text-white" />
 								</div>
-								<span className="text-lg font-bold tracking-[-0.01em] text-green-600 dark:text-green-400">
+								<span className="text-base font-bold tracking-[-0.01em] text-green-600 dark:text-green-400">
 									Tasks
 								</span>
 							</div>
@@ -85,12 +85,12 @@ export default async function Home() {
 								<div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-pink-600 rounded-2xl flex items-center justify-center shadow-sm shadow-pink-200/50 group-hover:shadow-pink-300/60 transition-shadow">
 									<CalendarIcon className="w-6 h-6 text-white" />
 								</div>
-								<span className="text-lg font-bold tracking-[-0.01em] text-pink-600 dark:text-pink-400">
+								<span className="text-base font-bold tracking-[-0.01em] text-pink-600 dark:text-pink-400">
 									Calendar
 								</span>
 							</div>
 							<div className="space-y-6">
-								<div className="text-3xl font-bold tracking-[-0.02em] text-gray-900 dark:text-gray-100">
+								<div className="text-2xl font-bold tracking-[-0.02em] text-gray-900 dark:text-gray-100">
 									Thu, Apr 17
 								</div>
 								<div className="space-y-3">
@@ -112,7 +112,7 @@ export default async function Home() {
 								<div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center shadow-sm shadow-blue-200/50 group-hover:shadow-blue-300/60 transition-shadow">
 									<FolderIcon className="w-6 h-6 text-white" />
 								</div>
-								<span className="text-lg font-bold tracking-[-0.01em] text-blue-600 dark:text-blue-400">
+								<span className="text-base font-bold tracking-[-0.01em] text-blue-600 dark:text-blue-400">
 									Files
 								</span>
 							</div>
@@ -159,7 +159,7 @@ export default async function Home() {
 							<div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center shadow-sm shadow-purple-200/50 dark:shadow-purple-800/50">
 								<UsersIcon className="w-6 h-6 text-white" />
 							</div>
-							<span className="text-xl font-bold tracking-[-0.01em] text-purple-600 dark:text-purple-400">
+							<span className="text-lg font-bold tracking-[-0.01em] text-purple-600 dark:text-purple-400">
 								Recent Activity
 							</span>
 						</div>
@@ -232,7 +232,7 @@ export default async function Home() {
 				</div>
 
 				<div className="mx-auto max-w-6xl text-center relative z-10">
-					<h2 className="text-5xl font-bold tracking-[-0.02em] text-gray-900 dark:text-white mb-6 leading-tight">
+					<h2 className="text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-gray-900 dark:text-white mb-6 leading-tight">
 						Essential tools that keep your team{" "}
 						<span className="text-green-600 dark:text-green-400 relative">
 							productive
@@ -280,7 +280,7 @@ export default async function Home() {
 								>
 									{feature.icon}
 								</div>
-								<h3 className="font-bold tracking-[-0.01em] text-gray-900 dark:text-white mb-2 text-lg">
+								<h3 className="font-bold tracking-[-0.01em] text-gray-900 dark:text-white mb-2 text-base">
 									{feature.name}
 								</h3>
 								<p className="text-gray-600 dark:text-gray-400 leading-relaxed">
@@ -297,7 +297,7 @@ export default async function Home() {
 				<div className="mx-auto max-w-7xl relative z-10">
 					<div className="grid lg:grid-cols-2 gap-20 items-center">
 						<div>
-							<h2 className="text-5xl font-bold tracking-[-0.02em] mb-8 leading-tight">
+							<h2 className="text-3xl sm:text-4xl font-bold tracking-[-0.02em] mb-8 leading-tight">
 								Transparent, audited, &<br />
 								<span className="text-green-400 relative">
 									open source
@@ -379,7 +379,7 @@ export default async function Home() {
 				</div>
 
 				<div className="mx-auto max-w-4xl relative z-10">
-					<h2 className="text-5xl font-bold tracking-[-0.02em] text-gray-900 dark:text-white mb-6 leading-tight">
+					<h2 className="text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-gray-900 dark:text-white mb-6 leading-tight">
 						Ready to transform your{" "}
 						<span className="text-green-600 dark:text-green-400 relative">
 							workflow
