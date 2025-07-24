@@ -4,7 +4,7 @@ import { type NodePgDatabase, drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import * as schema from "./drizzle/schema";
 
-async function getOpsDatabase(): Promise<NodePgDatabase<typeof schema>> {
+export async function getOpsDatabase(): Promise<NodePgDatabase<typeof schema>> {
 	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
 
 	const ownerDb = drizzle(`${process.env.DATABASE_URL}/manage${sslMode}`, {
@@ -69,6 +69,8 @@ export async function addUserToOpsDb() {
 					name: organization.name,
 					rawData: organization,
 					lastActiveAt: new Date(),
+					markedForDeletionAt: null,
+					finalWarningAt: null,
 				},
 			})
 			.execute();

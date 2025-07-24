@@ -12,8 +12,66 @@ const mainFont = Geist({
 });
 
 export const metadata = {
-	title: SITE_METADATA.TITLE,
+	title: {
+		default: SITE_METADATA.TITLE,
+		template: "%s | Manage"
+	},
 	description: SITE_METADATA.DESCRIPTION,
+	keywords: [
+		"project management",
+		"open source",
+		"team collaboration",
+		"task management",
+		"productivity",
+		"calendar",
+		"file sharing",
+		"activity tracking",
+		"multi-tenant"
+	],
+	authors: [{ name: "Techulus", url: "https://github.com/techulus" }],
+	creator: "Techulus",
+	publisher: "Techulus",
+	formatDetection: {
+		email: false,
+		address: false,
+		telephoneNo: false,
+	},
+	openGraph: {
+		title: SITE_METADATA.TITLE,
+		description: SITE_METADATA.DESCRIPTION,
+		url: "https://managee.xyz",
+		siteName: "Manage",
+		type: "website",
+		images: [
+			{
+				url: "/screenshots/overview.png",
+				width: 1200,
+				height: 630,
+				alt: "Manage - Project Management Dashboard"
+			}
+		]
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: SITE_METADATA.TITLE,
+		description: SITE_METADATA.DESCRIPTION,
+		creator: "@arjunz",
+		images: ["/screenshots/overview.png"]
+	},
+	robot: {
+		index: true,
+		follow: true,
+		googleBot: {
+			index: true,
+			follow: true,
+			"max-video-preview": -1,
+			"max-image-preview": "large",
+			"max-snippet": -1,
+		},
+	},
+	alternates: {
+		canonical: "https://managee.xyz"
+	}
 };
 
 export default function RootLayout({
