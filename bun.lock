@@ -37,7 +37,7 @@
         "@trpc/tanstack-react-query": "^11.0.2",
         "@turbowire/serverless": "^0.1.0",
         "@turbowire/web": "^0.3.0",
-        "@upstash/workflow": "^0.2.14",
+        "@upstash/workflow": "^0.2.16",
         "autoprefixer": "10.4.14",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
@@ -1069,7 +1069,7 @@
 
     "@upstash/qstash": ["@upstash/qstash@2.8.1", "", { "dependencies": { "crypto-js": ">=4.2.0", "jose": "^5.2.3", "neverthrow": "^7.0.1" } }, "sha512-E+JoLHMqygQksWATjS/9AAo7Mhi/k21Tu0zDwMm9GyNyNVjEJntQvmrH5NC7x6kXwjCDTEWFtIWz0JXu9/9pMQ=="],
 
-    "@upstash/workflow": ["@upstash/workflow@0.2.14", "", { "dependencies": { "@ai-sdk/openai": "^1.2.1", "@upstash/qstash": "^2.8.1", "ai": "^4.1.54", "zod": "^3.24.1" } }, "sha512-7w5jfdmJ81QF6z512MS7kgzvfF68YnyLnDwkCDYSA/yBq7VbqloD7jr52ixMsgTUG4Z/pbmUsV2JxhRn5v1x4A=="],
+    "@upstash/workflow": ["@upstash/workflow@0.2.16", "", { "dependencies": { "@ai-sdk/openai": "^1.2.1", "@upstash/qstash": "^2.8.1", "ai": "^4.1.54", "zod": "^3.24.1" } }, "sha512-9mqC3p5B9i92gf1KMEZhDcU5YMEut0hkWxmf2gsDcJVCcbLD958MEDT2q2wGZa7MnKAuvEOYNDSefi0x2a5pGQ=="],
 
     "@webassemblyjs/ast": ["@webassemblyjs/ast@1.14.1", "", { "dependencies": { "@webassemblyjs/helper-numbers": "1.13.2", "@webassemblyjs/helper-wasm-bytecode": "1.13.2" } }, "sha512-nuBEDgQfm1ccRp/8bCQrx1frohyufl4JlbMMZ4P1wpeOfDhF6FQkxZJ1b/e+PLwr6X1Nhw6OLme5usuBWYBvuQ=="],
 

@@ -18,7 +18,9 @@ type ClerkOrgData = {
 
 export const { POST } = serve(async (context) => {
 	const resend = new Resend(process.env.RESEND_API_KEY);
-	console.log(`[OrgDeletion] Resend API Key configured: ${process.env.RESEND_API_KEY ? 'Yes' : 'No'}`);
+	console.log(
+		`[OrgDeletion] Resend API Key configured: ${process.env.RESEND_API_KEY ? "Yes" : "No"}`,
+	);
 
 	console.log(
 		"[OrgDeletion] Starting organization deletion job at",
@@ -30,19 +32,6 @@ export const { POST } = serve(async (context) => {
 		"[OrgDeletion] Looking for orgs inactive since:",
 		thirtyDaysAgo.toISOString(),
 	);
-	
-	// Debug: Show all organizations in ops database
-	const allOrgs = await db.select().from(opsOrganization);
-	console.log(`[OrgDeletion] Total organizations in ops database: ${allOrgs.length}`);
-	if (allOrgs.length > 0) {
-		console.log("[OrgDeletion] All organizations:", allOrgs.map(o => ({
-			id: o.id,
-			name: o.name,
-			lastActiveAt: o.lastActiveAt?.toISOString(),
-			markedForDeletionAt: o.markedForDeletionAt?.toISOString(),
-			finalWarningAt: o.finalWarningAt?.toISOString()
-		})));
-	}
 
 	// Step 1: Mark organizations for deletion (30 days inactive)
 	const orgsToMark = await context.run("fetch-orgs-to-mark", async () => {
@@ -99,10 +88,15 @@ export const { POST } = serve(async (context) => {
 				console.log(
 					`[OrgDeletion] Processing org ${org.name} (${org.id}), contact email: ${contactEmail}`,
 				);
-				console.log(`[OrgDeletion] Raw org data for ${org.name}:`, JSON.stringify(rawData, null, 2));
+				console.log(
+					`[OrgDeletion] Raw org data for ${org.name}:`,
+					JSON.stringify(rawData, null, 2),
+				);
 
 				// Send 30-day deletion notice
-				console.log(`[OrgDeletion] Sending 30-day notice email to ${contactEmail} for org ${org.name}`);
+				console.log(
+					`[OrgDeletion] Sending 30-day notice email to ${contactEmail} for org ${org.name}`,
+				);
 				const emailResult = await resend.emails.send({
 					from: "noreply@email.managee.xyz",
 					to: contactEmail,
@@ -113,7 +107,10 @@ export const { POST } = serve(async (context) => {
 						organizationName: org.name,
 					}),
 				});
-				console.log(`[OrgDeletion] Email send result for ${org.name}:`, JSON.stringify(emailResult, null, 2));
+				console.log(
+					`[OrgDeletion] Email send result for ${org.name}:`,
+					JSON.stringify(emailResult, null, 2),
+				);
 
 				// Mark organization for deletion
 				await db
@@ -195,7 +192,9 @@ export const { POST } = serve(async (context) => {
 				);
 
 				// Send 7-day warning
-				console.log(`[OrgDeletion] Sending 7-day warning email to ${contactEmail} for org ${org.name}`);
+				console.log(
+					`[OrgDeletion] Sending 7-day warning email to ${contactEmail} for org ${org.name}`,
+				);
 				const emailResult = await resend.emails.send({
 					from: "noreply@email.managee.xyz",
 					to: contactEmail,
@@ -206,7 +205,10 @@ export const { POST } = serve(async (context) => {
 						organizationName: org.name,
 					}),
 				});
-				console.log(`[OrgDeletion] 7-day warning email result for ${org.name}:`, JSON.stringify(emailResult, null, 2));
+				console.log(
+					`[OrgDeletion] 7-day warning email result for ${org.name}:`,
+					JSON.stringify(emailResult, null, 2),
+				);
 
 				// Mark final warning sent
 				await db

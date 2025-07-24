@@ -12,6 +12,7 @@ const mainFont = Geist({
 });
 
 export const metadata = {
+	metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://managee.xyz'),
 	title: {
 		default: SITE_METADATA.TITLE,
 		template: "%s | Manage"
