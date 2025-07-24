@@ -13,59 +13,71 @@ import {
 export function FeaturesSection() {
 	const features = [
 		{
-			title: "Open-source",
+			title: "Open Source & Transparent",
 			description:
-				"Built for engineers, developers, dreamers, thinkers and doers.",
+				"Fully open-source codebase with complete transparency. Customize, extend, and contribute to the platform.",
 			icon: <TerminalIcon />,
 		},
 		{
-			title: "Ease of use",
+			title: "Intuitive Interface",
 			description:
-				"Easily manage your tasks, events, files & more with a single click.",
+				"Clean, modern design that gets out of your way. Manage tasks, events, and files with minimal clicks.",
 			icon: <ShieldQuestion />,
 		},
 		{
-			title: "File Sharing",
+			title: "Seamless File Sharing",
 			description:
-				"Upload and share files within your team to centralize project resources.",
+				"Upload, organize, and share files within your team. Keep all project resources in one centralized location.",
 			icon: <Cloud />,
 		},
 		{
-			title: "Pricing like no other",
+			title: "Simple Pricing",
 			description:
-				"It's free to self-host, we might charge you for the cloud version.",
+				"Free to self-host forever. Affordable cloud hosting with no hidden fees or usage limits.",
 			icon: <DollarSign />,
 		},
 		{
-			title: "Multi-tenant Architecture",
+			title: "Team Management",
 			description:
-				"Efficiently manage users and teams with integrated authentication and authorization.",
+				"Multi-tenant architecture with role-based permissions. Scale from small teams to large organizations.",
 			icon: <RouterIcon />,
 		},
 		{
-			title: "Commenting System",
+			title: "Real-time Collaboration",
 			description:
-				"Facilitate discussions and feedback with a built-in commenting feature.",
+				"Live comments, instant notifications, and real-time updates keep your team in sync.",
 			icon: <HelpCircle />,
 		},
 		{
-			title: "Activity Logs",
+			title: "Complete Visibility",
 			description:
-				"Monitor project activities with comprehensive activity logs.",
+				"Comprehensive activity logs and progress tracking. Never lose sight of project momentum.",
 			icon: <CloudLightning />,
 		},
 		{
-			title: "And everything else",
-			description: "I just ran out of copy ideas. Accept my sincere apologies",
+			title: "Developer-First",
+			description: "Built by developers, for developers. API-first design with webhook integrations and automation.",
 			icon: <HeartIcon />,
 		},
 	];
 	return (
-		<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 relative z-10 py-12 max-w-7xl mx-auto">
-			{features.map((feature, index) => (
-				<Feature key={feature.title} {...feature} index={index} />
-			))}
-		</div>
+		<section className="py-24 sm:py-32 bg-white dark:bg-gray-800">
+			<div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+				<div className="text-center mb-20">
+					<h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 dark:text-white mb-4">
+						Everything you need in one place
+					</h2>
+					<p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+						Powerful project management features that actually make your team more productive.
+					</p>
+				</div>
+				<div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">
+					{features.map((feature, index) => (
+						<Feature key={feature.title} {...feature} index={index} />
+					))}
+				</div>
+			</div>
+		</section>
 	);
 }
 
@@ -81,29 +93,16 @@ const Feature = ({
 	index: number;
 }) => {
 	return (
-		<div
-			className={cn(
-				"flex flex-col lg:border-r  py-10 relative group/feature dark:border-neutral-800",
-				(index === 0 || index === 4) && "lg:border-l dark:border-neutral-800",
-				index < 4 && "lg:border-b dark:border-neutral-800",
-			)}
-		>
-			{index < 4 && (
-				<div className="opacity-0 group-hover/feature:opacity-100 transition duration-200 absolute inset-0 h-full w-full bg-gradient-to-t from-neutral-100 dark:from-neutral-800 to-transparent pointer-events-none" />
-			)}
-			{index >= 4 && (
-				<div className="opacity-0 group-hover/feature:opacity-100 transition duration-200 absolute inset-0 h-full w-full bg-gradient-to-b from-neutral-100 dark:from-neutral-800 to-transparent pointer-events-none" />
-			)}
-			<div className="mb-4 relative z-10 px-10 text-neutral-600 dark:text-neutral-400">
-				{icon}
+		<div className="text-center">
+			<div className="flex items-center justify-center w-16 h-16 bg-green-100 rounded-2xl mx-auto mb-6 dark:bg-green-900/20">
+				<div className="w-8 h-8 text-green-600 dark:text-green-400">
+					{icon}
+				</div>
 			</div>
-			<div className="text-lg font-bold mb-2 relative z-10 px-10">
-				<div className="absolute left-0 inset-y-0 h-6 group-hover/feature:h-8 w-1 rounded-tr-full rounded-br-full bg-neutral-300 dark:bg-neutral-700 group-hover/feature:bg-primary transition-all duration-200 origin-center" />
-				<span className="group-hover/feature:translate-x-2 transition duration-200 inline-block text-primary">
-					{title}
-				</span>
-			</div>
-			<p className="text-sm text-neutral-600 dark:text-neutral-300 max-w-xs relative z-10 px-10">
+			<h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+				{title}
+			</h3>
+			<p className="text-gray-600 dark:text-gray-300 leading-7 text-lg">
 				{description}
 			</p>
 		</div>

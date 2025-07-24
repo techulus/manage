@@ -3,26 +3,30 @@ import { buttonVariants } from "../ui/button";
 
 function CTA() {
 	return (
-		<div className="w-full py-8">
-			<div className="mx-auto max-w-7xl px-6 sm:py-24 lg:px-8">
-				<h2 className="max-w-2xl text-balance text-xl font-semibold sm:text-5xl">
-					<span className="text-primary font-extrabold">Boost</span> your
-					productivity. Start using{" "}
-					<span className="text-primary font-extrabold">Manage</span> today.
+		<section className="py-24 sm:py-32 bg-white dark:bg-gray-800">
+			<div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
+				<h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 dark:text-white mb-6">
+					Ready to get started?
 				</h2>
-				<div className="mt-10 flex items-center gap-x-6">
+				<p className="text-xl text-gray-600 dark:text-gray-300 mb-10">
+					Join the beta and help shape the future of project management.
+				</p>
+				<div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
 					<Link
-						href="http://github.com/techulus/manage"
-						className={buttonVariants({
-							variant: "default",
-							className: "flex items-center gap-2 p-8",
-						})}
+						href="/start"
+						className="inline-flex items-center px-8 py-4 text-lg font-semibold text-white bg-green-600 rounded-lg shadow-lg shadow-green-600/25 border-b-4 border-green-700 hover:bg-green-500 hover:border-green-600 active:border-green-600 active:shadow-md active:translate-y-0.5 transition-all duration-150"
 					>
-						Find on GitHub
+						Start for free →
+					</Link>
+					<Link
+						href="https://github.com/techulus/manage"
+						className="text-lg font-semibold text-gray-600 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400"
+					>
+						View on GitHub
 					</Link>
 				</div>
 			</div>
-		</div>
+		</section>
 	);
 }
 
