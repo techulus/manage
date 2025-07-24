@@ -4,77 +4,51 @@ import { buttonVariants } from "../ui/button";
 
 export function PricingSection() {
 	return (
-		<div className="py-12">
-			<div className="mx-auto max-w-7xl px-6 lg:px-8">
-				<div className="mx-auto mt-16 max-w-2xl rounded-3xl sm:mt-20 lg:mx-0 lg:flex lg:max-w-none">
-					<div className="p-8 sm:p-10 lg:flex-auto">
-						<h3 className="text-4xl font-bold tracking-tighter">
-							<span className="text-primary font-extrabold">Free</span> during
-							public beta
+		<section className="py-24 sm:py-32 bg-gray-50 dark:bg-gray-900">
+			<div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
+				<h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 dark:text-white mb-6">
+					Simple pricing
+				</h2>
+				<p className="text-xl text-gray-600 dark:text-gray-300 mb-12">
+					Free during beta. Fair pricing when we launch.
+				</p>
+				
+				<div className="inline-block p-8 bg-white rounded-2xl shadow-lg dark:bg-gray-800 text-left max-w-md">
+					<div className="text-center mb-6">
+						<h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+							Beta Access
 						</h3>
-						<div className="mt-10 flex items-center gap-x-4">
-							<h4 className="flex-none text-lg font-semibold leading-6">
-								What's included
-							</h4>
-							<div className="h-px flex-auto" />
+						<div className="text-5xl font-bold text-gray-900 dark:text-white mb-2">
+							Free
 						</div>
-						<ul className="mt-8 grid grid-cols-1 gap-4 text-sm leading-6">
-							<li className="flex gap-x-3">
-								<CheckCircleIcon
-									className="h-6 w-5 flex-none text-primary"
-									aria-hidden="true"
-								/>
-								All core features
-							</li>
-							<li className="flex gap-x-3">
-								<CheckCircleIcon
-									className="h-6 w-5 flex-none text-primary"
-									aria-hidden="true"
-								/>
-								Unlimited projects, tasks and events
-							</li>
-							<li className="flex gap-x-3">
-								<CheckCircleIcon
-									className="h-6 w-5 flex-none text-primary"
-									aria-hidden="true"
-								/>
-								Single organization workspace
-							</li>
-							<li className="flex gap-x-3">
-								<CheckCircleIcon
-									className="h-6 w-5 flex-none text-primary"
-									aria-hidden="true"
-								/>
-								Suggest features and influence roadmap
-							</li>
-						</ul>
+						<p className="text-gray-600 dark:text-gray-400">
+							Until launch
+						</p>
 					</div>
-					<div className="-mt-2 p-2 lg:mt-0 lg:w-full lg:max-w-md lg:flex-shrink-0">
-						<div className="rounded-2xl py-10 text-center lg:flex lg:flex-col lg:justify-center lg:py-16 border">
-							<div className="mx-auto max-w-xs px-8">
-								<p className="text-base font-semibold">Pricing</p>
-								<p className="mt-6 flex items-baseline justify-center gap-x-2">
-									<span className="text-5xl font-bold tracking-tight text-primary">
-										$0
-									</span>
-									<span className="text-sm font-semibold leading-6 tracking-wide">
-										during beta
-									</span>
-								</p>
-								<p className="mt-6 text-sm leading-5">
-									Future pricing will include monthly and annual subscription
-									options
-								</p>
-								<div className="mt-10">
-									<Link href="/start" className={buttonVariants()}>
-										Get started for free
-									</Link>
-								</div>
-							</div>
-						</div>
-					</div>
+					
+					<ul className="space-y-3 mb-8">
+						{[
+							"Unlimited projects",
+							"Team collaboration",
+							"File sharing",
+							"Real-time updates",
+							"Priority support"
+						].map((feature) => (
+							<li key={feature} className="flex items-center">
+								<CheckCircleIcon className="h-5 w-5 text-green-600 dark:text-green-400 mr-3 flex-shrink-0" />
+								<span className="text-gray-700 dark:text-gray-300">{feature}</span>
+							</li>
+						))}
+					</ul>
+					
+					<Link
+						href="/start"
+						className="w-full block text-center bg-green-600 text-white py-3 px-6 rounded-lg font-semibold shadow-lg shadow-green-600/25 border-b-4 border-green-700 hover:bg-green-500 hover:border-green-600 active:border-green-600 active:shadow-md active:translate-y-0.5 transition-all duration-150"
+					>
+						Get started free
+					</Link>
 				</div>
 			</div>
-		</div>
+		</section>
 	);
 }

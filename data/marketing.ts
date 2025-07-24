@@ -1,6 +1,6 @@
 export const SITE_METADATA = {
 	TITLE: "Manage [beta]",
-	TAGLINE: "Your Open-Source Gateway to Seamless Project Collaboration",
+	TAGLINE: "The project management tool your team will actually want to use",
 	DESCRIPTION:
-		"Discover Manage, the open-source project management tool that redefines team collaboration. Manage offers an intuitive interface and customizable features, empowering teams to boost productivity and achieve project success.",
+		"Beautiful, fast, and open-source. Manage brings simplicity back to project management with intuitive task tracking, seamless collaboration, and all the features your team needs.",
 };
