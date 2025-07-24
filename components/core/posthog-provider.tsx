@@ -34,7 +34,7 @@ function PostHogPageView() {
       let url = window.origin + pathname
       const search = searchParams.toString()
       if (search) {
-        url += "?" + search
+        url += `?${search}`
       }
       posthog.capture("$pageview", { "$current_url": url })
     }

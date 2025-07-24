@@ -11,7 +11,7 @@ function toDateString(date: any) {
 	const dateObj = typeof date === "string" ? new Date(date) : date;
 	
 	// Check if it's a valid date
-	if (dateObj instanceof Date && !isNaN(dateObj.getTime())) {
+	if (dateObj instanceof Date && !Number.isNaN(dateObj.getTime())) {
 		return toDateStringWithDay(dateObj, guessTimezone);
 	}
 	
@@ -152,16 +152,25 @@ export function generateObjectDiffMessage(item: ActivityWithActor) {
 				} else if (!newValue[key] && oldValue[key]) {
 					changes.push(`removed ${fieldLabel}`);
 				} else if (newValue[key] && !oldValue[key]) {
-					changes.push(`set ${fieldLabel} to **${newValue[key]}**`);
+					// Handle adding new values more nicely
+					if (key === 'position') {
+						changes.push("repositioned");
+					} else {
+						changes.push(`set ${fieldLabel} to **${newValue[key]}**`);
+					}
 				} else {
-					// Handle status changes with better formatting
-					if (key === 'status') {
+					// Handle different field types with specific formatting
+					if (key === 'position') {
+						changes.push("repositioned");
+					} else if (key === 'status') {
 						changes.push(
-							`changed status from **${oldValue[key]}** to **${newValue[key]}**`
+							`changed status from **${oldValue[key] || '-'}** to **${newValue[key]}**`
 						);
 					} else {
+						// Improve display of null/undefined old values
+						const oldDisplay = oldValue[key] || '-';
 						changes.push(
-							`changed ${fieldLabel} from **${oldValue[key]}** to **${newValue[key]}**`
+							`changed ${fieldLabel} from **${oldDisplay}** to **${newValue[key]}**`
 						);
 					}
 				}
