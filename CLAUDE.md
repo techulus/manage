@@ -103,3 +103,7 @@ RESEND_API_KEY=
 - Docker support available via `docker-compose.yml`
 - Turbopack enabled for faster development builds
 - UI components ignore linting (see `biome.json`)
+```
+
+## Product Insights
+- The product name is Manage, even though domain name is managee.xyz
