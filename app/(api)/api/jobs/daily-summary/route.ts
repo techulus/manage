@@ -1,15 +1,11 @@
 import { DailySummary } from "@/components/emails/daily-summary";
-import { calendarEvent, task, user as userSchema } from "@/drizzle/schema";
-import { TaskStatus } from "@/drizzle/types";
+import { user as userSchema } from "@/drizzle/schema";
+import { getTodayDataForUser } from "@/lib/utils/todayData";
 import { getDatabaseForOwner } from "@/lib/utils/useDatabase";
-import {
-	filterByRepeatRule,
-	getStartEndDateRangeInUtc,
-} from "@/lib/utils/useEvents";
 import { opsUser } from "@/ops/drizzle/schema";
 import { getOpsDatabase } from "@/ops/useOps";
 import { serve } from "@upstash/workflow/nextjs";
-import { and, between, eq, gte, isNotNull, lt, or } from "drizzle-orm";
+import { eq, gte } from "drizzle-orm";
 import { Resend } from "resend";
 
 export const { POST } = serve(async (context) => {
@@ -92,105 +88,17 @@ async function processUserSummary(
 
 		// Get today's data using the same logic as getTodayData
 		const today = new Date();
-		const { startOfDay, endOfDay } = getStartEndDateRangeInUtc(timezone, today);
-
-		const [tasksDueToday, overDueTasks, events] = await Promise.all([
-			// Tasks due today
-			db.query.task.findMany({
-				where: and(
-					between(task.dueDate, startOfDay, endOfDay),
-					eq(task.status, TaskStatus.TODO),
-					isNotNull(task.dueDate),
-				),
-				columns: {
-					name: true,
-					dueDate: true,
-					id: true,
-				},
-				with: {
-					taskList: {
-						columns: {
-							id: true,
-							status: true,
-							name: true,
-						},
-						with: {
-							project: {
-								columns: {
-									id: true,
-									name: true,
-								},
-							},
-						},
-					},
-				},
-			}),
-			// Overdue tasks
-			db.query.task.findMany({
-				where: and(
-					lt(task.dueDate, startOfDay),
-					eq(task.status, TaskStatus.TODO),
-					isNotNull(task.dueDate),
-				),
-				columns: {
-					name: true,
-					dueDate: true,
-					id: true,
-				},
-				with: {
-					taskList: {
-						columns: {
-							id: true,
-							status: true,
-							name: true,
-						},
-						with: {
-							project: {
-								columns: {
-									id: true,
-									name: true,
-								},
-							},
-						},
-					},
-				},
-			}),
-			// Today's events
-			db.query.calendarEvent.findMany({
-				where: and(
-					or(
-						between(calendarEvent.start, startOfDay, endOfDay),
-						between(calendarEvent.end, startOfDay, endOfDay),
-						and(
-							lt(calendarEvent.start, startOfDay),
-							between(calendarEvent.end, startOfDay, endOfDay),
-						),
-						isNotNull(calendarEvent.repeatRule),
-						eq(calendarEvent.start, startOfDay),
-						eq(calendarEvent.end, endOfDay),
-					),
-				),
-				with: {
-					project: {
-						columns: {
-							id: true,
-							name: true,
-						},
-					},
-				},
-			}),
-		]);
-
-		// Filter events by repeat rule
-		const filteredEvents = events.filter((event) =>
-			filterByRepeatRule(event, today, timezone),
+		const { dueToday, overDue, events } = await getTodayDataForUser(
+			db,
+			timezone,
+			today,
 		);
 
 		// Only send email if user has relevant content
 		const hasContent =
-			tasksDueToday.length > 0 ||
-			overDueTasks.length > 0 ||
-			filteredEvents.length > 0;
+			dueToday.length > 0 ||
+			overDue.length > 0 ||
+			events.length > 0;
 
 		if (!hasContent) {
 			console.log(
@@ -200,7 +108,7 @@ async function processUserSummary(
 		}
 
 		console.log(
-			`[DailySummary] Sending summary to ${email}: ${overDueTasks.length} overdue, ${tasksDueToday.length} due today, ${filteredEvents.length} events`,
+			`[DailySummary] Sending summary to ${email}: ${overDue.length} overdue, ${dueToday.length} due today, ${events.length} events`,
 		);
 
 		// Send daily summary email
@@ -213,9 +121,9 @@ async function processUserSummary(
 				email,
 				timezone,
 				date: today,
-				overdueTasks: overDueTasks,
-				dueToday: tasksDueToday,
-				events: filteredEvents,
+				overdueTasks: overDue,
+				dueToday: dueToday,
+				events: events,
 			}),
 		});
 

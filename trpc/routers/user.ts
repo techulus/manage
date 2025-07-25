@@ -1,30 +1,17 @@
 import {
-	calendarEvent,
 	notification,
 	project,
-	task,
 	user,
 } from "@/drizzle/schema";
-import {
-	type NotificationWithUser,
-	TaskListStatus,
-	TaskStatus,
+import type {
+	NotificationWithUser,
 } from "@/drizzle/types";
+import { getTodayDataForUser } from "@/lib/utils/todayData";
 import { broadcastEvent, getSignedWireUrl } from "@/lib/utils/turbowire";
-import {
-	filterByRepeatRule,
-	getStartEndDateRangeInUtc,
-} from "@/lib/utils/useEvents";
 import { currentUser } from "@clerk/nextjs/server";
 import {
-	and,
-	asc,
-	between,
 	desc,
 	eq,
-	gt,
-	isNotNull,
-	lt,
 	or,
 } from "drizzle-orm";
 import { z } from "zod";
@@ -70,116 +57,7 @@ export const userRouter = createTRPCRouter({
 		await broadcastEvent("notifications", ctx.userId);
 	}),
 	getTodayData: protectedProcedure.query(async ({ ctx }) => {
-		const today = new Date();
-		const { startOfDay, endOfDay } = getStartEndDateRangeInUtc(
-			ctx.timezone,
-			today,
-		);
-
-		const [tasksDueToday, overDueTasks, events] = await Promise.all([
-			ctx.db.query.task.findMany({
-				where: and(
-					between(task.dueDate, startOfDay, endOfDay),
-					eq(task.status, TaskStatus.TODO),
-					isNotNull(task.dueDate),
-				),
-				orderBy: [asc(task.position)],
-				columns: {
-					name: true,
-					dueDate: true,
-					id: true,
-				},
-				with: {
-					taskList: {
-						columns: {
-							id: true,
-							status: true,
-							name: true,
-						},
-						with: {
-							project: {
-								columns: {
-									id: true,
-									name: true,
-								},
-							},
-						},
-					},
-				},
-			}),
-			ctx.db.query.task.findMany({
-				where: and(
-					lt(task.dueDate, startOfDay),
-					eq(task.status, TaskStatus.TODO),
-					isNotNull(task.dueDate),
-				),
-				orderBy: [asc(task.position)],
-				columns: {
-					name: true,
-					dueDate: true,
-					id: true,
-				},
-				with: {
-					taskList: {
-						columns: {
-							id: true,
-							status: true,
-							name: true,
-						},
-						with: {
-							project: {
-								columns: {
-									id: true,
-									name: true,
-								},
-							},
-						},
-					},
-				},
-			}),
-			ctx.db.query.calendarEvent.findMany({
-				where: and(
-					or(
-						between(calendarEvent.start, startOfDay, endOfDay),
-						between(calendarEvent.end, startOfDay, endOfDay),
-						and(
-							lt(calendarEvent.start, startOfDay),
-							gt(calendarEvent.end, endOfDay),
-						),
-						isNotNull(calendarEvent.repeatRule),
-						eq(calendarEvent.start, startOfDay),
-						eq(calendarEvent.end, endOfDay),
-					),
-				),
-				orderBy: [desc(calendarEvent.start), asc(calendarEvent.allDay)],
-				with: {
-					project: {
-						columns: {
-							id: true,
-							name: true,
-						},
-					},
-				},
-			}),
-		]);
-
-		const dueToday = tasksDueToday.filter(
-			(t) => t.taskList?.status !== TaskListStatus.ARCHIVED,
-		);
-
-		const overDue = overDueTasks.filter(
-			(t) => t.taskList?.status !== TaskListStatus.ARCHIVED,
-		);
-
-		const filteredEvents = events.filter((event) =>
-			filterByRepeatRule(event, new Date(today), ctx.timezone),
-		);
-
-		return {
-			dueToday,
-			overDue,
-			events: filteredEvents,
-		};
+		return getTodayDataForUser(ctx.db, ctx.timezone);
 	}),
 	getProjects: protectedProcedure
 		.input(

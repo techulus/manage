@@ -2,6 +2,7 @@ import type { Blob as ManageBlob } from "@/drizzle/types";
 import {
 	DeleteObjectCommand,
 	GetObjectCommand,
+	ListObjectsV2Command,
 	PutObjectCommand,
 	S3Client,
 } from "@aws-sdk/client-s3";
@@ -67,4 +68,14 @@ const deleteFile = async (key: string) => {
 	await blobStorage.send(command);
 };
 
-export { bytesToMegabytes, deleteFile, getFileUrl, getUrl, upload };
+const listFiles = async (prefix: string, maxKeys?: number) => {
+	const command = new ListObjectsV2Command({
+		Bucket: process.env.S3_BUCKET_NAME,
+		Prefix: prefix,
+		MaxKeys: maxKeys,
+	});
+	const response = await blobStorage.send(command);
+	return response.Contents || [];
+};
+
+export { bytesToMegabytes, deleteFile, getFileUrl, getUrl, listFiles, upload };

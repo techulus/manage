@@ -1,13 +1,12 @@
-import { deleteDatabase } from "@/lib/utils/useDatabase";
-import { verifyWebhook } from "@clerk/nextjs/webhooks";
-import type { NextRequest } from "next/server";
-import { opsUser, opsOrganization } from "@/ops/drizzle/schema";
-import { getOpsDatabase } from "@/ops/useOps";
-import { eq } from "drizzle-orm";
 import { AccountDeleted } from "@/components/emails/account-deleted";
+import { deleteDatabase } from "@/lib/utils/useDatabase";
+import { triggerBlobDeletionWorkflow } from "@/lib/utils/workflow";
+import { opsOrganization, opsUser } from "@/ops/drizzle/schema";
+import { getOpsDatabase } from "@/ops/useOps";
+import { verifyWebhook } from "@clerk/nextjs/webhooks";
+import { eq } from "drizzle-orm";
+import type { NextRequest } from "next/server";
 import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 type ClerkOrgData = {
 	createdBy?: {
@@ -50,7 +49,7 @@ export async function POST(req: NextRequest) {
 				} catch (err) {
 					console.error("Error deleting user database:", err);
 				}
-				
+
 				// Also delete user from ops database
 				try {
 					const db = await getOpsDatabase();
@@ -59,40 +58,67 @@ export async function POST(req: NextRequest) {
 				} catch (err) {
 					console.error("Error deleting user from ops database:", err);
 				}
+
+				// Trigger blob deletion workflow
+				try {
+					await triggerBlobDeletionWorkflow(id);
+					console.log("User blob deletion workflow triggered successfully");
+				} catch (err) {
+					console.error("Error triggering user blob deletion workflow:", err);
+				}
 				break;
 			case WebhookEventType.organizationDeleted: {
 				console.log(`[Webhook] Processing organization deletion for ID: ${id}`);
-				
+
 				// First, get the organization info from ops database for email
 				let orgData = null;
 				try {
 					const db = await getOpsDatabase();
-					const orgs = await db.select().from(opsOrganization).where(eq(opsOrganization.id, id));
+					const orgs = await db
+						.select()
+						.from(opsOrganization)
+						.where(eq(opsOrganization.id, id));
 					orgData = orgs[0];
 					if (orgData) {
-						console.log(`[Webhook] Found organization data for ${orgData.name} (${id})`);
+						console.log(
+							`[Webhook] Found organization data for ${orgData.name} (${id})`,
+						);
 					}
 				} catch (err) {
-					console.error(`[Webhook] Error fetching organization data for ID: ${id}:`, err);
+					console.error(
+						`[Webhook] Error fetching organization data for ID: ${id}:`,
+						err,
+					);
 				}
-				
+
 				// Delete organization database immediately when Clerk deletes the organization
 				try {
 					await deleteDatabase(id);
-					console.log(`[Webhook] Organization database deleted successfully for ID: ${id}`);
+					console.log(
+						`[Webhook] Organization database deleted successfully for ID: ${id}`,
+					);
 				} catch (err) {
-					console.error(`[Webhook] Error deleting organization database for ID: ${id}:`, err);
+					console.error(
+						`[Webhook] Error deleting organization database for ID: ${id}:`,
+						err,
+					);
 				}
-				
+
 				// Send deletion confirmation email if we have org data
 				if (orgData) {
 					try {
 						const rawData = orgData.rawData as ClerkOrgData;
 						const createdBy = rawData?.createdBy;
-						const contactEmail = createdBy?.email || rawData?.adminEmails?.[0] || "admin@managee.xyz";
-						
-						console.log(`[Webhook] Sending deletion confirmation email to ${contactEmail} for org ${orgData.name}`);
-						
+						const contactEmail =
+							createdBy?.email ||
+							rawData?.adminEmails?.[0] ||
+							"admin@managee.xyz";
+
+						console.log(
+							`[Webhook] Sending deletion confirmation email to ${contactEmail} for org ${orgData.name}`,
+						);
+
+						const resend = new Resend(process.env.RESEND_API_KEY);
 						await resend.emails.send({
 							from: "noreply@email.managee.xyz",
 							to: contactEmail,
@@ -103,20 +129,43 @@ export async function POST(req: NextRequest) {
 								organizationName: orgData.name,
 							}),
 						});
-						
-						console.log(`[Webhook] Deletion confirmation email sent successfully for org ${orgData.name}`);
+
+						console.log(
+							`[Webhook] Deletion confirmation email sent successfully for org ${orgData.name}`,
+						);
 					} catch (emailErr) {
-						console.error(`[Webhook] Error sending deletion confirmation email for ID: ${id}:`, emailErr);
+						console.error(
+							`[Webhook] Error sending deletion confirmation email for ID: ${id}:`,
+							emailErr,
+						);
 					}
 				}
-				
+
 				// Delete organization from ops database
 				try {
 					const db = await getOpsDatabase();
 					await db.delete(opsOrganization).where(eq(opsOrganization.id, id));
-					console.log(`[Webhook] Organization deleted from ops database successfully for ID: ${id}`);
+					console.log(
+						`[Webhook] Organization deleted from ops database successfully for ID: ${id}`,
+					);
 				} catch (err) {
-					console.error(`[Webhook] Error deleting organization from ops database for ID: ${id}:`, err);
+					console.error(
+						`[Webhook] Error deleting organization from ops database for ID: ${id}:`,
+						err,
+					);
+				}
+
+				// Trigger blob deletion workflow
+				try {
+					await triggerBlobDeletionWorkflow(id);
+					console.log(
+						`[Webhook] Organization blob deletion workflow triggered successfully for ID: ${id}`,
+					);
+				} catch (err) {
+					console.error(
+						`[Webhook] Error triggering organization blob deletion workflow for ID: ${id}:`,
+						err,
+					);
 				}
 				break;
 			}
