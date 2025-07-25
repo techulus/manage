@@ -12,7 +12,14 @@ import { serve } from "@upstash/workflow/nextjs";
 import { and, between, eq, gte, isNotNull, lt, or } from "drizzle-orm";
 import { Resend } from "resend";
 
+console.log("Daily summary - QStash URL", process.env.QSTASH_URL ?? "missing");
+
 export const { POST } = serve(async (context) => {
+	console.log(
+		"Daily summary - QStash URL",
+		process.env.QSTASH_URL ?? "missing",
+	);
+
 	const resend = new Resend(process.env.RESEND_API_KEY);
 	console.log(
 		`[DailySummary] Starting daily summary job at ${new Date().toISOString()}`,
