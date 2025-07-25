@@ -98,7 +98,7 @@ export const { POST } = serve(async (context) => {
 					`[OrgDeletion] Sending 30-day notice email to ${contactEmail} for org ${org.name}`,
 				);
 				const emailResult = await resend.emails.send({
-					from: "noreply@email.managee.xyz",
+					from: "Manage Team <noreply@email.managee.xyz>",
 					to: contactEmail,
 					subject: "Organization Deletion Notice - 30 Days",
 					react: ThirtyDayDeletionNotice({
@@ -196,7 +196,7 @@ export const { POST } = serve(async (context) => {
 					`[OrgDeletion] Sending 7-day warning email to ${contactEmail} for org ${org.name}`,
 				);
 				const emailResult = await resend.emails.send({
-					from: "noreply@email.managee.xyz",
+					from: "Manage Team <noreply@email.managee.xyz>",
 					to: contactEmail,
 					subject: "Final Warning - Organization Deletion in 7 Days",
 					react: SevenDayWarning({
