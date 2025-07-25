@@ -120,7 +120,6 @@ const container = {
   margin: '0 auto',
   padding: '20px 0 48px',
   marginBottom: '64px',
-  border: '2px solid #ef4444',
 };
 
 const header = {
