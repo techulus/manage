@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
 
 						const resend = new Resend(process.env.RESEND_API_KEY);
 						await resend.emails.send({
-							from: "noreply@email.managee.xyz",
+							from: "Manage Team <noreply@email.managee.xyz>",
 							to: contactEmail,
 							subject: "Organization Deleted",
 							react: AccountDeleted({

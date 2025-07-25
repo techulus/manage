@@ -113,7 +113,7 @@ async function processUserSummary(
 
 		// Send daily summary email
 		await resend.emails.send({
-			from: "daily-summary@email.managee.xyz",
+			from: "Manage Daily Summary <daily-summary@email.managee.xyz>",
 			to: email,
 			subject: `🌅 Your Daily Summary - ${getFormattedDate(today, timezone)} ✨`,
 			react: DailySummary({
