@@ -25,7 +25,7 @@ const nextConfig = {
 	// This is required to support PostHog trailing slash API requests
 	skipTrailingSlashRedirect: true,
 
-	output: "standalone", // Uncomment this to enable standalone mode in Docker
+	// output: "standalone", // Uncomment this to enable standalone mode in Docker
 };
 
 const config = withSentryConfig(nextConfig, {
