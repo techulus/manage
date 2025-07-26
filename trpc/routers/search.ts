@@ -12,11 +12,13 @@ export const searchRouter = createTRPCRouter({
 			}),
 		)
 		.query(async ({ input, ctx }) => {
+			console.log('Search query input:', input);
 			const results = await ctx.search.search(input.query, {
 				type: input.type,
 				projectId: input.projectId,
 				limit: input.limit,
 			});
+			console.log('Search results count:', results.length);
 
 			return results;
 		}),

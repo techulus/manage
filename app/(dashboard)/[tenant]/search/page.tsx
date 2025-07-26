@@ -190,7 +190,7 @@ export default function SearchPage() {
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-2">
 						{typeFilter && (
-							<Badge variant="secondary" className="gap-1">
+							<Badge variant="secondary" className="gap-1 p-1.5">
 								{getTypeIcon(typeFilter)}
 								{getTypeLabel(typeFilter)}
 								<button
@@ -311,7 +311,7 @@ export default function SearchPage() {
 												{getTypeLabel(type)}s ({results.length})
 											</h3>
 										</div>
-										<div className="space-y-2">
+										<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
 											{results.map((result) => (
 												<div
 													key={result.id}

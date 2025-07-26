@@ -53,20 +53,18 @@ export class SearchService {
 
 		await index.upsert({
 			id: searchableItem.id,
-			// Combine title multiple times to give it more weight in search
 			content: {
-				text: `${searchableItem.title} ${searchableItem.title} ${searchableItem.title} ${searchableItem.description || ""} ${searchableItem.type} ${searchableItem.status || ""}`
-			},
-			metadata: {
-				...searchableItem.metadata,
 				title: searchableItem.title,
 				description: searchableItem.description || "",
 				type: searchableItem.type,
 				status: searchableItem.status || "",
-				url: searchableItem.url,
 				projectId: searchableItem.projectId,
+			},
+			metadata: {
+				url: searchableItem.url,
 				createdAt: searchableItem.createdAt.toISOString(),
 				dueDate: searchableItem.dueDate?.toISOString(),
+				createdByUser: searchableItem.metadata?.createdByUser,
 			},
 		});
 	}
@@ -99,21 +97,22 @@ export class SearchService {
 
 		await index.upsert({
 			id: searchableItem.id,
-			// Combine title multiple times to give it more weight in search
 			content: {
-				text: `${searchableItem.title} ${searchableItem.title} ${searchableItem.title} ${searchableItem.description || ""} ${searchableItem.type} ${searchableItem.status || ""} ${searchableItem.projectName || ""}`
-			},
-			metadata: {
-				...searchableItem.metadata,
 				title: searchableItem.title,
 				description: searchableItem.description || "",
 				type: searchableItem.type,
 				status: searchableItem.status || "",
 				projectName: searchableItem.projectName || "",
-				url: searchableItem.url,
 				projectId: searchableItem.projectId,
+			},
+			metadata: {
+				url: searchableItem.url,
 				createdAt: searchableItem.createdAt.toISOString(),
 				dueDate: searchableItem.dueDate?.toISOString(),
+				taskListId: searchableItem.metadata?.taskListId,
+				taskListName: searchableItem.metadata?.taskListName,
+				createdByUser: searchableItem.metadata?.createdByUser,
+				assignedToUser: searchableItem.metadata?.assignedToUser,
 			},
 		});
 	}
@@ -142,21 +141,19 @@ export class SearchService {
 
 		await index.upsert({
 			id: searchableItem.id,
-			// Combine title multiple times to give it more weight in search
 			content: {
-				text: `${searchableItem.title} ${searchableItem.title} ${searchableItem.title} ${searchableItem.description || ""} ${searchableItem.type} ${searchableItem.status || ""} ${searchableItem.projectName || ""}`
-			},
-			metadata: {
-				...searchableItem.metadata,
 				title: searchableItem.title,
 				description: searchableItem.description || "",
 				type: searchableItem.type,
 				status: searchableItem.status || "",
 				projectName: searchableItem.projectName || "",
-				url: searchableItem.url,
 				projectId: searchableItem.projectId,
+			},
+			metadata: {
+				url: searchableItem.url,
 				createdAt: searchableItem.createdAt.toISOString(),
 				dueDate: searchableItem.dueDate?.toISOString(),
+				createdByUser: searchableItem.metadata?.createdByUser,
 			},
 		});
 	}
@@ -186,19 +183,20 @@ export class SearchService {
 
 		await index.upsert({
 			id: searchableItem.id,
-			// Combine title multiple times to give it more weight in search
 			content: {
-				text: `${searchableItem.title} ${searchableItem.title} ${searchableItem.title} ${searchableItem.description || ""} ${searchableItem.type} ${searchableItem.projectName || ""}`
-			},
-			metadata: {
-				...searchableItem.metadata,
 				title: searchableItem.title,
 				description: searchableItem.description || "",
 				type: searchableItem.type,
 				projectName: searchableItem.projectName || "",
-				url: searchableItem.url,
 				projectId: searchableItem.projectId,
+			},
+			metadata: {
+				url: searchableItem.url,
 				createdAt: searchableItem.createdAt.toISOString(),
+				start: searchableItem.metadata?.start,
+				end: searchableItem.metadata?.end,
+				allDay: searchableItem.metadata?.allDay,
+				createdByUser: searchableItem.metadata?.createdByUser,
 			},
 		});
 	}
@@ -235,31 +233,38 @@ export class SearchService {
 			searchOptions.filter = filters.join(" AND ");
 		}
 
+		console.log('Search options:', searchOptions);
 		const results = await index.search(searchOptions);
+		console.log('Raw Upstash results:', results.length);
+		if (results.length > 0) {
+			console.log('First result metadata:', results[0].metadata);
+		}
 		
 		return results.map((result: {
 			id: string;
 			score: number;
-			metadata?: {
+			content?: {
 				title?: string;
 				description?: string;
 				type?: string;
 				status?: string;
 				projectName?: string;
-				url?: string;
 				projectId?: number;
+			};
+			metadata?: {
+				url?: string;
 				createdAt?: string;
 				dueDate?: string;
 			};
 		}) => ({
 			id: result.id,
-			title: result.metadata?.title || "",
-			description: result.metadata?.description || "",
-			type: (result.metadata?.type || "") as "project" | "task" | "tasklist" | "event",
-			status: result.metadata?.status || "",
-			projectName: result.metadata?.projectName || "",
+			title: result.content?.title || "",
+			description: result.content?.description || "",
+			type: (result.content?.type || "") as "project" | "task" | "tasklist" | "event",
+			status: result.content?.status || "",
+			projectName: result.content?.projectName || "",
 			url: result.metadata?.url || "",
-			projectId: result.metadata?.projectId || 0,
+			projectId: result.content?.projectId || 0,
 			score: result.score,
 			createdAt: result.metadata?.createdAt ? new Date(result.metadata.createdAt) : new Date(),
 			dueDate: result.metadata?.dueDate ? new Date(result.metadata.dueDate) : undefined,
@@ -281,10 +286,9 @@ export class SearchService {
 	}
 
 	async deleteTenantIndex() {
-		// Delete the entire index for a tenant
-		const index = this.index;
+		// Delete the entire index for a tenant (clear all documents)
 		try {
-			await index.delete(""); // This deletes the entire index
+			await this.index.reset(); 
 		} catch (error) {
 			// Index might not exist, which is fine
 			console.log(`Index for tenant ${this.tenant} does not exist or already deleted`);
