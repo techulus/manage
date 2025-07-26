@@ -34,6 +34,34 @@ export class SearchService {
 		this.index = client.index(`manage-${tenant}`);
 	}
 
+	private truncateContentObject(
+		contentObj: Record<string, string | number | undefined>,
+	): Record<string, string | number | undefined> {
+		// Calculate the size of the entire content object
+		const contentStr = JSON.stringify(contentObj);
+		if (contentStr.length <= 4000) {
+			// Leave buffer for JSON overhead
+			return contentObj;
+		}
+
+		// If too large, aggressively truncate the description
+		const result = { ...contentObj };
+		if (result.description && typeof result.description === "string") {
+			// Calculate approximate overhead from other fields
+			const { description, ...otherFields } = result;
+			const overhead = JSON.stringify(otherFields).length;
+
+			// Leave space for description field structure and buffer
+			const maxDescLength = Math.max(100, 3500 - overhead);
+
+			if (description.length > maxDescLength) {
+				result.description = `${description.substring(0, maxDescLength - 3)}...`;
+			}
+		}
+
+		return result;
+	}
+
 	async indexProject(projectData: typeof project.$inferSelect) {
 		const index = this.index;
 		const searchableItem: SearchableItem = {
@@ -51,15 +79,17 @@ export class SearchService {
 			},
 		};
 
+		const content = this.truncateContentObject({
+			title: searchableItem.title,
+			description: searchableItem.description || "",
+			type: searchableItem.type,
+			status: searchableItem.status || "",
+			projectId: searchableItem.projectId,
+		});
+
 		await index.upsert({
 			id: searchableItem.id,
-			content: {
-				title: searchableItem.title,
-				description: searchableItem.description || "",
-				type: searchableItem.type,
-				status: searchableItem.status || "",
-				projectId: searchableItem.projectId,
-			},
+			content,
 			metadata: {
 				url: searchableItem.url,
 				createdAt: searchableItem.createdAt.toISOString(),
@@ -95,16 +125,18 @@ export class SearchService {
 			},
 		};
 
+		const content = this.truncateContentObject({
+			title: searchableItem.title,
+			description: searchableItem.description || "",
+			type: searchableItem.type,
+			status: searchableItem.status || "",
+			projectName: searchableItem.projectName || "",
+			projectId: searchableItem.projectId,
+		});
+
 		await index.upsert({
 			id: searchableItem.id,
-			content: {
-				title: searchableItem.title,
-				description: searchableItem.description || "",
-				type: searchableItem.type,
-				status: searchableItem.status || "",
-				projectName: searchableItem.projectName || "",
-				projectId: searchableItem.projectId,
-			},
+			content,
 			metadata: {
 				url: searchableItem.url,
 				createdAt: searchableItem.createdAt.toISOString(),
@@ -139,16 +171,18 @@ export class SearchService {
 			},
 		};
 
+		const content = this.truncateContentObject({
+			title: searchableItem.title,
+			description: searchableItem.description || "",
+			type: searchableItem.type,
+			status: searchableItem.status || "",
+			projectName: searchableItem.projectName || "",
+			projectId: searchableItem.projectId,
+		});
+
 		await index.upsert({
 			id: searchableItem.id,
-			content: {
-				title: searchableItem.title,
-				description: searchableItem.description || "",
-				type: searchableItem.type,
-				status: searchableItem.status || "",
-				projectName: searchableItem.projectName || "",
-				projectId: searchableItem.projectId,
-			},
+			content,
 			metadata: {
 				url: searchableItem.url,
 				createdAt: searchableItem.createdAt.toISOString(),
@@ -181,15 +215,17 @@ export class SearchService {
 			},
 		};
 
+		const content = this.truncateContentObject({
+			title: searchableItem.title,
+			description: searchableItem.description || "",
+			type: searchableItem.type,
+			projectName: searchableItem.projectName || "",
+			projectId: searchableItem.projectId,
+		});
+
 		await index.upsert({
 			id: searchableItem.id,
-			content: {
-				title: searchableItem.title,
-				description: searchableItem.description || "",
-				type: searchableItem.type,
-				projectName: searchableItem.projectName || "",
-				projectId: searchableItem.projectId,
-			},
+			content,
 			metadata: {
 				url: searchableItem.url,
 				createdAt: searchableItem.createdAt.toISOString(),
