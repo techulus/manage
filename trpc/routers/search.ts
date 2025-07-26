@@ -21,64 +21,90 @@ export const searchRouter = createTRPCRouter({
 			return results;
 		}),
 
-	indexAllContent: protectedProcedure
-		.mutation(async ({ ctx }) => {
-			await ctx.search.clearIndex();
-			
-			const projects = await ctx.db.query.project.findMany({
-				where: (project, { eq }) => eq(project.createdByUser, ctx.ownerId),
-			});
+	indexAllContent: protectedProcedure.mutation(async ({ ctx }) => {
+		await ctx.search.clearIndex();
 
-			for (const project of projects) {
-				await ctx.search.indexProject(project);
-			}
+		const projects = await ctx.db.query.project.findMany({
+			where: (project, { eq }) => eq(project.createdByUser, ctx.ownerId),
+		});
 
-			const taskLists = await ctx.db.query.taskList.findMany({
-				where: (taskList, { eq }) => eq(taskList.createdByUser, ctx.ownerId),
-				with: {
-					project: true,
-				},
-			});
+		await Promise.allSettled(
+			projects.map(async (project) => {
+				try {
+					await ctx.search.indexProject(project);
+				} catch (error) {
+					console.error(`Failed to index project ${project.id}:`, error);
+				}
+			}),
+		);
 
-			for (const taskList of taskLists) {
-				await ctx.search.indexTaskList(taskList, taskList.project);
-			}
+		const taskLists = await ctx.db.query.taskList.findMany({
+			where: (taskList, { eq }) => eq(taskList.createdByUser, ctx.ownerId),
+			with: {
+				project: true,
+			},
+		});
 
-			const tasks = await ctx.db.query.task.findMany({
-				where: (task, { eq }) => eq(task.createdByUser, ctx.ownerId),
-				with: {
-					taskList: {
-						with: {
-							project: true,
-						},
+		await Promise.allSettled(
+			taskLists.map(async (taskList) => {
+				try {
+					await ctx.search.indexTaskList(taskList, taskList.project);
+				} catch (error) {
+					console.error(`Failed to index task list ${taskList.id}:`, error);
+				}
+			}),
+		);
+
+		const tasks = await ctx.db.query.task.findMany({
+			where: (task, { eq }) => eq(task.createdByUser, ctx.ownerId),
+			with: {
+				taskList: {
+					with: {
+						project: true,
 					},
 				},
-			});
+			},
+		});
 
-			for (const task of tasks) {
-				await ctx.search.indexTask(
-					task,
-					task.taskList,
-					task.taskList.project,
-				);
-			}
+		await Promise.allSettled(
+			tasks.map(async (task) => {
+				try {
+					await ctx.search.indexTask(
+						task,
+						task.taskList,
+						task.taskList.project,
+					);
+				} catch (error) {
+					console.error(`Failed to index task ${task.id}:`, error);
+				}
+			}),
+		);
 
-			const events = await ctx.db.query.calendarEvent.findMany({
-				where: (event, { eq }) => eq(event.createdByUser, ctx.ownerId),
-				with: {
-					project: true,
-				},
-			});
+		const events = await ctx.db.query.calendarEvent.findMany({
+			where: (event, { eq }) => eq(event.createdByUser, ctx.ownerId),
+			with: {
+				project: true,
+			},
+		});
 
-			for (const event of events) {
-				await ctx.search.indexEvent(event, event.project);
-			}
+		await Promise.allSettled(
+			events.map(async (event) => {
+				try {
+					await ctx.search.indexEvent(event, event.project);
+				} catch (error) {
+					console.error(`Failed to index event ${event.id}:`, error);
+				}
+			}),
+		);
 
-			return { success: true, indexed: {
+		return {
+			success: true,
+			indexed: {
 				projects: projects.length,
 				taskLists: taskLists.length,
 				tasks: tasks.length,
 				events: events.length,
-			}};
-		}),
+			},
+		};
+	}),
 });

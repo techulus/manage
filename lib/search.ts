@@ -290,7 +290,7 @@ export class SearchService {
 
 	async deleteTenantIndex() {
 		try {
-			await this.index.reset();
+			await this.index.deleteIndex();
 		} catch (error) {
 			console.log(
 				`Index for tenant ${this.tenant} does not exist or already deleted`,
