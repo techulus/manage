@@ -1,4 +1,4 @@
-import { AccountDeleted } from "@/components/emails/account-deleted";
+import { AccountDeleted, accountDeletedPlainText } from "@/components/emails/account-deleted";
 import { deleteDatabase } from "@/lib/utils/useDatabase";
 import { triggerBlobDeletionWorkflow } from "@/lib/utils/workflow";
 import { opsOrganization, opsUser } from "@/ops/drizzle/schema";
@@ -109,30 +109,38 @@ export async function POST(req: NextRequest) {
 					try {
 						const rawData = orgData.rawData as ClerkOrgData;
 						const createdBy = rawData?.createdBy;
-						const contactEmail =
-							createdBy?.email ||
-							rawData?.adminEmails?.[0] ||
-							"admin@managee.xyz";
+						const contactEmail = createdBy?.email || rawData?.adminEmails?.[0];
 
-						console.log(
-							`[Webhook] Sending deletion confirmation email to ${contactEmail} for org ${orgData.name}`,
-						);
+						if (contactEmail) {
+							console.log(
+								`[Webhook] Sending deletion confirmation email to ${contactEmail} for org ${orgData.name}`,
+							);
 
-						const resend = new Resend(process.env.RESEND_API_KEY);
-						await resend.emails.send({
-							from: "Manage Team <noreply@email.managee.xyz>",
-							to: contactEmail,
-							subject: "Organization Deleted",
-							react: AccountDeleted({
-								firstName: createdBy?.firstName || undefined,
-								email: contactEmail,
-								organizationName: orgData.name,
-							}),
-						});
+							const resend = new Resend(process.env.RESEND_API_KEY);
+							await resend.emails.send({
+								from: "Manage Team <noreply@email.managee.xyz>",
+								to: contactEmail,
+								subject: "Organization Deleted",
+								react: AccountDeleted({
+									firstName: createdBy?.firstName || undefined,
+									email: contactEmail,
+									organizationName: orgData.name,
+								}),
+								text: accountDeletedPlainText({
+									firstName: createdBy?.firstName || undefined,
+									email: contactEmail,
+									organizationName: orgData.name,
+								}),
+							});
 
-						console.log(
-							`[Webhook] Deletion confirmation email sent successfully for org ${orgData.name}`,
-						);
+							console.log(
+								`[Webhook] Deletion confirmation email sent successfully for org ${orgData.name}`,
+							);
+						} else {
+							console.log(
+								`[Webhook] No contact email found for org ${orgData.name}, skipping deletion confirmation email`,
+							);
+						}
 					} catch (emailErr) {
 						console.error(
 							`[Webhook] Error sending deletion confirmation email for ID: ${id}:`,

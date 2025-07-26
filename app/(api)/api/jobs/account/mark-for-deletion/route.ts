@@ -1,5 +1,5 @@
-import { SevenDayWarning } from "@/components/emails/seven-day-warning";
-import { ThirtyDayDeletionNotice } from "@/components/emails/thirty-day-deletion-notice";
+import { SevenDayWarning, sevenDayWarningPlainText } from "@/components/emails/seven-day-warning";
+import { ThirtyDayDeletionNotice, thirtyDayDeletionNoticePlainText } from "@/components/emails/thirty-day-deletion-notice";
 import { opsOrganization } from "@/ops/drizzle/schema";
 import { getOpsDatabase } from "@/ops/useOps";
 import { clerkClient } from "@clerk/nextjs/server";
@@ -126,6 +126,11 @@ export const { POST } = serve(async (context) => {
 						email: contactEmail,
 						organizationName: org.name,
 					}),
+					text: thirtyDayDeletionNoticePlainText({
+						firstName: firstName,
+						email: contactEmail,
+						organizationName: org.name,
+					}),
 				});
 				console.log(
 					`[OrgDeletion] Email send result for ${org.name}:`,
@@ -217,6 +222,11 @@ export const { POST } = serve(async (context) => {
 					to: contactEmail,
 					subject: "Final Warning - Organization Deletion in 7 Days",
 					react: SevenDayWarning({
+						firstName: firstName,
+						email: contactEmail,
+						organizationName: org.name,
+					}),
+					text: sevenDayWarningPlainText({
 						firstName: firstName,
 						email: contactEmail,
 						organizationName: org.name,

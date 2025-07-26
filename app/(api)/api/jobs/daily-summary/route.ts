@@ -1,4 +1,4 @@
-import { DailySummary } from "@/components/emails/daily-summary";
+import { DailySummary, dailySummaryPlainText } from "@/components/emails/daily-summary";
 import { user as userSchema } from "@/drizzle/schema";
 import { getTodayDataForUser } from "@/lib/utils/todayData";
 import { getDatabaseForOwner } from "@/lib/utils/useDatabase";
@@ -117,6 +117,15 @@ async function processUserSummary(
 			to: email,
 			subject: `🌅 Your Daily Summary - ${getFormattedDate(today, timezone)} ✨`,
 			react: DailySummary({
+				firstName: firstName || undefined,
+				email,
+				timezone,
+				date: today,
+				overdueTasks: overDue,
+				dueToday: dueToday,
+				events: events,
+			}),
+			text: dailySummaryPlainText({
 				firstName: firstName || undefined,
 				email,
 				timezone,

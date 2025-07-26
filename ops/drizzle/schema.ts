@@ -9,6 +9,8 @@ export const opsUser = pgTable("User", {
 	timeZone: text("timeZone"),
 	rawData: jsonb("rawData").notNull(),
 	lastActiveAt: timestamp(),
+	markedForDeletionAt: timestamp(),
+	finalWarningAt: timestamp(),
 	createdAt: timestamp().notNull().defaultNow(),
 	updatedAt: timestamp().notNull().defaultNow(),
 });
