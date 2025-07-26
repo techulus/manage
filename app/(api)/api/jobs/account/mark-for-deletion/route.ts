@@ -8,13 +8,36 @@ import { and, eq, isNull, lte } from "drizzle-orm";
 import { Resend } from "resend";
 
 type ClerkOrgData = {
-	createdBy?: {
-		email?: string;
-		firstName?: string;
-		lastName?: string;
-	};
-	adminEmails?: string[];
+	createdBy?: string;
 };
+
+async function getOrgCreatorDetails(org: { id: string; name: string; rawData: unknown }) {
+	const rawData = org.rawData as ClerkOrgData;
+	const createdByUserId = rawData?.createdBy;
+
+	if (!createdByUserId) {
+		throw new Error(`No creator user ID found for organization ${org.name} (${org.id})`);
+	}
+
+	try {
+		const clerk = await clerkClient();
+		const creator = await clerk.users.getUser(createdByUserId);
+		const contactEmail = creator.emailAddresses[0]?.emailAddress;
+		const firstName = creator.firstName || undefined;
+
+		if (!contactEmail) {
+			throw new Error(`No email address found for creator of organization ${org.name} (${org.id})`);
+		}
+
+		return { contactEmail, firstName };
+	} catch (error) {
+		console.error(
+			`[OrgDeletion] Failed to fetch creator details for user ${createdByUserId}:`,
+			error,
+		);
+		throw new Error(`Failed to fetch creator details for organization ${org.name} (${org.id}): ${error}`);
+	}
+}
 
 export const { POST } = serve(async (context) => {
 	const resend = new Resend(process.env.RESEND_API_KEY);
@@ -79,18 +102,15 @@ export const { POST } = serve(async (context) => {
 		);
 		for (const org of orgsToMark) {
 			try {
-				// Extract creator info from rawData (Clerk organization data)
-				const rawData = org.rawData as ClerkOrgData;
-				const createdBy = rawData?.createdBy;
-				const contactEmail =
-					createdBy?.email || rawData?.adminEmails?.[0] || "admin@managee.xyz";
+				// Get creator details
+				const { contactEmail, firstName } = await getOrgCreatorDetails(org);
 
 				console.log(
 					`[OrgDeletion] Processing org ${org.name} (${org.id}), contact email: ${contactEmail}`,
 				);
 				console.log(
 					`[OrgDeletion] Raw org data for ${org.name}:`,
-					JSON.stringify(rawData, null, 2),
+					JSON.stringify(org.rawData, null, 2),
 				);
 
 				// Send 30-day deletion notice
@@ -102,7 +122,7 @@ export const { POST } = serve(async (context) => {
 					to: contactEmail,
 					subject: "Organization Deletion Notice - 30 Days",
 					react: ThirtyDayDeletionNotice({
-						firstName: createdBy?.firstName || undefined,
+						firstName: firstName,
 						email: contactEmail,
 						organizationName: org.name,
 					}),
@@ -181,11 +201,8 @@ export const { POST } = serve(async (context) => {
 		);
 		for (const org of orgsFor7DayWarning) {
 			try {
-				// Extract creator info from rawData (Clerk organization data)
-				const rawData = org.rawData as ClerkOrgData;
-				const createdBy = rawData?.createdBy;
-				const contactEmail =
-					createdBy?.email || rawData?.adminEmails?.[0] || "admin@managee.xyz";
+				// Get creator details
+				const { contactEmail, firstName } = await getOrgCreatorDetails(org);
 
 				console.log(
 					`[OrgDeletion] Sending 7-day warning to org ${org.name} (${org.id}), contact email: ${contactEmail}`,
@@ -200,7 +217,7 @@ export const { POST } = serve(async (context) => {
 					to: contactEmail,
 					subject: "Final Warning - Organization Deletion in 7 Days",
 					react: SevenDayWarning({
-						firstName: createdBy?.firstName || undefined,
+						firstName: firstName,
 						email: contactEmail,
 						organizationName: org.name,
 					}),
