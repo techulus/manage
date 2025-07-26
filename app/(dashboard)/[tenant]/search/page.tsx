@@ -1,19 +1,5 @@
 "use client";
 
-import { HtmlPreview } from "@/components/core/html-view";
-import PageSection from "@/components/core/section";
-import PageTitle from "@/components/layout/page-title";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { useTRPC } from "@/trpc/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
 	AlertCircle,
@@ -29,8 +15,22 @@ import {
 } from "lucide-react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useDebounce } from "use-debounce";
 import { toast } from "sonner";
+import { useDebounce } from "use-debounce";
+import { HtmlPreview } from "@/components/core/html-view";
+import PageSection from "@/components/core/section";
+import PageTitle from "@/components/layout/page-title";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { useTRPC } from "@/trpc/client";
 
 interface SearchResult {
 	id: string;
@@ -105,6 +105,8 @@ export default function SearchPage() {
 	const [typeFilter, setTypeFilter] = useState<
 		"project" | "task" | "tasklist" | "event" | undefined
 	>();
+	const [projectFilter, setProjectFilter] = useState<number | undefined>();
+	const [statusFilter, setStatusFilter] = useState<string | undefined>();
 	const [debouncedQuery] = useDebounce(query, 300);
 
 	const trpc = useTRPC();
@@ -117,10 +119,17 @@ export default function SearchPage() {
 		...trpc.search.searchQuery.queryOptions({
 			query: debouncedQuery,
 			type: typeFilter,
+			projectId: projectFilter,
+			status: statusFilter,
 			limit: 50,
 		}),
 		enabled: debouncedQuery.length > 0,
 	});
+
+	// Fetch projects for project filter
+	const { data: projects = [] } = useQuery(
+		trpc.user.getProjects.queryOptions(),
+	);
 
 	const indexAllMutation = useMutation(
 		trpc.search.indexAllContent.mutationOptions(),
@@ -149,13 +158,36 @@ export default function SearchPage() {
 		} catch (err) {
 			console.error("Error reindexing content:", err);
 			toast.error("Failed to reindex content", {
-				description: "Please try again or contact support if the problem persists.",
+				description:
+					"Please try again or contact support if the problem persists.",
 			});
 		}
 	};
 
 	const clearFilter = () => {
 		setTypeFilter(undefined);
+		setProjectFilter(undefined);
+		setStatusFilter(undefined);
+	};
+
+	const clearTypeFilter = () => setTypeFilter(undefined);
+	const clearProjectFilter = () => setProjectFilter(undefined);
+	const clearStatusFilter = () => setStatusFilter(undefined);
+
+	// Get available statuses based on selected type
+	const getAvailableStatuses = () => {
+		switch (typeFilter) {
+			case "project":
+				return ["active", "archived"];
+			case "task":
+				return ["todo", "done"];
+			case "tasklist":
+				return ["active", "archived"];
+			case "event":
+				return []; // Events don't have status
+			default:
+				return ["active", "archived", "todo", "done"]; // All statuses
+		}
 	};
 
 	const groupedResults = searchResults.reduce(
@@ -190,50 +222,145 @@ export default function SearchPage() {
 				</div>
 
 				{/* Filters and Actions */}
-				<div className="flex items-center justify-between">
-					<div className="flex items-center gap-2">
+				<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+					<div className="flex items-center gap-2 flex-wrap">
 						{typeFilter && (
 							<Badge variant="secondary" className="gap-1 p-1.5">
 								{getTypeIcon(typeFilter)}
 								{getTypeLabel(typeFilter)}
 								<button
 									type="button"
-									onClick={clearFilter}
+									onClick={clearTypeFilter}
 									className="ml-1 hover:bg-muted rounded-full"
 								>
 									<X className="h-3 w-3" />
 								</button>
 							</Badge>
 						)}
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button variant="outline" size="sm" className="gap-2">
-									<Filter className="h-4 w-4" />
-									Filter
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="start">
-								<DropdownMenuItem onClick={() => setTypeFilter(undefined)}>
-									All Types
-								</DropdownMenuItem>
-								<DropdownMenuItem onClick={() => setTypeFilter("project")}>
-									<FolderOpen className="mr-2 h-4 w-4" />
-									Projects
-								</DropdownMenuItem>
-								<DropdownMenuItem onClick={() => setTypeFilter("task")}>
-									<CheckSquare className="mr-2 h-4 w-4" />
-									Tasks
-								</DropdownMenuItem>
-								<DropdownMenuItem onClick={() => setTypeFilter("tasklist")}>
-									<FileText className="mr-2 h-4 w-4" />
-									Task Lists
-								</DropdownMenuItem>
-								<DropdownMenuItem onClick={() => setTypeFilter("event")}>
-									<Calendar className="mr-2 h-4 w-4" />
-									Events
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
+						{projectFilter && (
+							<Badge variant="secondary" className="gap-1 p-1.5">
+								<FolderOpen className="h-3 w-3" />
+								{projects.find((p) => p.id === projectFilter)?.name ||
+									"Project"}
+								<button
+									type="button"
+									onClick={clearProjectFilter}
+									className="ml-1 hover:bg-muted rounded-full"
+								>
+									<X className="h-3 w-3" />
+								</button>
+							</Badge>
+						)}
+						{statusFilter && (
+							<Badge variant="secondary" className="gap-1 p-1.5">
+								<CheckSquare className="h-3 w-3" />
+								{statusFilter}
+								<button
+									type="button"
+									onClick={clearStatusFilter}
+									className="ml-1 hover:bg-muted rounded-full"
+								>
+									<X className="h-3 w-3" />
+								</button>
+							</Badge>
+						)}
+						{(typeFilter || projectFilter || statusFilter) && (
+							<Button
+								variant="ghost"
+								size="sm"
+								onClick={clearFilter}
+								className="text-muted-foreground hover:text-foreground"
+							>
+								Clear all
+							</Button>
+						)}
+						<div className="flex items-center gap-2 flex-wrap">
+							{/* Type Filter */}
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button variant="outline" size="sm" className="gap-2">
+										<Filter className="h-4 w-4" />
+										Type
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="start">
+									<DropdownMenuItem onClick={() => setTypeFilter(undefined)}>
+										All Types
+									</DropdownMenuItem>
+									<DropdownMenuItem onClick={() => setTypeFilter("project")}>
+										<FolderOpen className="mr-2 h-4 w-4" />
+										Projects
+									</DropdownMenuItem>
+									<DropdownMenuItem onClick={() => setTypeFilter("task")}>
+										<CheckSquare className="mr-2 h-4 w-4" />
+										Tasks
+									</DropdownMenuItem>
+									<DropdownMenuItem onClick={() => setTypeFilter("tasklist")}>
+										<FileText className="mr-2 h-4 w-4" />
+										Task Lists
+									</DropdownMenuItem>
+									<DropdownMenuItem onClick={() => setTypeFilter("event")}>
+										<Calendar className="mr-2 h-4 w-4" />
+										Events
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
+
+							{/* Project Filter */}
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button variant="outline" size="sm" className="gap-2">
+										<FolderOpen className="h-4 w-4" />
+										Project
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent
+									align="start"
+									className="max-h-48 overflow-y-auto"
+								>
+									<DropdownMenuItem onClick={() => setProjectFilter(undefined)}>
+										All Projects
+									</DropdownMenuItem>
+									{projects.map((project) => (
+										<DropdownMenuItem
+											key={project.id}
+											onClick={() => setProjectFilter(project.id)}
+										>
+											<FolderOpen className="mr-2 h-4 w-4" />
+											{project.name}
+										</DropdownMenuItem>
+									))}
+								</DropdownMenuContent>
+							</DropdownMenu>
+
+							{/* Status Filter */}
+							{getAvailableStatuses().length > 0 && (
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>
+										<Button variant="outline" size="sm" className="gap-2">
+											<CheckSquare className="h-4 w-4" />
+											Status
+										</Button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent align="start">
+										<DropdownMenuItem
+											onClick={() => setStatusFilter(undefined)}
+										>
+											All Statuses
+										</DropdownMenuItem>
+										{getAvailableStatuses().map((status) => (
+											<DropdownMenuItem
+												key={status}
+												onClick={() => setStatusFilter(status)}
+											>
+												<CheckSquare className="mr-2 h-4 w-4" />
+												{status}
+											</DropdownMenuItem>
+										))}
+									</DropdownMenuContent>
+								</DropdownMenu>
+							)}
+						</div>
 					</div>
 
 					<Button
@@ -314,7 +441,7 @@ export default function SearchPage() {
 												{getTypeLabel(type)}s ({results.length})
 											</h3>
 										</div>
-										<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+										<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
 											{results.map((result) => (
 												<div
 													key={result.id}
@@ -342,7 +469,7 @@ export default function SearchPage() {
 																		getStatusColor(result.status),
 																	)}
 																>
-																	{result.status}
+																	{result.status.toUpperCase()}
 																</Badge>
 															)}
 														</div>
@@ -379,7 +506,6 @@ export default function SearchPage() {
 						</div>
 					)}
 				</div>
-
 			</PageSection>
 		</>
 	);

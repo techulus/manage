@@ -1,5 +1,3 @@
-import { Footer } from "@/components/layout/footer";
-import { Header } from "@/components/layout/header";
 import {
 	CalendarIcon,
 	FolderIcon,
@@ -7,6 +5,8 @@ import {
 	UsersIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { Footer } from "@/components/layout/footer";
+import { Header } from "@/components/layout/header";
 
 export const dynamic = "force-static";
 export const revalidate = 86400;
@@ -270,7 +270,7 @@ export default async function Home() {
 								desc: "Secure file storage",
 								color: "from-purple-400 to-purple-600",
 							},
-						].map((feature, idx) => (
+						].map((feature) => (
 							<div
 								key={feature.name}
 								className="text-center group cursor-pointer"

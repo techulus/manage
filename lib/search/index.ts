@@ -1,5 +1,5 @@
-import type { calendarEvent, project, task, taskList } from "@/drizzle/schema";
 import { Search } from "@upstash/search";
+import type { calendarEvent, project, task, taskList } from "@/drizzle/schema";
 
 const client = Search.fromEnv();
 
@@ -242,6 +242,7 @@ export class SearchService {
 		options?: {
 			type?: "project" | "task" | "tasklist" | "event";
 			projectId?: number;
+			status?: string;
 			limit?: number;
 		},
 	) {
@@ -269,6 +270,10 @@ export class SearchService {
 			filters.push(`projectId = ${options.projectId}`);
 		}
 
+		if (options?.status) {
+			filters.push(`status = '${options.status}'`);
+		}
+
 		if (filters.length > 0) {
 			searchOptions.filter = filters.join(" AND ");
 		}
@@ -291,6 +296,10 @@ export class SearchService {
 					url?: string;
 					createdAt?: string;
 					dueDate?: string;
+					createdByUser?: string;
+					assignedToUser?: string;
+					taskListId?: number;
+					taskListName?: string;
 				};
 			}) => ({
 				id: result.id,
@@ -333,6 +342,7 @@ export class SearchService {
 		} catch (error) {
 			console.log(
 				`Index for tenant ${this.tenant} does not exist or already deleted`,
+				error,
 			);
 		}
 	}

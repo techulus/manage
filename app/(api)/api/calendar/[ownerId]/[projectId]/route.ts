@@ -19,7 +19,7 @@ export async function GET(
 
 	const db = await getDatabaseForOwner(ownerId);
 
-	let timezone: string | undefined | null = undefined;
+	let timezone: string | undefined | null ;
 	const userId = searchParams.get("userId");
 	if (userId) {
 		const userDetails = await db.query.user.findFirst({

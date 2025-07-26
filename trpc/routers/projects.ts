@@ -1,5 +1,10 @@
 import { activity, comment, project } from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
+import {
+	deleteProjectSearchItems,
+	deleteSearchItem,
+	indexProject,
+} from "@/lib/search/helpers";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
@@ -36,11 +41,7 @@ export const projectsRouter = createTRPCRouter({
 
 			// Index the project for search
 			if (newProject?.[0]) {
-				try {
-					await ctx.search.indexProject(newProject[0]);
-				} catch (err) {
-					console.error("Error indexing project for search:", err);
-				}
+				await indexProject(ctx.search, newProject[0]);
 			}
 
 			return newProject?.[0];
@@ -100,11 +101,7 @@ export const projectsRouter = createTRPCRouter({
 
 				// Re-index the updated project for search
 				if (updatedProject?.[0]) {
-					try {
-						await ctx.search.indexProject(updatedProject[0]);
-					} catch (err) {
-						console.error("Error re-indexing project for search:", err);
-					}
+					await indexProject(ctx.search, updatedProject[0]);
 				}
 			}
 
@@ -130,18 +127,10 @@ export const projectsRouter = createTRPCRouter({
 			});
 
 			// Remove project from search index
-			try {
-				await ctx.search.deleteItem(`project-${input.id}`);
-			} catch (err) {
-				console.error("Error removing project from search index:", err);
-			}
+			await deleteSearchItem(ctx.search, `project-${input.id}`, "project");
 
 			// Also remove all related content from search (tasks, tasklists, events)
-			try {
-				await ctx.search.deleteByProject(input.id);
-			} catch (err) {
-				console.error("Error removing project-related content from search index:", err);
-			}
+			await deleteProjectSearchItems(ctx.search, input.id);
 
 			return deletedProject[0];
 		}),

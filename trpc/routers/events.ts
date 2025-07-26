@@ -1,5 +1,9 @@
 import { calendarEvent } from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
+import {
+	deleteSearchItem,
+	indexEventWithProjectFetch,
+} from "@/lib/search/helpers";
 import { toEndOfDay, toStartOfDay, toTimeZone, toUTC } from "@/lib/utils/date";
 import {
 	getStartEndDateRangeInUtc,
@@ -135,6 +139,8 @@ export const eventsRouter = createTRPCRouter({
 					projectId: event[0].projectId,
 					oldValue: event[0],
 				});
+
+				await deleteSearchItem(ctx.search, `event-${id}`, "event");
 			}
 
 			return event[0];
@@ -228,6 +234,10 @@ export const eventsRouter = createTRPCRouter({
 					oldValue: oldEvent,
 					newValue: updatedEvent[0],
 				});
+
+				if (updatedEvent?.[0]) {
+					await indexEventWithProjectFetch(ctx.db, ctx.search, updatedEvent[0]);
+				}
 			} else {
 				const newEvent = await ctx.db
 					.insert(calendarEvent)
@@ -246,6 +256,10 @@ export const eventsRouter = createTRPCRouter({
 					projectId,
 					newValue: newEvent[0],
 				});
+
+				if (newEvent?.[0]) {
+					await indexEventWithProjectFetch(ctx.db, ctx.search, newEvent[0]);
+				}
 			}
 
 			return { id: eventId, ...eventData };

@@ -1,5 +1,7 @@
 "use client";
 
+import { Check, ChevronsUpDown } from "lucide-react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Command,
@@ -15,8 +17,6 @@ import {
 } from "@/components/ui/popover";
 import type { User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { useMemo, useState } from "react";
 import { UserBadge } from "./user-badge";
 
 export function AssignToUser({
@@ -32,7 +32,7 @@ export function AssignToUser({
 
 	const assignedTo = useMemo(() => {
 		const user = users.find((user) => user.id === value);
-		return value ? user?.firstName ?? user?.email ?? "-" : "Select user...";
+		return value ? (user?.firstName ?? user?.email ?? "-") : "Select user...";
 	}, [value, users]);
 
 	if (!isAssigning) {
@@ -55,7 +55,6 @@ export function AssignToUser({
 			<PopoverTrigger asChild>
 				<Button
 					variant="outline"
-					role="combobox"
 					aria-expanded={open}
 					className="w-[200px] justify-between"
 				>

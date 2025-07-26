@@ -87,7 +87,7 @@
   },
   "devDependencies": {
     "@aws-sdk/s3-request-presigner": "^3.623.0",
-    "@biomejs/biome": "1.8.3",
+    "@biomejs/biome": "2.0.6",
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.13",
     "@types/mime-types": "^2.1.4",

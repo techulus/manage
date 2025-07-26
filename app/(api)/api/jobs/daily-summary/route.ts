@@ -1,15 +1,14 @@
+import { serve } from "@upstash/workflow/nextjs";
+import { gte } from "drizzle-orm";
+import { Resend } from "resend";
 import {
 	DailySummary,
 	dailySummaryPlainText,
 } from "@/components/emails/daily-summary";
-import { user as userSchema } from "@/drizzle/schema";
 import { getTodayDataForUser } from "@/lib/utils/todayData";
 import { getDatabaseForOwner } from "@/lib/utils/useDatabase";
 import { opsUser } from "@/ops/drizzle/schema";
 import { getOpsDatabase } from "@/ops/useOps";
-import { serve } from "@upstash/workflow/nextjs";
-import { eq, gte } from "drizzle-orm";
-import { Resend } from "resend";
 
 function isCurrentlySevenAM(timezone: string): boolean {
 	try {
@@ -19,15 +18,17 @@ function isCurrentlySevenAM(timezone: string): boolean {
 			hour: "numeric",
 			hour12: false,
 		}).format(now);
-		
-		const hour = Number.parseInt(userTime.split(' ')[0] || userTime, 10);
+
+		const hour = Number.parseInt(userTime.split(" ")[0] || userTime, 10);
 		return hour === 7;
 	} catch (error) {
-		console.error(`[DailySummary] Error checking time for timezone ${timezone}:`, error);
+		console.error(
+			`[DailySummary] Error checking time for timezone ${timezone}:`,
+			error,
+		);
 		return false;
 	}
 }
-
 
 export const { POST } = serve(async (context) => {
 	const resend = new Resend(process.env.RESEND_API_KEY);
@@ -50,7 +51,7 @@ export const { POST } = serve(async (context) => {
 		);
 
 		// Filter users where it's currently 7AM in their timezone
-		const usersAt7AM = allUsers.filter(user => {
+		const usersAt7AM = allUsers.filter((user) => {
 			const userTimezone = user.timeZone || "UTC";
 			return isCurrentlySevenAM(userTimezone);
 		});
@@ -171,6 +172,10 @@ function getFormattedDate(date: Date, timezone: string): string {
 			day: "numeric",
 		}).format(date);
 	} catch (error) {
+		console.error(
+			`[DailySummary] Error formatting date for timezone ${timezone}:`,
+			error,
+		);
 		// Fallback to UTC if timezone is invalid
 		return new Intl.DateTimeFormat("en-US", {
 			weekday: "long",

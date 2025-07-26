@@ -1,4 +1,5 @@
 import type { InferSelectModel } from "drizzle-orm";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type {
 	activity,
 	blob,
@@ -9,6 +10,9 @@ import type {
 	taskList,
 	user,
 } from "./schema";
+import type * as dbSchema from "./schema";
+
+export type Database = NodePgDatabase<typeof dbSchema>;
 
 export type User = InferSelectModel<typeof user>;
 export type Project = InferSelectModel<typeof project>;
