@@ -206,7 +206,6 @@ export class SearchService {
 		projectId?: number;
 		limit?: number;
 	}) {
-		const index = this.index;
 		const searchOptions: {
 			query: string;
 			limit: number;
@@ -218,7 +217,6 @@ export class SearchService {
 			reranking: true,
 		};
 
-		// Build filter (no need for tenant filter since we use tenant-specific index)
 		const filters: string[] = [];
 		
 		if (options?.type) {
@@ -233,12 +231,7 @@ export class SearchService {
 			searchOptions.filter = filters.join(" AND ");
 		}
 
-		console.log('Search options:', searchOptions);
 		const results = await index.search(searchOptions);
-		console.log('Raw Upstash results:', results.length);
-		if (results.length > 0) {
-			console.log('First result metadata:', results[0].metadata);
-		}
 		
 		return results.map((result: {
 			id: string;
@@ -272,13 +265,10 @@ export class SearchService {
 	}
 
 	async deleteItem(id: string) {
-		const index = this.index;
-		await index.delete(id);
+		await this.index.delete(id);
 	}
 
 	async deleteByProject(projectId: number) {
-		// Unfortunately Upstash doesn't support bulk delete by filter
-		// We'd need to search and delete individually
 		const projectItems = await this.search("", { projectId, limit: 1000 });
 		for (const item of projectItems) {
 			await this.deleteItem(item.id);
@@ -286,17 +276,14 @@ export class SearchService {
 	}
 
 	async deleteTenantIndex() {
-		// Delete the entire index for a tenant (clear all documents)
 		try {
 			await this.index.reset(); 
 		} catch (error) {
-			// Index might not exist, which is fine
 			console.log(`Index for tenant ${this.tenant} does not exist or already deleted`);
 		}
 	}
 
 	async clearIndex() {
-		// Clear all entries from the index (for reindexing)
 		try {
 			await this.index.reset();
 		} catch (error) {

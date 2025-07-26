@@ -12,25 +12,19 @@ export const searchRouter = createTRPCRouter({
 			}),
 		)
 		.query(async ({ input, ctx }) => {
-			console.log('Search query input:', input);
 			const results = await ctx.search.search(input.query, {
 				type: input.type,
 				projectId: input.projectId,
 				limit: input.limit,
 			});
-			console.log('Search results count:', results.length);
 
 			return results;
 		}),
 
 	indexAllContent: protectedProcedure
 		.mutation(async ({ ctx }) => {
-			// This is a utility endpoint to re-index all content for the current organization
-			
-			// Clear the existing index first to ensure clean state
 			await ctx.search.clearIndex();
 			
-			// Index all projects
 			const projects = await ctx.db.query.project.findMany({
 				where: (project, { eq }) => eq(project.createdByUser, ctx.ownerId),
 			});
@@ -39,7 +33,6 @@ export const searchRouter = createTRPCRouter({
 				await ctx.search.indexProject(project);
 			}
 
-			// Index all task lists with their projects
 			const taskLists = await ctx.db.query.taskList.findMany({
 				where: (taskList, { eq }) => eq(taskList.createdByUser, ctx.ownerId),
 				with: {
@@ -51,7 +44,6 @@ export const searchRouter = createTRPCRouter({
 				await ctx.search.indexTaskList(taskList, taskList.project);
 			}
 
-			// Index all tasks with their task lists and projects
 			const tasks = await ctx.db.query.task.findMany({
 				where: (task, { eq }) => eq(task.createdByUser, ctx.ownerId),
 				with: {
@@ -71,7 +63,6 @@ export const searchRouter = createTRPCRouter({
 				);
 			}
 
-			// Index all events with their projects
 			const events = await ctx.db.query.calendarEvent.findMany({
 				where: (event, { eq }) => eq(event.createdByUser, ctx.ownerId),
 				with: {
