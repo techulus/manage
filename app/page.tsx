@@ -270,7 +270,7 @@ export default async function Home() {
 							<div className="grid grid-cols-2 gap-6 text-sm">
 								<div className="flex items-center gap-2">
 									<div className="w-2 h-2 bg-green-400 rounded-full" />
-									<span className="text-gray-300">MIT Licensed</span>
+									<span className="text-gray-300">AGPL-3.0 Licensed</span>
 								</div>
 								<div className="flex items-center gap-2">
 									<div className="w-2 h-2 bg-blue-400 rounded-full" />
