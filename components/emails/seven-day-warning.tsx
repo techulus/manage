@@ -183,4 +183,42 @@ const footer = {
   margin: '32px 0 0',
 };
 
+export function sevenDayWarningPlainText({
+  firstName,
+  email,
+  organizationName,
+}: SevenDayWarningProps): string {
+  const isOrganization = !!organizationName;
+  
+  return `🚨 Final Warning: ${isOrganization ? 'Organization' : 'Account'} Deletion in 7 Days
+
+Hello ${firstName || 'there'},
+
+${isOrganization 
+  ? `This is your final warning. Your Manage organization "${organizationName}" will be permanently deleted in 7 days.`
+  : `This is your final warning. Your Manage account (${email}) will be permanently deleted in 7 days.`}
+
+${isOrganization 
+  ? `We sent you a notice 23 days ago about your inactive organization, but we haven't seen any activity since then.`
+  : `We sent you a notice 23 days ago about your inactive account, but we haven't seen any activity since then.`}
+
+What happens if you don't act:
+${isOrganization ? `• Your organization will be permanently deleted
+• All projects and tasks will be lost
+• This action cannot be undone` : `• Your account will be permanently deleted
+• All your projects and tasks will be lost
+• This action cannot be undone`}
+
+${isOrganization ? 'To save your organization:' : 'To save your account:'} Simply log in to Manage within the next 7 days.
+
+${isOrganization ? 'Save My Organization Now' : 'Save My Account Now'}: https://managee.xyz/start
+
+${isOrganization 
+  ? "If you no longer want to use Manage, you can ignore this email and your organization will be automatically deleted."
+  : "If you no longer want to use Manage, you can ignore this email and your account will be automatically deleted."}
+
+Best regards,
+The Manage Team`;
+}
+
 export default SevenDayWarning;

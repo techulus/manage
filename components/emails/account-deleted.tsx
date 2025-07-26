@@ -22,8 +22,8 @@ export const AccountDeleted = ({
 }: AccountDeletedProps) => {
   const isOrganization = !!organizationName;
   const previewText = isOrganization 
-    ? `Your Manage organization "${organizationName}" has been deleted due to inactivity`
-    : "Your Manage account has been deleted due to inactivity";
+    ? `Your Manage organization "${organizationName}" has been deleted`
+    : "Your Manage account has been deleted";
 
   return (
     <Html>
@@ -44,19 +44,9 @@ export const AccountDeleted = ({
             
             <Text style={text}>
               {isOrganization ? (
-                `Your Manage organization "${organizationName}" has been permanently deleted due to inactivity.`
+                `Your Manage organization "${organizationName}" has been permanently deleted.`
               ) : (
-                `Your Manage account (${email}) has been permanently deleted due to inactivity.`
-              )}
-            </Text>
-            
-            <Text style={text}>
-              {isOrganization ? (
-                `As we notified you in our previous emails, organizations inactive for more than 30 days 
-                are automatically removed to keep our platform secure and efficient.`
-              ) : (
-                `As we notified you in our previous emails, accounts inactive for more than 30 days 
-                are automatically removed to keep our platform secure and efficient.`
+                `Your Manage account (${email}) has been permanently deleted.`
               )}
             </Text>
             
@@ -89,7 +79,7 @@ export const AccountDeleted = ({
             </Text>
             
             <Text style={text}>
-              Thank you for being part of the Manage community. We're sorry to see you go.
+              Thank you for being part of the Manage community.
             </Text>
             
             <Text style={footer}>
@@ -146,5 +136,43 @@ const footer = {
   lineHeight: '20px',
   margin: '32px 0 0',
 };
+
+AccountDeleted.PreviewProps = {
+  firstName: 'John',
+  email: 'john@example.com',
+  organizationName: 'Acme Corp',
+} as AccountDeletedProps;
+
+export function accountDeletedPlainText({
+  firstName,
+  email,
+  organizationName,
+}: AccountDeletedProps): string {
+  const isOrganization = !!organizationName;
+  
+  return `${isOrganization ? 'Organization Deleted' : 'Account Deleted'}
+
+Hello ${firstName || 'there'},
+
+${isOrganization 
+  ? `Your Manage organization "${organizationName}" has been permanently deleted.`
+  : `Your Manage account (${email}) has been permanently deleted.`}
+
+What this means:
+${isOrganization ? `• Your organization has been permanently deleted
+• All projects, tasks, and data have been removed
+• This action cannot be undone` : `• Your account has been permanently deleted
+• All projects, tasks, and data have been removed
+• This action cannot be undone`}
+
+${isOrganization 
+  ? `If you'd like to use Manage again in the future, you're welcome to create a new organization at any time.`
+  : `If you'd like to use Manage again in the future, you're welcome to create a new account at any time.`}
+
+Thank you for being part of the Manage community.
+
+Best regards,
+The Manage Team`;
+}
 
 export default AccountDeleted;

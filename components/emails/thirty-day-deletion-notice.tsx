@@ -159,4 +159,37 @@ const footer = {
   margin: '32px 0 0',
 };
 
+export function thirtyDayDeletionNoticePlainText({
+  firstName,
+  email,
+  organizationName,
+}: ThirtyDayDeletionNoticeProps): string {
+  const isOrganization = !!organizationName;
+  
+  return `${isOrganization ? 'Organization Deletion Notice' : 'Account Deletion Notice'}
+
+Hello ${firstName || 'there'},
+
+${isOrganization 
+  ? `We noticed that your Manage organization "${organizationName}" has been inactive for 30 days. To keep our platform secure and efficient, we automatically remove inactive organizations.`
+  : `We noticed that your Manage account (${email}) has been inactive for 30 days. To keep our platform secure and efficient, we automatically remove inactive accounts.`}
+
+${isOrganization 
+  ? `Your organization "${organizationName}" will be permanently deleted in 30 days`
+  : 'Your account will be permanently deleted in 30 days'} unless you log in and use the platform.
+
+${isOrganization 
+  ? `If you'd like to keep your organization, simply log in to Manage within the next 30 days. All your projects, tasks, and data will remain intact.`
+  : `If you'd like to keep your account, simply log in to Manage within the next 30 days. All your projects, tasks, and data will remain intact.`}
+
+${isOrganization ? 'Keep My Organization Active' : 'Keep My Account Active'}: https://managee.xyz/start
+
+${isOrganization 
+  ? `If you no longer wish to use Manage, you don't need to do anything. Your organization and all associated data will be automatically deleted.`
+  : `If you no longer wish to use Manage, you don't need to do anything. Your account and all associated data will be automatically deleted.`}
+
+Best regards,
+The Manage Team`;
+}
+
 export default ThirtyDayDeletionNotice;

@@ -380,4 +380,82 @@ const footer = {
   textAlign: 'center' as const,
 };
 
+export function dailySummaryPlainText({
+  firstName,
+  email,
+  timezone,
+  date,
+  overdueTasks,
+  dueToday,
+  events,
+}: DailySummaryProps): string {
+  const formattedDate = getFormattedDate(date, timezone);
+  
+  let content = `Daily Summary - ${formattedDate}
+
+🌅 Good morning ${firstName || 'there'}!
+
+📅 Here's what's on your agenda today:
+
+`;
+
+  // Overdue Tasks
+  if (overdueTasks.length > 0) {
+    content += `🚨 OVERDUE TASKS (${overdueTasks.length})
+${'-'.repeat(30)}
+`;
+    overdueTasks.forEach((task) => {
+      content += `• ${task.name}\n`;
+      content += `  ${task.taskList.project.name} • ${task.taskList.name}`;
+      if (task.dueDate) {
+        content += ` • Due: ${formatTaskDate(task.dueDate, timezone)}`;
+      }
+      content += '\n\n';
+    });
+    content += '\n';
+  }
+
+  // Due Today Tasks
+  if (dueToday.length > 0) {
+    content += `📋 DUE TODAY (${dueToday.length})
+${'-'.repeat(30)}
+`;
+    dueToday.forEach((task) => {
+      content += `• ${task.name}\n`;
+      content += `  ${task.taskList.project.name} • ${task.taskList.name}\n\n`;
+    });
+    content += '\n';
+  }
+
+  // Events
+  if (events.length > 0) {
+    content += `📅 TODAY'S EVENTS (${events.length})
+${'-'.repeat(30)}
+`;
+    events.forEach((event) => {
+      content += `• ${event.name}\n`;
+      content += `  ${event.project.name}`;
+      if (!event.allDay) {
+        content += ` • ${formatEventTime(event.start, event.end, timezone)}`;
+      } else {
+        content += ' • All Day';
+      }
+      if (event.description) {
+        content += `\n  ${event.description}`;
+      }
+      content += '\n\n';
+    });
+  }
+
+  content += `
+Open Manage: https://managee.xyz/start
+
+✨ Have a productive day! 🚀
+The Manage Team`;
+
+  return content;
+}
+
+export { getFormattedDate };
+
 export default DailySummary;
