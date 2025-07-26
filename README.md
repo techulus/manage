@@ -16,9 +16,9 @@ Manage is an open-source project management platform. With its intuitive interfa
 - [x] Comments
 - [x] Events / Calendar
 - [x] Activity logs
+- [x] Search
 - [ ] Posts & files
 - [ ] Notifications
-- [ ] Search
 - [ ] Admin panel
 - [ ] Permissions
 
@@ -55,6 +55,14 @@ RESEND_API_KEY=
 ```bash
 docker-compose up
 ```
+
+## Deployment
+
+<a href="https://railway.com?referralCode=techulus">
+  <img src="https://railway.com/brand/logotype-light.png" alt="Railway" height="70" />
+</a>
+
+Manage is hosted on [Railway](https://railway.com?referralCode=techulus), a modern platform that makes deploying applications simple and fast. Railway provides excellent developer experience with features like automatic deployments, built-in databases, and seamless scaling.
 
 ## Note on Performance
 

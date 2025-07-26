@@ -112,18 +112,14 @@ export default function SearchPage() {
 		data: searchResults = [],
 		isLoading,
 		error,
-	} = useQuery(
-		trpc.search.searchQuery.queryOptions(
-			{
-				query: debouncedQuery,
-				type: typeFilter,
-				limit: 50,
-			},
-			{
-				enabled: debouncedQuery.length > 0,
-			},
-		),
-	);
+	} = useQuery({
+		...trpc.search.searchQuery.queryOptions({
+			query: debouncedQuery,
+			type: typeFilter,
+			limit: 50,
+		}),
+		enabled: debouncedQuery.length > 0,
+	});
 
 	const indexAllMutation = useMutation(
 		trpc.search.indexAllContent.mutationOptions(),

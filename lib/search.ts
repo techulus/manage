@@ -1,5 +1,5 @@
-import { Search } from "@upstash/search";
 import type { calendarEvent, project, task, taskList } from "@/drizzle/schema";
+import { Search } from "@upstash/search";
 
 const client = Search.fromEnv();
 
@@ -201,11 +201,14 @@ export class SearchService {
 		});
 	}
 
-	async search(query: string, options?: {
-		type?: "project" | "task" | "tasklist" | "event";
-		projectId?: number;
-		limit?: number;
-	}) {
+	async search(
+		query: string,
+		options?: {
+			type?: "project" | "task" | "tasklist" | "event";
+			projectId?: number;
+			limit?: number;
+		},
+	) {
 		const searchOptions: {
 			query: string;
 			limit: number;
@@ -218,11 +221,11 @@ export class SearchService {
 		};
 
 		const filters: string[] = [];
-		
+
 		if (options?.type) {
 			filters.push(`type = '${options.type}'`);
 		}
-		
+
 		if (options?.projectId) {
 			filters.push(`projectId = ${options.projectId}`);
 		}
@@ -231,37 +234,47 @@ export class SearchService {
 			searchOptions.filter = filters.join(" AND ");
 		}
 
-		const results = await index.search(searchOptions);
-		
-		return results.map((result: {
-			id: string;
-			score: number;
-			content?: {
-				title?: string;
-				description?: string;
-				type?: string;
-				status?: string;
-				projectName?: string;
-				projectId?: number;
-			};
-			metadata?: {
-				url?: string;
-				createdAt?: string;
-				dueDate?: string;
-			};
-		}) => ({
-			id: result.id,
-			title: result.content?.title || "",
-			description: result.content?.description || "",
-			type: (result.content?.type || "") as "project" | "task" | "tasklist" | "event",
-			status: result.content?.status || "",
-			projectName: result.content?.projectName || "",
-			url: result.metadata?.url || "",
-			projectId: result.content?.projectId || 0,
-			score: result.score,
-			createdAt: result.metadata?.createdAt ? new Date(result.metadata.createdAt) : new Date(),
-			dueDate: result.metadata?.dueDate ? new Date(result.metadata.dueDate) : undefined,
-		}));
+		const results = await this.index.search(searchOptions);
+
+		return results.map(
+			(result: {
+				id: string;
+				score: number;
+				content?: {
+					title?: string;
+					description?: string;
+					type?: string;
+					status?: string;
+					projectName?: string;
+					projectId?: number;
+				};
+				metadata?: {
+					url?: string;
+					createdAt?: string;
+					dueDate?: string;
+				};
+			}) => ({
+				id: result.id,
+				title: result.content?.title || "",
+				description: result.content?.description || "",
+				type: (result.content?.type || "") as
+					| "project"
+					| "task"
+					| "tasklist"
+					| "event",
+				status: result.content?.status || "",
+				projectName: result.content?.projectName || "",
+				url: result.metadata?.url || "",
+				projectId: result.content?.projectId || 0,
+				score: result.score,
+				createdAt: result.metadata?.createdAt
+					? new Date(result.metadata.createdAt)
+					: new Date(),
+				dueDate: result.metadata?.dueDate
+					? new Date(result.metadata.dueDate)
+					: undefined,
+			}),
+		);
 	}
 
 	async deleteItem(id: string) {
@@ -277,9 +290,11 @@ export class SearchService {
 
 	async deleteTenantIndex() {
 		try {
-			await this.index.reset(); 
+			await this.index.reset();
 		} catch (error) {
-			console.log(`Index for tenant ${this.tenant} does not exist or already deleted`);
+			console.log(
+				`Index for tenant ${this.tenant} does not exist or already deleted`,
+			);
 		}
 	}
 
@@ -287,8 +302,10 @@ export class SearchService {
 		try {
 			await this.index.reset();
 		} catch (error) {
-			console.log(`Index for tenant ${this.tenant} could not be cleared:`, error);
+			console.log(
+				`Index for tenant ${this.tenant} could not be cleared:`,
+				error,
+			);
 		}
 	}
 }
-

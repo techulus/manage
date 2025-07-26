@@ -22,6 +22,7 @@ import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { CommandMenu } from "../core/cmd-menu";
+import { GlobalSearch } from "../core/global-search";
 import { Notifications } from "../core/notifications";
 
 interface NavLink {
@@ -291,6 +292,8 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				</div>
 
 				<div className="ml-auto flex items-center space-x-1">
+					<GlobalSearch />
+
 					<Button
 						variant="ghost"
 						size="icon"
