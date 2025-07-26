@@ -404,14 +404,14 @@ export function dailySummaryPlainText({
     content += `🚨 OVERDUE TASKS (${overdueTasks.length})
 ${'-'.repeat(30)}
 `;
-    overdueTasks.forEach((task) => {
+    for (const task of overdueTasks) {
       content += `• ${task.name}\n`;
       content += `  ${task.taskList.project.name} • ${task.taskList.name}`;
       if (task.dueDate) {
         content += ` • Due: ${formatTaskDate(task.dueDate, timezone)}`;
       }
       content += '\n\n';
-    });
+    }
     content += '\n';
   }
 
@@ -420,10 +420,10 @@ ${'-'.repeat(30)}
     content += `📋 DUE TODAY (${dueToday.length})
 ${'-'.repeat(30)}
 `;
-    dueToday.forEach((task) => {
+    for (const task of dueToday) {
       content += `• ${task.name}\n`;
       content += `  ${task.taskList.project.name} • ${task.taskList.name}\n\n`;
-    });
+    }
     content += '\n';
   }
 
@@ -432,7 +432,7 @@ ${'-'.repeat(30)}
     content += `📅 TODAY'S EVENTS (${events.length})
 ${'-'.repeat(30)}
 `;
-    events.forEach((event) => {
+    for (const event of events) {
       content += `• ${event.name}\n`;
       content += `  ${event.project.name}`;
       if (!event.allDay) {
@@ -444,7 +444,7 @@ ${'-'.repeat(30)}
         content += `\n  ${event.description}`;
       }
       content += '\n\n';
-    });
+    }
   }
 
   content += `

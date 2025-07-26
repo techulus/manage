@@ -33,6 +33,17 @@ export const projectsRouter = createTRPCRouter({
 				newValue: newProject?.[0],
 				projectId: newProject?.[0].id,
 			});
+
+			// Index the project for search
+			if (newProject?.[0]) {
+				try {
+					await ctx.search.indexProject(newProject[0]);
+				} catch (err) {
+					console.error("Error indexing project for search:", err);
+				}
+			}
+
+			return newProject?.[0];
 		}),
 	updateProject: protectedProcedure
 		.input(
@@ -86,7 +97,18 @@ export const projectsRouter = createTRPCRouter({
 					target: `/${ctx.orgSlug}/projects/${input.id}`,
 					projectId: +input.id,
 				});
+
+				// Re-index the updated project for search
+				if (updatedProject?.[0]) {
+					try {
+						await ctx.search.indexProject(updatedProject[0]);
+					} catch (err) {
+						console.error("Error re-indexing project for search:", err);
+					}
+				}
 			}
+
+			return updatedProject?.[0];
 		}),
 	deleteProject: protectedProcedure
 		.input(
@@ -106,6 +128,22 @@ export const projectsRouter = createTRPCRouter({
 				projectId: input.id,
 				oldValue: deletedProject[0],
 			});
+
+			// Remove project from search index
+			try {
+				await ctx.search.deleteItem(`project-${input.id}`);
+			} catch (err) {
+				console.error("Error removing project from search index:", err);
+			}
+
+			// Also remove all related content from search (tasks, tasklists, events)
+			try {
+				await ctx.search.deleteByProject(input.id);
+			} catch (err) {
+				console.error("Error removing project-related content from search index:", err);
+			}
+
+			return deletedProject[0];
 		}),
 	getProjectById: protectedProcedure
 		.input(

@@ -1,4 +1,4 @@
-import { task, taskList } from "@/drizzle/schema";
+import { project, task, taskList } from "@/drizzle/schema";
 import { TaskListStatus, TaskStatus } from "@/drizzle/types";
 import { logActivity } from "@/lib/activity";
 import { notifyUser } from "@/lib/utils/useNotification";
@@ -74,6 +74,20 @@ export const tasksRouter = createTRPCRouter({
 				newValue: createdTaskList[0],
 			});
 
+			// Index the task list for search
+			if (createdTaskList?.[0]) {
+				try {
+					const projectData = await ctx.db.query.project.findFirst({
+						where: eq(project.id, input.projectId),
+					});
+					if (projectData) {
+						await ctx.search.indexTaskList(createdTaskList[0], projectData);
+					}
+				} catch (err) {
+					console.error("Error indexing task list for search:", err);
+				}
+			}
+
 			return createdTaskList?.[0];
 		}),
 	updateTaskList: protectedProcedure
@@ -137,6 +151,20 @@ export const tasksRouter = createTRPCRouter({
 					oldValue: oldTaskList,
 					newValue: data[0],
 				});
+
+				// Re-index the updated task list for search
+				if (data?.[0]) {
+					try {
+						const projectData = await ctx.db.query.project.findFirst({
+							where: eq(project.id, oldTaskList.projectId),
+						});
+						if (projectData) {
+							await ctx.search.indexTaskList(data[0], projectData);
+						}
+					} catch (err) {
+						console.error("Error re-indexing task list for search:", err);
+					}
+				}
 			}
 
 			return data?.[0];
@@ -156,6 +184,13 @@ export const tasksRouter = createTRPCRouter({
 					projectId: data[0].projectId,
 					oldValue: data[0],
 				});
+
+				// Remove task list from search index
+				try {
+					await ctx.search.deleteItem(`tasklist-${input.id}`);
+				} catch (err) {
+					console.error("Error removing task list from search index:", err);
+				}
 			}
 
 			return data?.[0];
@@ -238,6 +273,23 @@ export const tasksRouter = createTRPCRouter({
 					projectId: taskListDetails.projectId,
 					newValue: createdTask[0],
 				});
+				
+				// Index the task for search
+				if (createdTask?.[0]) {
+					try {
+						const fullTaskList = await ctx.db.query.taskList.findFirst({
+							where: eq(taskList.id, input.taskListId),
+							with: {
+								project: true,
+							},
+						});
+						if (fullTaskList?.project) {
+							await ctx.search.indexTask(createdTask[0], fullTaskList, fullTaskList.project);
+						}
+					} catch (err) {
+						console.error("Error indexing task for search:", err);
+					}
+				}
 			}
 
 			return createdTask?.[0];
@@ -333,6 +385,23 @@ export const tasksRouter = createTRPCRouter({
 					oldValue: oldTask,
 					newValue: updatedTask[0],
 				});
+
+				// Re-index the updated task for search
+				if (updatedTask?.[0]) {
+					try {
+						const fullTaskList = await ctx.db.query.taskList.findFirst({
+							where: eq(taskList.id, updatedTask[0].taskListId),
+							with: {
+								project: true,
+							},
+						});
+						if (fullTaskList?.project) {
+							await ctx.search.indexTask(updatedTask[0], fullTaskList, fullTaskList.project);
+						}
+					} catch (err) {
+						console.error("Error re-indexing task for search:", err);
+					}
+				}
 			}
 
 			return updatedTask?.[0];
@@ -360,6 +429,13 @@ export const tasksRouter = createTRPCRouter({
 					projectId: currentTask.taskList.projectId,
 					oldValue: currentTask,
 				});
+
+				// Remove task from search index
+				try {
+					await ctx.search.deleteItem(`task-${input.id}`);
+				} catch (err) {
+					console.error("Error removing task from search index:", err);
+				}
 			}
 
 			return currentTask;
