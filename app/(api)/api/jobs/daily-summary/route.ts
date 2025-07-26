@@ -1,4 +1,7 @@
-import { DailySummary, dailySummaryPlainText } from "@/components/emails/daily-summary";
+import {
+	DailySummary,
+	dailySummaryPlainText,
+} from "@/components/emails/daily-summary";
 import { user as userSchema } from "@/drizzle/schema";
 import { getTodayDataForUser } from "@/lib/utils/todayData";
 import { getDatabaseForOwner } from "@/lib/utils/useDatabase";
@@ -8,26 +11,54 @@ import { serve } from "@upstash/workflow/nextjs";
 import { eq, gte } from "drizzle-orm";
 import { Resend } from "resend";
 
+function isCurrentlySevenAM(timezone: string): boolean {
+	try {
+		const now = new Date();
+		const userTime = new Intl.DateTimeFormat("en-US", {
+			timeZone: timezone,
+			hour: "numeric",
+			hour12: false,
+		}).format(now);
+		
+		const hour = Number.parseInt(userTime.split(' ')[0] || userTime, 10);
+		return hour === 7;
+	} catch (error) {
+		console.error(`[DailySummary] Error checking time for timezone ${timezone}:`, error);
+		return false;
+	}
+}
+
+
 export const { POST } = serve(async (context) => {
 	const resend = new Resend(process.env.RESEND_API_KEY);
 	console.log(
 		`[DailySummary] Starting daily summary job at ${new Date().toISOString()}`,
 	);
 
-	// Step 1: Get active users from ops database (active in last 7 days)
+	// Step 1: Get active users from ops database (active in last 7 days) and filter by 7AM timezone
 	const users = await context.run("fetch-users", async () => {
 		const opsDb = await getOpsDatabase();
 		const sevenDaysAgo = new Date();
 		sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-		const users = await opsDb
+		const allUsers = await opsDb
 			.select()
 			.from(opsUser)
 			.where(gte(opsUser.lastActiveAt, sevenDaysAgo));
 		console.log(
-			`[DailySummary] Found ${users.length} active users (last 7 days)`,
+			`[DailySummary] Found ${allUsers.length} active users (last 7 days)`,
 		);
-		return users;
+
+		// Filter users where it's currently 7AM in their timezone
+		const usersAt7AM = allUsers.filter(user => {
+			const userTimezone = user.timeZone || "UTC";
+			return isCurrentlySevenAM(userTimezone);
+		});
+
+		console.log(
+			`[DailySummary] Found ${usersAt7AM.length} users where it's currently 7AM`,
+		);
+		return usersAt7AM;
 	});
 
 	// Step 2: Process users
@@ -36,10 +67,12 @@ export const { POST } = serve(async (context) => {
 
 		for (const userData of users) {
 			try {
+				const userTimezone = userData.timeZone || "UTC";
 				await processUserSummary(
 					userData.id,
 					userData.email,
 					userData.firstName,
+					userTimezone,
 					resend,
 				);
 			} catch (error) {
@@ -60,31 +93,16 @@ async function processUserSummary(
 	userId: string,
 	email: string,
 	firstName: string | undefined | null,
+	timezone: string,
 	resend: Resend,
 ) {
 	try {
 		console.log(
-			`[DailySummary] Processing summary for user ${email} (${userId})`,
+			`[DailySummary] Processing summary for user ${email} (${userId}) at timezone ${timezone}`,
 		);
 
-		// Get user's database and timezone
+		// Get user's database
 		const db = await getDatabaseForOwner(userId);
-		const userDetails = await db.query.user.findFirst({
-			where: eq(userSchema.id, userId),
-			columns: {
-				timeZone: true,
-			},
-		});
-
-		if (!userDetails) {
-			console.log(
-				`[DailySummary] User ${email} not found in main database, skipping`,
-			);
-			return;
-		}
-
-		const timezone = userDetails.timeZone || "UTC";
-		console.log(`[DailySummary] Using timezone ${timezone} for user ${email}`);
 
 		// Get today's data using the same logic as getTodayData
 		const today = new Date();
@@ -96,9 +114,7 @@ async function processUserSummary(
 
 		// Only send email if user has relevant content
 		const hasContent =
-			dueToday.length > 0 ||
-			overDue.length > 0 ||
-			events.length > 0;
+			dueToday.length > 0 || overDue.length > 0 || events.length > 0;
 
 		if (!hasContent) {
 			console.log(

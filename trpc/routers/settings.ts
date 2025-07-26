@@ -1,5 +1,7 @@
 import { blob, user } from "@/drizzle/schema";
 import type { User } from "@/drizzle/types";
+import { opsUser } from "@/ops/drizzle/schema";
+import { getOpsDatabase } from "@/ops/useOps";
 import { eq, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { z } from "zod";
@@ -30,11 +32,25 @@ export const settingsRouter = createTRPCRouter({
 				maxAge: 60 * 60 * 24 * 365,
 			});
 
+			// Update main user database
 			await ctx.db
 				.update(user)
 				.set({ timeZone: input })
 				.where(eq(user.id, ctx.userId))
 				.execute();
+
+			// Also update ops user database for email scheduling
+			try {
+				const opsDb = await getOpsDatabase();
+				await opsDb
+					.update(opsUser)
+					.set({ timeZone: input })
+					.where(eq(opsUser.id, ctx.userId))
+					.execute();
+			} catch (error) {
+				console.error("[Settings] Error updating timezone in ops database:", error);
+				// Don't throw error to avoid blocking the main update
+			}
 		}),
 	getTimezone: protectedProcedure.output(z.string()).query(async () => {
 		const cookieStore = await cookies();
