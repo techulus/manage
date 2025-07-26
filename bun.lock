@@ -37,6 +37,7 @@
         "@trpc/tanstack-react-query": "^11.0.2",
         "@turbowire/serverless": "^0.1.0",
         "@turbowire/web": "^0.3.0",
+        "@upstash/search": "^0.1.5",
         "@upstash/workflow": "^0.2.16",
         "autoprefixer": "10.4.14",
         "class-variance-authority": "^0.7.1",
@@ -1068,6 +1069,10 @@
     "@unrs/rspack-resolver-binding-win32-x64-msvc": ["@unrs/rspack-resolver-binding-win32-x64-msvc@1.2.2", "", { "os": "win32", "cpu": "x64" }, "sha512-hewo/UMGP1a7O6FG/ThcPzSJdm/WwrYDNkdGgWl6M18H6K6MSitklomWpT9MUtT5KGj++QJb06va/14QBC4pvw=="],
 
     "@upstash/qstash": ["@upstash/qstash@2.8.1", "", { "dependencies": { "crypto-js": ">=4.2.0", "jose": "^5.2.3", "neverthrow": "^7.0.1" } }, "sha512-E+JoLHMqygQksWATjS/9AAo7Mhi/k21Tu0zDwMm9GyNyNVjEJntQvmrH5NC7x6kXwjCDTEWFtIWz0JXu9/9pMQ=="],
+
+    "@upstash/search": ["@upstash/search@0.1.5", "", { "dependencies": { "@upstash/vector": "^1.2.1" } }, "sha512-+vkNsxC6jRP1m1HZdnJx7MD8KqvKHlqZjZ+eJMhgnTNXIYoqeY63WBorHY8M3nN7Buhns+eRl1YUTRwnZuiwgQ=="],
+
+    "@upstash/vector": ["@upstash/vector@1.2.2", "", {}, "sha512-ptQ9xnxtKqmpNK52PCcHCszlPOLxIBfjsv7ty8RoF95pkjctS9rSjTQ3Pl9bx5VFbpDj+0dMXw88WLt6swDkgQ=="],
 
     "@upstash/workflow": ["@upstash/workflow@0.2.16", "", { "dependencies": { "@ai-sdk/openai": "^1.2.1", "@upstash/qstash": "^2.8.1", "ai": "^4.1.54", "zod": "^3.24.1" } }, "sha512-9mqC3p5B9i92gf1KMEZhDcU5YMEut0hkWxmf2gsDcJVCcbLD958MEDT2q2wGZa7MnKAuvEOYNDSefi0x2a5pGQ=="],
 
