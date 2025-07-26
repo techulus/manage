@@ -53,14 +53,16 @@ export class SearchService {
 
 		await index.upsert({
 			id: searchableItem.id,
+			// Combine title multiple times to give it more weight in search
 			content: {
+				text: `${searchableItem.title} ${searchableItem.title} ${searchableItem.title} ${searchableItem.description || ""} ${searchableItem.type} ${searchableItem.status || ""}`
+			},
+			metadata: {
+				...searchableItem.metadata,
 				title: searchableItem.title,
 				description: searchableItem.description || "",
 				type: searchableItem.type,
 				status: searchableItem.status || "",
-			},
-			metadata: {
-				...searchableItem.metadata,
 				url: searchableItem.url,
 				projectId: searchableItem.projectId,
 				createdAt: searchableItem.createdAt.toISOString(),
@@ -97,15 +99,17 @@ export class SearchService {
 
 		await index.upsert({
 			id: searchableItem.id,
+			// Combine title multiple times to give it more weight in search
 			content: {
+				text: `${searchableItem.title} ${searchableItem.title} ${searchableItem.title} ${searchableItem.description || ""} ${searchableItem.type} ${searchableItem.status || ""} ${searchableItem.projectName || ""}`
+			},
+			metadata: {
+				...searchableItem.metadata,
 				title: searchableItem.title,
 				description: searchableItem.description || "",
 				type: searchableItem.type,
 				status: searchableItem.status || "",
 				projectName: searchableItem.projectName || "",
-			},
-			metadata: {
-				...searchableItem.metadata,
 				url: searchableItem.url,
 				projectId: searchableItem.projectId,
 				createdAt: searchableItem.createdAt.toISOString(),
@@ -138,15 +142,17 @@ export class SearchService {
 
 		await index.upsert({
 			id: searchableItem.id,
+			// Combine title multiple times to give it more weight in search
 			content: {
+				text: `${searchableItem.title} ${searchableItem.title} ${searchableItem.title} ${searchableItem.description || ""} ${searchableItem.type} ${searchableItem.status || ""} ${searchableItem.projectName || ""}`
+			},
+			metadata: {
+				...searchableItem.metadata,
 				title: searchableItem.title,
 				description: searchableItem.description || "",
 				type: searchableItem.type,
 				status: searchableItem.status || "",
 				projectName: searchableItem.projectName || "",
-			},
-			metadata: {
-				...searchableItem.metadata,
 				url: searchableItem.url,
 				projectId: searchableItem.projectId,
 				createdAt: searchableItem.createdAt.toISOString(),
@@ -180,14 +186,16 @@ export class SearchService {
 
 		await index.upsert({
 			id: searchableItem.id,
+			// Combine title multiple times to give it more weight in search
 			content: {
+				text: `${searchableItem.title} ${searchableItem.title} ${searchableItem.title} ${searchableItem.description || ""} ${searchableItem.type} ${searchableItem.projectName || ""}`
+			},
+			metadata: {
+				...searchableItem.metadata,
 				title: searchableItem.title,
 				description: searchableItem.description || "",
 				type: searchableItem.type,
 				projectName: searchableItem.projectName || "",
-			},
-			metadata: {
-				...searchableItem.metadata,
 				url: searchableItem.url,
 				projectId: searchableItem.projectId,
 				createdAt: searchableItem.createdAt.toISOString(),
@@ -229,13 +237,27 @@ export class SearchService {
 
 		const results = await index.search(searchOptions);
 		
-		return results.map((result: any) => ({
+		return results.map((result: {
+			id: string;
+			score: number;
+			metadata?: {
+				title?: string;
+				description?: string;
+				type?: string;
+				status?: string;
+				projectName?: string;
+				url?: string;
+				projectId?: number;
+				createdAt?: string;
+				dueDate?: string;
+			};
+		}) => ({
 			id: result.id,
-			title: result.content.title,
-			description: result.content.description,
-			type: result.content.type,
-			status: result.content.status,
-			projectName: result.content.projectName,
+			title: result.metadata?.title || "",
+			description: result.metadata?.description || "",
+			type: (result.metadata?.type || "") as "project" | "task" | "tasklist" | "event",
+			status: result.metadata?.status || "",
+			projectName: result.metadata?.projectName || "",
 			url: result.metadata?.url || "",
 			projectId: result.metadata?.projectId || 0,
 			score: result.score,

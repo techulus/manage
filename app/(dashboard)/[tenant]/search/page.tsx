@@ -1,17 +1,10 @@
 "use client";
 
+import { HtmlPreview } from "@/components/core/html-view";
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
-import { HtmlPreview } from "@/components/core/html-view";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -324,6 +317,13 @@ export default function SearchPage() {
 													key={result.id}
 													className="border rounded-lg p-3 hover:bg-muted/50 transition-colors cursor-pointer"
 													onClick={() => handleItemClick(result.url)}
+													onKeyDown={(e) => {
+														if (e.key === "Enter" || e.key === " ") {
+															handleItemClick(result.url);
+														}
+													}}
+													role="button"
+													tabIndex={0}
 												>
 													<div className="space-y-2">
 														<div className="flex items-center gap-2 min-w-0">

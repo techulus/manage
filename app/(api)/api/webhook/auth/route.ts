@@ -1,7 +1,10 @@
-import { AccountDeleted, accountDeletedPlainText } from "@/components/emails/account-deleted";
+import {
+	AccountDeleted,
+	accountDeletedPlainText,
+} from "@/components/emails/account-deleted";
+import { SearchService } from "@/lib/search";
 import { deleteDatabase } from "@/lib/utils/useDatabase";
 import { triggerBlobDeletionWorkflow } from "@/lib/utils/workflow";
-import { SearchService } from "@/lib/search";
 import { opsOrganization, opsUser } from "@/ops/drizzle/schema";
 import { getOpsDatabase } from "@/ops/useOps";
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
@@ -116,10 +119,7 @@ export async function POST(req: NextRequest) {
 
 				// Delete search index for organization
 				try {
-					if (!orgData?.slug) {
-						throw new Error(`Organization slug not found for ID: ${id}`);
-					}
-					const orgSearch = new SearchService(id, orgData.slug);
+					const orgSearch = new SearchService(id, id); // slug is not relevant for deleting
 					await orgSearch.deleteTenantIndex();
 					console.log(
 						`[Webhook] Organization search index deleted successfully for ID: ${id}`,
