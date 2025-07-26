@@ -30,6 +30,7 @@ import {
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
+import { toast } from "sonner";
 
 interface SearchResult {
 	id: string;
@@ -141,9 +142,15 @@ export default function SearchPage() {
 
 	const handleReindexAll = async () => {
 		try {
-			await indexAllMutation.mutateAsync();
+			const result = await indexAllMutation.mutateAsync();
+			toast.success("Content reindexed successfully!", {
+				description: `Indexed ${result.indexed.projects} projects, ${result.indexed.taskLists} task lists, ${result.indexed.tasks} tasks, and ${result.indexed.events} events.`,
+			});
 		} catch (err) {
 			console.error("Error reindexing content:", err);
+			toast.error("Failed to reindex content", {
+				description: "Please try again or contact support if the problem persists.",
+			});
 		}
 	};
 
@@ -373,23 +380,6 @@ export default function SearchPage() {
 					)}
 				</div>
 
-				{/* Reindex Status */}
-				{indexAllMutation.isSuccess && (
-					<div className="border border-green-200 rounded-lg p-4 bg-green-50 dark:bg-green-950 dark:border-green-800">
-						<div className="flex items-center gap-2 text-green-800 dark:text-green-200">
-							<CheckSquare className="h-4 w-4" />
-							<span className="font-medium">
-								Content reindexed successfully!
-							</span>
-						</div>
-						<p className="text-sm text-green-700 dark:text-green-300 mt-1">
-							Indexed {indexAllMutation.data?.indexed.projects} projects,{" "}
-							{indexAllMutation.data?.indexed.taskLists} task lists,{" "}
-							{indexAllMutation.data?.indexed.tasks} tasks, and{" "}
-							{indexAllMutation.data?.indexed.events} events.
-						</p>
-					</div>
-				)}
 			</PageSection>
 		</>
 	);

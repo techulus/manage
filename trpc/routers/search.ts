@@ -24,9 +24,7 @@ export const searchRouter = createTRPCRouter({
 	indexAllContent: protectedProcedure.mutation(async ({ ctx }) => {
 		await ctx.search.clearIndex();
 
-		const projects = await ctx.db.query.project.findMany({
-			where: (project, { eq }) => eq(project.createdByUser, ctx.ownerId),
-		});
+		const projects = await ctx.db.query.project.findMany();
 
 		await Promise.allSettled(
 			projects.map(async (project) => {
@@ -39,7 +37,6 @@ export const searchRouter = createTRPCRouter({
 		);
 
 		const taskLists = await ctx.db.query.taskList.findMany({
-			where: (taskList, { eq }) => eq(taskList.createdByUser, ctx.ownerId),
 			with: {
 				project: true,
 			},
@@ -56,7 +53,6 @@ export const searchRouter = createTRPCRouter({
 		);
 
 		const tasks = await ctx.db.query.task.findMany({
-			where: (task, { eq }) => eq(task.createdByUser, ctx.ownerId),
 			with: {
 				taskList: {
 					with: {
@@ -81,7 +77,6 @@ export const searchRouter = createTRPCRouter({
 		);
 
 		const events = await ctx.db.query.calendarEvent.findMany({
-			where: (event, { eq }) => eq(event.createdByUser, ctx.ownerId),
 			with: {
 				project: true,
 			},
