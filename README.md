@@ -48,6 +48,16 @@ TURBOWIRE_BROADCAST_KEY=
 
 # Email
 RESEND_API_KEY=
+
+# Workflows
+QSTASH_URL=
+QSTASH_TOKEN=
+QSTASH_CURRENT_SIGNING_KEY=
+QSTASH_NEXT_SIGNING_KEY=
+
+# Search
+UPSTASH_SEARCH_URL=
+UPSTASH_SEARCH_TOKEN=
 ```
 
 ### Run using Docker
@@ -67,8 +77,7 @@ Manage is hosted on [Railway](https://railway.com?referralCode=techulus), a mode
 ## Note on Performance
 
 > **Warning**
-> This app is still in development. It's not ready for production use.
-> **Expect some bugs & performance hits when testing**.
+> This app is still in development.
 > If you see something broken, you can ping me [@arjunz](https://twitter.com/arjunz).
 
 ## License
