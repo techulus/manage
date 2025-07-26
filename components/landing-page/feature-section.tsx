@@ -1,4 +1,3 @@
-import { cn } from "@/lib/utils";
 import {
 	Cloud,
 	CloudLightning,
@@ -56,7 +55,8 @@ export function FeaturesSection() {
 		},
 		{
 			title: "Developer-First",
-			description: "Built by developers, for developers. API-first design with webhook integrations and automation.",
+			description:
+				"Built by developers, for developers. API-first design with webhook integrations and automation.",
 			icon: <HeartIcon />,
 		},
 	];
@@ -68,12 +68,13 @@ export function FeaturesSection() {
 						Everything you need in one place
 					</h2>
 					<p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-						Powerful project management features that actually make your team more productive.
+						Powerful project management features that actually make your team
+						more productive.
 					</p>
 				</div>
 				<div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">
-					{features.map((feature, index) => (
-						<Feature key={feature.title} {...feature} index={index} />
+					{features.map((feature) => (
+						<Feature key={feature.title} {...feature} />
 					))}
 				</div>
 			</div>
@@ -85,19 +86,15 @@ const Feature = ({
 	title,
 	description,
 	icon,
-	index,
 }: {
 	title: string;
 	description: string;
 	icon: React.ReactNode;
-	index: number;
 }) => {
 	return (
 		<div className="text-center">
 			<div className="flex items-center justify-center w-16 h-16 bg-green-100 rounded-2xl mx-auto mb-6 dark:bg-green-900/20">
-				<div className="w-8 h-8 text-green-600 dark:text-green-400">
-					{icon}
-				</div>
+				<div className="w-8 h-8 text-green-600 dark:text-green-400">{icon}</div>
 			</div>
 			<h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
 				{title}

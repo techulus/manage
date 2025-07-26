@@ -1,5 +1,5 @@
 import { Check, ChevronsUpDown } from "lucide-react";
-
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Command,
@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/popover";
 import type { User } from "@/drizzle/types";
 import { cn } from "@/lib/utils";
-import { useMemo, useState } from "react";
 import { UserBadge } from "./user-badge";
 
 export function MultiUserSelect({
@@ -39,7 +38,6 @@ export function MultiUserSelect({
 			<PopoverTrigger asChild>
 				<Button
 					variant="outline"
-					role="combobox"
 					aria-expanded={open}
 					className="w-[200px] justify-between"
 				>

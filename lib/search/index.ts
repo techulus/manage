@@ -1,5 +1,5 @@
-import type { calendarEvent, project, task, taskList } from "@/drizzle/schema";
 import { Search } from "@upstash/search";
+import type { calendarEvent, project, task, taskList } from "@/drizzle/schema";
 
 const client = Search.fromEnv();
 
@@ -342,6 +342,7 @@ export class SearchService {
 		} catch (error) {
 			console.log(
 				`Index for tenant ${this.tenant} does not exist or already deleted`,
+				error,
 			);
 		}
 	}

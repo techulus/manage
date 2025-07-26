@@ -1,9 +1,14 @@
 "use client";
 
+import { useUser } from "@clerk/nextjs";
+import { Title } from "@radix-ui/react-dialog";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { CircleEllipsisIcon } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useState } from "react";
 import EmptyState from "@/components/core/empty-state";
 import { HtmlPreview } from "@/components/core/html-view";
 import { Panel } from "@/components/core/panel";
-import PageSection from "@/components/core/section";
 import { UserAvatar } from "@/components/core/user-avatar";
 import { DeleteButton } from "@/components/form/button";
 import EventForm from "@/components/form/event";
@@ -22,12 +27,6 @@ import {
 	filterByRepeatRule,
 } from "@/lib/utils/useEvents";
 import { useTRPC } from "@/trpc/client";
-import { useUser } from "@clerk/nextjs";
-import { Title } from "@radix-ui/react-dialog";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { CircleEllipsisIcon } from "lucide-react";
-import { useParams } from "next/navigation";
-import { useState } from "react";
 
 export default function EventsList({
 	date,
