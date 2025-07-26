@@ -1,6 +1,6 @@
+import { SearchService } from "@/lib/search";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
-import { SearchService } from "@/lib/search";
 import { auth } from "@clerk/nextjs/server";
 import { TRPCError, initTRPC } from "@trpc/server";
 import { cache } from "react";

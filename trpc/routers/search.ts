@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
+import { runAndLogError } from "@/lib/error";
 
 export const searchRouter = createTRPCRouter({
 	searchQuery: protectedProcedure
@@ -27,13 +28,11 @@ export const searchRouter = createTRPCRouter({
 		const projects = await ctx.db.query.project.findMany();
 
 		await Promise.allSettled(
-			projects.map(async (project) => {
-				try {
+			projects.map((project) =>
+				runAndLogError(`indexing project ${project.id}`, async () => {
 					await ctx.search.indexProject(project);
-				} catch (error) {
-					console.error(`Failed to index project ${project.id}:`, error);
-				}
-			}),
+				}),
+			),
 		);
 
 		const taskLists = await ctx.db.query.taskList.findMany({
@@ -43,13 +42,11 @@ export const searchRouter = createTRPCRouter({
 		});
 
 		await Promise.allSettled(
-			taskLists.map(async (taskList) => {
-				try {
+			taskLists.map((taskList) =>
+				runAndLogError(`indexing task list ${taskList.id}`, async () => {
 					await ctx.search.indexTaskList(taskList, taskList.project);
-				} catch (error) {
-					console.error(`Failed to index task list ${taskList.id}:`, error);
-				}
-			}),
+				}),
+			),
 		);
 
 		const tasks = await ctx.db.query.task.findMany({
@@ -63,17 +60,15 @@ export const searchRouter = createTRPCRouter({
 		});
 
 		await Promise.allSettled(
-			tasks.map(async (task) => {
-				try {
+			tasks.map((task) =>
+				runAndLogError(`indexing task ${task.id}`, async () => {
 					await ctx.search.indexTask(
 						task,
 						task.taskList,
 						task.taskList.project,
 					);
-				} catch (error) {
-					console.error(`Failed to index task ${task.id}:`, error);
-				}
-			}),
+				}),
+			),
 		);
 
 		const events = await ctx.db.query.calendarEvent.findMany({
@@ -83,13 +78,11 @@ export const searchRouter = createTRPCRouter({
 		});
 
 		await Promise.allSettled(
-			events.map(async (event) => {
-				try {
+			events.map((event) =>
+				runAndLogError(`indexing event ${event.id}`, async () => {
 					await ctx.search.indexEvent(event, event.project);
-				} catch (error) {
-					console.error(`Failed to index event ${event.id}:`, error);
-				}
-			}),
+				}),
+			),
 		);
 
 		return {

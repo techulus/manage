@@ -1,6 +1,11 @@
-import { project, task, taskList } from "@/drizzle/schema";
+import { task, taskList } from "@/drizzle/schema";
 import { TaskListStatus, TaskStatus } from "@/drizzle/types";
 import { logActivity } from "@/lib/activity";
+import {
+	deleteSearchItem,
+	indexTaskListWithProjectFetch,
+	indexTaskWithDataFetch,
+} from "@/lib/search/helpers";
 import { notifyUser } from "@/lib/utils/useNotification";
 import { and, asc, desc, eq, or } from "drizzle-orm";
 import { z } from "zod";
@@ -74,18 +79,12 @@ export const tasksRouter = createTRPCRouter({
 				newValue: createdTaskList[0],
 			});
 
-			// Index the task list for search
 			if (createdTaskList?.[0]) {
-				try {
-					const projectData = await ctx.db.query.project.findFirst({
-						where: eq(project.id, input.projectId),
-					});
-					if (projectData) {
-						await ctx.search.indexTaskList(createdTaskList[0], projectData);
-					}
-				} catch (err) {
-					console.error("Error indexing task list for search:", err);
-				}
+				await indexTaskListWithProjectFetch(
+					ctx.db,
+					ctx.search,
+					createdTaskList[0],
+				);
 			}
 
 			return createdTaskList?.[0];
@@ -152,18 +151,8 @@ export const tasksRouter = createTRPCRouter({
 					newValue: data[0],
 				});
 
-				// Re-index the updated task list for search
 				if (data?.[0]) {
-					try {
-						const projectData = await ctx.db.query.project.findFirst({
-							where: eq(project.id, oldTaskList.projectId),
-						});
-						if (projectData) {
-							await ctx.search.indexTaskList(data[0], projectData);
-						}
-					} catch (err) {
-						console.error("Error re-indexing task list for search:", err);
-					}
+					await indexTaskListWithProjectFetch(ctx.db, ctx.search, data[0]);
 				}
 			}
 
@@ -186,11 +175,7 @@ export const tasksRouter = createTRPCRouter({
 				});
 
 				// Remove task list from search index
-				try {
-					await ctx.search.deleteItem(`tasklist-${input.id}`);
-				} catch (err) {
-					console.error("Error removing task list from search index:", err);
-				}
+				await deleteSearchItem(ctx.search, `tasklist-${input.id}`, "task list");
 			}
 
 			return data?.[0];
@@ -273,22 +258,9 @@ export const tasksRouter = createTRPCRouter({
 					projectId: taskListDetails.projectId,
 					newValue: createdTask[0],
 				});
-				
-				// Index the task for search
+
 				if (createdTask?.[0]) {
-					try {
-						const fullTaskList = await ctx.db.query.taskList.findFirst({
-							where: eq(taskList.id, input.taskListId),
-							with: {
-								project: true,
-							},
-						});
-						if (fullTaskList?.project) {
-							await ctx.search.indexTask(createdTask[0], fullTaskList, fullTaskList.project);
-						}
-					} catch (err) {
-						console.error("Error indexing task for search:", err);
-					}
+					await indexTaskWithDataFetch(ctx.db, ctx.search, createdTask[0]);
 				}
 			}
 
@@ -386,21 +358,8 @@ export const tasksRouter = createTRPCRouter({
 					newValue: updatedTask[0],
 				});
 
-				// Re-index the updated task for search
 				if (updatedTask?.[0]) {
-					try {
-						const fullTaskList = await ctx.db.query.taskList.findFirst({
-							where: eq(taskList.id, updatedTask[0].taskListId),
-							with: {
-								project: true,
-							},
-						});
-						if (fullTaskList?.project) {
-							await ctx.search.indexTask(updatedTask[0], fullTaskList, fullTaskList.project);
-						}
-					} catch (err) {
-						console.error("Error re-indexing task for search:", err);
-					}
+					await indexTaskWithDataFetch(ctx.db, ctx.search, updatedTask[0]);
 				}
 			}
 
@@ -430,12 +389,7 @@ export const tasksRouter = createTRPCRouter({
 					oldValue: currentTask,
 				});
 
-				// Remove task from search index
-				try {
-					await ctx.search.deleteItem(`task-${input.id}`);
-				} catch (err) {
-					console.error("Error removing task from search index:", err);
-				}
+				await deleteSearchItem(ctx.search, `task-${input.id}`, "task");
 			}
 
 			return currentTask;
