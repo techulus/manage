@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { groupBy } from "es-toolkit";
 import {
 	AlertCircle,
 	Calendar,
@@ -190,16 +191,10 @@ export default function SearchPage() {
 		}
 	};
 
-	const groupedResults = searchResults.reduce(
-		(acc, result) => {
-			if (!acc[result.type]) {
-				acc[result.type] = [];
-			}
-			acc[result.type].push(result);
-			return acc;
-		},
-		{} as Record<string, SearchResult[]>,
-	);
+	const groupedResults = groupBy<
+		SearchResult,
+		"project" | "task" | "tasklist" | "event"
+	>(searchResults, (item) => item.type);
 
 	return (
 		<>
@@ -430,7 +425,8 @@ export default function SearchPage() {
 							</div>
 
 							{["project", "tasklist", "task", "event"].map((type) => {
-								const results = groupedResults[type];
+								const results =
+									groupedResults[type as keyof typeof groupedResults];
 								if (!results || results.length === 0) return null;
 
 								return (
