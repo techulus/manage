@@ -242,6 +242,7 @@ export class SearchService {
 		options?: {
 			type?: "project" | "task" | "tasklist" | "event";
 			projectId?: number;
+			status?: string;
 			limit?: number;
 		},
 	) {
@@ -269,6 +270,10 @@ export class SearchService {
 			filters.push(`projectId = ${options.projectId}`);
 		}
 
+		if (options?.status) {
+			filters.push(`status = '${options.status}'`);
+		}
+
 		if (filters.length > 0) {
 			searchOptions.filter = filters.join(" AND ");
 		}
@@ -291,6 +296,10 @@ export class SearchService {
 					url?: string;
 					createdAt?: string;
 					dueDate?: string;
+					createdByUser?: string;
+					assignedToUser?: string;
+					taskListId?: number;
+					taskListName?: string;
 				};
 			}) => ({
 				id: result.id,

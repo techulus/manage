@@ -9,6 +9,7 @@ export const searchRouter = createTRPCRouter({
 				query: z.string().min(1),
 				type: z.enum(["project", "task", "tasklist", "event"]).optional(),
 				projectId: z.number().optional(),
+				status: z.string().optional(),
 				limit: z.number().min(1).max(50).default(20),
 			}),
 		)
@@ -16,6 +17,7 @@ export const searchRouter = createTRPCRouter({
 			const results = await ctx.search.search(input.query, {
 				type: input.type,
 				projectId: input.projectId,
+				status: input.status,
 				limit: input.limit,
 			});
 
