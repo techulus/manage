@@ -223,7 +223,10 @@ export class SearchService {
 		const filters: string[] = [];
 
 		if (options?.type) {
-			filters.push(`type = '${options.type}'`);
+			const allowedTypes = ["project", "task", "tasklist", "event"] as const;
+			if (allowedTypes.includes(options.type)) {
+				filters.push(`type = '${options.type}'`);
+			}
 		}
 
 		if (options?.projectId) {
