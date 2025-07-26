@@ -156,9 +156,9 @@ export function ActivityFeed() {
 								</Button>
 							) : (
 								<div className="flex items-center gap-2 text-muted-foreground text-sm">
-									<div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30"></div>
+									<div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30" />
 									<span>You've reached the end</span>
-									<div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30"></div>
+									<div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30" />
 								</div>
 							)}
 						</div>

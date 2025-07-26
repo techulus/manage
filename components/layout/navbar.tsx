@@ -194,6 +194,11 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				active: pathname === `/${tenant}/today`,
 			},
 			{
+				href: `/${tenant}/search`,
+				label: "Search",
+				active: pathname === `/${tenant}/search`,
+			},
+			{
 				href: `/${tenant}/notifications`,
 				label: "Notifications",
 				active: pathname === `/${tenant}/notifications`,

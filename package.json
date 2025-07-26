@@ -43,6 +43,7 @@
     "@trpc/tanstack-react-query": "^11.0.2",
     "@turbowire/serverless": "^0.1.0",
     "@turbowire/web": "^0.3.0",
+    "@upstash/search": "^0.1.5",
     "@upstash/workflow": "^0.2.16",
     "autoprefixer": "10.4.14",
     "class-variance-authority": "^0.7.1",
