@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export function PricingSection() {
 	return (
-		<section className="py-24 sm:py-32 bg-gray-50 dark:bg-gray-900">
+		<section className="py-24 sm:py-32 bg-neutral-50 dark:bg-neutral-900">
 			<div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
 				<h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 dark:text-white mb-6">
 					Simple pricing
@@ -12,7 +12,7 @@ export function PricingSection() {
 					Free during beta. Fair pricing when we launch.
 				</p>
 
-				<div className="inline-block p-8 bg-white rounded-2xl shadow-lg dark:bg-gray-800 text-left max-w-md">
+				<div className="inline-block p-8 bg-white rounded-2xl shadow-lg dark:bg-neutral-800 text-left max-w-md">
 					<div className="text-center mb-6">
 						<h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
 							Beta Access
