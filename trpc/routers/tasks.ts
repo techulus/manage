@@ -221,6 +221,13 @@ export const tasksRouter = createTRPCRouter({
 				name: z.string().optional().default(""),
 				status: z.nativeEnum(TaskStatus).optional().default(TaskStatus.TODO),
 				taskListId: z.number().optional().default(0),
+				description: z.string().optional(),
+				assignedToUser: z.string().nullable().optional(),
+				dueDate: z
+					.string()
+					.nullable()
+					.optional()
+					.transform((val) => (val?.trim()?.length ? new Date(val) : null)),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
