@@ -2,9 +2,9 @@ import {
 	CalendarIcon,
 	FolderIcon,
 	ListTodoIcon,
-	UsersIcon,
 	SearchIcon,
 	SettingsIcon,
+	UsersIcon,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -29,16 +29,17 @@ export default async function Home() {
 						</span>
 					</div>
 					<h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.02em] text-gray-900 dark:text-white leading-[0.9]">
-						Tired of complex project tools?{" "}
-						<br />
+						Tired of complex project tools? <br />
 						Meet{" "}
 						<span className="text-green-600 dark:text-green-400">
 							beautiful simplicity
-						</span>.
+						</span>
+						.
 					</h1>
 					<p className="mt-8 text-xl sm:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-						Self-hostable, developer-friendly project management. All the power you need, 
-						none of the bloat you don't. Built with modern tech stack and open source values.
+						Self-hostable, developer-friendly project management. All the power
+						you need, none of the bloat you don't. Built with modern tech stack
+						and open source values.
 					</p>
 					<div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12">
 						<Link
@@ -49,10 +50,14 @@ export default async function Home() {
 						</Link>
 						<Link
 							href="https://github.com/techulus/manage"
-							className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-lg font-semibold border-2 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+							className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-lg font-semibold border-2 border-neutral-300 dark:border-neutral-600 hover:border-neutral-400 dark:hover:border-neutral-500 transition-colors"
 						>
 							<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-								<path fillRule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clipRule="evenodd" />
+								<path
+									fillRule="evenodd"
+									d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z"
+									clipRule="evenodd"
+								/>
 							</svg>
 							View on GitHub
 						</Link>
@@ -68,13 +73,14 @@ export default async function Home() {
 							See Manage in action
 						</h2>
 						<p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-							Real screenshots from the actual product. No mock-ups, no fake data.
+							Real screenshots from the actual product. No mock-ups, no fake
+							data.
 						</p>
 					</div>
 
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
 						<div className="group">
-							<div className="relative overflow-hidden rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-3xl hover:scale-[1.02]">
+							<div className="relative overflow-hidden rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-700 transition-all duration-300 hover:shadow-3xl hover:scale-[1.02]">
 								<Image
 									src="/screenshots/overview.png"
 									alt="Project overview dashboard showing tasks, progress, and team activity"
@@ -90,13 +96,14 @@ export default async function Home() {
 									Project Dashboard
 								</h3>
 								<p className="text-gray-600 dark:text-gray-400">
-									Get a complete overview of your projects, track progress, and manage team workload in one place.
+									Get a complete overview of your projects, track progress, and
+									manage team workload in one place.
 								</p>
 							</div>
 						</div>
 
 						<div className="group">
-							<div className="relative overflow-hidden rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-3xl hover:scale-[1.02]">
+							<div className="relative overflow-hidden rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-700 transition-all duration-300 hover:shadow-3xl hover:scale-[1.02]">
 								<Image
 									src="/screenshots/tasks.png"
 									alt="Task management interface with lists, priorities, and team assignments"
@@ -111,7 +118,8 @@ export default async function Home() {
 									Task Management
 								</h3>
 								<p className="text-gray-600 dark:text-gray-400">
-									Organize tasks with lists, set priorities, assign team members, and track progress with intuitive workflows.
+									Organize tasks with lists, set priorities, assign team
+									members, and track progress with intuitive workflows.
 								</p>
 							</div>
 						</div>
@@ -119,7 +127,7 @@ export default async function Home() {
 
 					<div className="flex justify-center">
 						<div className="group max-w-4xl">
-							<div className="relative overflow-hidden rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-3xl hover:scale-[1.02]">
+							<div className="relative overflow-hidden rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-700 transition-all duration-300 hover:shadow-3xl hover:scale-[1.02]">
 								<Image
 									src="/screenshots/events.png"
 									alt="Calendar and events interface showing scheduled meetings and deadlines"
@@ -134,7 +142,8 @@ export default async function Home() {
 									Calendar & Events
 								</h3>
 								<p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-									Schedule meetings, set deadlines, and keep your team synchronized with integrated calendar management.
+									Schedule meetings, set deadlines, and keep your team
+									synchronized with integrated calendar management.
 								</p>
 							</div>
 						</div>
@@ -169,48 +178,78 @@ export default async function Home() {
 								icon: <ListTodoIcon className="w-8 h-8 text-white" />,
 								name: "Task Management",
 								desc: "Create, organize, and track tasks with powerful lists, priorities, and team assignments",
-								features: ["Task lists & boards", "Priority levels", "Team assignments", "Progress tracking"],
+								features: [
+									"Task lists & boards",
+									"Priority levels",
+									"Team assignments",
+									"Progress tracking",
+								],
 								color: "from-green-400 to-green-600",
 							},
 							{
 								icon: <CalendarIcon className="w-8 h-8 text-white" />,
 								name: "Calendar & Events",
 								desc: "Schedule meetings, set deadlines, and keep your team synchronized with integrated calendar",
-								features: ["Event scheduling", "Deadline tracking", "Team sync", "Calendar integration"],
+								features: [
+									"Event scheduling",
+									"Deadline tracking",
+									"Team sync",
+									"Calendar integration",
+								],
 								color: "from-pink-400 to-pink-600",
 							},
 							{
 								icon: <UsersIcon className="w-8 h-8 text-white" />,
 								name: "Team Collaboration",
 								desc: "Real-time activity feeds, notifications, and seamless team communication tools",
-								features: ["Activity tracking", "Real-time updates", "Team notifications", "Collaboration tools"],
+								features: [
+									"Activity tracking",
+									"Real-time updates",
+									"Team notifications",
+									"Collaboration tools",
+								],
 								color: "from-blue-400 to-blue-600",
 							},
 							{
 								icon: <FolderIcon className="w-8 h-8 text-white" />,
 								name: "File Management",
 								desc: "Secure file storage, sharing, and organization with S3-compatible storage backend",
-								features: ["File upload/sharing", "Secure storage", "Version control", "Team access"],
+								features: [
+									"File upload/sharing",
+									"Secure storage",
+									"Version control",
+									"Team access",
+								],
 								color: "from-purple-400 to-purple-600",
 							},
 							{
 								icon: <SearchIcon className="w-8 h-8 text-white" />,
 								name: "Advanced Search",
 								desc: "Full-text search across projects, tasks, and content with advanced filtering options",
-								features: ["Full-text search", "Advanced filters", "Project-based search", "Quick navigation"],
+								features: [
+									"Full-text search",
+									"Advanced filters",
+									"Project-based search",
+									"Quick navigation",
+								],
 								color: "from-orange-400 to-orange-600",
 							},
 							{
 								icon: <SettingsIcon className="w-8 h-8 text-white" />,
 								name: "Self-Hosted",
 								desc: "Deploy on your infrastructure with Docker, customize to your needs, full control",
-								features: ["Docker deployment", "Self-hosting", "Full customization", "No vendor lock-in"],
+								features: [
+									"Docker deployment",
+									"Self-hosting",
+									"Full customization",
+									"No vendor lock-in",
+								],
 								color: "from-slate-500 to-slate-700",
 							},
 						].map((feature) => (
 							<div
 								key={feature.name}
-								className="bg-white dark:bg-gray-800/50 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group"
+								className="bg-white dark:bg-neutral-900 rounded-2xl p-8 shadow-lg border border-neutral-200 dark:border-neutral-700 hover:shadow-xl transition-all duration-300 group"
 							>
 								<div className="flex items-center gap-4 mb-6">
 									<div
@@ -226,8 +265,11 @@ export default async function Home() {
 									{feature.desc}
 								</p>
 								<ul className="space-y-2">
-									{feature.features.map((item, index) => (
-										<li key={index} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+									{feature.features.map((item) => (
+										<li
+											key={item}
+											className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"
+										>
 											<div className="w-1.5 h-1.5 bg-green-500 rounded-full flex-shrink-0" />
 											{item}
 										</li>
@@ -252,17 +294,25 @@ export default async function Home() {
 								</span>
 							</h2>
 							<p className="text-xl text-gray-300 mb-10 leading-relaxed">
-								Built by developers, for developers. Self-host on your infrastructure, 
-								customize to your needs, and contribute to a growing community. 
-								No vendor lock-in, no hidden costs.
+								Built by developers, for developers. Self-host on your
+								infrastructure, customize to your needs, and contribute to a
+								growing community. No vendor lock-in, no hidden costs.
 							</p>
 							<div className="flex flex-col sm:flex-row gap-4 mb-8">
 								<Link
 									href="https://github.com/techulus/manage"
 									className="inline-flex items-center gap-3 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold shadow-sm shadow-green-600/25 border-b-4 border-green-700 hover:bg-green-500 hover:border-green-600 active:border-green-600 active:shadow-sm active:translate-y-0.5 transition-all duration-150"
 								>
-									<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-										<path fillRule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clipRule="evenodd" />
+									<svg
+										className="w-5 h-5"
+										fill="currentColor"
+										viewBox="0 0 20 20"
+									>
+										<path
+											fillRule="evenodd"
+											d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z"
+											clipRule="evenodd"
+										/>
 									</svg>
 									Star on GitHub <span>→</span>
 								</Link>
@@ -286,7 +336,7 @@ export default async function Home() {
 								</div>
 							</div>
 						</div>
-						<div className="bg-black text-white rounded-2xl p-8 font-mono border border-gray-600 shadow-2xl min-h-[400px]">
+						<div className="bg-black text-white rounded-2xl p-8 font-mono border border-neutral-600 shadow-2xl min-h-[400px]">
 							<div className="flex items-center gap-2 mb-6">
 								<div className="w-3 h-3 bg-red-500 rounded-full shadow-sm" />
 								<div className="w-3 h-3 bg-yellow-500 rounded-full shadow-sm" />
