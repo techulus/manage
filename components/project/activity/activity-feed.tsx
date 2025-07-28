@@ -19,7 +19,7 @@ export function ActivityItem({
 	isLast,
 }: { item: ActivityWithActor; isLast: boolean }) {
 	return (
-		<li key={item.id} className="group hover:bg-muted/40 transition-all duration-200 rounded-lg border border-transparent hover:border-border/50 hover:shadow-sm">
+		<li key={item.id} className="group rounded-lg border border-transparent">
 			<div className="relative px-4 py-3">
 				{!isLast ? (
 					<span
@@ -33,7 +33,7 @@ export function ActivityItem({
 							<div className="h-8 w-8">
 								<UserAvatar
 									user={item.actor}
-									className="ring-2 ring-background shadow-md group-hover:ring-4 transition-all duration-200"
+									className="ring-2 ring-background shadow-md"
 								/>
 							</div>
 						) : null}

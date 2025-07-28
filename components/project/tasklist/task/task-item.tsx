@@ -344,12 +344,15 @@ export const TaskItem = ({
 														<DropdownMenuItem key={list.id} className="w-full">
 															<form
 																className="w-full"
-																action={() => {
-																	toast.promise(
+																action={async () => {
+																	await toast.promise(
 																		createTask.mutateAsync({
 																			name: task.name,
 																			taskListId: list.id,
-																			status: "todo",
+																			status: TaskStatus.TODO,
+																			description: task.description || undefined,
+																			assignedToUser: task.assignedToUser || undefined,
+																			dueDate: task.dueDate ? task.dueDate.toISOString() : undefined,
 																		}),
 																		{
 																			loading: "Copying...",
@@ -358,6 +361,7 @@ export const TaskItem = ({
 																				"Error while copying, please try again.",
 																		},
 																	);
+																	setDetailsOpen(false);
 																}}
 															>
 																<button

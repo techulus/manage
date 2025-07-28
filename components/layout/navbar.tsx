@@ -20,10 +20,11 @@ import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CommandMenu } from "../core/cmd-menu";
 import { GlobalSearch } from "../core/global-search";
 import { Notifications } from "../core/notifications";
+import { SearchSheet } from "../core/search-panel";
 
 interface NavLink {
 	href: string;
@@ -42,6 +43,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 	const router = useRouter();
 	const { tenant, projectId } = useParams();
 	const pathname = usePathname();
+	const [searchOpen, setSearchOpen] = useState(false);
 
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
@@ -195,11 +197,6 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				active: pathname === `/${tenant}/today`,
 			},
 			{
-				href: `/${tenant}/search`,
-				label: "Search",
-				active: pathname === `/${tenant}/search`,
-			},
-			{
 				href: `/${tenant}/notifications`,
 				label: "Notifications",
 				active: pathname === `/${tenant}/notifications`,
@@ -292,7 +289,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				</div>
 
 				<div className="ml-auto flex items-center space-x-1">
-					<GlobalSearch />
+					<GlobalSearch onSearchClick={() => setSearchOpen(true)} />
 
 					<Button
 						variant="ghost"
@@ -367,6 +364,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 					),
 				)}
 			</nav>
+			<SearchSheet open={searchOpen} onOpenChange={setSearchOpen} />
 		</>
 	);
 }

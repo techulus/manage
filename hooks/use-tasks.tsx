@@ -58,7 +58,7 @@ export function TasksProvider({
 
 	const createTask = useMutation(
 		trpc.tasks.createTask.mutationOptions({
-			onSuccess: () => invalidateData(),
+			onSuccess: (data) => invalidateData(data?.taskListId),
 			onMutate: async (newTask) => {
 				await queryClient.cancelQueries({
 					queryKey: trpc.tasks.getListById.queryKey({ id: newTask.taskListId }),
