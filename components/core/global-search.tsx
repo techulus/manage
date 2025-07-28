@@ -1,35 +1,30 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import { Button } from "../ui/button";
 
-export function GlobalSearch() {
-	const router = useRouter();
-	const { tenant } = useParams();
+interface GlobalSearchProps {
+	onSearchClick: () => void;
+}
 
+export function GlobalSearch({ onSearchClick }: GlobalSearchProps) {
 	useEffect(() => {
 		const down = (e: KeyboardEvent) => {
 			if (e.key === "/" && (e.metaKey || e.ctrlKey)) {
 				e.preventDefault();
-				router.push(`/${tenant}/search`);
+				onSearchClick();
 			}
 		};
 		document.addEventListener("keydown", down);
 		return () => document.removeEventListener("keydown", down);
-	}, [router, tenant]);
-
-	const handleSearchClick = () => {
-		router.push(`/${tenant}/search`);
-	};
+	}, [onSearchClick]);
 
 	return (
 		<Button
 			variant="ghost"
 			className="relative h-9 w-9 p-0 xl:h-10 xl:w-60 xl:justify-start xl:px-3 xl:py-2"
-			onClick={handleSearchClick}
+			onClick={onSearchClick}
 		>
 			<Search className="h-5 w-5 xl:mr-2" />
 			<span className="hidden xl:inline-flex">Search everything...</span>
