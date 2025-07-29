@@ -7,7 +7,7 @@ import { Header } from "@/components/layout/header";
 
 export default async function Home() {
 	const { userId } = await auth();
-	
+
 	if (userId) {
 		redirect("/start");
 	}

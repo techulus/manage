@@ -9,7 +9,12 @@ import { guessTimezone, toDateTimeString } from "@/lib/utils/date";
 import { formatDistanceToNow } from "date-fns";
 import { useTRPC } from "@/trpc/client";
 import { useQuery } from "@tanstack/react-query";
-import { PencilIcon, PlusCircleIcon, TrashIcon, ActivityIcon } from "lucide-react";
+import {
+	PencilIcon,
+	PlusCircleIcon,
+	TrashIcon,
+	ActivityIcon,
+} from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
@@ -17,7 +22,10 @@ import Markdown from "react-markdown";
 export function ActivityItem({
 	item,
 	isLast,
-}: { item: ActivityWithActor; isLast: boolean }) {
+}: {
+	item: ActivityWithActor;
+	isLast: boolean;
+}) {
 	return (
 		<li key={item.id} className="group rounded-lg border border-transparent">
 			<div className="relative px-4 py-3">
@@ -70,17 +78,36 @@ export function ActivityItem({
 							<span className="font-medium text-foreground text-sm">
 								{item.actor.firstName}
 							</span>
-							<span className="text-muted-foreground text-xs font-medium bg-muted/50 px-1.5 py-0.5 rounded-full w-fit" title={toDateTimeString(item.createdAt, guessTimezone)}>
-								{formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
+							<span
+								className="text-muted-foreground text-xs font-medium bg-muted/50 px-1.5 py-0.5 rounded-full w-fit"
+								title={toDateTimeString(item.createdAt, guessTimezone)}
+							>
+								{formatDistanceToNow(new Date(item.createdAt), {
+									addSuffix: true,
+								})}
 							</span>
 						</div>
 						<div className="mt-1 prose dark:prose-invert max-w-none prose-sm text-sm leading-relaxed">
-							<Markdown 
+							<Markdown
 								components={{
-									p: ({ children }) => <p className="mb-1.5 last:mb-0 text-muted-foreground leading-relaxed">{children}</p>,
-									strong: ({ children }) => <strong className="font-semibold text-foreground bg-muted/30 px-1 py-0.5 rounded">{children}</strong>,
-									ul: ({ children }) => <ul className="ml-4 mt-1 space-y-1">{children}</ul>,
-									li: ({ children }) => <li className="text-muted-foreground before:content-['•'] before:text-primary before:font-bold before:-ml-4 before:mr-2">{children}</li>
+									p: ({ children }) => (
+										<p className="mb-1.5 last:mb-0 text-muted-foreground leading-relaxed">
+											{children}
+										</p>
+									),
+									strong: ({ children }) => (
+										<strong className="font-semibold text-foreground bg-muted/30 px-1 py-0.5 rounded">
+											{children}
+										</strong>
+									),
+									ul: ({ children }) => (
+										<ul className="ml-4 mt-1 space-y-1">{children}</ul>
+									),
+									li: ({ children }) => (
+										<li className="text-muted-foreground before:content-['•'] before:text-primary before:font-bold before:-ml-4 before:mr-2">
+											{children}
+										</li>
+									),
 								}}
 							>
 								{generateObjectDiffMessage(item)}
@@ -163,7 +190,11 @@ export function ActivityFeed() {
 							)}
 						</div>
 					) : null}
-					{isLoading ? <div className="flex justify-center py-4"><Spinner className="mx-auto" /></div> : null}
+					{isLoading ? (
+						<div className="flex justify-center py-4">
+							<Spinner className="mx-auto" />
+						</div>
+					) : null}
 				</>
 			) : (
 				<div className="flex flex-col items-center justify-center py-12 px-4 text-center">
@@ -173,7 +204,8 @@ export function ActivityFeed() {
 					<div className="mt-4 space-y-1">
 						<h3 className="font-medium text-foreground">No activity yet</h3>
 						<p className="text-sm text-muted-foreground max-w-sm">
-							Project activity will appear here as you and your team make changes
+							Project activity will appear here as you and your team make
+							changes
 						</p>
 					</div>
 				</div>

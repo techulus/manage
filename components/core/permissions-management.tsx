@@ -4,10 +4,10 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Plus, Shield, ShieldCheck, Users, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Panel } from "@/components/core/panel";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Panel } from "@/components/core/panel";
 import {
 	Select,
 	SelectContent,
@@ -42,8 +42,12 @@ interface PermissionsManagementProps {
 	projectId?: number;
 }
 
-export default function PermissionsManagement({ projectId }: PermissionsManagementProps) {
-	const [selectedProject, setSelectedProject] = useState<number | null>(projectId || null);
+export default function PermissionsManagement({
+	projectId,
+}: PermissionsManagementProps) {
+	const [selectedProject, setSelectedProject] = useState<number | null>(
+		projectId || null,
+	);
 	const [selectedUser, setSelectedUser] = useState<string>("");
 	const [selectedRole, setSelectedRole] = useState<"editor" | "reader">(
 		"reader",
@@ -149,7 +153,7 @@ export default function PermissionsManagement({ projectId }: PermissionsManageme
 	);
 
 	return (
-		<div className="space-y-6">
+		<>
 			{/* Project Selector - only show if no specific projectId provided */}
 			{!projectId && (
 				<div className="p-4 sm:flex">
@@ -203,7 +207,9 @@ export default function PermissionsManagement({ projectId }: PermissionsManageme
 						<div className="p-6">
 							<div className="flex items-start justify-between mb-6">
 								<div>
-									<h2 className="text-lg font-semibold">Grant Project Access</h2>
+									<h2 className="text-lg font-semibold">
+										Grant Project Access
+									</h2>
 									<p className="text-sm text-muted-foreground">
 										Add a user and assign their role for this project.
 									</p>
@@ -232,7 +238,12 @@ export default function PermissionsManagement({ projectId }: PermissionsManageme
 							) : (
 								<div className="space-y-4">
 									<div className="space-y-2">
-										<label htmlFor="user-select" className="text-sm font-medium">User</label>
+										<label
+											htmlFor="user-select"
+											className="text-sm font-medium"
+										>
+											User
+										</label>
 										<Select
 											value={selectedUser}
 											onValueChange={setSelectedUser}
@@ -251,8 +262,7 @@ export default function PermissionsManagement({ projectId }: PermissionsManageme
 																</AvatarFallback>
 															</Avatar>
 															<span>
-																{user.firstName} {user.lastName} ({user.email}
-																)
+																{user.firstName} {user.lastName} ({user.email})
 															</span>
 														</div>
 													</SelectItem>
@@ -261,33 +271,38 @@ export default function PermissionsManagement({ projectId }: PermissionsManageme
 										</Select>
 									</div>
 
-								<div className="space-y-2">
-									<label htmlFor="role-select" className="text-sm font-medium">Role</label>
-									<Select
-										value={selectedRole}
-										onValueChange={(value) =>
-											setSelectedRole(value as "editor" | "reader")
-										}
-									>
-										<SelectTrigger>
-											<SelectValue />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="reader">
-												<div className="flex items-center gap-2">
-													<Shield className="w-4 h-4 text-blue-500" />
-													<span>Reader - View only access</span>
-												</div>
-											</SelectItem>
-											<SelectItem value="editor">
-												<div className="flex items-center gap-2">
-													<ShieldCheck className="w-4 h-4 text-green-500" />
-													<span>Editor - Full read/write access</span>
-												</div>
-											</SelectItem>
-										</SelectContent>
-									</Select>
-								</div>
+									<div className="space-y-2">
+										<label
+											htmlFor="role-select"
+											className="text-sm font-medium"
+										>
+											Role
+										</label>
+										<Select
+											value={selectedRole}
+											onValueChange={(value) =>
+												setSelectedRole(value as "editor" | "reader")
+											}
+										>
+											<SelectTrigger>
+												<SelectValue />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value="reader">
+													<div className="flex items-center gap-2">
+														<Shield className="w-4 h-4 text-blue-500" />
+														<span>Reader - View only access</span>
+													</div>
+												</SelectItem>
+												<SelectItem value="editor">
+													<div className="flex items-center gap-2">
+														<ShieldCheck className="w-4 h-4 text-green-500" />
+														<span>Editor - Full read/write access</span>
+													</div>
+												</SelectItem>
+											</SelectContent>
+										</Select>
+									</div>
 
 									<div className="flex justify-end gap-2">
 										<Button
@@ -305,8 +320,8 @@ export default function PermissionsManagement({ projectId }: PermissionsManageme
 									</div>
 								</div>
 							)}
-								</div>
-							</Panel>
+						</div>
+					</Panel>
 
 					{/* Permissions List */}
 					<div className="divide-y border-t">
@@ -333,7 +348,10 @@ export default function PermissionsManagement({ projectId }: PermissionsManageme
 								</dt>
 								<dd className="mt-1 sm:mt-0 sm:flex-auto space-y-4">
 									{projectPermissions.map((permission: Permission) => (
-										<div key={permission.id} className="flex items-center justify-between">
+										<div
+											key={permission.id}
+											className="flex items-center justify-between"
+										>
 											<div className="flex items-center gap-3">
 												<Avatar className="w-8 h-8">
 													<AvatarImage src={permission.user.imageUrl || ""} />
@@ -344,7 +362,8 @@ export default function PermissionsManagement({ projectId }: PermissionsManageme
 												</Avatar>
 												<div>
 													<p className="font-medium text-sm">
-														{permission.user.firstName} {permission.user.lastName}
+														{permission.user.firstName}{" "}
+														{permission.user.lastName}
 													</p>
 													<p className="text-xs text-gray-500 dark:text-gray-400">
 														{permission.user.email}
@@ -364,11 +383,15 @@ export default function PermissionsManagement({ projectId }: PermissionsManageme
 												<Button
 													variant="ghost"
 													size="sm"
-													onClick={() => handleRevokePermission(permission.userId)}
+													onClick={() =>
+														handleRevokePermission(permission.userId)
+													}
 													disabled={revokePermission.isPending}
 													className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
 												>
-													{revokePermission.isPending ? "Removing..." : "Remove"}
+													{revokePermission.isPending
+														? "Removing..."
+														: "Remove"}
 												</Button>
 											</div>
 										</div>
@@ -379,6 +402,6 @@ export default function PermissionsManagement({ projectId }: PermissionsManageme
 					</div>
 				</>
 			)}
-		</div>
+		</>
 	);
 }

@@ -7,6 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "biome lint",
+    "format": "biome format --write",
+    "lint:fix": "biome lint --write",
+    "fix": "biome format --write && biome lint --write",
     "generate:migrations": "drizzle-kit generate"
   },
   "dependencies": {

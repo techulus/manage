@@ -4,7 +4,6 @@ import type { ProjectWithCreator } from "@/drizzle/types";
 import { toDateStringWithDay } from "@/lib/utils/date";
 import { HtmlPreview } from "../core/html-view";
 import { UserAvatar } from "../core/user-avatar";
-import { Badge } from "../ui/badge";
 
 export const ProjecItem = ({
 	project: { id, name, description, creator, dueDate },
@@ -16,7 +15,7 @@ export const ProjecItem = ({
 	timezone: string;
 }) => {
 	return (
-		<Link 
+		<Link
 			href={`./projects/${id}`}
 			className="block p-3 rounded-lg bg-muted hover:bg-muted/80"
 		>
@@ -26,17 +25,15 @@ export const ProjecItem = ({
 						{name}
 					</h3>
 					{userRole && (
-						<Badge variant="outline" className="text-xs h-5 capitalize w-fit">
-							{userRole}
-						</Badge>
+						<span className="text-primary capitalize">{userRole}</span>
 					)}
-					
+
 					{description && (
 						<div className="text-sm text-muted-foreground line-clamp-2">
 							<HtmlPreview content={description} />
 						</div>
 					)}
-					
+
 					{dueDate && (
 						<div className="flex items-center gap-1 text-xs text-muted-foreground pt-1">
 							<CalendarClock className="w-3 h-3" />
@@ -44,7 +41,7 @@ export const ProjecItem = ({
 						</div>
 					)}
 				</div>
-				
+
 				<UserAvatar user={creator} className="w-8 h-8" />
 			</div>
 		</Link>

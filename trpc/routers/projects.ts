@@ -1,6 +1,15 @@
-import { activity, comment, project, projectPermission } from "@/drizzle/schema";
+import {
+	activity,
+	comment,
+	project,
+	projectPermission,
+} from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
-import { canEditProject, canViewProject } from "@/lib/permissions";
+import {
+	canEditProject,
+	canViewProject,
+	checkProjectPermission,
+} from "@/lib/permissions";
 import {
 	deleteProjectSearchItems,
 	deleteSearchItem,
@@ -183,7 +192,19 @@ export const projectsRouter = createTRPCRouter({
 				throw new Error(`Project with id ${input.id} not found`);
 			}
 
-			return data;
+			// Get the user's permission for this project
+			const userRole = await checkProjectPermission(
+				ctx.db,
+				input.id,
+				ctx.userId,
+			);
+			const canEdit = await canEditProject(ctx.db, input.id, ctx.userId);
+
+			return {
+				...data,
+				userRole,
+				canEdit,
+			};
 		}),
 	getComments: protectedProcedure
 		.input(

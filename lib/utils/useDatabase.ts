@@ -48,9 +48,7 @@ export async function database(): Promise<Database> {
 	return getDatabaseForOwner(ownerId);
 }
 
-export async function getDatabaseForOwner(
-	ownerId: string,
-): Promise<Database> {
+export async function getDatabaseForOwner(ownerId: string): Promise<Database> {
 	const databaseName = getDatabaseName(ownerId);
 	if (!databaseName) {
 		throw new Error("Database name not found");
@@ -96,5 +94,7 @@ export async function deleteDatabase(ownerId: string) {
 	`);
 
 	// Drop the database with FORCE option (PostgreSQL 13+)
-	await ownerDb.execute(sql`DROP DATABASE ${sql.identifier(databaseName)} WITH (FORCE)`);
+	await ownerDb.execute(
+		sql`DROP DATABASE ${sql.identifier(databaseName)} WITH (FORCE)`,
+	);
 }

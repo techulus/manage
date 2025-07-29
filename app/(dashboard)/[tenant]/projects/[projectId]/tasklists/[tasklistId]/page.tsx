@@ -20,18 +20,23 @@ export default function TaskLists() {
 	const { projectId, tasklistId } = useParams();
 
 	const trpc = useTRPC();
-	const [{ data: list }, { data: timezone }] = useQueries({
+	const [{ data: list }, { data: timezone }, { data: project }] = useQueries({
 		queries: [
 			trpc.tasks.getListById.queryOptions({
 				id: +tasklistId!,
 			}),
 			trpc.settings.getTimezone.queryOptions(),
+			trpc.projects.getProjectById.queryOptions({
+				id: +projectId!,
+			}),
 		],
 	});
 
 	const { updateTaskList, tidyUpTaskList } = useTaskLists();
 
-	const totalCount = list?.tasks.filter(task => task.status !== TaskStatus.DELETED).length;
+	const totalCount = list?.tasks.filter(
+		(task) => task.status !== TaskStatus.DELETED,
+	).length;
 	const doneCount = list?.tasks.filter(
 		(task) => task.status === TaskStatus.DONE,
 	).length;
@@ -41,14 +46,15 @@ export default function TaskLists() {
 			? Math.round((doneCount / totalCount) * 100)
 			: undefined;
 
-	if (!list || !timezone) return <PageLoading />;
+	if (!list || !timezone || !project) return <PageLoading />;
 
 	return (
 		<>
 			<PageTitle
 				title={list.name}
-				editableTitle
+				editableTitle={project.canEdit}
 				titleOnChange={async (val) => {
+					if (!project.canEdit) return;
 					await updateTaskList.mutateAsync({
 						id: list.id,
 						name: val,
@@ -71,6 +77,7 @@ export default function TaskLists() {
 							value={list.dueDate}
 							timezone={timezone}
 							onChange={async (dueDate) => {
+								if (!project.canEdit) return;
 								await updateTaskList.mutateAsync({
 									id: list.id,
 									dueDate: dueDate ? toStartOfDay(dueDate).toISOString() : null,
@@ -79,7 +86,7 @@ export default function TaskLists() {
 							label="due"
 						/>
 
-						{doneCount ? (
+						{doneCount && project.canEdit ? (
 							<ConfirmButton
 								variant="outline"
 								size="sm"
@@ -102,6 +109,7 @@ export default function TaskLists() {
 				<form
 					className="flex flex-col px-4 py-2"
 					action={async (formData) => {
+						if (!project.canEdit) return;
 						await updateTaskList.mutateAsync({
 							id: list.id,
 							description: formData.get("description") as string,
@@ -114,7 +122,12 @@ export default function TaskLists() {
 
 			<PageSection className="divide-y-0" transparent>
 				<TasksProvider projectId={+projectId!} taskListId={+tasklistId!}>
-					<TaskListItem key={list.id} id={list.id} hideHeader />
+					<TaskListItem
+						key={list.id}
+						id={list.id}
+						hideHeader
+						canEdit={project.canEdit}
+					/>
 				</TasksProvider>
 
 				<div className="py-8">

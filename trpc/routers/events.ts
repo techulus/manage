@@ -1,6 +1,6 @@
 import { calendarEvent } from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
-import { canViewProject } from "@/lib/permissions";
+import { canEditProject, canViewProject } from "@/lib/permissions";
 import {
 	deleteSearchItem,
 	indexEventWithProjectFetch,
@@ -141,6 +141,25 @@ export const eventsRouter = createTRPCRouter({
 		.mutation(async ({ ctx, input }) => {
 			const { id } = input;
 
+			// First get the event to check permissions
+			const existingEvent = await ctx.db.query.calendarEvent.findFirst({
+				where: eq(calendarEvent.id, id),
+			});
+
+			if (!existingEvent) {
+				throw new Error("Event not found");
+			}
+
+			// Check if user has edit permission for this project
+			const canEdit = await canEditProject(
+				ctx.db,
+				existingEvent.projectId,
+				ctx.userId,
+			);
+			if (!canEdit) {
+				throw new Error("Project edit access denied");
+			}
+
 			const event = await ctx.db
 				.delete(calendarEvent)
 				.where(and(eq(calendarEvent.id, id)))
@@ -191,6 +210,12 @@ export const eventsRouter = createTRPCRouter({
 				repeat,
 				repeatUntil,
 			} = input;
+
+			// Check if user has edit permission for this project
+			const canEdit = await canEditProject(ctx.db, projectId, ctx.userId);
+			if (!canEdit) {
+				throw new Error("Project edit access denied");
+			}
 
 			if (allDay) {
 				start = toUTC(

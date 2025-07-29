@@ -78,8 +78,9 @@ export default function ProjectDetails() {
 		<>
 			<PageTitle
 				title={project.name}
-				editableTitle
+				editableTitle={project.canEdit}
 				titleOnChange={async (val) => {
+					if (!project.canEdit) return;
 					await updateProject.mutateAsync({
 						id: project.id,
 						name: val,
@@ -92,6 +93,7 @@ export default function ProjectDetails() {
 							value={project.dueDate}
 							timezone={timezone}
 							onChange={async (date) => {
+								if (!project.canEdit) return;
 								await updateProject.mutateAsync({
 									id: project.id,
 									dueDate: date ? toStartOfDay(date) : null,
@@ -100,55 +102,56 @@ export default function ProjectDetails() {
 							label="due"
 						/>
 
-						{project.status === "archived" ? (
-							<div className="flex flex-row gap-2">
+						{project.canEdit &&
+							(project.status === "archived" ? (
+								<div className="flex flex-row gap-2">
+									<form
+										action={async () => {
+											await updateProject.mutateAsync({
+												id: project.id,
+												status: "active",
+											});
+										}}
+									>
+										<ActionButton
+											label="Unarchive"
+											variant="outline"
+											className="h-8"
+										/>
+									</form>
+									<form
+										action={async () => {
+											await deleteProject.mutateAsync({
+												id: project.id,
+											});
+											router.push(`/${tenant}/today`);
+										}}
+									>
+										<DeleteButton
+											action="Delete"
+											className="h-8"
+											variant="outline"
+											compact
+										/>
+									</form>
+								</div>
+							) : (
 								<form
 									action={async () => {
 										await updateProject.mutateAsync({
 											id: project.id,
-											status: "active",
+											status: "archived",
 										});
-									}}
-								>
-									<ActionButton
-										label="Unarchive"
-										variant="outline"
-										className="h-8"
-									/>
-								</form>
-								<form
-									action={async () => {
-										await deleteProject.mutateAsync({
-											id: project.id,
-										});
-										router.push(`/${tenant}/today`);
 									}}
 								>
 									<DeleteButton
-										action="Delete"
+										action="Archive"
 										className="h-8"
 										variant="outline"
 										compact
 									/>
 								</form>
-							</div>
-						) : (
-							<form
-								action={async () => {
-									await updateProject.mutateAsync({
-										id: project.id,
-										status: "archived",
-									});
-								}}
-							>
-								<DeleteButton
-									action="Archive"
-									className="h-8"
-									variant="outline"
-									compact
-								/>
-							</form>
-						)}
+							))}
 					</div>
 				</div>
 			</PageTitle>
@@ -157,6 +160,7 @@ export default function ProjectDetails() {
 				<form
 					className="flex flex-col px-4 py-2"
 					action={async (formData) => {
+						if (!project.canEdit) return;
 						await updateProject.mutateAsync({
 							id: project.id,
 							description: formData.get("description") as string,
@@ -171,13 +175,15 @@ export default function ProjectDetails() {
 				title="Tasks"
 				titleIcon={<ListIcon className="w-5 h-5" />}
 				titleAction={
-					<Link
-						className={buttonVariants({ size: "sm" })}
-						href={`/${tenant}/projects/${projectId}/tasklists?create=true`}
-					>
-						New
-						<span className="sr-only">, list</span>
-					</Link>
+					project.canEdit && (
+						<Link
+							className={buttonVariants({ size: "sm" })}
+							href={`/${tenant}/projects/${projectId}/tasklists?create=true`}
+						>
+							New
+							<span className="sr-only">, list</span>
+						</Link>
+					)
 				}
 				transparent={!!taskLists.length}
 			>
@@ -188,10 +194,15 @@ export default function ProjectDetails() {
 								<div key={taskList.id} className="overflow-hidden rounded-lg ">
 									<TaskListHeader
 										taskList={taskList}
-										totalCount={taskList.tasks.filter(task => task.status !== TaskStatus.DELETED).length}
+										totalCount={
+											taskList.tasks.filter(
+												(task) => task.status !== TaskStatus.DELETED,
+											).length
+										}
 										doneCount={
-											taskList.tasks.filter((task) => task.status === TaskStatus.DONE)
-												.length
+											taskList.tasks.filter(
+												(task) => task.status === TaskStatus.DONE,
+											).length
 										}
 									/>
 								</div>
@@ -200,11 +211,19 @@ export default function ProjectDetails() {
 					</ul>
 				) : (
 					<div className="p-2">
-						<EmptyState
-							show={!taskLists.length}
-							label="list"
-							createLink={`/${tenant}/projects/${projectId}/tasklists?create=true`}
-						/>
+						{project.canEdit ? (
+							<EmptyState
+								show={!taskLists.length}
+								label="list"
+								createLink={`/${tenant}/projects/${projectId}/tasklists?create=true`}
+							/>
+						) : (
+							!taskLists.length && (
+								<div className="text-center text-muted-foreground py-8">
+									No task lists available
+								</div>
+							)
+						)}
 					</div>
 				)}
 			</PageSection>
@@ -213,13 +232,15 @@ export default function ProjectDetails() {
 				title="Events this week"
 				titleIcon={<CalendarIcon className="w-5 h-5" />}
 				titleAction={
-					<Link
-						className={buttonVariants({ size: "sm" })}
-						href={`/${tenant}/projects/${projectId}/events?create=true`}
-					>
-						New
-						<span className="sr-only">, event</span>
-					</Link>
+					project.canEdit && (
+						<Link
+							className={buttonVariants({ size: "sm" })}
+							href={`/${tenant}/projects/${projectId}/events?create=true`}
+						>
+							New
+							<span className="sr-only">, event</span>
+						</Link>
+					)
 				}
 				className="p-2"
 			>

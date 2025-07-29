@@ -48,7 +48,10 @@ export const settingsRouter = createTRPCRouter({
 					.where(eq(opsUser.id, ctx.userId))
 					.execute();
 			} catch (error) {
-				console.error("[Settings] Error updating timezone in ops database:", error);
+				console.error(
+					"[Settings] Error updating timezone in ops database:",
+					error,
+				);
 				// Don't throw error to avoid blocking the main update
 			}
 		}),

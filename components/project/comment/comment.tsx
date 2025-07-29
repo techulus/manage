@@ -10,11 +10,7 @@ import { useUser } from "@clerk/nextjs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 
-export default function CommentForm({
-	roomId,
-}: {
-	roomId: string;
-}) {
+export default function CommentForm({ roomId }: { roomId: string }) {
 	const { projectId } = useParams();
 	const { user: creator } = useUser();
 

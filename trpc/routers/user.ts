@@ -4,19 +4,11 @@ import {
 	projectPermission,
 	user,
 } from "@/drizzle/schema";
-import type {
-	NotificationWithUser,
-} from "@/drizzle/types";
+import type { NotificationWithUser } from "@/drizzle/types";
 import { getTodayDataForUser } from "@/lib/utils/todayData";
 import { broadcastEvent, getSignedWireUrl } from "@/lib/utils/turbowire";
 import { currentUser } from "@clerk/nextjs/server";
-import {
-	and,
-	desc,
-	eq,
-	inArray,
-	or,
-} from "drizzle-orm";
+import { and, desc, eq, inArray, or } from "drizzle-orm";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
@@ -91,8 +83,11 @@ export const userRouter = createTRPCRouter({
 				where: and(
 					or(
 						// User has explicit permission
-						userPermissions.length > 0 
-							? inArray(project.id, userPermissions.map((p) => p.projectId))
+						userPermissions.length > 0
+							? inArray(
+									project.id,
+									userPermissions.map((p) => p.projectId),
+								)
 							: undefined,
 						// User is the creator (for backward compatibility)
 						eq(project.createdByUser, ctx.userId),
@@ -108,7 +103,9 @@ export const userRouter = createTRPCRouter({
 			const projectsWithRole = projects.map((proj) => {
 				const permission = userPermissions.find((p) => p.projectId === proj.id);
 				// If no explicit permission but user is creator, they have editor role
-				const role = permission?.role || (proj.createdByUser === ctx.userId ? "editor" : undefined);
+				const role =
+					permission?.role ||
+					(proj.createdByUser === ctx.userId ? "editor" : undefined);
 				return {
 					...proj,
 					userRole: role,

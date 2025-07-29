@@ -1,27 +1,27 @@
 "use client";
 
+import {
+	closestCenter,
+	DndContext,
+	type DragEndEvent,
+	PointerSensor,
+	TouchSensor,
+	useSensor,
+	useSensors,
+} from "@dnd-kit/core";
+import {
+	arrayMove,
+	SortableContext,
+	verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { useQuery } from "@tanstack/react-query";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TaskStatus } from "@/drizzle/types";
 import { useTasks } from "@/hooks/use-tasks";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
-import {
-	DndContext,
-	type DragEndEvent,
-	PointerSensor,
-	TouchSensor,
-	closestCenter,
-	useSensor,
-	useSensors,
-} from "@dnd-kit/core";
-import {
-	SortableContext,
-	arrayMove,
-	verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useState } from "react";
 import InlineTaskForm from "../../form/task";
 import { TaskItem } from "./task/task-item";
 import { TaskListHeader } from "./tasklist-header";
@@ -30,10 +30,12 @@ export const TaskListItem = ({
 	id,
 	hideHeader = false,
 	compact = false,
+	canEdit = true,
 }: {
 	id: number;
 	hideHeader?: boolean;
 	compact?: boolean;
+	canEdit?: boolean;
 }) => {
 	const trpc = useTRPC();
 	const { data: taskList, isLoading } = useQuery(
@@ -122,7 +124,10 @@ export const TaskListItem = ({
 			{!hideHeader ? (
 				<TaskListHeader
 					taskList={taskList}
-					totalCount={taskList.tasks.filter(task => task.status !== TaskStatus.DELETED).length}
+					totalCount={
+						taskList.tasks.filter((task) => task.status !== TaskStatus.DELETED)
+							.length
+					}
 					doneCount={doneItems.length}
 				/>
 			) : null}
@@ -133,23 +138,39 @@ export const TaskListItem = ({
 					compact ? "max-h-96 overflow-y-auto" : "",
 				)}
 			>
-				<DndContext
-					id="tasklist-dnd"
-					sensors={sensors}
-					collisionDetection={closestCenter}
-					onDragEnd={handleDragEnd}
-				>
-					<SortableContext
-						items={localTodoItems}
-						strategy={verticalListSortingStrategy}
+				{canEdit ? (
+					<DndContext
+						id="tasklist-dnd"
+						sensors={sensors}
+						collisionDetection={closestCenter}
+						onDragEnd={handleDragEnd}
 					>
-						{localTodoItems.map((task) => (
-							<TaskItem key={task.id} task={task} compact={compact} />
-						))}
-					</SortableContext>
-				</DndContext>
+						<SortableContext
+							items={localTodoItems}
+							strategy={verticalListSortingStrategy}
+						>
+							{localTodoItems.map((task) => (
+								<TaskItem
+									key={task.id}
+									task={task}
+									compact={compact}
+									canEdit={canEdit}
+								/>
+							))}
+						</SortableContext>
+					</DndContext>
+				) : (
+					localTodoItems.map((task) => (
+						<TaskItem
+							key={task.id}
+							task={task}
+							compact={compact}
+							canEdit={canEdit}
+						/>
+					))
+				)}
 
-				{!compact ? (
+				{!compact && canEdit ? (
 					<div className="px-6 py-2">
 						<InlineTaskForm
 							action={async (name) => {
@@ -164,13 +185,15 @@ export const TaskListItem = ({
 
 				{compact
 					? null
-					: doneItems.map((task) => <TaskItem key={task.id} task={task} />)}
+					: doneItems.map((task) => (
+							<TaskItem key={task.id} task={task} canEdit={canEdit} />
+						))}
 
 				{compact ? null : (
 					<>
 						{showDeleted
 							? deletedItems.map((task) => (
-									<TaskItem key={task.id} task={task} />
+									<TaskItem key={task.id} task={task} canEdit={canEdit} />
 								))
 							: null}
 

@@ -41,12 +41,10 @@ export async function triggerWorkflow<T = unknown>(
 /**
  * Trigger the blob deletion workflow for a given owner
  */
-export async function triggerBlobDeletionWorkflow(ownerId: string): Promise<void> {
+export async function triggerBlobDeletionWorkflow(
+	ownerId: string,
+): Promise<void> {
 	const url = `${process.env.NEXT_PUBLIC_APP_URL}/api/jobs/blobs/delete-owner-blobs`;
-	await triggerWorkflow(
-		url,
-		{ ownerId },
-		"[BlobDeletion]",
-	);
+	await triggerWorkflow(url, { ownerId }, "[BlobDeletion]");
 	console.log(`[BlobDeletion] Initial workflow triggered for owner ${ownerId}`);
 }
