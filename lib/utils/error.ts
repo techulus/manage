@@ -20,6 +20,7 @@ export function displayMutationError(error: TRPCClientErrorLike<AppRouter>) {
 	}
 
 	toast.error(
-		error.message || "Oops! Something went wrong. Please try again or contact support.",
+		error.message ||
+			"Oops! Something went wrong. Please try again or contact support.",
 	);
 }

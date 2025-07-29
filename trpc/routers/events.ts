@@ -151,7 +151,11 @@ export const eventsRouter = createTRPCRouter({
 			}
 
 			// Check if user has edit permission for this project
-			const canEdit = await canEditProject(ctx.db, existingEvent.projectId, ctx.userId);
+			const canEdit = await canEditProject(
+				ctx.db,
+				existingEvent.projectId,
+				ctx.userId,
+			);
 			if (!canEdit) {
 				throw new Error("Project edit access denied");
 			}
