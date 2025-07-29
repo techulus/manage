@@ -1,14 +1,15 @@
+import { and, asc, desc, eq, or } from "drizzle-orm";
+import { z } from "zod";
 import { task, taskList } from "@/drizzle/schema";
 import { TaskListStatus, TaskStatus } from "@/drizzle/types";
 import { logActivity } from "@/lib/activity";
+import { canEditProject, canViewProject } from "@/lib/permissions";
 import {
 	deleteSearchItem,
 	indexTaskListWithProjectFetch,
 	indexTaskWithDataFetch,
 } from "@/lib/search/helpers";
 import { notifyUser } from "@/lib/utils/useNotification";
-import { and, asc, desc, eq, or } from "drizzle-orm";
-import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
 const POSITION_INCREMENT = 1000;
@@ -25,6 +26,16 @@ export const tasksRouter = createTRPCRouter({
 			}),
 		)
 		.query(async ({ ctx, input }) => {
+			// Check if user has permission to view this project
+			const hasAccess = await canViewProject(
+				ctx.db,
+				input.projectId,
+				ctx.userId,
+			);
+			if (!hasAccess) {
+				throw new Error("Project access denied");
+			}
+
 			const data = await ctx.db.query.taskList
 				.findMany({
 					where: and(
@@ -60,6 +71,12 @@ export const tasksRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
+			// Check if user has edit permission for this project
+			const canEdit = await canEditProject(ctx.db, input.projectId, ctx.userId);
+			if (!canEdit) {
+				throw new Error("Project edit access denied");
+			}
+
 			const createdTaskList = await ctx.db
 				.insert(taskList)
 				.values({

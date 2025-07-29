@@ -1,6 +1,6 @@
-import { isDatabaseReady } from "@/lib/utils/useDatabase";
 import { auth } from "@clerk/nextjs/server";
 import { RedirectType, redirect } from "next/navigation";
+import { isDatabaseReady } from "@/lib/utils/useDatabase";
 
 export const fetchCache = "force-no-store";
 export const dynamic = "force-dynamic";

@@ -11,7 +11,7 @@ import { useUser } from "@clerk/nextjs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type ReactNode, createContext, useCallback, useContext } from "react";
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: context value typed as any for flexibility
 const TasksContext = createContext<any>(undefined);
 
 export function TasksProvider({

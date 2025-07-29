@@ -5,7 +5,7 @@ import { useTRPC } from "@/trpc/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type ReactNode, createContext, useCallback, useContext } from "react";
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: context value typed as any for flexibility
 const TaskListsContext = createContext<any>(undefined);
 
 export function TaskListsProvider({

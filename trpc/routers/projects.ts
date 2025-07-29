@@ -1,5 +1,6 @@
-import { activity, comment, project } from "@/drizzle/schema";
+import { activity, comment, project, projectPermission } from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
+import { canEditProject, canViewProject } from "@/lib/permissions";
 import {
 	deleteProjectSearchItems,
 	deleteSearchItem,
@@ -19,6 +20,11 @@ export const projectsRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
+			// Check if user is in an organization and if they're an admin
+			if (ctx.orgId && !ctx.isOrgAdmin) {
+				throw new Error("Only organization admins can create projects");
+			}
+
 			const newProject = await ctx.db
 				.insert(project)
 				.values({
@@ -39,8 +45,16 @@ export const projectsRouter = createTRPCRouter({
 				projectId: newProject?.[0].id,
 			});
 
-			// Index the project for search
+			// Grant editor permission to the project creator
 			if (newProject?.[0]) {
+				await ctx.db.insert(projectPermission).values({
+					projectId: newProject[0].id,
+					userId: ctx.userId,
+					role: "editor",
+					createdByUser: ctx.userId,
+				});
+
+				// Index the project for search
 				await indexProject(ctx.search, newProject[0]);
 			}
 
@@ -73,6 +87,12 @@ export const projectsRouter = createTRPCRouter({
 				),
 		)
 		.mutation(async ({ ctx, input }) => {
+			// Check if user has edit permission for this project
+			const canEdit = await canEditProject(ctx.db, +input.id, ctx.userId);
+			if (!canEdit) {
+				throw new Error("Project edit access denied");
+			}
+
 			const currentProject = await ctx.db.query.project
 				.findFirst({
 					where: eq(project.id, +input.id),
@@ -114,6 +134,12 @@ export const projectsRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
+			// Check if user has edit permission for this project (needed to delete)
+			const canEdit = await canEditProject(ctx.db, input.id, ctx.userId);
+			if (!canEdit) {
+				throw new Error("Project delete access denied");
+			}
+
 			const deletedProject = await ctx.db
 				.delete(project)
 				.where(eq(project.id, input.id))
@@ -141,6 +167,12 @@ export const projectsRouter = createTRPCRouter({
 			}),
 		)
 		.query(async ({ ctx, input }) => {
+			// Check if user has permission to view this project
+			const hasAccess = await canViewProject(ctx.db, input.id, ctx.userId);
+			if (!hasAccess) {
+				throw new Error("Project access denied");
+			}
+
 			const data = await ctx.db.query.project
 				.findFirst({
 					where: and(eq(project.id, input.id)),

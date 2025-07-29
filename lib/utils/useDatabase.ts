@@ -1,9 +1,10 @@
 import path from "node:path";
 import { addUserToOpsDb } from "@/ops/useOps";
 import { sql } from "drizzle-orm";
-import { type NodePgDatabase, drizzle } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import * as schema from "../../drizzle/schema";
+import type { Database } from "@/drizzle/types";
 import { getOwner } from "./useOwner";
 import { addUserToTenantDb } from "./useUser";
 
@@ -38,7 +39,7 @@ async function migrateDatabase(): Promise<void> {
 	await migrate(db, { migrationsFolder: migrationsFolder });
 }
 
-export async function database(): Promise<NodePgDatabase<typeof schema>> {
+export async function database(): Promise<Database> {
 	const { ownerId } = await getOwner();
 	if (!ownerId) {
 		throw new Error("Owner ID not found");
@@ -49,7 +50,7 @@ export async function database(): Promise<NodePgDatabase<typeof schema>> {
 
 export async function getDatabaseForOwner(
 	ownerId: string,
-): Promise<NodePgDatabase<typeof schema>> {
+): Promise<Database> {
 	const databaseName = getDatabaseName(ownerId);
 	if (!databaseName) {
 		throw new Error("Database name not found");

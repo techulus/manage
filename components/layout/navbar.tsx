@@ -187,6 +187,11 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 					label: "Activity",
 					active: pathname === `/${tenant}/projects/${projectId}/activity`,
 				},
+				{
+					href: `/${tenant}/projects/${projectId}/settings`,
+					label: "Settings",
+					active: pathname === `/${tenant}/projects/${projectId}/settings`,
+				},
 			];
 		}
 

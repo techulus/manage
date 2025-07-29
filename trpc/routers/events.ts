@@ -1,5 +1,6 @@
 import { calendarEvent } from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
+import { canViewProject } from "@/lib/permissions";
 import {
 	deleteSearchItem,
 	indexEventWithProjectFetch,
@@ -66,6 +67,13 @@ export const eventsRouter = createTRPCRouter({
 		)
 		.query(async ({ ctx, input }) => {
 			const { date, projectId } = input;
+
+			// Check if user has permission to view this project
+			const hasAccess = await canViewProject(ctx.db, projectId, ctx.userId);
+			if (!hasAccess) {
+				throw new Error("Project access denied");
+			}
+
 			const { startOfDay, endOfDay } = getStartEndDateRangeInUtc(
 				ctx.timezone,
 				date,
@@ -85,6 +93,12 @@ export const eventsRouter = createTRPCRouter({
 		)
 		.query(async ({ ctx, input }) => {
 			const { projectId } = input;
+
+			// Check if user has permission to view this project
+			const hasAccess = await canViewProject(ctx.db, projectId, ctx.userId);
+			if (!hasAccess) {
+				throw new Error("Project access denied");
+			}
 
 			const { start, end } = getStartEndWeekRangeInUtc(
 				ctx.timezone,

@@ -1,11 +1,11 @@
-import { SearchService } from "@/lib/search";
-import { database } from "@/lib/utils/useDatabase";
-import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 import { auth } from "@clerk/nextjs/server";
-import { TRPCError, initTRPC } from "@trpc/server";
+import { initTRPC, TRPCError } from "@trpc/server";
 import { cache } from "react";
 import superjson from "superjson";
 import { ZodError } from "zod";
+import { SearchService } from "@/lib/search";
+import { database } from "@/lib/utils/useDatabase";
+import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 
 export const createTRPCContext = cache(async () => {
 	/**
@@ -50,12 +50,17 @@ export const createCallerFactory = t.createCallerFactory;
 
 export const publicProcedure = t.procedure;
 export const protectedProcedure = t.procedure.use(async ({ next }) => {
-	const { sessionId } = await auth();
+	const { sessionId, has } = await auth();
 	if (!sessionId) {
 		throw new TRPCError({ code: "UNAUTHORIZED" });
 	}
 
 	const { orgSlug, ownerId, orgId, userId } = await getOwner();
+
+	// For personal accounts (no orgId), user is always admin
+	// For organizations, check if user has org:admin role
+	const isOrgAdmin = !orgId ? true : has({ role: "org:admin" });
+
 	const db = await database();
 	const search = new SearchService(ownerId, orgSlug);
 
@@ -68,6 +73,7 @@ export const protectedProcedure = t.procedure.use(async ({ next }) => {
 			ownerId,
 			db,
 			search,
+			isOrgAdmin,
 		},
 	});
 });
