@@ -39,6 +39,12 @@ export default function TaskLists() {
 		}),
 	);
 
+	const { data: project } = useQuery(
+		trpc.projects.getProjectById.queryOptions({
+			id: +projectId!,
+		}),
+	);
+
 	const { createTaskList } = useTaskLists();
 
 	return (
@@ -46,21 +52,31 @@ export default function TaskLists() {
 			<PageTitle
 				title="Tasks"
 				actions={
-					<Link
-						href={`/${tenant}/projects/${projectId}/tasklists?create=true`}
-						className={buttonVariants()}
-					>
-						New
-					</Link>
+					project?.canEdit ? (
+						<Link
+							href={`/${tenant}/projects/${projectId}/tasklists?create=true`}
+							className={buttonVariants()}
+						>
+							New
+						</Link>
+					) : undefined
 				}
 			/>
 
 			<PageSection transparent>
-				<EmptyState
-					show={!taskLists.length}
-					label="list"
-					createLink={`/${tenant}/projects/${projectId}/tasklists?create=true`}
-				/>
+				{project?.canEdit ? (
+					<EmptyState
+						show={!taskLists.length}
+						label="list"
+						createLink={`/${tenant}/projects/${projectId}/tasklists?create=true`}
+					/>
+				) : (
+					!taskLists.length && (
+						<div className="text-center text-muted-foreground py-8">
+							No task lists available
+						</div>
+					)
+				)}
 
 				{taskLists?.length ? (
 					<ul className="grid grid-cols-1 gap-x-4 gap-y-4 lg:grid-cols-2">
@@ -70,7 +86,11 @@ export default function TaskLists() {
 								projectId={+projectId!}
 								taskListId={taskList.id}
 							>
-								<TaskListItem id={taskList.id} compact />
+								<TaskListItem
+									id={taskList.id}
+									compact
+									canEdit={project?.canEdit ?? false}
+								/>
 							</TasksProvider>
 						))}
 					</ul>
@@ -95,41 +115,43 @@ export default function TaskLists() {
 				</div>
 			</PageSection>
 
-			<Panel open={create} setOpen={setCreate}>
-				<Title>
-					<PageTitle title="Create List" compact />
-				</Title>
-				<form
-					action={async (formData) => {
-						const name = formData.get("name") as string;
-						const description = formData.get("description") as string;
-						const dueDate = formData.get("dueDate") as string;
+			{project?.canEdit && (
+				<Panel open={create} setOpen={setCreate}>
+					<Title>
+						<PageTitle title="Create List" compact />
+					</Title>
+					<form
+						action={async (formData) => {
+							const name = formData.get("name") as string;
+							const description = formData.get("description") as string;
+							const dueDate = formData.get("dueDate") as string;
 
-						await createTaskList.mutateAsync({
-							projectId: +projectId!,
-							name,
-							description,
-							dueDate,
-						});
+							await createTaskList.mutateAsync({
+								projectId: +projectId!,
+								name,
+								description,
+								dueDate,
+							});
 
-						setCreate(false);
-					}}
-					className="px-6"
-				>
-					<SharedForm />
+							setCreate(false);
+						}}
+						className="px-6"
+					>
+						<SharedForm />
 
-					<div className="mt-6 flex items-center justify-end gap-x-6">
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => setCreate(false)}
-						>
-							Cancel
-						</Button>
-						<SaveButton />
-					</div>
-				</form>
-			</Panel>
+						<div className="mt-6 flex items-center justify-end gap-x-6">
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => setCreate(false)}
+							>
+								Cancel
+							</Button>
+							<SaveButton />
+						</div>
+					</form>
+				</Panel>
+			)}
 		</>
 	);
 }

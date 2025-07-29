@@ -327,7 +327,9 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 										align="start"
 										className="max-h-48 overflow-y-auto"
 									>
-										<DropdownMenuItem onClick={() => setProjectFilter(undefined)}>
+										<DropdownMenuItem
+											onClick={() => setProjectFilter(undefined)}
+										>
 											All Projects
 										</DropdownMenuItem>
 										{projects.map((project) => (
@@ -395,10 +397,12 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 							<div className="border rounded-lg p-8">
 								<div className="flex flex-col items-center justify-center text-center">
 									<Search className="h-12 w-12 text-muted-foreground mb-4" />
-									<h3 className="text-xl font-semibold mb-2">Start searching</h3>
+									<h3 className="text-xl font-semibold mb-2">
+										Start searching
+									</h3>
 									<p className="text-muted-foreground max-w-md">
-										Type in the search box above to find projects, tasks, events,
-										and more across your workspace.
+										Type in the search box above to find projects, tasks,
+										events, and more across your workspace.
 									</p>
 								</div>
 							</div>
@@ -415,8 +419,8 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 									<AlertCircle className="h-12 w-12 text-destructive mb-4" />
 									<h3 className="text-xl font-semibold mb-2">Search Error</h3>
 									<p className="text-muted-foreground max-w-md">
-										There was an error performing your search. Please try again or
-										reindex your content.
+										There was an error performing your search. Please try again
+										or reindex your content.
 									</p>
 								</div>
 							</div>
@@ -424,7 +428,9 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 							<div className="border rounded-lg p-8">
 								<div className="flex flex-col items-center justify-center text-center">
 									<Search className="h-12 w-12 text-muted-foreground mb-4" />
-									<h3 className="text-xl font-semibold mb-2">No results found</h3>
+									<h3 className="text-xl font-semibold mb-2">
+										No results found
+									</h3>
 									<p className="text-muted-foreground max-w-md">
 										No results found for "{debouncedQuery}". Try different
 										keywords or check your spelling.
@@ -497,7 +503,8 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 																	</div>
 																)}
 																<div className="flex items-center gap-1">
-																	Created {result.createdAt.toLocaleDateString()}
+																	Created{" "}
+																	{result.createdAt.toLocaleDateString()}
 																</div>
 															</div>
 														</div>

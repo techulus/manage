@@ -18,7 +18,10 @@ import {
 export function CommandMenu({
 	tenant,
 	projectId,
-}: { tenant: string; projectId: number }) {
+}: {
+	tenant: string;
+	projectId: number;
+}) {
 	const [open, setOpen] = useState(false);
 	const router = useRouter();
 

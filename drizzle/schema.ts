@@ -161,19 +161,16 @@ export const calendarEvent = pgTable("Event", {
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
 });
-export const calendarEventRelations = relations(
-	calendarEvent,
-	({ one }) => ({
-		creator: one(user, {
-			fields: [calendarEvent.createdByUser],
-			references: [user.id],
-		}),
-		project: one(project, {
-			fields: [calendarEvent.projectId],
-			references: [project.id],
-		}),
+export const calendarEventRelations = relations(calendarEvent, ({ one }) => ({
+	creator: one(user, {
+		fields: [calendarEvent.createdByUser],
+		references: [user.id],
 	}),
-);
+	project: one(project, {
+		fields: [calendarEvent.projectId],
+		references: [project.id],
+	}),
+}));
 
 export const comment = pgTable("Comment", {
 	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),

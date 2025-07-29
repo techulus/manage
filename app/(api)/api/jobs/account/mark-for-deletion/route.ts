@@ -1,5 +1,11 @@
-import { SevenDayWarning, sevenDayWarningPlainText } from "@/components/emails/seven-day-warning";
-import { ThirtyDayDeletionNotice, thirtyDayDeletionNoticePlainText } from "@/components/emails/thirty-day-deletion-notice";
+import {
+	SevenDayWarning,
+	sevenDayWarningPlainText,
+} from "@/components/emails/seven-day-warning";
+import {
+	ThirtyDayDeletionNotice,
+	thirtyDayDeletionNoticePlainText,
+} from "@/components/emails/thirty-day-deletion-notice";
 import { opsOrganization } from "@/ops/drizzle/schema";
 import { getOpsDatabase } from "@/ops/useOps";
 import { clerkClient } from "@clerk/nextjs/server";
@@ -11,12 +17,18 @@ type ClerkOrgData = {
 	createdBy?: string;
 };
 
-async function getOrgCreatorDetails(org: { id: string; name: string; rawData: unknown }) {
+async function getOrgCreatorDetails(org: {
+	id: string;
+	name: string;
+	rawData: unknown;
+}) {
 	const rawData = org.rawData as ClerkOrgData;
 	const createdByUserId = rawData?.createdBy;
 
 	if (!createdByUserId) {
-		throw new Error(`No creator user ID found for organization ${org.name} (${org.id})`);
+		throw new Error(
+			`No creator user ID found for organization ${org.name} (${org.id})`,
+		);
 	}
 
 	try {
@@ -26,7 +38,9 @@ async function getOrgCreatorDetails(org: { id: string; name: string; rawData: un
 		const firstName = creator.firstName || undefined;
 
 		if (!contactEmail) {
-			throw new Error(`No email address found for creator of organization ${org.name} (${org.id})`);
+			throw new Error(
+				`No email address found for creator of organization ${org.name} (${org.id})`,
+			);
 		}
 
 		return { contactEmail, firstName };
@@ -35,7 +49,9 @@ async function getOrgCreatorDetails(org: { id: string; name: string; rawData: un
 			`[OrgDeletion] Failed to fetch creator details for user ${createdByUserId}:`,
 			error,
 		);
-		throw new Error(`Failed to fetch creator details for organization ${org.name} (${org.id}): ${error}`);
+		throw new Error(
+			`Failed to fetch creator details for organization ${org.name} (${org.id}): ${error}`,
+		);
 	}
 }
 

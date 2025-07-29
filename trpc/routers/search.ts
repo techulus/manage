@@ -2,8 +2,8 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
 import { runAndLogError } from "@/lib/error";
 import { getUserProjectIds } from "@/lib/permissions";
-import { eq, } from "drizzle-orm";
-import { project, } from "@/drizzle/schema";
+import { eq } from "drizzle-orm";
+import { project } from "@/drizzle/schema";
 
 export const searchRouter = createTRPCRouter({
 	searchQuery: protectedProcedure
@@ -19,22 +19,24 @@ export const searchRouter = createTRPCRouter({
 		.query(async ({ input, ctx }) => {
 			// Get projects the user has access to via permissions
 			const userProjectIds = await getUserProjectIds(ctx.db, ctx.userId);
-			
+
 			// Get projects the user created (for backward compatibility)
 			const createdProjects = await ctx.db.query.project.findMany({
 				where: eq(project.createdByUser, ctx.userId),
 				columns: { id: true },
 			});
-			const createdProjectIds = createdProjects.map(p => p.id);
-			
+			const createdProjectIds = createdProjects.map((p) => p.id);
+
 			// Combine both sets of project IDs
-			const accessibleProjectIds = [...new Set([...userProjectIds, ...createdProjectIds])];
-			
+			const accessibleProjectIds = [
+				...new Set([...userProjectIds, ...createdProjectIds]),
+			];
+
 			// If user has no accessible projects, return empty results
 			if (accessibleProjectIds.length === 0) {
 				return [];
 			}
-			
+
 			const results = await ctx.search.search(input.query, {
 				type: input.type,
 				projectId: input.projectId,
@@ -43,14 +45,16 @@ export const searchRouter = createTRPCRouter({
 			});
 
 			// Filter results to only include content from accessible projects
-			const filteredResults = results.filter(result => {
+			const filteredResults = results.filter((result) => {
 				// For project search results, check if the project ID is accessible
-				if (result.type === 'project') {
+				if (result.type === "project") {
 					return accessibleProjectIds.includes(result.projectId);
 				}
-				
+
 				// For tasks, tasklists, and events, check if their project is accessible
-				return result.projectId && accessibleProjectIds.includes(result.projectId);
+				return (
+					result.projectId && accessibleProjectIds.includes(result.projectId)
+				);
 			});
 
 			return filteredResults;

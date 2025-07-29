@@ -136,11 +136,7 @@ export const { POST } = serve<WorkflowPayload>(async (context) => {
 	if (hasMore) {
 		await context.run("trigger-next-batch", async () => {
 			const url = `${process.env.NEXT_PUBLIC_APP_URL}/api/jobs/blobs/delete-owner-blobs`;
-			await triggerWorkflow(
-				url,
-				{ ownerId },
-				"[BlobDeletion]",
-			);
+			await triggerWorkflow(url, { ownerId }, "[BlobDeletion]");
 			console.log(`[BlobDeletion] Next batch triggered for owner: ${ownerId}`);
 		});
 	}

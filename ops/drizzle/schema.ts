@@ -16,7 +16,7 @@ export const opsUser = pgTable("User", {
 });
 
 export const opsOrganization = pgTable("Organization", {
-	id: text("id").primaryKey().notNull(),  
+	id: text("id").primaryKey().notNull(),
 	name: text("name").notNull(),
 	rawData: jsonb("rawData").notNull(),
 	lastActiveAt: timestamp(),

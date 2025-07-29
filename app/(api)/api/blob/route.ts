@@ -1,10 +1,10 @@
+import { randomUUID } from "node:crypto";
+import mime from "mime-types";
+import { type NextRequest, NextResponse } from "next/server";
 import { blob } from "@/drizzle/schema";
 import { upload } from "@/lib/blobStore";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
-import mime from "mime-types";
-import { type NextRequest, NextResponse } from "next/server";
-import { v4 as uuidv4 } from "uuid";
 
 export type BlobUploadResult = {
 	message: string;
@@ -15,12 +15,12 @@ export async function PUT(request: NextRequest) {
 	const { ownerId, userId } = await getOwner();
 	const body = await request.blob();
 	const extension = mime.extension(body.type);
-	const name = request.nextUrl.searchParams.get("name") ?? uuidv4();
+	const name = request.nextUrl.searchParams.get("name") ?? randomUUID();
 
 	const db = await database();
 
 	try {
-		const fileId = uuidv4();
+		const fileId = randomUUID();
 		const key = `${ownerId}/${fileId}`;
 
 		await upload(key, {

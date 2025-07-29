@@ -1,5 +1,19 @@
 "use client";
 
+import { useUser } from "@clerk/nextjs";
+import { Title } from "@radix-ui/react-dialog";
+import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
+import {
+	AlertTriangleIcon,
+	CalendarClockIcon,
+	FolderIcon,
+	InfoIcon,
+	Users,
+} from "lucide-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useQueryState } from "nuqs";
+import { useMemo, useState } from "react";
 import { Greeting } from "@/components/core/greeting";
 import { PageLoading } from "@/components/core/loaders";
 import { Panel } from "@/components/core/panel";
@@ -14,20 +28,6 @@ import { toDateStringWithDay } from "@/lib/utils/date";
 import { displayMutationError } from "@/lib/utils/error";
 import { eventToHumanReadableString } from "@/lib/utils/useEvents";
 import { useTRPC } from "@/trpc/client";
-import { useUser } from "@clerk/nextjs";
-import { Title } from "@radix-ui/react-dialog";
-import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
-import {
-	AlertTriangleIcon,
-	CalendarClockIcon,
-	FolderIcon,
-	InfoIcon,
-	Users,
-} from "lucide-react";
-import Link from "next/link";
-import { useParams } from "next/navigation";
-import { useQueryState } from "nuqs";
-import { useState, useMemo } from "react";
 
 export default function Today() {
 	const params = useParams();
@@ -44,15 +44,15 @@ export default function Today() {
 	const isOrgAdmin = useMemo(() => {
 		// Check if current tenant matches any organization the user belongs to
 		const orgMembership = user?.organizationMemberships?.find(
-			(membership) => membership.organization.slug === tenant
+			(membership) => membership.organization.slug === tenant,
 		);
-		
+
 		if (orgMembership) {
 			// This is an organization tenant - check if user has org:admin role
 			return orgMembership.role === "org:admin";
 		}
-			// This is a personal account tenant (no matching organization) - user is admin
-			return true;
+		// This is a personal account tenant (no matching organization) - user is admin
+		return true;
 	}, [user, tenant]);
 
 	const [{ data: todayData }, { data: projects }, { data: timezone }] =
@@ -189,15 +189,14 @@ export default function Today() {
 						))}
 					</div>
 				) : (
-					<div className="flex flex-col items-center justify-center py-8">
+					<div className="flex flex-col items-center justify-center py-8 border border-muted rounded-lg">
 						{isOrgAdmin ? (
 							<>
 								<FolderIcon className="h-12 w-12 text-muted-foreground/50" />
-								<p className="mt-4 text-sm text-muted-foreground">No projects yet</p>
-								<Button
-									className="mt-4"
-									onClick={() => setCreate(true)}
-								>
+								<p className="mt-4 text-sm text-muted-foreground">
+									No projects yet
+								</p>
+								<Button className="mt-4" onClick={() => setCreate(true)}>
 									Create new project
 								</Button>
 							</>

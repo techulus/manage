@@ -12,10 +12,12 @@ const mainFont = Geist({
 });
 
 export const metadata = {
-	metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://managee.xyz'),
+	metadataBase: new URL(
+		process.env.NEXT_PUBLIC_APP_URL || "https://managee.xyz",
+	),
 	title: {
 		default: SITE_METADATA.TITLE,
-		template: "%s | Manage"
+		template: "%s | Manage",
 	},
 	description: SITE_METADATA.DESCRIPTION,
 	keywords: [
@@ -27,7 +29,7 @@ export const metadata = {
 		"calendar",
 		"file sharing",
 		"activity tracking",
-		"multi-tenant"
+		"multi-tenant",
 	],
 	authors: [{ name: "Techulus", url: "https://github.com/techulus" }],
 	creator: "Techulus",
@@ -48,16 +50,16 @@ export const metadata = {
 				url: "/screenshots/overview.png",
 				width: 1200,
 				height: 630,
-				alt: "Manage - Project Management Dashboard"
-			}
-		]
+				alt: "Manage - Project Management Dashboard",
+			},
+		],
 	},
 	twitter: {
 		card: "summary_large_image",
 		title: SITE_METADATA.TITLE,
 		description: SITE_METADATA.DESCRIPTION,
 		creator: "@arjunz",
-		images: ["/screenshots/overview.png"]
+		images: ["/screenshots/overview.png"],
 	},
 	robot: {
 		index: true,
@@ -71,8 +73,8 @@ export const metadata = {
 		},
 	},
 	alternates: {
-		canonical: "https://managee.xyz"
-	}
+		canonical: "https://managee.xyz",
+	},
 };
 
 export default function RootLayout({
