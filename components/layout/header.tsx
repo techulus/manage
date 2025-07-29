@@ -10,7 +10,7 @@ export function Header() {
 	const user = useUser();
 
 	return (
-		<header className="absolute inset-x-0 top-0 z-50 text-black dark:text-white">
+		<header className="absolute inset-x-0 top-0 z-50 text-black dark:text-white max-w-7xl mx-auto">
 			<nav
 				className="flex items-center justify-between p-6 lg:px-8"
 				aria-label="Global"

@@ -26,6 +26,9 @@ export const userRelations = relations(user, ({ many }) => ({
 	projects: many(project),
 	taskLists: many(taskList),
 	events: many(calendarEvent),
+	projectPermissions: many(projectPermission, {
+		relationName: "permissionUser",
+	}),
 }));
 
 export const project = pgTable("Project", {
@@ -48,6 +51,7 @@ export const projectRelations = relations(project, ({ many, one }) => ({
 	}),
 	taskLists: many(taskList),
 	events: many(calendarEvent),
+	permissions: many(projectPermission),
 }));
 
 export const task = pgTable("Task", {
@@ -243,3 +247,39 @@ export const notificationRelations = relations(notification, ({ one }) => ({
 		references: [user.id],
 	}),
 }));
+
+export const projectPermission = pgTable("ProjectPermission", {
+	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+	projectId: integer("projectId")
+		.notNull()
+		.references(() => project.id, { onDelete: "cascade", onUpdate: "cascade" }),
+	userId: text("userId")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
+	role: text("role").notNull(), // 'editor' or 'reader'
+	createdAt: timestamp().notNull().defaultNow(),
+	updatedAt: timestamp().notNull().defaultNow(),
+	createdByUser: text("createdByUser")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
+});
+
+export const projectPermissionRelations = relations(
+	projectPermission,
+	({ one }) => ({
+		project: one(project, {
+			fields: [projectPermission.projectId],
+			references: [project.id],
+		}),
+		user: one(user, {
+			fields: [projectPermission.userId],
+			references: [user.id],
+			relationName: "permissionUser",
+		}),
+		createdBy: one(user, {
+			fields: [projectPermission.createdByUser],
+			references: [user.id],
+			relationName: "permissionCreator",
+		}),
+	}),
+);

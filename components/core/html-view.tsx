@@ -1,6 +1,5 @@
 "use client";
 
-import DOMPurify from "dompurify";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/core/style.css";
 

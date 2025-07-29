@@ -39,7 +39,7 @@ export default function Notifications() {
 					{markNotificationsAsRead.isPending ? (
 						<Spinner className="h-4 w-4" />
 					) : (
-						<>Mark all as read</>
+						"Mark all as read"
 					)}
 				</Button>
 			</PageTitle>

@@ -33,7 +33,7 @@ export async function GET(
 		return new Response(await file.blob(), {
 			headers,
 		});
-	} catch (e) {
+	} catch (_e) {
 		return new Response("Not found", { status: 404 });
 	}
 }
