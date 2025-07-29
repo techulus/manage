@@ -17,6 +17,27 @@ import {
 } from "@/components/ui/select";
 import { useTRPC } from "@/trpc/client";
 
+interface User {
+	id: string;
+	email: string;
+	firstName?: string | null;
+	lastName?: string | null;
+	imageUrl?: string | null;
+}
+
+interface Project {
+	id: number;
+	name: string;
+}
+
+interface Permission {
+	id: number;
+	projectId: number;
+	userId: string;
+	role: string;
+	user: User;
+}
+
 interface PermissionsManagementProps {
 	projectId?: number;
 }
@@ -62,7 +83,7 @@ export default function PermissionsManagement({ projectId }: PermissionsManageme
 				setSelectedUser("");
 				setSelectedRole("reader");
 			},
-			onError: (error: any) => {
+			onError: (error) => {
 				toast.error(error.message);
 			},
 		}),
@@ -74,7 +95,7 @@ export default function PermissionsManagement({ projectId }: PermissionsManageme
 				toast.success("Permission revoked successfully");
 				refetchPermissions();
 			},
-			onError: (error: any) => {
+			onError: (error) => {
 				toast.error(error.message);
 			},
 		}),
@@ -123,8 +144,8 @@ export default function PermissionsManagement({ projectId }: PermissionsManageme
 
 	// Filter out users who already have permissions
 	const availableUsers = orgUsers.filter(
-		(user: any) =>
-			!projectPermissions.some((perm: any) => perm.userId === user.id),
+		(user: User) =>
+			!projectPermissions.some((perm: Permission) => perm.userId === user.id),
 	);
 
 	return (
@@ -144,7 +165,7 @@ export default function PermissionsManagement({ projectId }: PermissionsManageme
 								<SelectValue placeholder="Choose a project to manage" />
 							</SelectTrigger>
 							<SelectContent>
-								{projects.map((project: any) => (
+								{projects.map((project: Project) => (
 									<SelectItem key={project.id} value={project.id.toString()}>
 										{project.name}
 									</SelectItem>
@@ -211,7 +232,7 @@ export default function PermissionsManagement({ projectId }: PermissionsManageme
 							) : (
 								<div className="space-y-4">
 									<div className="space-y-2">
-										<label className="text-sm font-medium">User</label>
+										<label htmlFor="user-select" className="text-sm font-medium">User</label>
 										<Select
 											value={selectedUser}
 											onValueChange={setSelectedUser}
@@ -220,7 +241,7 @@ export default function PermissionsManagement({ projectId }: PermissionsManageme
 												<SelectValue placeholder="Select a user" />
 											</SelectTrigger>
 											<SelectContent>
-												{availableUsers.map((user: any) => (
+												{availableUsers.map((user: User) => (
 													<SelectItem key={user.id} value={user.id}>
 														<div className="flex items-center gap-2">
 															<Avatar className="w-6 h-6">
@@ -241,7 +262,7 @@ export default function PermissionsManagement({ projectId }: PermissionsManageme
 									</div>
 
 								<div className="space-y-2">
-									<label className="text-sm font-medium">Role</label>
+									<label htmlFor="role-select" className="text-sm font-medium">Role</label>
 									<Select
 										value={selectedRole}
 										onValueChange={(value) =>
@@ -311,7 +332,7 @@ export default function PermissionsManagement({ projectId }: PermissionsManageme
 									Users
 								</dt>
 								<dd className="mt-1 sm:mt-0 sm:flex-auto space-y-4">
-									{projectPermissions.map((permission: any) => (
+									{projectPermissions.map((permission: Permission) => (
 										<div key={permission.id} className="flex items-center justify-between">
 											<div className="flex items-center gap-3">
 												<Avatar className="w-8 h-8">

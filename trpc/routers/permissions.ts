@@ -1,5 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import { projectPermission } from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
 import { createTRPCRouter, protectedProcedure } from "../init";
@@ -15,9 +16,10 @@ export const permissionsRouter = createTRPCRouter({
 		.query(async ({ ctx, input }) => {
 			// Check if user is org admin
 			if (!ctx.isOrgAdmin) {
-				throw new Error(
-					"Only organization admins can view project permissions",
-				);
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Only organization admins can view project permissions",
+				});
 			}
 
 			const permissions = await ctx.db.query.projectPermission.findMany({
@@ -50,9 +52,10 @@ export const permissionsRouter = createTRPCRouter({
 		.mutation(async ({ ctx, input }) => {
 			// Check if user is org admin
 			if (!ctx.isOrgAdmin) {
-				throw new Error(
-					"Only organization admins can grant project permissions",
-				);
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Only organization admins can grant project permissions",
+				});
 			}
 
 			// Check if permission already exists
@@ -117,9 +120,10 @@ export const permissionsRouter = createTRPCRouter({
 		.mutation(async ({ ctx, input }) => {
 			// Check if user is org admin
 			if (!ctx.isOrgAdmin) {
-				throw new Error(
-					"Only organization admins can revoke project permissions",
-				);
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Only organization admins can revoke project permissions",
+				});
 			}
 
 			await ctx.db
@@ -145,7 +149,10 @@ export const permissionsRouter = createTRPCRouter({
 	getOrganizationUsers: protectedProcedure.query(async ({ ctx }) => {
 		// Check if user is org admin
 		if (!ctx.isOrgAdmin) {
-			throw new Error("Only organization admins can view organization users");
+			throw new TRPCError({
+				code: "FORBIDDEN",
+				message: "Only organization admins can view organization users",
+			});
 		}
 
 		// Get all users in the organization

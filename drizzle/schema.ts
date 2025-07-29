@@ -163,7 +163,7 @@ export const calendarEvent = pgTable("Event", {
 });
 export const calendarEventRelations = relations(
 	calendarEvent,
-	({ one, many }) => ({
+	({ one }) => ({
 		creator: one(user, {
 			fields: [calendarEvent.createdByUser],
 			references: [user.id],

@@ -1,7 +1,7 @@
 import type { ActivityWithActor } from "@/drizzle/types";
 import { guessTimezone, toDateStringWithDay } from "../utils/date";
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: flexible date parameter handling
 function toDateString(date: any) {
 	if (!date) {
 		return "-";
@@ -44,7 +44,7 @@ function getFieldLabel(key: string): string {
 }
 
 // Generate contextual action messages
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: flexible activity value handling
 function generateContextualMessage(item: ActivityWithActor, newValue: any, oldValue: any): string {
 	const itemName = newValue?.name ?? newValue?.title ?? oldValue?.name ?? oldValue?.title ?? 'item';
 	
@@ -109,9 +109,9 @@ function generateContextualMessage(item: ActivityWithActor, newValue: any, oldVa
 }
 
 export function generateObjectDiffMessage(item: ActivityWithActor) {
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	// biome-ignore lint/suspicious/noExplicitAny: type casting for activity values
 	const newValue = item.newValue as any;
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	// biome-ignore lint/suspicious/noExplicitAny: type casting for activity values
 	const oldValue = item.oldValue as any;
 
 	// Generate the main action message
