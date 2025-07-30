@@ -1,33 +1,30 @@
 "use client";
 
-import { useOrganization } from "@clerk/nextjs";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useTRPC } from "@/trpc/client";
 
 export function useOrganizationChange() {
-	const { organization } = useOrganization();
 	const queryClient = useQueryClient();
-	const previousOrgId = useRef<string | undefined>(undefined);
+	const previousTenant = useRef<string | undefined>(undefined);
 	const { tenant } = useParams();
 	const trpc = useTRPC();
 
 	useEffect(() => {
-		const currentOrgId = organization?.id;
+		const currentTenant = tenant as string;
 
 		if (
-			previousOrgId.current !== undefined &&
-			previousOrgId.current !== currentOrgId
+			previousTenant.current !== undefined &&
+			previousTenant.current !== currentTenant
 		) {
 			console.log(
-				`Organization changed from ${previousOrgId.current} to ${currentOrgId}. Invalidating all queries.`,
+				`Tenant changed from ${previousTenant.current} to ${currentTenant}. Invalidating all queries.`,
 			);
-			// Clear all cached queries
-			queryClient.clear();
+			queryClient.invalidateQueries();
 		}
 
-		previousOrgId.current = currentOrgId;
+		previousTenant.current = currentTenant;
 
 		Promise.all([
 			queryClient.prefetchQuery(trpc.settings.getTimezone.queryOptions()),
@@ -45,13 +42,5 @@ export function useOrganizationChange() {
 			.catch((err) => {
 				console.error(">>>>> Error prefetching essential queries", err);
 			});
-	}, [
-		organization?.id,
-		queryClient,
-		trpc.user.getProjects.queryOptions,
-		trpc.settings.getTimezone.queryOptions,
-		trpc.user.getTodayData.queryOptions,
-		trpc.user.getNotificationsWire.queryOptions,
-		tenant,
-	]);
+	}, [tenant, queryClient, trpc]);
 }
