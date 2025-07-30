@@ -1,7 +1,7 @@
+import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs/server";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 
@@ -17,17 +17,10 @@ export default async function Home() {
 
 			<section className="px-6">
 				<div className="mx-auto max-w-7xl relative border border-gray-200 dark:border-gray-800 pb-24 pt-8">
-					{/* Container corner plus icons */}
-					<div className="absolute -top-3 -left-3 w-6 h-6 flex items-center justify-center text-gray-400 text-xl font-light">
+					<div className="absolute -top-3 -left-3 w-6 h-6 flex items-center justify-center text-primary text-xl font-light">
 						+
 					</div>
-					<div className="absolute -top-3 -right-3 w-6 h-6 flex items-center justify-center text-gray-400 text-xl font-light">
-						+
-					</div>
-					<div className="absolute -bottom-3 -left-3 w-6 h-6 flex items-center justify-center text-gray-400 text-xl font-light">
-						+
-					</div>
-					<div className="absolute -bottom-3 -right-3 w-6 h-6 flex items-center justify-center text-gray-400 text-xl font-light">
+					<div className="absolute -bottom-3 -right-3 w-6 h-6 flex items-center justify-center text-primary text-xl font-light">
 						+
 					</div>
 					<div className="text-center mt-12">
@@ -45,7 +38,7 @@ export default async function Home() {
 							</span>
 							.
 						</h1>
-						<p className="mt-8 text-xl sm:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed mb-12">
+						<p className="mt-8 text-xl sm:text-2xl text-gray-600 dark:text-primary max-w-3xl mx-auto leading-relaxed mb-12">
 							Self-hostable, developer-friendly project management. All the
 							power you need, none of the bloat you don't. Built with modern
 							tech stack and open source values.
@@ -79,21 +72,16 @@ export default async function Home() {
 				</div>
 			</section>
 
-			{/* Product Screenshots Section */}
 			<section className="px-6">
 				<div className="mx-auto max-w-7xl relative border border-gray-200 dark:border-gray-800 p-16">
-					{/* Container corner plus icons */}
-					<div className="absolute -bottom-3 -left-3 w-6 h-6 flex items-center justify-center text-gray-400 text-xl font-light">
-						+
-					</div>
-					<div className="absolute -bottom-3 -right-3 w-6 h-6 flex items-center justify-center text-gray-400 text-xl font-light">
+					<div className="absolute -bottom-3 -right-3 w-6 h-6 flex items-center justify-center text-primary text-xl font-light">
 						+
 					</div>
 					<div className="text-center mb-16">
 						<h2 className="text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-gray-900 dark:text-white mb-6">
 							See Manage in action
 						</h2>
-						<p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+						<p className="text-xl text-gray-600 dark:text-primary max-w-2xl mx-auto">
 							Real screenshots from the actual product. No mock-ups, no fake
 							data.
 						</p>
@@ -116,7 +104,7 @@ export default async function Home() {
 								<h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
 									Project Dashboard
 								</h3>
-								<p className="text-gray-600 dark:text-gray-400">
+								<p className="text-gray-600 dark:text-primary">
 									Get a complete overview of your projects, track progress, and
 									manage team workload in one place.
 								</p>
@@ -138,7 +126,7 @@ export default async function Home() {
 								<h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
 									Task Management
 								</h3>
-								<p className="text-gray-600 dark:text-gray-400">
+								<p className="text-gray-600 dark:text-primary">
 									Organize tasks with lists, set priorities, assign team
 									members, and track progress with intuitive workflows.
 								</p>
@@ -162,7 +150,7 @@ export default async function Home() {
 								<h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
 									Calendar & Events
 								</h3>
-								<p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+								<p className="text-gray-600 dark:text-primary max-w-2xl mx-auto">
 									Schedule meetings, set deadlines, and keep your team
 									synchronized with integrated calendar management.
 								</p>
@@ -186,17 +174,10 @@ export default async function Home() {
 				</p>
 
 				<div className="relative">
-					{/* Container with corner plus icons */}
-					<div className="absolute -top-3 -left-3 w-6 h-6 flex items-center justify-center text-gray-400 text-xl font-light z-10">
+					<div className="absolute -top-3 -left-3 w-6 h-6 flex items-center justify-center text-primary text-xl font-light z-10">
 						+
 					</div>
-					<div className="absolute -top-3 -right-3 w-6 h-6 flex items-center justify-center text-gray-400 text-xl font-light z-10">
-						+
-					</div>
-					<div className="absolute -bottom-3 -left-3 w-6 h-6 flex items-center justify-center text-gray-400 text-xl font-light z-10">
-						+
-					</div>
-					<div className="absolute -bottom-3 -right-3 w-6 h-6 flex items-center justify-center text-gray-400 text-xl font-light z-10">
+					<div className="absolute -bottom-3 -right-3 w-6 h-6 flex items-center justify-center text-primary text-xl font-light z-10">
 						+
 					</div>
 
@@ -235,12 +216,12 @@ export default async function Home() {
 						].map((feature, _index) => (
 							<div key={feature.name} className="p-8 border">
 								<div className="flex items-center gap-3 mb-3">
-									<span className="text-gray-400">{feature.icon}</span>
+									<span className="text-primary">{feature.icon}</span>
 									<h3 className="font-semibold text-gray-900 dark:text-white">
 										{feature.name}
 									</h3>
 								</div>
-								<p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+								<p className="text-gray-600 dark:text-primary text-sm leading-relaxed">
 									{feature.desc}
 								</p>
 							</div>
@@ -252,17 +233,10 @@ export default async function Home() {
 			{/* Technical Section */}
 			<section className="px-6 bg-gradient-to-r relative overflow-hidden">
 				<div className="mx-auto max-w-7xl relative border border-gray-200 dark:border-gray-800 p-16 z-10">
-					{/* Container corner plus icons */}
-					<div className="absolute -top-3 -left-3 w-6 h-6 flex items-center justify-center text-gray-400 text-xl font-light">
+					<div className="absolute -top-3 -left-3 w-6 h-6 flex items-center justify-center text-primary text-xl font-light">
 						+
 					</div>
-					<div className="absolute -top-3 -right-3 w-6 h-6 flex items-center justify-center text-gray-400 text-xl font-light">
-						+
-					</div>
-					<div className="absolute -bottom-3 -left-3 w-6 h-6 flex items-center justify-center text-gray-400 text-xl font-light">
-						+
-					</div>
-					<div className="absolute -bottom-3 -right-3 w-6 h-6 flex items-center justify-center text-gray-400 text-xl font-light">
+					<div className="absolute -bottom-3 -right-3 w-6 h-6 flex items-center justify-center text-primary text-xl font-light">
 						+
 					</div>
 					<div className="grid lg:grid-cols-2 gap-20 items-center">
@@ -378,10 +352,10 @@ export default async function Home() {
 				</div>
 
 				<div className="mx-auto max-w-7xl relative border border-gray-200 dark:border-gray-800 p-16 z-10">
-					<div className="absolute -bottom-3 -left-3 w-6 h-6 flex items-center justify-center text-gray-400 text-xl font-light">
+					<div className="absolute -bottom-3 -left-3 w-6 h-6 flex items-center justify-center text-primary text-xl font-light">
 						+
 					</div>
-					<div className="absolute -bottom-3 -right-3 w-6 h-6 flex items-center justify-center text-gray-400 text-xl font-light">
+					<div className="absolute -bottom-3 -right-3 w-6 h-6 flex items-center justify-center text-primary text-xl font-light">
 						+
 					</div>
 					<h2 className="text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-gray-900 dark:text-white mb-6 leading-tight">
