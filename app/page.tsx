@@ -15,8 +15,8 @@ export default async function Home() {
 		<div className="min-h-screen">
 			<Header />
 
-			<section className="px-6">
-				<div className="mx-auto max-w-7xl relative border border-gray-200 dark:border-gray-800 pb-24 pt-8">
+			<section>
+				<div className="mx-auto max-w-7xl relative border border-gray-200 dark:border-gray-800 pb-24 pt-8 px-6">
 					<div className="absolute -top-3 -left-3 w-6 h-6 flex items-center justify-center text-primary text-xl font-light">
 						+
 					</div>
@@ -25,9 +25,10 @@ export default async function Home() {
 					</div>
 					<div className="text-center mt-12">
 						<div className="mb-6">
-							<span className="inline-flex items-center gap-2 bg-green-100 dark:bg-green-900/30 px-4 py-2 text-sm font-semibold text-green-700 dark:text-green-300">
-								<span className="w-2 h-2 bg-green-500 animate-pulse" />
+							<span className="relative inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-green-700 dark:text-green-300">
+								<span className="w-2 h-2 bg-green-500 animate-pulse rounded-lg" />
 								Open Source Project Management
+								<div className="absolute bottom-1 left-0 right-0 h-8 bg-green-200/20 dark:bg-green-400/30 -skew-x-12" />
 							</span>
 						</div>
 						<h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.02em] text-gray-900 dark:text-white leading-[0.9] mb-8">
@@ -73,14 +74,14 @@ export default async function Home() {
 			</section>
 
 			<div className="mx-auto max-w-7xl text-center relative z-10 border-l border-r border-b border-gray-200 dark:border-gray-800 pt-24">
-				<h2 className="text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-gray-900 dark:text-white leading-tight">
+				<h2 className="text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-gray-900 dark:text-white leading-tight px-6">
 					Essential tools that keep your team{" "}
 					<span className="text-green-600 dark:text-green-400 relative">
 						productive
 						<div className="absolute bottom-1 left-0 right-0 h-8 bg-green-200/20 dark:bg-green-400/30 -skew-x-12" />
 					</span>
 				</h2>
-				<p className="text-xl text-gray-600 dark:text-gray-300 mb-20 max-w-3xl mx-auto leading-relaxed">
+				<p className="text-xl text-gray-600 dark:text-gray-300 mb-20 max-w-3xl mx-auto leading-relaxed px-6">
 					Tasks, Events, Files, Docs, and more — beautifully designed and
 					thoughtfully integrated for maximum efficiency.
 				</p>
@@ -177,7 +178,7 @@ export default async function Home() {
 								Monitor project progress and resource allocation through
 								intuitive dashboards and analytics.
 							</p>
-							<div className="relative overflow-hidden border border-gray-800">
+							<div className="relative overflow-hidden">
 								<Image
 									src="/screenshots/overview.png"
 									alt="Project overview dashboard"
@@ -214,7 +215,7 @@ export default async function Home() {
 								Create task lists, set priorities, assign team members, and
 								track progress with powerful workflow automation.
 							</p>
-							<div className="relative overflow-hidden border border-gray-800">
+							<div className="relative overflow-hidden">
 								<Image
 									src="/screenshots/tasks.png"
 									alt="Task management interface"
@@ -253,7 +254,7 @@ export default async function Home() {
 								Schedule meetings, track milestones, and keep your entire team
 								synchronized with integrated calendar views.
 							</p>
-							<div className="relative overflow-hidden border border-gray-800">
+							<div className="relative overflow-hidden">
 								<Image
 									src="/screenshots/events.png"
 									alt="Calendar and events interface"
@@ -289,7 +290,7 @@ export default async function Home() {
 								Full-text search across all your projects, tasks, and documents.
 								Filter by type, status, or team member with lightning speed.
 							</p>
-							<div className="relative overflow-hidden border border-gray-800 bg-gray-900 p-12 flex items-center justify-center">
+							<div className="relative overflow-hidden bg-gray-900 p-12 flex items-center justify-center">
 								<div className="text-center">
 									<div className="inline-flex items-center gap-3 bg-gray-800 px-6 py-3 rounded-full mb-4">
 										<svg
@@ -329,8 +330,8 @@ export default async function Home() {
 			</section>
 
 			{/* Technical Section */}
-			<section className="px-6 relative overflow-hidden">
-				<div className="mx-auto max-w-7xl relative border border-gray-200 dark:border-gray-800 p-16 z-10">
+			<section className="relative overflow-hidden">
+				<div className="mx-auto max-w-7xl relative border border-gray-200 dark:border-gray-800 p-6 py-16">
 					<div className="absolute -top-3 -left-3 w-6 h-6 flex items-center justify-center text-primary text-xl font-light">
 						+
 					</div>
@@ -389,11 +390,11 @@ export default async function Home() {
 								</div>
 							</div>
 						</div>
-						<div className="bg-black text-white p-8 font-mono border border-neutral-600 min-h-[400px]">
+						<div className="bg-black text-white p-8 font-mono min-h-[400px] rounded-md border">
 							<div className="flex items-center gap-2 mb-6">
-								<div className="w-3 h-3 bg-red-500" />
-								<div className="w-3 h-3 bg-yellow-500" />
-								<div className="w-3 h-3 bg-green-500" />
+								<div className="w-3 h-3 bg-red-500 rounded-lg" />
+								<div className="w-3 h-3 bg-yellow-500 rounded-lg" />
+								<div className="w-3 h-3 bg-green-500 rounded-lg" />
 								<div className="ml-4 text-gray-300 text-xs">Terminal</div>
 							</div>
 							<div className="space-y-2 text-base">
@@ -441,7 +442,7 @@ export default async function Home() {
 			</section>
 
 			{/* CTA Section */}
-			<section className="px-6 text-center relative overflow-hidden">
+			<section className="text-center relative overflow-hidden">
 				{/* Background Elements */}
 				<div className="absolute inset-0 opacity-30 dark:opacity-15">
 					<div className="absolute top-10 left-10 w-72 h-72 bg-gradient-to-br from-green-300/30 dark:from-green-900/30 to-transparent blur-3xl" />
@@ -456,7 +457,7 @@ export default async function Home() {
 					<div className="absolute -bottom-3 -right-3 w-6 h-6 flex items-center justify-center text-primary text-xl font-light">
 						+
 					</div>
-					<h2 className="text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-gray-900 dark:text-white mb-6 leading-tight">
+					<h2 className="text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-gray-900 dark:text-white mb-6 leading-tight px-6">
 						Ready to transform your{" "}
 						<span className="text-green-600 dark:text-green-400 relative">
 							workflow
