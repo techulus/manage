@@ -1,5 +1,15 @@
 "use client";
 
+import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
+import { useQueries, useQueryClient } from "@tanstack/react-query";
+import { isEmpty } from "es-toolkit/compat";
+import { ChevronDown, HelpCircle } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -12,15 +22,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import logo from "@/public/images/logo.png";
 import { useTRPC } from "@/trpc/client";
-import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
-import { useQueries, useQueryClient } from "@tanstack/react-query";
-import { ChevronDown, HelpCircle } from "lucide-react";
-import { useTheme } from "next-themes";
-import Image from "next/image";
-import Link from "next/link";
-import { useParams, usePathname, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
 import { CommandMenu } from "../core/cmd-menu";
 import { GlobalSearch } from "../core/global-search";
 import { Notifications } from "../core/notifications";
@@ -49,32 +50,27 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 	const queryClient = useQueryClient();
 
 	useEffect(() => {
-		if (!tenant) {
+		if (isEmpty(tenant)) {
 			return;
 		}
 
-		console.log(">>>>> Invalidating all queries for tenant", tenant);
-		queryClient.invalidateQueries().then(() => {
-			console.log(">>>>> Invalidated all queries for tenant", tenant);
-			Promise.all([
-				queryClient.prefetchQuery(trpc.settings.getTimezone.queryOptions()),
-				queryClient.prefetchQuery(trpc.user.getTodayData.queryOptions()),
-				queryClient.prefetchQuery(
-					trpc.user.getNotificationsWire.queryOptions(),
-				),
-				queryClient.prefetchQuery(
-					trpc.user.getProjects.queryOptions({
-						statuses: ["active"],
-					}),
-				),
-			])
-				.then(() => {
-					console.log(">>>>> Prefetched queries for tenant", tenant);
-				})
-				.catch((err) => {
-					console.error(">>>>> Error prefetching queries", err);
-				});
-		});
+		console.log(">>>>> Invalidated all queries for tenant", tenant);
+		Promise.all([
+			queryClient.prefetchQuery(trpc.settings.getTimezone.queryOptions()),
+			queryClient.prefetchQuery(trpc.user.getTodayData.queryOptions()),
+			queryClient.prefetchQuery(trpc.user.getNotificationsWire.queryOptions()),
+			queryClient.prefetchQuery(
+				trpc.user.getProjects.queryOptions({
+					statuses: ["active"],
+				}),
+			),
+		])
+			.then(() => {
+				console.log(">>>>> Prefetched queries for tenant", tenant);
+			})
+			.catch((err) => {
+				console.error(">>>>> Error prefetching queries", err);
+			});
 	}, [queryClient, trpc, tenant]);
 
 	const [{ data: projects = [] }, { data: tasklists = [] }] = useQueries({

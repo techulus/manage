@@ -17,7 +17,7 @@ export const ProjecItem = ({
 	return (
 		<Link
 			href={`./projects/${id}`}
-			className="block p-3 rounded-lg bg-muted hover:bg-muted/80"
+			className="block p-3 rounded-lg bg-muted hover:bg-primary/20"
 		>
 			<div className="flex items-start justify-between gap-3">
 				<div className="flex-1 min-w-0 space-y-1">

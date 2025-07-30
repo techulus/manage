@@ -26,6 +26,7 @@ import {
 import { Frequency, RRule } from "rrule";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
+import { sendMentionNotifications } from "@/lib/utils/mentionNotifications";
 
 const buildEventsQuery = (projectId: number, start: Date, end: Date) => {
 	return {
@@ -276,6 +277,18 @@ export const eventsRouter = createTRPCRouter({
 
 				if (updatedEvent?.[0]) {
 					await indexEventWithProjectFetch(ctx.db, ctx.search, updatedEvent[0]);
+
+					// Send mention notifications if description was updated
+					if (description) {
+						await sendMentionNotifications(description, {
+							type: "event",
+							entityName: name,
+							entityId: id,
+							projectId,
+							orgSlug: ctx.orgSlug,
+							fromUserId: ctx.userId,
+						});
+					}
 				}
 			} else {
 				const newEvent = await ctx.db
@@ -298,6 +311,18 @@ export const eventsRouter = createTRPCRouter({
 
 				if (newEvent?.[0]) {
 					await indexEventWithProjectFetch(ctx.db, ctx.search, newEvent[0]);
+
+					// Send mention notifications if description was provided
+					if (description) {
+						await sendMentionNotifications(description, {
+							type: "event",
+							entityName: name,
+							entityId: eventId,
+							projectId,
+							orgSlug: ctx.orgSlug,
+							fromUserId: ctx.userId,
+						});
+					}
 				}
 			}
 

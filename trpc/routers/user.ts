@@ -114,4 +114,33 @@ export const userRouter = createTRPCRouter({
 
 			return projectsWithRole;
 		}),
+	searchUsersForMention: protectedProcedure
+		.input(
+			z.object({
+				query: z.string().optional(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const users = await ctx.db.query.user.findMany({
+				columns: {
+					id: true,
+					email: true,
+					firstName: true,
+					lastName: true,
+					imageUrl: true,
+				},
+			});
+
+			if (input.query) {
+				const query = input.query.toLowerCase();
+				return users.filter((user) => {
+					const fullName =
+						`${user.firstName || ""} ${user.lastName || ""}`.toLowerCase();
+					const email = user.email.toLowerCase();
+					return fullName.includes(query) || email.includes(query);
+				});
+			}
+
+			return users;
+		}),
 });

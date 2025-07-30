@@ -1,11 +1,11 @@
 "use client";
 
-import { HtmlPreview } from "@/components/core/html-view";
-import Editor from "@/components/editor";
-import { Button } from "@/components/ui/button";
 import { Edit } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
+import { HtmlPreview } from "@/components/core/html-view";
+import Editor from "@/components/editor";
+import { Button } from "@/components/ui/button";
 import { Spinner } from "../core/loaders";
 
 export default function NotesForm({
@@ -41,7 +41,7 @@ export default function NotesForm({
 						Cancel
 					</Button>
 					<Button type="submit" disabled={pending} size="sm">
-						{pending ? <Spinner /> : "Save"}
+						{pending ? <Spinner className="text-muted" /> : "Save"}
 					</Button>
 				</div>
 			</div>

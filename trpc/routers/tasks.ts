@@ -9,6 +9,7 @@ import {
 	indexTaskListWithProjectFetch,
 	indexTaskWithDataFetch,
 } from "@/lib/search/helpers";
+import { sendMentionNotifications } from "@/lib/utils/mentionNotifications";
 import { notifyUser } from "@/lib/utils/useNotification";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
@@ -102,6 +103,18 @@ export const tasksRouter = createTRPCRouter({
 					ctx.search,
 					createdTaskList[0],
 				);
+
+				// Send mention notifications if description was provided
+				if (input.description) {
+					await sendMentionNotifications(input.description, {
+						type: "tasklist",
+						entityName: input.name,
+						entityId: createdTaskList[0].id,
+						projectId: input.projectId,
+						orgSlug: ctx.orgSlug,
+						fromUserId: ctx.userId,
+					});
+				}
 			}
 
 			return createdTaskList?.[0];
@@ -186,6 +199,18 @@ export const tasksRouter = createTRPCRouter({
 
 				if (data?.[0]) {
 					await indexTaskListWithProjectFetch(ctx.db, ctx.search, data[0]);
+
+					// Send mention notifications if description was updated
+					if ("description" in input && input.description) {
+						await sendMentionNotifications(input.description, {
+							type: "tasklist",
+							entityName: oldTaskList.name,
+							entityId: input.id,
+							projectId: oldTaskList.projectId,
+							orgSlug: ctx.orgSlug,
+							fromUserId: ctx.userId,
+						});
+					}
 				}
 			}
 
@@ -338,6 +363,18 @@ export const tasksRouter = createTRPCRouter({
 
 			if (createdTask?.[0]) {
 				await indexTaskWithDataFetch(ctx.db, ctx.search, createdTask[0]);
+
+				// Send mention notifications if description was provided
+				if (input.description) {
+					await sendMentionNotifications(input.description, {
+						type: "task",
+						entityName: input.name || "Untitled Task",
+						entityId: createdTask[0].id,
+						projectId: taskListDetails.projectId,
+						orgSlug: ctx.orgSlug,
+						fromUserId: ctx.userId,
+					});
+				}
 			}
 
 			return createdTask?.[0];
@@ -452,6 +489,18 @@ export const tasksRouter = createTRPCRouter({
 
 				if (updatedTask?.[0]) {
 					await indexTaskWithDataFetch(ctx.db, ctx.search, updatedTask[0]);
+
+					// Send mention notifications if description was updated
+					if ("description" in input && input.description) {
+						await sendMentionNotifications(input.description, {
+							type: "task",
+							entityName: oldTask.name,
+							entityId: input.id,
+							projectId: oldTask.taskList.projectId,
+							orgSlug: ctx.orgSlug,
+							fromUserId: ctx.userId,
+						});
+					}
 				}
 			}
 

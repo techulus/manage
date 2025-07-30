@@ -1,3 +1,5 @@
+import { and, desc, eq } from "drizzle-orm";
+import { z } from "zod";
 import {
 	activity,
 	comment,
@@ -15,8 +17,7 @@ import {
 	deleteSearchItem,
 	indexProject,
 } from "@/lib/search/helpers";
-import { and, desc, eq } from "drizzle-orm";
-import { z } from "zod";
+import { sendMentionNotifications } from "@/lib/utils/mentionNotifications";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const projectsRouter = createTRPCRouter({
@@ -65,6 +66,17 @@ export const projectsRouter = createTRPCRouter({
 
 				// Index the project for search
 				await indexProject(ctx.search, newProject[0]);
+
+				// Send mention notifications if description was provided
+				if (input.description) {
+					await sendMentionNotifications(input.description, {
+						type: "project",
+						entityName: input.name,
+						entityId: newProject[0].id,
+						orgSlug: ctx.orgSlug,
+						fromUserId: ctx.userId,
+					});
+				}
 			}
 
 			return newProject?.[0];
@@ -131,6 +143,17 @@ export const projectsRouter = createTRPCRouter({
 				// Re-index the updated project for search
 				if (updatedProject?.[0]) {
 					await indexProject(ctx.search, updatedProject[0]);
+				}
+
+				// Send mention notifications if description was updated
+				if ("description" in input && input.description && currentProject) {
+					await sendMentionNotifications(input.description, {
+						type: "project",
+						entityName: currentProject.name,
+						entityId: +input.id,
+						orgSlug: ctx.orgSlug,
+						fromUserId: ctx.userId,
+					});
 				}
 			}
 
@@ -228,24 +251,52 @@ export const projectsRouter = createTRPCRouter({
 			z.object({
 				projectId: z.number(),
 				roomId: z.string(),
-				content: z.string(),
+				content: z.string().min(1, "Comment content cannot be empty"),
 				metadata: z.string(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			await ctx.db.insert(comment).values({
-				roomId: input.roomId,
-				content: input.content,
-				metadata: JSON.parse(input.metadata),
-				createdByUser: ctx.userId,
-				createdAt: new Date(),
-				updatedAt: new Date(),
+			const canEdit = await canEditProject(ctx.db, input.projectId, ctx.userId);
+			if (!canEdit) {
+				throw new Error(
+					"You don't have permission to add comments to this project",
+				);
+			}
+
+			const [newComment] = await ctx.db
+				.insert(comment)
+				.values({
+					roomId: input.roomId,
+					content: input.content,
+					metadata: JSON.parse(input.metadata),
+					createdByUser: ctx.userId,
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				})
+				.returning();
+
+			const projectData = await ctx.db.query.project.findFirst({
+				where: eq(project.id, input.projectId),
 			});
+
+			if (projectData) {
+				await sendMentionNotifications(input.content, {
+					type: "comment",
+					entityName: projectData.name,
+					entityId: input.projectId,
+					projectId: input.projectId,
+					orgSlug: ctx.orgSlug,
+					fromUserId: ctx.userId,
+				});
+			}
+
 			await logActivity({
 				action: "created",
 				type: "comment",
 				projectId: input.projectId,
 			});
+
+			return newComment;
 		}),
 	deleteComment: protectedProcedure
 		.input(

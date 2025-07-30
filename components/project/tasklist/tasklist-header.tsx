@@ -1,5 +1,9 @@
 "use client";
 
+import { CheckCircle, CircleEllipsisIcon } from "lucide-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { toast } from "sonner";
 import { DeleteButton } from "@/components/form/button";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,10 +14,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { TaskList } from "@/drizzle/types";
 import { useTaskLists } from "@/hooks/use-tasklist";
-import { CheckCircle, CircleEllipsisIcon } from "lucide-react";
-import Link from "next/link";
-import { useParams } from "next/navigation";
-import { toast } from "sonner";
 
 export const TaskListHeader = ({
 	taskList,
@@ -34,7 +34,7 @@ export const TaskListHeader = ({
 	const { updateTaskList, deleteTaskList } = useTaskLists();
 
 	return (
-		<div className="group relative flex items-center gap-x-4 rounded-tl-lg rounded-tr-lg bg-muted p-3">
+		<div className="group relative flex items-center gap-x-4 rounded-tl-lg rounded-tr-lg bg-muted p-3 hover:bg-primary/20">
 			<Link
 				href={`/${tenant}/projects/${taskList.projectId}/tasklists/${taskList.id}`}
 				className="text-sm font-medium flex-grow flex-auto"

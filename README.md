@@ -18,9 +18,8 @@ Manage is an open-source project management platform. With its intuitive interfa
 - [x] Activity logs
 - [x] Search
 - [x] Permissions
-- [ ] Posts & files
 - [ ] Notifications
-- [ ] Admin panel
+- [ ] Posts & files
 
 ## Development
 

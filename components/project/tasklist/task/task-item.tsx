@@ -78,7 +78,7 @@ export const TaskItem = ({
 				className={cn(
 					"flex scale-100 rounded-lg shadow-none",
 					"flex-row items-center justify-center space-x-2 border-none",
-					"hover:bg-muted-foreground/10",
+					"hover:bg-primary/20",
 				)}
 				ref={setNodeRef}
 				style={style}
