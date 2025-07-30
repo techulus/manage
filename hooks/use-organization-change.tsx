@@ -9,7 +9,7 @@ import { useTRPC } from "@/trpc/client";
 export function useOrganizationChange() {
 	const { organization } = useOrganization();
 	const queryClient = useQueryClient();
-	const previousOrgId = useRef<string | undefined>(null);
+	const previousOrgId = useRef<string | undefined>(undefined);
 	const { tenant } = useParams();
 	const trpc = useTRPC();
 
