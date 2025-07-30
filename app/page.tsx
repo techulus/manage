@@ -38,7 +38,7 @@ export default async function Home() {
 							</span>
 							.
 						</h1>
-						<p className="mt-8 text-xl sm:text-2xl text-gray-600 dark:text-primary max-w-3xl mx-auto leading-relaxed mb-12">
+						<p className="mt-8 text-xl sm:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed mb-12">
 							Self-hostable, developer-friendly project management. All the
 							power you need, none of the bloat you don't. Built with modern
 							tech stack and open source values.
@@ -81,7 +81,7 @@ export default async function Home() {
 						<h2 className="text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-gray-900 dark:text-white mb-6">
 							See Manage in action
 						</h2>
-						<p className="text-xl text-gray-600 dark:text-primary max-w-2xl mx-auto">
+						<p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
 							Real screenshots from the actual product. No mock-ups, no fake
 							data.
 						</p>
@@ -104,7 +104,7 @@ export default async function Home() {
 								<h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
 									Project Dashboard
 								</h3>
-								<p className="text-gray-600 dark:text-primary">
+								<p className="text-gray-600 dark:text-gray-300">
 									Get a complete overview of your projects, track progress, and
 									manage team workload in one place.
 								</p>
@@ -126,7 +126,7 @@ export default async function Home() {
 								<h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
 									Task Management
 								</h3>
-								<p className="text-gray-600 dark:text-primary">
+								<p className="text-gray-600 dark:text-gray-300">
 									Organize tasks with lists, set priorities, assign team
 									members, and track progress with intuitive workflows.
 								</p>
@@ -150,7 +150,7 @@ export default async function Home() {
 								<h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
 									Calendar & Events
 								</h3>
-								<p className="text-gray-600 dark:text-primary max-w-2xl mx-auto">
+								<p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
 									Schedule meetings, set deadlines, and keep your team
 									synchronized with integrated calendar management.
 								</p>
@@ -221,7 +221,7 @@ export default async function Home() {
 										{feature.name}
 									</h3>
 								</div>
-								<p className="text-gray-600 dark:text-primary text-sm leading-relaxed">
+								<p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
 									{feature.desc}
 								</p>
 							</div>
