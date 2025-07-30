@@ -72,95 +72,7 @@ export default async function Home() {
 				</div>
 			</section>
 
-			<section className="px-6">
-				<div className="mx-auto max-w-7xl relative border border-gray-200 dark:border-gray-800 p-16">
-					<div className="absolute -bottom-3 -right-3 w-6 h-6 flex items-center justify-center text-primary text-xl font-light">
-						+
-					</div>
-					<div className="text-center mb-16">
-						<h2 className="text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-gray-900 dark:text-white mb-6">
-							See Manage in action
-						</h2>
-						<p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-							Real screenshots from the actual product. No mock-ups, no fake
-							data.
-						</p>
-					</div>
-
-					<div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-						<div className="group">
-							<div className="relative overflow-hidden border border-neutral-200 dark:border-neutral-700 transition-all duration-300">
-								<Image
-									src="/screenshots/overview.png"
-									alt="Project overview dashboard showing tasks, progress, and team activity"
-									width={800}
-									height={600}
-									className="w-full h-auto"
-									priority
-								/>
-								<div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-							</div>
-							<div className="mt-6 px-2">
-								<h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-									Project Dashboard
-								</h3>
-								<p className="text-gray-600 dark:text-gray-300">
-									Get a complete overview of your projects, track progress, and
-									manage team workload in one place.
-								</p>
-							</div>
-						</div>
-
-						<div className="group">
-							<div className="relative overflow-hidden border border-neutral-200 dark:border-neutral-700 transition-all duration-300">
-								<Image
-									src="/screenshots/tasks.png"
-									alt="Task management interface with lists, priorities, and team assignments"
-									width={800}
-									height={600}
-									className="w-full h-auto"
-								/>
-								<div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-							</div>
-							<div className="mt-6 px-2">
-								<h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-									Task Management
-								</h3>
-								<p className="text-gray-600 dark:text-gray-300">
-									Organize tasks with lists, set priorities, assign team
-									members, and track progress with intuitive workflows.
-								</p>
-							</div>
-						</div>
-					</div>
-
-					<div className="flex justify-center">
-						<div className="group max-w-4xl">
-							<div className="relative overflow-hidden border border-neutral-200 dark:border-neutral-700 transition-all duration-300">
-								<Image
-									src="/screenshots/events.png"
-									alt="Calendar and events interface showing scheduled meetings and deadlines"
-									width={1200}
-									height={800}
-									className="w-full h-auto"
-								/>
-								<div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-							</div>
-							<div className="mt-6 px-2 text-center">
-								<h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-									Calendar & Events
-								</h3>
-								<p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-									Schedule meetings, set deadlines, and keep your team
-									synchronized with integrated calendar management.
-								</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
-
-			<div className="mx-auto max-w-7xl text-center relative z-10 border-l border-r py-24 pb-0">
+			<div className="mx-auto max-w-7xl text-center relative z-10 border-l border-r border-b border-gray-200 dark:border-gray-800 pt-24">
 				<h2 className="text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-gray-900 dark:text-white leading-tight">
 					Essential tools that keep your team{" "}
 					<span className="text-green-600 dark:text-green-400 relative">
@@ -181,7 +93,7 @@ export default async function Home() {
 						+
 					</div>
 
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border border-gray-200 dark:border-gray-800">
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
 						{[
 							{
 								icon: "📋",
@@ -230,8 +142,194 @@ export default async function Home() {
 				</div>
 			</div>
 
+			<section>
+				<div className="mx-auto max-w-7xl relative border-l border-r border-gray-800">
+					<div className="absolute -top-3 -left-3 w-6 h-6 flex items-center justify-center text-gray-600 text-xl font-light z-10">
+						+
+					</div>
+					<div className="absolute -bottom-3 -right-3 w-6 h-6 flex items-center justify-center text-gray-600 text-xl font-light z-10">
+						+
+					</div>
+
+					<div className="grid grid-cols-1 lg:grid-cols-2">
+						{/* Project Dashboard Card */}
+						<div className="relative border border-gray-800 p-8 bg-gray-950 hover:border-gray-700 transition-colors">
+							<div className="flex items-center gap-2 mb-4">
+								<svg
+									className="w-4 h-4 text-gray-400"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+									/>
+								</svg>
+								<span className="text-gray-400 text-sm">Project Overview</span>
+							</div>
+							<h3 className="text-2xl font-bold mb-3">
+								Real-time project insights.
+							</h3>
+							<p className="text-gray-400 mb-6 leading-relaxed">
+								Monitor project progress and resource allocation through
+								intuitive dashboards and analytics.
+							</p>
+							<div className="relative overflow-hidden border border-gray-800">
+								<Image
+									src="/screenshots/overview.png"
+									alt="Project overview dashboard"
+									width={800}
+									height={600}
+									className="w-full h-auto opacity-90"
+									priority
+								/>
+							</div>
+						</div>
+
+						{/* Task Management Card */}
+						<div className="relative border border-gray-800 p-8 bg-gray-950 hover:border-gray-700 transition-colors">
+							<div className="flex items-center gap-2 mb-4">
+								<svg
+									className="w-4 h-4 text-gray-400"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+									/>
+								</svg>
+								<span className="text-gray-400 text-sm">Task Management</span>
+							</div>
+							<h3 className="text-2xl font-bold mb-3">
+								Organize work, deliver faster.
+							</h3>
+							<p className="text-gray-400 mb-6 leading-relaxed">
+								Create task lists, set priorities, assign team members, and
+								track progress with powerful workflow automation.
+							</p>
+							<div className="relative overflow-hidden border border-gray-800">
+								<Image
+									src="/screenshots/tasks.png"
+									alt="Task management interface"
+									width={800}
+									height={600}
+									className="w-full h-auto opacity-90"
+									priority
+								/>
+							</div>
+						</div>
+
+						{/* Calendar & Events Card */}
+						<div className="relative border border-gray-800 p-8 bg-gray-950 hover:border-gray-700 transition-colors">
+							<div className="flex items-center gap-2 mb-4">
+								<svg
+									className="w-4 h-4 text-gray-400"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+									/>
+								</svg>
+								<span className="text-gray-400 text-sm">
+									Calendar Integration
+								</span>
+							</div>
+							<h3 className="text-2xl font-bold mb-3">
+								Never miss a deadline.
+							</h3>
+							<p className="text-gray-400 mb-6 leading-relaxed">
+								Schedule meetings, track milestones, and keep your entire team
+								synchronized with integrated calendar views.
+							</p>
+							<div className="relative overflow-hidden border border-gray-800">
+								<Image
+									src="/screenshots/events.png"
+									alt="Calendar and events interface"
+									width={800}
+									height={600}
+									className="w-full h-auto opacity-90"
+								/>
+							</div>
+						</div>
+
+						{/* Search & Organization Card */}
+						<div className="relative border border-gray-800 p-8 bg-gray-950 hover:border-gray-700 transition-colors">
+							<div className="flex items-center gap-2 mb-4">
+								<svg
+									className="w-4 h-4 text-gray-400"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+									/>
+								</svg>
+								<span className="text-gray-400 text-sm">Smart Search</span>
+							</div>
+							<h3 className="text-2xl font-bold mb-3">
+								Find anything, instantly.
+							</h3>
+							<p className="text-gray-400 mb-6 leading-relaxed">
+								Full-text search across all your projects, tasks, and documents.
+								Filter by type, status, or team member with lightning speed.
+							</p>
+							<div className="relative overflow-hidden border border-gray-800 bg-gray-900 p-12 flex items-center justify-center">
+								<div className="text-center">
+									<div className="inline-flex items-center gap-3 bg-gray-800 px-6 py-3 rounded-full mb-4">
+										<svg
+											className="w-5 h-5 text-gray-400"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+											/>
+										</svg>
+										<span className="text-gray-300">Search everywhere...</span>
+									</div>
+									<div className="flex flex-wrap gap-2 justify-center">
+										<span className="text-xs bg-gray-800 text-gray-400 px-3 py-1 rounded-full">
+											Projects
+										</span>
+										<span className="text-xs bg-gray-800 text-gray-400 px-3 py-1 rounded-full">
+											Tasks
+										</span>
+										<span className="text-xs bg-gray-800 text-gray-400 px-3 py-1 rounded-full">
+											Events
+										</span>
+										<span className="text-xs bg-gray-800 text-gray-400 px-3 py-1 rounded-full">
+											Documents
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
 			{/* Technical Section */}
-			<section className="px-6 bg-gradient-to-r relative overflow-hidden">
+			<section className="px-6 relative overflow-hidden">
 				<div className="mx-auto max-w-7xl relative border border-gray-200 dark:border-gray-800 p-16 z-10">
 					<div className="absolute -top-3 -left-3 w-6 h-6 flex items-center justify-center text-primary text-xl font-light">
 						+
