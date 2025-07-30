@@ -1,5 +1,14 @@
 "use client";
 
+import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
+import { useQueries } from "@tanstack/react-query";
+import { ChevronDown, HelpCircle } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -7,20 +16,10 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { TaskListStatus } from "@/drizzle/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import logo from "@/public/images/logo.png";
 import { useTRPC } from "@/trpc/client";
-import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
-import { useQueries, useQueryClient } from "@tanstack/react-query";
-import { ChevronDown, HelpCircle } from "lucide-react";
-import { useTheme } from "next-themes";
-import Image from "next/image";
-import Link from "next/link";
-import { useParams, usePathname, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
 import { CommandMenu } from "../core/cmd-menu";
 import { GlobalSearch } from "../core/global-search";
 import { Notifications } from "../core/notifications";
@@ -46,36 +45,6 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 	const [searchOpen, setSearchOpen] = useState(false);
 
 	const trpc = useTRPC();
-	const queryClient = useQueryClient();
-
-	useEffect(() => {
-		if (!tenant) {
-			return;
-		}
-
-		console.log(">>>>> Invalidating all queries for tenant", tenant);
-		queryClient.invalidateQueries().then(() => {
-			console.log(">>>>> Invalidated all queries for tenant", tenant);
-			Promise.all([
-				queryClient.prefetchQuery(trpc.settings.getTimezone.queryOptions()),
-				queryClient.prefetchQuery(trpc.user.getTodayData.queryOptions()),
-				queryClient.prefetchQuery(
-					trpc.user.getNotificationsWire.queryOptions(),
-				),
-				queryClient.prefetchQuery(
-					trpc.user.getProjects.queryOptions({
-						statuses: ["active"],
-					}),
-				),
-			])
-				.then(() => {
-					console.log(">>>>> Prefetched queries for tenant", tenant);
-				})
-				.catch((err) => {
-					console.error(">>>>> Error prefetching queries", err);
-				});
-		});
-	}, [queryClient, trpc, tenant]);
 
 	const [{ data: projects = [] }, { data: tasklists = [] }] = useQueries({
 		queries: [
@@ -98,63 +67,6 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 
 		return projects.find((p) => p.id === +projectId);
 	}, [projects, projectId]);
-
-	useEffect(() => {
-		if (projects.length) {
-			for (const project of projects) {
-				console.log(">>>>> Prefetching queries for project", project.id);
-				Promise.all([
-					queryClient.prefetchQuery(
-						trpc.projects.getProjectById.queryOptions({
-							id: project.id,
-						}),
-					),
-					queryClient.prefetchQuery(
-						trpc.tasks.getTaskLists.queryOptions({
-							projectId: project.id,
-							statuses: [TaskListStatus.ACTIVE],
-						}),
-					),
-					queryClient.prefetchQuery(
-						trpc.events.getByWeek.queryOptions({
-							projectId: project.id,
-						}),
-					),
-					queryClient.prefetchQuery(
-						trpc.events.getByMonth.queryOptions({
-							projectId: project.id,
-						}),
-					),
-				])
-					.then(() => {
-						console.log(">>>>> Prefetched queries for project", project.id);
-					})
-					.catch((err) => {
-						console.error(">>>>> Error prefetching queries", err);
-					});
-			}
-		}
-	}, [queryClient, trpc, projects]);
-
-	useEffect(() => {
-		if (tasklists.length) {
-			for (const list of tasklists) {
-				console.log(">>>>> Prefetching queries for tasklist", list.id);
-				queryClient
-					.prefetchQuery(
-						trpc.tasks.getListById.queryOptions({
-							id: list.id,
-						}),
-					)
-					.then(() => {
-						console.log(">>>>> Prefetched queries for tasklist", list.id);
-					})
-					.catch((err) => {
-						console.error(">>>>> Error prefetching queries", err);
-					});
-			}
-		}
-	}, [queryClient, trpc, tasklists]);
 
 	const navLinks: NavLink[] = useMemo(() => {
 		if (projectId) {
@@ -186,6 +98,11 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 					href: `/${tenant}/projects/${projectId}/activity`,
 					label: "Activity",
 					active: pathname === `/${tenant}/projects/${projectId}/activity`,
+				},
+				{
+					href: `/${tenant}/projects/${projectId}/settings`,
+					label: "Settings",
+					active: pathname === `/${tenant}/projects/${projectId}/settings`,
 				},
 			];
 		}

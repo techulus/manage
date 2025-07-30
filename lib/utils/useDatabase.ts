@@ -1,44 +1,70 @@
 import path from "node:path";
-import { addUserToOpsDb } from "@/ops/useOps";
 import { sql } from "drizzle-orm";
-import { type NodePgDatabase, drizzle } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
+import { err, ok, type Result, ResultAsync } from "neverthrow";
+import type { Database } from "@/drizzle/types";
+import { addUserToOpsDb } from "@/ops/useOps";
 import * as schema from "../../drizzle/schema";
 import { getOwner } from "./useOwner";
 import { addUserToTenantDb } from "./useUser";
 
-function getDatabaseName(ownerId: string) {
+function handleError(message: string) {
+	return (error: unknown) => {
+		console.error(message, error);
+		return false;
+	};
+}
+
+function getDatabaseName(ownerId: string): Result<string, string> {
 	if (!ownerId.startsWith("org_") && !ownerId.startsWith("user_")) {
-		throw new Error("Invalid owner ID");
+		return err("Invalid owner ID");
 	}
-	return ownerId.toLowerCase().replace(/ /g, "_");
+	return ok(ownerId.toLowerCase().replace(/ /g, "_"));
 }
 
 export async function isDatabaseReady(): Promise<boolean> {
-	try {
-		await migrateDatabase();
-		await addUserToTenantDb();
-		addUserToOpsDb()
-			.then(() => {
-				console.log("User added to ops database");
-			})
-			.catch((error) => {
-				console.error("Failed to add user to ops database", error);
-			});
-		return true;
-	} catch (e) {
-		console.error("Database not ready", e);
-		return false;
-	}
+	return await ResultAsync.fromPromise(
+		migrateDatabase(),
+		handleError("Migration failed"),
+	)
+		.andThen(() =>
+			ResultAsync.fromPromise(
+				addUserToTenantDb(),
+				handleError("Failed to add user to tenant database"),
+			),
+		)
+		.andThen(() =>
+			ResultAsync.fromPromise(
+				addUserToOpsDb(),
+				handleError("Failed to add user to ops database"),
+			),
+		)
+		.match(
+			() => true,
+			() => false,
+		);
 }
 
-async function migrateDatabase(): Promise<void> {
-	const db = await database();
-	const migrationsFolder = path.resolve(process.cwd(), "drizzle");
-	await migrate(db, { migrationsFolder: migrationsFolder });
+async function migrateDatabase(): Promise<boolean> {
+	return await ResultAsync.fromPromise(
+		database(),
+		handleError("Failed to get database"),
+	)
+		.andThen((db) => {
+			const migrationsFolder = path.resolve(process.cwd(), "drizzle");
+			return ResultAsync.fromPromise(
+				migrate(db, { migrationsFolder: migrationsFolder }),
+				handleError("Failed to migrate database"),
+			);
+		})
+		.match(
+			() => true,
+			() => false,
+		);
 }
 
-export async function database(): Promise<NodePgDatabase<typeof schema>> {
+export async function database(): Promise<Database> {
 	const { ownerId } = await getOwner();
 	if (!ownerId) {
 		throw new Error("Owner ID not found");
@@ -47,13 +73,15 @@ export async function database(): Promise<NodePgDatabase<typeof schema>> {
 	return getDatabaseForOwner(ownerId);
 }
 
-export async function getDatabaseForOwner(
-	ownerId: string,
-): Promise<NodePgDatabase<typeof schema>> {
-	const databaseName = getDatabaseName(ownerId);
-	if (!databaseName) {
-		throw new Error("Database name not found");
-	}
+export async function getDatabaseForOwner(ownerId: string): Promise<Database> {
+	const databaseName = getDatabaseName(ownerId).match(
+		(value) => {
+			return value;
+		},
+		() => {
+			throw new Error("Database name not found");
+		},
+	);
 
 	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
 
@@ -79,7 +107,15 @@ export async function getDatabaseForOwner(
 }
 
 export async function deleteDatabase(ownerId: string) {
-	const databaseName = getDatabaseName(ownerId);
+	const databaseName = getDatabaseName(ownerId).match(
+		(value) => {
+			return value;
+		},
+		() => {
+			throw new Error("Database name not found");
+		},
+	);
+
 	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
 
 	const ownerDb = drizzle(`${process.env.DATABASE_URL}/manage${sslMode}`, {
@@ -95,5 +131,7 @@ export async function deleteDatabase(ownerId: string) {
 	`);
 
 	// Drop the database with FORCE option (PostgreSQL 13+)
-	await ownerDb.execute(sql`DROP DATABASE ${sql.identifier(databaseName)} WITH (FORCE)`);
+	await ownerDb.execute(
+		sql`DROP DATABASE ${sql.identifier(databaseName)} WITH (FORCE)`,
+	);
 }

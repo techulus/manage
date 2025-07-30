@@ -1,5 +1,13 @@
 "use client";
 
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { Close, Title } from "@radix-ui/react-dialog";
+import { useQueries } from "@tanstack/react-query";
+import { AlignJustifyIcon, CalendarClock, FileIcon, X } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { Panel } from "@/components/core/panel";
 import { ConfirmButton } from "@/components/form/button";
 import EditableText from "@/components/form/editable-text";
@@ -20,14 +28,6 @@ import { useTasks } from "@/hooks/use-tasks";
 import { cn } from "@/lib/utils";
 import { toDateStringWithDay, toStartOfDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { Close, Title } from "@radix-ui/react-dialog";
-import { useQueries } from "@tanstack/react-query";
-import { AlignJustifyIcon, CalendarClock, FileIcon, X } from "lucide-react";
-import { useParams } from "next/navigation";
-import { useMemo, useState } from "react";
-import { toast } from "sonner";
 import { Checkbox } from "../../../ui/checkbox";
 import { DateTimePicker } from "../../events/date-time-picker";
 import { AssignToUser } from "../../shared/assign-to-user";
@@ -36,9 +36,11 @@ import { UserBadge } from "../../shared/user-badge";
 export const TaskItem = ({
 	task,
 	compact = false,
+	canEdit = true,
 }: {
 	task: TaskWithDetails;
 	compact?: boolean;
+	canEdit?: boolean;
 }) => {
 	const { projectId } = useParams();
 	const [detailsOpen, setDetailsOpen] = useState(false);
@@ -76,7 +78,7 @@ export const TaskItem = ({
 				className={cn(
 					"flex scale-100 rounded-lg shadow-none",
 					"flex-row items-center justify-center space-x-2 border-none",
-					"hover:bg-muted-foreground/10",
+					"hover:bg-primary/20",
 				)}
 				ref={setNodeRef}
 				style={style}
@@ -88,9 +90,11 @@ export const TaskItem = ({
 							"my-4 ml-6 mr-1 transition-all",
 							compact ? "py-0 my-0" : "",
 							isDone ? "my-2.5 opacity-50" : "scale-125",
+							!canEdit ? "cursor-not-allowed" : "",
 						)}
+						disabled={!canEdit}
 						onCheckedChange={async (checked) => {
-							if (compact) return;
+							if (compact || !canEdit) return;
 							const status = checked ? TaskStatus.DONE : TaskStatus.TODO;
 							updateTask.mutate({
 								id: task.id,
@@ -139,7 +143,7 @@ export const TaskItem = ({
 					</div>
 				</button>
 
-				{!isDone && !compact && !creating ? (
+				{!isDone && !compact && !creating && canEdit ? (
 					<div
 						className="cursor-move touch-none p-1 pr-3"
 						{...attributes}
@@ -170,6 +174,7 @@ export const TaskItem = ({
 								value={task.name}
 								label="task"
 								onChange={(val) => {
+									if (!canEdit) return;
 									updateTask.mutate({
 										id: task.id,
 										name: val,
@@ -194,6 +199,7 @@ export const TaskItem = ({
 					<div className="space-y-6 p-6">
 						<form
 							action={(formData) => {
+								if (!canEdit) return;
 								updateTask.mutate({
 									id: task.id,
 									description: formData.get("description") as string,
@@ -350,9 +356,13 @@ export const TaskItem = ({
 																			name: task.name,
 																			taskListId: list.id,
 																			status: TaskStatus.TODO,
-																			description: task.description || undefined,
-																			assignedToUser: task.assignedToUser || undefined,
-																			dueDate: task.dueDate ? task.dueDate.toISOString() : undefined,
+																			description:
+																				task.description || undefined,
+																			assignedToUser:
+																				task.assignedToUser || undefined,
+																			dueDate: task.dueDate
+																				? task.dueDate.toISOString()
+																				: undefined,
 																		}),
 																		{
 																			loading: "Copying...",

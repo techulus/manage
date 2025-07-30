@@ -4,6 +4,8 @@ import { useTRPC } from "@/trpc/client";
 import { useQuery } from "@tanstack/react-query";
 import { TurboWire } from "@turbowire/web";
 import { Bell } from "lucide-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
@@ -16,6 +18,8 @@ export function Notifications({
 }: {
 	notificationsWire: string;
 }) {
+	const params = useParams();
+	const tenant = params.tenant as string;
 	const trpc = useTRPC();
 	const {
 		data: notifications,
@@ -65,7 +69,16 @@ export function Notifications({
 					<SpinnerWithSpacing />
 				) : (
 					<div className="flex flex-col">
-						<h3 className="font-medium px-4 py-2">Notifications</h3>
+						<div className="flex items-center justify-between px-4 py-2 border-b dark:border-white/10">
+							<h3 className="font-medium">Notifications</h3>
+							{tenant && (
+								<Link href={`/${tenant}/notifications`}>
+									<Button variant="ghost" size="sm" className="text-xs">
+										View all
+									</Button>
+								</Link>
+							)}
+						</div>
 						{notifications?.length && timezone ? (
 							<div className="flex flex-col divide-y dark:divide-white/10">
 								{notifications.map((notification) => (
@@ -77,7 +90,7 @@ export function Notifications({
 								))}
 							</div>
 						) : (
-							<div className="text-sm text-muted-foreground">
+							<div className="text-sm text-muted-foreground px-4 py-2">
 								You have no new notifications.
 							</div>
 						)}

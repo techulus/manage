@@ -6,7 +6,7 @@ export async function notifyUser(
 	userId: string,
 	message: string | null = null,
 	options: {
-		type: "task" | "project" | "event" | "comment" | null;
+		type: "task" | "project" | "event" | "comment" | "mention" | null;
 		target: string | null;
 		fromUser: string | null;
 	} = {

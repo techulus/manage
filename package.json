@@ -7,6 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "biome lint",
+    "format": "biome format --write",
+    "lint:fix": "biome lint --write",
+    "fix": "biome format --write && biome lint --write",
     "generate:migrations": "drizzle-kit generate"
   },
   "dependencies": {
@@ -59,6 +62,7 @@
     "ical-generator": "^8.0.1",
     "lucide-react": "^0.503.0",
     "mime-types": "^2.1.35",
+    "neverthrow": "^8.2.0",
     "next": "15.4.3",
     "next-themes": "^0.3.0",
     "nuqs": "^2.4.1",
@@ -82,7 +86,6 @@
     "tailwindcss": "3.3.2",
     "tailwindcss-animate": "^1.0.7",
     "use-debounce": "^10.0.2",
-    "uuid": "^9.0.1",
     "zod": "^3.24.2",
     "zod-validation-error": "^3.4.0"
   },
@@ -95,7 +98,6 @@
     "@types/node": "20.1.0",
     "@types/react": "19.1.8",
     "@types/react-dom": "19.1.6",
-    "@types/uuid": "^9.0.8",
     "drizzle-kit": "^0.30.6",
     "encoding": "^0.1.13",
     "typescript": "5.7.2"

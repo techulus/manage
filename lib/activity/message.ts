@@ -1,7 +1,7 @@
 import type { ActivityWithActor } from "@/drizzle/types";
 import { guessTimezone, toDateStringWithDay } from "../utils/date";
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: flexible date parameter handling
 function toDateString(date: any) {
 	if (!date) {
 		return "-";
@@ -9,12 +9,12 @@ function toDateString(date: any) {
 
 	// Handle string dates by parsing them first
 	const dateObj = typeof date === "string" ? new Date(date) : date;
-	
+
 	// Check if it's a valid date
 	if (dateObj instanceof Date && !Number.isNaN(dateObj.getTime())) {
 		return toDateStringWithDay(dateObj, guessTimezone);
 	}
-	
+
 	return "-";
 }
 
@@ -40,78 +40,87 @@ const fieldLabels: Record<string, string> = {
 
 // Get user-friendly field name
 function getFieldLabel(key: string): string {
-	return fieldLabels[key] || key.replace(/([A-Z])/g, ' $1').toLowerCase();
+	return fieldLabels[key] || key.replace(/([A-Z])/g, " $1").toLowerCase();
 }
 
 // Generate contextual action messages
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-function generateContextualMessage(item: ActivityWithActor, newValue: any, oldValue: any): string {
-	const itemName = newValue?.name ?? newValue?.title ?? oldValue?.name ?? oldValue?.title ?? 'item';
-	
+// biome-ignore lint/suspicious/noExplicitAny: flexible activity value handling
+function generateContextualMessage(
+	item: ActivityWithActor,
+	newValue: any,
+	oldValue: any,
+): string {
+	const itemName =
+		newValue?.name ??
+		newValue?.title ??
+		oldValue?.name ??
+		oldValue?.title ??
+		"item";
+
 	switch (item.action) {
-		case 'created':
+		case "created":
 			switch (item.type) {
-				case 'task':
+				case "task":
 					return `created task **${itemName}**`;
-				case 'tasklist':
+				case "tasklist":
 					return `created task list **${itemName}**`;
-				case 'project':
+				case "project":
 					return `created project **${itemName}**`;
-				case 'event':
+				case "event":
 					return `created event **${itemName}**`;
-				case 'comment':
+				case "comment":
 					return "added a comment";
-				case 'blob':
+				case "blob":
 					return "uploaded a file";
 				default:
 					return `created ${item.type} **${itemName}**`;
 			}
-			
-		case 'deleted':
+
+		case "deleted":
 			switch (item.type) {
-				case 'task':
+				case "task":
 					return `deleted task **${itemName}**`;
-				case 'tasklist':
+				case "tasklist":
 					return `deleted task list **${itemName}**`;
-				case 'project':
+				case "project":
 					return `deleted project **${itemName}**`;
-				case 'event':
+				case "event":
 					return `deleted event **${itemName}**`;
-				case 'comment':
+				case "comment":
 					return "deleted a comment";
-				case 'blob':
+				case "blob":
 					return "deleted a file";
 				default:
 					return `deleted ${item.type} **${itemName}**`;
 			}
-			
-		case 'updated':
+
+		case "updated":
 			switch (item.type) {
-				case 'task':
+				case "task":
 					return `updated task **${itemName}**`;
-				case 'tasklist':
+				case "tasklist":
 					return `updated task list **${itemName}**`;
-				case 'project':
+				case "project":
 					return `updated project **${itemName}**`;
-				case 'event':
+				case "event":
 					return `updated event **${itemName}**`;
-				case 'comment':
+				case "comment":
 					return "updated a comment";
-				case 'blob':
+				case "blob":
 					return "updated a file";
 				default:
 					return `updated ${item.type} **${itemName}**`;
 			}
-			
+
 		default:
 			return `${item.action} ${item.type} **${itemName}**`;
 	}
 }
 
 export function generateObjectDiffMessage(item: ActivityWithActor) {
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	// biome-ignore lint/suspicious/noExplicitAny: type casting for activity values
 	const newValue = item.newValue as any;
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	// biome-ignore lint/suspicious/noExplicitAny: type casting for activity values
 	const oldValue = item.oldValue as any;
 
 	// Generate the main action message
@@ -119,13 +128,19 @@ export function generateObjectDiffMessage(item: ActivityWithActor) {
 	const changes: string[] = [];
 
 	// For creation and deletion, we don't need to show field changes
-	if (item.action === 'created' || item.action === 'deleted') {
+	if (item.action === "created" || item.action === "deleted") {
 		return mainMessage;
 	}
 
 	// For updates, show specific field changes
 	if (newValue && oldValue) {
-		const ignoreKeys = ["updatedAt", "createdAt", "repeatRule", "creatorId", "id"];
+		const ignoreKeys = [
+			"updatedAt",
+			"createdAt",
+			"repeatRule",
+			"creatorId",
+			"id",
+		];
 
 		for (const key in oldValue) {
 			if (ignoreKeys.includes(key)) {
@@ -134,43 +149,56 @@ export function generateObjectDiffMessage(item: ActivityWithActor) {
 
 			if (key in newValue && oldValue[key] !== newValue[key]) {
 				const fieldLabel = getFieldLabel(key);
-				
-				if (typeof newValue[key] === "string" && (newValue[key] as string)?.length > 250) {
+
+				if (
+					typeof newValue[key] === "string" &&
+					(newValue[key] as string)?.length > 250
+				) {
 					changes.push(`updated ${fieldLabel}`);
-				} else if (newValue[key] instanceof Date || (typeof newValue[key] === "string" && new Date(newValue[key]).toString() !== "Invalid Date")) {
+				} else if (
+					newValue[key] instanceof Date ||
+					(typeof newValue[key] === "string" &&
+						new Date(newValue[key]).toString() !== "Invalid Date")
+				) {
 					changes.push(
-						`changed ${fieldLabel} from **${toDateString(oldValue[key])}** to **${toDateString(newValue[key])}**`
+						`changed ${fieldLabel} from **${toDateString(oldValue[key])}** to **${toDateString(newValue[key])}**`,
 					);
 				} else if (typeof newValue[key] === "boolean") {
-					if (key === 'completed') {
-						changes.push(newValue[key] ? "marked as completed" : "marked as incomplete");
-					} else if (key === 'archived') {
+					if (key === "completed") {
+						changes.push(
+							newValue[key] ? "marked as completed" : "marked as incomplete",
+						);
+					} else if (key === "archived") {
 						changes.push(newValue[key] ? "archived" : "unarchived");
 					} else {
-						changes.push(newValue[key] ? `enabled ${fieldLabel}` : `disabled ${fieldLabel}`);
+						changes.push(
+							newValue[key]
+								? `enabled ${fieldLabel}`
+								: `disabled ${fieldLabel}`,
+						);
 					}
 				} else if (!newValue[key] && oldValue[key]) {
 					changes.push(`removed ${fieldLabel}`);
 				} else if (newValue[key] && !oldValue[key]) {
 					// Handle adding new values more nicely
-					if (key === 'position') {
+					if (key === "position") {
 						changes.push("repositioned");
 					} else {
 						changes.push(`set ${fieldLabel} to **${newValue[key]}**`);
 					}
 				} else {
 					// Handle different field types with specific formatting
-					if (key === 'position') {
+					if (key === "position") {
 						changes.push("repositioned");
-					} else if (key === 'status') {
+					} else if (key === "status") {
 						changes.push(
-							`changed status from **${oldValue[key] || '-'}** to **${newValue[key]}**`
+							`changed status from **${oldValue[key] || "-"}** to **${newValue[key]}**`,
 						);
 					} else {
 						// Improve display of null/undefined old values
-						const oldDisplay = oldValue[key] || '-';
+						const oldDisplay = oldValue[key] || "-";
 						changes.push(
-							`changed ${fieldLabel} from **${oldDisplay}** to **${newValue[key]}**`
+							`changed ${fieldLabel} from **${oldDisplay}** to **${newValue[key]}**`,
 						);
 					}
 				}
@@ -183,7 +211,7 @@ export function generateObjectDiffMessage(item: ActivityWithActor) {
 		if (changes.length === 1) {
 			return `${mainMessage} • ${changes[0]}`;
 		}
-		return `${mainMessage}\n\n${changes.map(change => `• ${change}`).join('\n')}`;
+		return `${mainMessage}\n\n${changes.map((change) => `• ${change}`).join("\n")}`;
 	}
 
 	return mainMessage;

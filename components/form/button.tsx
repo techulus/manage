@@ -84,7 +84,7 @@ export const SaveButton = ({
 	return (
 		<Button type="submit" disabled={pending || disabled}>
 			{pending ? (
-				<Spinner message={loadingLabel} />
+				<Spinner message={loadingLabel} className="text-muted" />
 			) : (
 				<>
 					{icon}

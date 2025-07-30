@@ -1,3 +1,4 @@
+import { OrganizationChangeHandler } from "@/components/core/organization-change-handler";
 import { ReportTimezone } from "@/components/core/report-timezone";
 import { Navbar } from "@/components/layout/navbar";
 import { isDatabaseReady } from "@/lib/utils/useDatabase";
@@ -28,16 +29,18 @@ export default async function ConsoleLayout(props: {
 
 	return (
 		<TRPCReactProvider>
-			<NuqsAdapter>
-				<main className="relative mx-auto w-full flex-grow flex-col">
-					<Navbar notificationsWire={notificationsWire} />
-					<div className="min-h-[calc(100vh-97px)] lg:min-w-0 lg:flex-1 pb-8">
-						{props.children}
-					</div>
+			<OrganizationChangeHandler>
+				<NuqsAdapter>
+					<main className="relative mx-auto w-full flex-grow flex-col">
+						<Navbar notificationsWire={notificationsWire} />
+						<div className="min-h-[calc(100vh-97px)] lg:min-w-0 lg:flex-1 pb-8">
+							{props.children}
+						</div>
 
-					<ReportTimezone />
-				</main>
-			</NuqsAdapter>
+						<ReportTimezone />
+					</main>
+				</NuqsAdapter>
+			</OrganizationChangeHandler>
 		</TRPCReactProvider>
 	);
 }

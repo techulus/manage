@@ -1,19 +1,14 @@
 import {
 	notification,
 	project,
+	projectPermission,
 	user,
 } from "@/drizzle/schema";
-import type {
-	NotificationWithUser,
-} from "@/drizzle/types";
+import type { NotificationWithUser } from "@/drizzle/types";
 import { getTodayDataForUser } from "@/lib/utils/todayData";
 import { broadcastEvent, getSignedWireUrl } from "@/lib/utils/turbowire";
 import { currentUser } from "@clerk/nextjs/server";
-import {
-	desc,
-	eq,
-	or,
-} from "drizzle-orm";
+import { and, desc, eq, inArray, or } from "drizzle-orm";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
@@ -70,17 +65,82 @@ export const userRouter = createTRPCRouter({
 		.query(async ({ ctx, input }) => {
 			const statuses = input?.statuses ?? ["active"];
 
+			// First, get the project IDs that the user has permission to access
+			const userPermissions = await ctx.db.query.projectPermission.findMany({
+				where: eq(projectPermission.userId, ctx.userId),
+				columns: {
+					projectId: true,
+					role: true,
+				},
+			});
+
 			const statusFilter = statuses?.map((status) =>
 				eq(project.status, status),
 			);
 
+			// Get projects where user has explicit permissions OR is the creator
 			const projects = await ctx.db.query.project.findMany({
-				where: or(...statusFilter),
+				where: and(
+					or(
+						// User has explicit permission
+						userPermissions.length > 0
+							? inArray(
+									project.id,
+									userPermissions.map((p) => p.projectId),
+								)
+							: undefined,
+						// User is the creator (for backward compatibility)
+						eq(project.createdByUser, ctx.userId),
+					),
+					or(...statusFilter),
+				),
 				with: {
 					creator: true,
 				},
 			});
 
-			return projects;
+			// Add user's role to each project
+			const projectsWithRole = projects.map((proj) => {
+				const permission = userPermissions.find((p) => p.projectId === proj.id);
+				// If no explicit permission but user is creator, they have editor role
+				const role =
+					permission?.role ||
+					(proj.createdByUser === ctx.userId ? "editor" : undefined);
+				return {
+					...proj,
+					userRole: role,
+				};
+			});
+
+			return projectsWithRole;
+		}),
+	searchUsersForMention: protectedProcedure
+		.input(
+			z.object({
+				query: z.string().optional(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const users = await ctx.db.query.user.findMany({
+				columns: {
+					id: true,
+					email: true,
+					firstName: true,
+					lastName: true,
+					imageUrl: true,
+				},
+			});
+
+			if (input.query) {
+				const query = input.query.toLowerCase();
+				return users.filter((user) => {
+					const fullName =
+						`${user.firstName || ""} ${user.lastName || ""}`.toLowerCase();
+					const email = user.email.toLowerCase();
+					return fullName.includes(query) || email.includes(query);
+				});
+			}
+
+			return users;
 		}),
 });

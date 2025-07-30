@@ -1,10 +1,11 @@
 import path from "node:path";
 import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
-import { type NodePgDatabase, drizzle } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import * as schema from "./drizzle/schema";
+import type { OpsDatabase } from "./drizzle/types";
 
-export async function getOpsDatabase(): Promise<NodePgDatabase<typeof schema>> {
+export async function getOpsDatabase(): Promise<OpsDatabase> {
 	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
 
 	const ownerDb = drizzle(`${process.env.DATABASE_URL}/manage${sslMode}`, {

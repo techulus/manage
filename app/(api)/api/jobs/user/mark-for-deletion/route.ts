@@ -1,5 +1,11 @@
-import { SevenDayWarning, sevenDayWarningPlainText } from "@/components/emails/seven-day-warning";
-import { ThirtyDayDeletionNotice, thirtyDayDeletionNoticePlainText } from "@/components/emails/thirty-day-deletion-notice";
+import {
+	SevenDayWarning,
+	sevenDayWarningPlainText,
+} from "@/components/emails/seven-day-warning";
+import {
+	ThirtyDayDeletionNotice,
+	thirtyDayDeletionNoticePlainText,
+} from "@/components/emails/thirty-day-deletion-notice";
 import { opsUser } from "@/ops/drizzle/schema";
 import { getOpsDatabase } from "@/ops/useOps";
 import { clerkClient } from "@clerk/nextjs/server";
@@ -7,7 +13,11 @@ import { serve } from "@upstash/workflow/nextjs";
 import { and, eq, isNull, lte } from "drizzle-orm";
 import { Resend } from "resend";
 
-async function getUserDetails(user: { id: string; email: string; firstName?: string | null }) {
+async function getUserDetails(user: {
+	id: string;
+	email: string;
+	firstName?: string | null;
+}) {
 	const contactEmail = user.email;
 	const firstName = user.firstName || undefined;
 
@@ -18,18 +28,21 @@ async function getUserDetails(user: { id: string; email: string; firstName?: str
 	return { contactEmail, firstName };
 }
 
-async function checkUserOrganizationMembership(userId: string): Promise<boolean> {
+async function checkUserOrganizationMembership(
+	userId: string,
+): Promise<boolean> {
 	try {
 		const clerk = await clerkClient();
 		// Get the user's organization memberships
-		const organizationMemberships = await clerk.users.getOrganizationMembershipList({
-			userId: userId,
-		});
-		
+		const organizationMemberships =
+			await clerk.users.getOrganizationMembershipList({
+				userId: userId,
+			});
+
 		console.log(
 			`[UserDeletion] User ${userId} has ${organizationMemberships.data.length} organization memberships`,
 		);
-		
+
 		// Return true if user belongs to any organization
 		return organizationMemberships.data.length > 0;
 	} catch (error) {
@@ -202,9 +215,7 @@ export const { POST } = serve(async (context) => {
 					})),
 				);
 			} else {
-				console.log(
-					"[UserDeletion] No users found that need 7-day warnings",
-				);
+				console.log("[UserDeletion] No users found that need 7-day warnings");
 			}
 			return users;
 		},
@@ -282,9 +293,7 @@ export const { POST } = serve(async (context) => {
 			const users = await db
 				.select()
 				.from(opsUser)
-				.where(
-					lte(opsUser.markedForDeletionAt, thirtyDaysAgoForDeletion),
-				);
+				.where(lte(opsUser.markedForDeletionAt, thirtyDaysAgoForDeletion));
 
 			console.log(
 				`[UserDeletion] Found ${users.length} users ready for deletion`,

@@ -50,6 +50,13 @@
       "when": 1746078277188,
       "tag": "0006_noisy_jack_murdock",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1753692074530,
+      "tag": "0007_brainy_freak",
+      "breakpoints": true
     }
   ]
 }

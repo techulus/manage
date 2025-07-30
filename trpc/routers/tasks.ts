@@ -1,14 +1,16 @@
+import { and, asc, desc, eq, or } from "drizzle-orm";
+import { z } from "zod";
 import { task, taskList } from "@/drizzle/schema";
 import { TaskListStatus, TaskStatus } from "@/drizzle/types";
 import { logActivity } from "@/lib/activity";
+import { canEditProject, canViewProject } from "@/lib/permissions";
 import {
 	deleteSearchItem,
 	indexTaskListWithProjectFetch,
 	indexTaskWithDataFetch,
 } from "@/lib/search/helpers";
+import { sendMentionNotifications } from "@/lib/utils/mentionNotifications";
 import { notifyUser } from "@/lib/utils/useNotification";
-import { and, asc, desc, eq, or } from "drizzle-orm";
-import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
 const POSITION_INCREMENT = 1000;
@@ -25,6 +27,16 @@ export const tasksRouter = createTRPCRouter({
 			}),
 		)
 		.query(async ({ ctx, input }) => {
+			// Check if user has permission to view this project
+			const hasAccess = await canViewProject(
+				ctx.db,
+				input.projectId,
+				ctx.userId,
+			);
+			if (!hasAccess) {
+				throw new Error("Project access denied");
+			}
+
 			const data = await ctx.db.query.taskList
 				.findMany({
 					where: and(
@@ -60,6 +72,12 @@ export const tasksRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
+			// Check if user has edit permission for this project
+			const canEdit = await canEditProject(ctx.db, input.projectId, ctx.userId);
+			if (!canEdit) {
+				throw new Error("Project edit access denied");
+			}
+
 			const createdTaskList = await ctx.db
 				.insert(taskList)
 				.values({
@@ -85,6 +103,18 @@ export const tasksRouter = createTRPCRouter({
 					ctx.search,
 					createdTaskList[0],
 				);
+
+				// Send mention notifications if description was provided
+				if (input.description) {
+					await sendMentionNotifications(input.description, {
+						type: "tasklist",
+						entityName: input.name,
+						entityId: createdTaskList[0].id,
+						projectId: input.projectId,
+						orgSlug: ctx.orgSlug,
+						fromUserId: ctx.userId,
+					});
+				}
 			}
 
 			return createdTaskList?.[0];
@@ -136,6 +166,22 @@ export const tasksRouter = createTRPCRouter({
 				where: eq(taskList.id, input.id),
 			});
 
+			if (!oldTaskList) {
+				throw new Error("Task list not found");
+			}
+
+			// Check if user has edit permission for this project
+			const canEdit = await canEditProject(
+				ctx.db,
+				oldTaskList.projectId,
+				ctx.userId,
+			);
+			if (!canEdit) {
+				throw new Error(
+					"You don't have permission to update task lists in this project",
+				);
+			}
+
 			const data = await ctx.db
 				.update(taskList)
 				.set(filteredInput)
@@ -153,6 +199,18 @@ export const tasksRouter = createTRPCRouter({
 
 				if (data?.[0]) {
 					await indexTaskListWithProjectFetch(ctx.db, ctx.search, data[0]);
+
+					// Send mention notifications if description was updated
+					if ("description" in input && input.description) {
+						await sendMentionNotifications(input.description, {
+							type: "tasklist",
+							entityName: oldTaskList.name,
+							entityId: input.id,
+							projectId: oldTaskList.projectId,
+							orgSlug: ctx.orgSlug,
+							fromUserId: ctx.userId,
+						});
+					}
 				}
 			}
 
@@ -161,6 +219,27 @@ export const tasksRouter = createTRPCRouter({
 	deleteTaskList: protectedProcedure
 		.input(z.object({ id: z.number() }))
 		.mutation(async ({ ctx, input }) => {
+			// First get the task list to check permissions
+			const taskListToDelete = await ctx.db.query.taskList.findFirst({
+				where: eq(taskList.id, input.id),
+			});
+
+			if (!taskListToDelete) {
+				throw new Error("Task list not found");
+			}
+
+			// Check if user has edit permission for this project
+			const canEdit = await canEditProject(
+				ctx.db,
+				taskListToDelete.projectId,
+				ctx.userId,
+			);
+			if (!canEdit) {
+				throw new Error(
+					"You don't have permission to delete task lists in this project",
+				);
+			}
+
 			const data = await ctx.db
 				.delete(taskList)
 				.where(eq(taskList.id, input.id))
@@ -231,6 +310,30 @@ export const tasksRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
+			// Get the task list to find the project ID
+			const taskListDetails = await ctx.db.query.taskList.findFirst({
+				where: eq(taskList.id, input.taskListId),
+				columns: {
+					projectId: true,
+				},
+			});
+
+			if (!taskListDetails) {
+				throw new Error("Task list not found");
+			}
+
+			// Check if user has edit permission for this project
+			const canEdit = await canEditProject(
+				ctx.db,
+				taskListDetails.projectId,
+				ctx.userId,
+			);
+			if (!canEdit) {
+				throw new Error(
+					"You don't have permission to add tasks to this project",
+				);
+			}
+
 			const lastPosition = await ctx.db.query.task
 				.findFirst({
 					where: eq(task.taskListId, input.taskListId),
@@ -251,23 +354,26 @@ export const tasksRouter = createTRPCRouter({
 				})
 				.returning();
 
-			const taskListDetails = await ctx.db.query.taskList.findFirst({
-				where: eq(taskList.id, input.taskListId),
-				columns: {
-					projectId: true,
-				},
+			await logActivity({
+				action: "created",
+				type: "task",
+				projectId: taskListDetails.projectId,
+				newValue: createdTask[0],
 			});
 
-			if (taskListDetails) {
-				await logActivity({
-					action: "created",
-					type: "task",
-					projectId: taskListDetails.projectId,
-					newValue: createdTask[0],
-				});
+			if (createdTask?.[0]) {
+				await indexTaskWithDataFetch(ctx.db, ctx.search, createdTask[0]);
 
-				if (createdTask?.[0]) {
-					await indexTaskWithDataFetch(ctx.db, ctx.search, createdTask[0]);
+				// Send mention notifications if description was provided
+				if (input.description) {
+					await sendMentionNotifications(input.description, {
+						type: "task",
+						entityName: input.name || "Untitled Task",
+						entityId: createdTask[0].id,
+						projectId: taskListDetails.projectId,
+						orgSlug: ctx.orgSlug,
+						fromUserId: ctx.userId,
+					});
 				}
 			}
 
@@ -338,6 +444,22 @@ export const tasksRouter = createTRPCRouter({
 				},
 			});
 
+			if (!oldTask) {
+				throw new Error("Task not found");
+			}
+
+			// Check if user has edit permission for this project
+			const canEdit = await canEditProject(
+				ctx.db,
+				oldTask.taskList.projectId,
+				ctx.userId,
+			);
+			if (!canEdit) {
+				throw new Error(
+					"You don't have permission to update tasks in this project",
+				);
+			}
+
 			const updatedTask = await ctx.db
 				.update(task)
 				.set(filteredInput)
@@ -367,6 +489,18 @@ export const tasksRouter = createTRPCRouter({
 
 				if (updatedTask?.[0]) {
 					await indexTaskWithDataFetch(ctx.db, ctx.search, updatedTask[0]);
+
+					// Send mention notifications if description was updated
+					if ("description" in input && input.description) {
+						await sendMentionNotifications(input.description, {
+							type: "task",
+							entityName: oldTask.name,
+							entityId: input.id,
+							projectId: oldTask.taskList.projectId,
+							orgSlug: ctx.orgSlug,
+							fromUserId: ctx.userId,
+						});
+					}
 				}
 			}
 
@@ -386,6 +520,22 @@ export const tasksRouter = createTRPCRouter({
 				},
 			});
 
+			if (!currentTask) {
+				throw new Error("Task not found");
+			}
+
+			// Check if user has edit permission for this project
+			const canEdit = await canEditProject(
+				ctx.db,
+				currentTask.taskList.projectId,
+				ctx.userId,
+			);
+			if (!canEdit) {
+				throw new Error(
+					"You don't have permission to delete tasks in this project",
+				);
+			}
+
 			await ctx.db.delete(task).where(eq(task.id, input.id)).returning();
 
 			if (currentTask) {
@@ -404,6 +554,30 @@ export const tasksRouter = createTRPCRouter({
 	tidyUpTaskList: protectedProcedure
 		.input(z.object({ id: z.number() }))
 		.mutation(async ({ ctx, input }) => {
+			// Get the task list to check permissions
+			const taskListDetails = await ctx.db.query.taskList.findFirst({
+				where: eq(taskList.id, input.id),
+				columns: {
+					projectId: true,
+				},
+			});
+
+			if (!taskListDetails) {
+				throw new Error("Task list not found");
+			}
+
+			// Check if user has edit permission for this project
+			const canEdit = await canEditProject(
+				ctx.db,
+				taskListDetails.projectId,
+				ctx.userId,
+			);
+			if (!canEdit) {
+				throw new Error(
+					"You don't have permission to modify tasks in this project",
+				);
+			}
+
 			const data = await ctx.db
 				.update(task)
 				.set({ status: TaskStatus.DELETED })

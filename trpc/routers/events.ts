@@ -1,5 +1,6 @@
 import { calendarEvent } from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
+import { canEditProject, canViewProject } from "@/lib/permissions";
 import {
 	deleteSearchItem,
 	indexEventWithProjectFetch,
@@ -25,6 +26,7 @@ import {
 import { Frequency, RRule } from "rrule";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
+import { sendMentionNotifications } from "@/lib/utils/mentionNotifications";
 
 const buildEventsQuery = (projectId: number, start: Date, end: Date) => {
 	return {
@@ -66,6 +68,13 @@ export const eventsRouter = createTRPCRouter({
 		)
 		.query(async ({ ctx, input }) => {
 			const { date, projectId } = input;
+
+			// Check if user has permission to view this project
+			const hasAccess = await canViewProject(ctx.db, projectId, ctx.userId);
+			if (!hasAccess) {
+				throw new Error("Project access denied");
+			}
+
 			const { startOfDay, endOfDay } = getStartEndDateRangeInUtc(
 				ctx.timezone,
 				date,
@@ -85,6 +94,12 @@ export const eventsRouter = createTRPCRouter({
 		)
 		.query(async ({ ctx, input }) => {
 			const { projectId } = input;
+
+			// Check if user has permission to view this project
+			const hasAccess = await canViewProject(ctx.db, projectId, ctx.userId);
+			if (!hasAccess) {
+				throw new Error("Project access denied");
+			}
 
 			const { start, end } = getStartEndWeekRangeInUtc(
 				ctx.timezone,
@@ -126,6 +141,25 @@ export const eventsRouter = createTRPCRouter({
 		)
 		.mutation(async ({ ctx, input }) => {
 			const { id } = input;
+
+			// First get the event to check permissions
+			const existingEvent = await ctx.db.query.calendarEvent.findFirst({
+				where: eq(calendarEvent.id, id),
+			});
+
+			if (!existingEvent) {
+				throw new Error("Event not found");
+			}
+
+			// Check if user has edit permission for this project
+			const canEdit = await canEditProject(
+				ctx.db,
+				existingEvent.projectId,
+				ctx.userId,
+			);
+			if (!canEdit) {
+				throw new Error("Project edit access denied");
+			}
 
 			const event = await ctx.db
 				.delete(calendarEvent)
@@ -177,6 +211,12 @@ export const eventsRouter = createTRPCRouter({
 				repeat,
 				repeatUntil,
 			} = input;
+
+			// Check if user has edit permission for this project
+			const canEdit = await canEditProject(ctx.db, projectId, ctx.userId);
+			if (!canEdit) {
+				throw new Error("Project edit access denied");
+			}
 
 			if (allDay) {
 				start = toUTC(
@@ -237,6 +277,18 @@ export const eventsRouter = createTRPCRouter({
 
 				if (updatedEvent?.[0]) {
 					await indexEventWithProjectFetch(ctx.db, ctx.search, updatedEvent[0]);
+
+					// Send mention notifications if description was updated
+					if (description) {
+						await sendMentionNotifications(description, {
+							type: "event",
+							entityName: name,
+							entityId: id,
+							projectId,
+							orgSlug: ctx.orgSlug,
+							fromUserId: ctx.userId,
+						});
+					}
 				}
 			} else {
 				const newEvent = await ctx.db
@@ -259,6 +311,18 @@ export const eventsRouter = createTRPCRouter({
 
 				if (newEvent?.[0]) {
 					await indexEventWithProjectFetch(ctx.db, ctx.search, newEvent[0]);
+
+					// Send mention notifications if description was provided
+					if (description) {
+						await sendMentionNotifications(description, {
+							type: "event",
+							entityName: name,
+							entityId: eventId,
+							projectId,
+							orgSlug: ctx.orgSlug,
+							fromUserId: ctx.userId,
+						});
+					}
 				}
 			}
 

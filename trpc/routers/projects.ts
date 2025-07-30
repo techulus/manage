@@ -1,12 +1,23 @@
-import { activity, comment, project } from "@/drizzle/schema";
+import { and, desc, eq } from "drizzle-orm";
+import { z } from "zod";
+import {
+	activity,
+	comment,
+	project,
+	projectPermission,
+} from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
+import {
+	canEditProject,
+	canViewProject,
+	checkProjectPermission,
+} from "@/lib/permissions";
 import {
 	deleteProjectSearchItems,
 	deleteSearchItem,
 	indexProject,
 } from "@/lib/search/helpers";
-import { and, desc, eq } from "drizzle-orm";
-import { z } from "zod";
+import { sendMentionNotifications } from "@/lib/utils/mentionNotifications";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const projectsRouter = createTRPCRouter({
@@ -19,6 +30,11 @@ export const projectsRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
+			// Check if user is in an organization and if they're an admin
+			if (ctx.orgId && !ctx.isOrgAdmin) {
+				throw new Error("Only organization admins can create projects");
+			}
+
 			const newProject = await ctx.db
 				.insert(project)
 				.values({
@@ -39,9 +55,28 @@ export const projectsRouter = createTRPCRouter({
 				projectId: newProject?.[0].id,
 			});
 
-			// Index the project for search
+			// Grant editor permission to the project creator
 			if (newProject?.[0]) {
+				await ctx.db.insert(projectPermission).values({
+					projectId: newProject[0].id,
+					userId: ctx.userId,
+					role: "editor",
+					createdByUser: ctx.userId,
+				});
+
+				// Index the project for search
 				await indexProject(ctx.search, newProject[0]);
+
+				// Send mention notifications if description was provided
+				if (input.description) {
+					await sendMentionNotifications(input.description, {
+						type: "project",
+						entityName: input.name,
+						entityId: newProject[0].id,
+						orgSlug: ctx.orgSlug,
+						fromUserId: ctx.userId,
+					});
+				}
 			}
 
 			return newProject?.[0];
@@ -73,6 +108,12 @@ export const projectsRouter = createTRPCRouter({
 				),
 		)
 		.mutation(async ({ ctx, input }) => {
+			// Check if user has edit permission for this project
+			const canEdit = await canEditProject(ctx.db, +input.id, ctx.userId);
+			if (!canEdit) {
+				throw new Error("Project edit access denied");
+			}
+
 			const currentProject = await ctx.db.query.project
 				.findFirst({
 					where: eq(project.id, +input.id),
@@ -103,6 +144,17 @@ export const projectsRouter = createTRPCRouter({
 				if (updatedProject?.[0]) {
 					await indexProject(ctx.search, updatedProject[0]);
 				}
+
+				// Send mention notifications if description was updated
+				if ("description" in input && input.description && currentProject) {
+					await sendMentionNotifications(input.description, {
+						type: "project",
+						entityName: currentProject.name,
+						entityId: +input.id,
+						orgSlug: ctx.orgSlug,
+						fromUserId: ctx.userId,
+					});
+				}
 			}
 
 			return updatedProject?.[0];
@@ -114,6 +166,12 @@ export const projectsRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
+			// Check if user has edit permission for this project (needed to delete)
+			const canEdit = await canEditProject(ctx.db, input.id, ctx.userId);
+			if (!canEdit) {
+				throw new Error("Project delete access denied");
+			}
+
 			const deletedProject = await ctx.db
 				.delete(project)
 				.where(eq(project.id, input.id))
@@ -141,6 +199,12 @@ export const projectsRouter = createTRPCRouter({
 			}),
 		)
 		.query(async ({ ctx, input }) => {
+			// Check if user has permission to view this project
+			const hasAccess = await canViewProject(ctx.db, input.id, ctx.userId);
+			if (!hasAccess) {
+				throw new Error("Project access denied");
+			}
+
 			const data = await ctx.db.query.project
 				.findFirst({
 					where: and(eq(project.id, input.id)),
@@ -151,7 +215,19 @@ export const projectsRouter = createTRPCRouter({
 				throw new Error(`Project with id ${input.id} not found`);
 			}
 
-			return data;
+			// Get the user's permission for this project
+			const userRole = await checkProjectPermission(
+				ctx.db,
+				input.id,
+				ctx.userId,
+			);
+			const canEdit = await canEditProject(ctx.db, input.id, ctx.userId);
+
+			return {
+				...data,
+				userRole,
+				canEdit,
+			};
 		}),
 	getComments: protectedProcedure
 		.input(
@@ -175,24 +251,52 @@ export const projectsRouter = createTRPCRouter({
 			z.object({
 				projectId: z.number(),
 				roomId: z.string(),
-				content: z.string(),
+				content: z.string().min(1, "Comment content cannot be empty"),
 				metadata: z.string(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			await ctx.db.insert(comment).values({
-				roomId: input.roomId,
-				content: input.content,
-				metadata: JSON.parse(input.metadata),
-				createdByUser: ctx.userId,
-				createdAt: new Date(),
-				updatedAt: new Date(),
+			const canEdit = await canEditProject(ctx.db, input.projectId, ctx.userId);
+			if (!canEdit) {
+				throw new Error(
+					"You don't have permission to add comments to this project",
+				);
+			}
+
+			const [newComment] = await ctx.db
+				.insert(comment)
+				.values({
+					roomId: input.roomId,
+					content: input.content,
+					metadata: JSON.parse(input.metadata),
+					createdByUser: ctx.userId,
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				})
+				.returning();
+
+			const projectData = await ctx.db.query.project.findFirst({
+				where: eq(project.id, input.projectId),
 			});
+
+			if (projectData) {
+				await sendMentionNotifications(input.content, {
+					type: "comment",
+					entityName: projectData.name,
+					entityId: input.projectId,
+					projectId: input.projectId,
+					orgSlug: ctx.orgSlug,
+					fromUserId: ctx.userId,
+				});
+			}
+
 			await logActivity({
 				action: "created",
 				type: "comment",
 				projectId: input.projectId,
 			});
+
+			return newComment;
 		}),
 	deleteComment: protectedProcedure
 		.input(

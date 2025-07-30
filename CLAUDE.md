@@ -146,3 +146,6 @@ UPSTASH_SEARCH_TOKEN=
 - **Mobile UX**: Improved responsive design for search interface
 - **Error Handling**: Standardized error handling across search operations
 - **Performance**: Optimized search indexing with automatic content updates
+
+## Development Workflow Guidance
+- Do not build the app after every change you make, only rebuild the app when I ask you to or after making large changes spanning many files

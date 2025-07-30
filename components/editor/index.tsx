@@ -1,52 +1,113 @@
 "use client";
 
-import { BlockNoteEditor, type PartialBlock } from "@blocknote/core";
+import {
+	BlockNoteEditor,
+	BlockNoteSchema,
+	defaultInlineContentSpecs,
+	type PartialBlock,
+} from "@blocknote/core";
 import { BlockNoteView } from "@blocknote/mantine";
-import { memo, useEffect, useMemo, useState } from "react";
+import { SuggestionMenuController, useCreateBlockNote } from "@blocknote/react";
+import { memo, useEffect, useState } from "react";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
+import { useQuery } from "@tanstack/react-query";
 import { useFormStatus } from "react-dom";
+import { useTRPC } from "@/trpc/client";
 import { Spinner } from "../core/loaders";
+import { Mention } from "./mention";
+import { MentionSuggestionMenu } from "./mention-suggestion-menu";
+
+const schema = BlockNoteSchema.create({
+	inlineContentSpecs: {
+		...defaultInlineContentSpecs,
+		mention: Mention,
+	},
+});
+
+type BlockNoteEditorType = typeof schema.BlockNoteEditor;
+type CustomPartialBlock = PartialBlock<
+	typeof schema.blockSchema,
+	typeof schema.inlineContentSchema,
+	typeof schema.styleSchema
+>;
 
 const Editor = memo(function Editor({
 	defaultValue,
 	metadata = undefined,
 	name = "description",
 	allowImageUpload = false,
+	onMentionAdded,
+	onContentChange,
 }: {
 	defaultValue?: string;
 	name?: string;
 	metadata?: PartialBlock[] | undefined;
 	allowImageUpload?: boolean;
+	onMentionAdded?: (userId: string) => void;
+	onContentChange?: (content: string) => void;
 }) {
 	const { pending } = useFormStatus();
 	const [value, onChange] = useState(defaultValue ?? "");
-	const [blocks, setBlocks] = useState<PartialBlock[]>([]);
+	const [blocks, setBlocks] = useState<CustomPartialBlock[]>([]);
 	const [initialContent, setInitialContent] = useState<
-		PartialBlock[] | undefined | "loading"
+		CustomPartialBlock[] | undefined | "loading"
 	>("loading");
+	const [mentionedUsers, setMentionedUsers] = useState<Set<string>>(new Set());
 
 	useEffect(() => {
 		if (defaultValue) {
-			BlockNoteEditor.create()
+			BlockNoteEditor.create({ schema })
 				.tryParseHTMLToBlocks(defaultValue)
 				.then((blocks) => {
-					setInitialContent(blocks);
+					setInitialContent(blocks as CustomPartialBlock[]);
 				});
 		} else {
 			setInitialContent(undefined);
 		}
 	}, [defaultValue]);
 
-	const editor = useMemo(() => {
-		if (metadata) {
-			return BlockNoteEditor.create({ initialContent: metadata });
-		}
-		if (initialContent === "loading") {
-			return undefined;
-		}
-		return BlockNoteEditor.create({
-			initialContent,
+	const [userSearchQuery, setUserSearchQuery] = useState<string>("");
+	const trpc = useTRPC();
+
+	const { data: users = [] } = useQuery(
+		trpc.user.searchUsersForMention.queryOptions({ query: userSearchQuery }),
+	);
+
+	const getMentionMenuItems = (editor: BlockNoteEditorType) => {
+		return users.map((user) => {
+			const userName =
+				`${user.firstName || ""} ${user.lastName || ""}`.trim() || user.email;
+			return {
+				title: userName,
+				user,
+				onItemClick: () => {
+					editor.insertInlineContent([
+						{
+							type: "mention",
+							props: {
+								userId: user.id,
+								userName: userName,
+							},
+						},
+						" ",
+					]);
+					if (!mentionedUsers.has(user.id)) {
+						setMentionedUsers((prev) => new Set(prev).add(user.id));
+						if (onMentionAdded) {
+							onMentionAdded(user.id);
+						}
+					}
+				},
+			};
+		});
+	};
+
+	const editor = useCreateBlockNote(
+		{
+			schema,
+			initialContent:
+				initialContent === "loading" ? undefined : metadata || initialContent,
 			uploadFile: allowImageUpload
 				? async (file) => {
 						const result: { url: string } = await fetch(
@@ -59,32 +120,36 @@ const Editor = memo(function Editor({
 						return result.url;
 					}
 				: undefined,
-		});
-	}, [initialContent, metadata, allowImageUpload]);
+		},
+		[initialContent, metadata, allowImageUpload],
+	);
 
 	useEffect(() => {
-		if (defaultValue) {
+		if (defaultValue || !editor || pending) {
 			return;
 		}
 
-		if (editor && !pending) {
-			const allBlockIds = editor.document.map((block) => block.id);
-			editor.removeBlocks(allBlockIds);
+		try {
+			editor.replaceBlocks(editor.document, [
+				{
+					type: "paragraph",
+					content: "",
+				},
+			]);
+			setMentionedUsers(new Set());
+		} catch (error) {
+			console.debug("Could not reset editor:", error);
 		}
 	}, [editor, pending, defaultValue]);
 
-	if (editor === undefined) {
+	if (editor === undefined || initialContent === "loading") {
 		return <Spinner />;
 	}
 
 	return (
 		<div className="bg-muted rounded-md">
 			<input type="hidden" name={name} defaultValue={value} />
-			<input
-				type="hidden"
-				name={"metadata"}
-				defaultValue={JSON.stringify(blocks)}
-			/>
+			<input type="hidden" name={"metadata"} value={JSON.stringify(blocks)} />
 			<BlockNoteView
 				editor={editor}
 				onChange={async () => {
@@ -97,12 +162,32 @@ const Editor = memo(function Editor({
 					setBlocks(editor.document);
 					if (isEmpty) {
 						onChange("");
+						onContentChange?.("");
 					} else {
 						const html = await editor.blocksToFullHTML(editor.document);
 						onChange(html);
+						onContentChange?.(html);
 					}
 				}}
-			/>
+			>
+				{/* TypeScript workaround: BlockNote's SuggestionMenuController has strict typing
+				    that doesn't accommodate our custom MentionSuggestionItem with user data.
+				    The 'as any' is necessary because we're extending the base suggestion item 
+				    structure with additional properties that BlockNote doesn't expect. */}
+				<SuggestionMenuController
+					triggerCharacter="@"
+					suggestionMenuComponent={MentionSuggestionMenu as any}
+					getItems={async (query) => {
+						setUserSearchQuery(query || "");
+						const items = getMentionMenuItems(editor);
+						if (!query) return items;
+						const lowerQuery = query.toLowerCase();
+						return items.filter((item) => {
+							return item.title.toLowerCase().includes(lowerQuery);
+						});
+					}}
+				/>
+			</BlockNoteView>
 		</div>
 	);
 });
