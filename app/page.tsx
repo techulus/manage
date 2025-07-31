@@ -93,53 +93,6 @@ export default async function Home() {
 					<div className="absolute -bottom-3 -right-3 w-6 h-6 flex items-center justify-center text-primary text-xl font-light z-10">
 						+
 					</div>
-
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-						{[
-							{
-								icon: "📋",
-								name: "Task Management",
-								desc: "Create and organize tasks. Track progress with lists, priorities, and team assignments for efficient project delivery.",
-							},
-							{
-								icon: "📅",
-								name: "Calendar & Events",
-								desc: "Schedule meetings and deadlines. Keep your team synchronized with integrated calendar management.",
-							},
-							{
-								icon: "👥",
-								name: "Team Collaboration",
-								desc: "Real-time activity feeds. Stay connected with instant notifications and seamless communication.",
-							},
-							{
-								icon: "🔍",
-								name: "Advanced Search",
-								desc: "Find anything instantly. Full-text search across all projects with powerful filtering options.",
-							},
-							{
-								icon: "🏢",
-								name: "Organization & Users",
-								desc: "Manage teams and organizations. Invite members, assign roles, and organize your workspace efficiently.",
-							},
-							{
-								icon: "🔐",
-								name: "Permissions & Security",
-								desc: "Fine-grained access control. Set project permissions, manage user roles, and keep your data secure.",
-							},
-						].map((feature, _index) => (
-							<div key={feature.name} className="p-8 border">
-								<div className="flex items-center gap-3 mb-3">
-									<span className="text-primary">{feature.icon}</span>
-									<h3 className="font-semibold text-gray-900 dark:text-white">
-										{feature.name}
-									</h3>
-								</div>
-								<p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-									{feature.desc}
-								</p>
-							</div>
-						))}
-					</div>
 				</div>
 			</div>
 
@@ -184,7 +137,7 @@ export default async function Home() {
 									alt="Project overview dashboard"
 									width={800}
 									height={600}
-									className="w-full h-auto opacity-90"
+									className="w-full h-auto"
 									priority
 								/>
 							</div>
@@ -221,7 +174,7 @@ export default async function Home() {
 									alt="Task management interface"
 									width={800}
 									height={600}
-									className="w-full h-auto opacity-90"
+									className="w-full h-auto"
 									priority
 								/>
 							</div>
@@ -260,7 +213,7 @@ export default async function Home() {
 									alt="Calendar and events interface"
 									width={800}
 									height={600}
-									className="w-full h-auto opacity-90"
+									className="w-full h-auto"
 								/>
 							</div>
 						</div>
@@ -290,39 +243,14 @@ export default async function Home() {
 								Full-text search across all your projects, tasks, and documents.
 								Filter by type, status, or team member with lightning speed.
 							</p>
-							<div className="relative overflow-hidden bg-gray-900 p-12 flex items-center justify-center">
-								<div className="text-center">
-									<div className="inline-flex items-center gap-3 bg-gray-800 px-6 py-3 rounded-full mb-4">
-										<svg
-											className="w-5 h-5 text-gray-400"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-											/>
-										</svg>
-										<span className="text-gray-300">Search everywhere...</span>
-									</div>
-									<div className="flex flex-wrap gap-2 justify-center">
-										<span className="text-xs bg-gray-800 text-gray-400 px-3 py-1 rounded-full">
-											Projects
-										</span>
-										<span className="text-xs bg-gray-800 text-gray-400 px-3 py-1 rounded-full">
-											Tasks
-										</span>
-										<span className="text-xs bg-gray-800 text-gray-400 px-3 py-1 rounded-full">
-											Events
-										</span>
-										<span className="text-xs bg-gray-800 text-gray-400 px-3 py-1 rounded-full">
-											Documents
-										</span>
-									</div>
-								</div>
+							<div className="relative overflow-hidden">
+								<Image
+									src="/screenshots/search.png"
+									alt="Search interface"
+									width={800}
+									height={600}
+									className="w-full h-auto"
+								/>
 							</div>
 						</div>
 					</div>
@@ -438,6 +366,55 @@ export default async function Home() {
 							</div>
 						</div>
 					</div>
+				</div>
+			</section>
+
+			<section className="max-w-7xl mx-auto">
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+					{[
+						{
+							icon: "📋",
+							name: "Task Management",
+							desc: "Create and organize tasks. Track progress with lists, priorities, and team assignments for efficient project delivery.",
+						},
+						{
+							icon: "📅",
+							name: "Calendar & Events",
+							desc: "Schedule meetings and deadlines. Keep your team synchronized with integrated calendar management.",
+						},
+						{
+							icon: "👥",
+							name: "Team Collaboration",
+							desc: "Real-time activity feeds. Stay connected with instant notifications and seamless communication.",
+						},
+						{
+							icon: "🔍",
+							name: "Advanced Search",
+							desc: "Find anything instantly. Full-text search across all projects with powerful filtering options.",
+						},
+						{
+							icon: "🏢",
+							name: "Organization & Users",
+							desc: "Manage teams and organizations. Invite members, assign roles, and organize your workspace efficiently.",
+						},
+						{
+							icon: "🔐",
+							name: "Permissions & Security",
+							desc: "Fine-grained access control. Set project permissions, manage user roles, and keep your data secure.",
+						},
+					].map((feature, _index) => (
+						<div key={feature.name} className="p-8 border">
+							<div className="flex items-center gap-3 mb-3">
+								<span className="text-primary">{feature.icon}</span>
+								<h3 className="font-semibold text-gray-900 dark:text-white">
+									{feature.name}
+								</h3>
+							</div>
+							<p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+								{feature.desc}
+							</p>
+						</div>
+					))}
 				</div>
 			</section>
 
