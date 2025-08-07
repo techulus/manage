@@ -101,13 +101,14 @@ export const eventsRouter = createTRPCRouter({
 				throw new Error("Project access denied");
 			}
 
-			const { start, end } = getStartEndWeekRangeInUtc(
+			const now = new Date();
+			const { end } = getStartEndWeekRangeInUtc(
 				ctx.timezone,
-				new Date(),
+				now,
 			);
 
 			const events = await ctx.db.query.calendarEvent
-				.findMany(buildEventsQuery(projectId, start, end))
+				.findMany(buildEventsQuery(projectId, now, end))
 				.execute();
 
 			return events;
