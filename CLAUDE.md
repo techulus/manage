@@ -149,3 +149,12 @@ UPSTASH_SEARCH_TOKEN=
 
 ## Development Workflow Guidance
 - Do not build the app after every change you make, only rebuild the app when I ask you to or after making large changes spanning many files
+
+## Code Style Guidelines
+- **No obvious comments**: Never add comments for obvious code. Comments should only provide context or insights that aren't clear from reading the code itself
+- **Self-documenting code**: Write code that is clear and self-explanatory. Variable and function names should describe what they do
+- **Avoid unnecessary intermediate variables**: Don't create variables just to "improve readability" when the expression is already clear
+- Examples of bad comments to avoid:
+  - `// Use current time as the start` before `buildQuery(now, end)`
+  - `// Increment counter` before `i++`
+  - `// Check if user exists` before `if (user)`

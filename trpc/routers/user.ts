@@ -80,20 +80,22 @@ export const userRouter = createTRPCRouter({
 
 			// Get projects where user has explicit permissions OR is the creator
 			const projects = await ctx.db.query.project.findMany({
-				where: and(
-					or(
-						// User has explicit permission
-						userPermissions.length > 0
-							? inArray(
-									project.id,
-									userPermissions.map((p) => p.projectId),
-								)
-							: undefined,
-						// User is the creator (for backward compatibility)
-						eq(project.createdByUser, ctx.userId),
-					),
-					or(...statusFilter),
-				),
+				where: ctx.isOrgAdmin
+					? or(...statusFilter)
+					: and(
+							or(
+								// User has explicit permission
+								userPermissions.length > 0
+									? inArray(
+											project.id,
+											userPermissions.map((p) => p.projectId),
+										)
+									: undefined,
+								// User is the creator (for backward compatibility)
+								eq(project.createdByUser, ctx.userId),
+							),
+							or(...statusFilter),
+						),
 				with: {
 					creator: true,
 				},
