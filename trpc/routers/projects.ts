@@ -109,7 +109,7 @@ export const projectsRouter = createTRPCRouter({
 		)
 		.mutation(async ({ ctx, input }) => {
 			// Check if user has edit permission for this project
-			const canEdit = await canEditProject(ctx.db, +input.id, ctx.userId);
+			const canEdit = await canEditProject(ctx, +input.id);
 			if (!canEdit) {
 				throw new Error("Project edit access denied");
 			}
@@ -167,7 +167,7 @@ export const projectsRouter = createTRPCRouter({
 		)
 		.mutation(async ({ ctx, input }) => {
 			// Check if user has edit permission for this project (needed to delete)
-			const canEdit = await canEditProject(ctx.db, input.id, ctx.userId);
+			const canEdit = await canEditProject(ctx, input.id);
 			if (!canEdit) {
 				throw new Error("Project delete access denied");
 			}
@@ -200,7 +200,7 @@ export const projectsRouter = createTRPCRouter({
 		)
 		.query(async ({ ctx, input }) => {
 			// Check if user has permission to view this project
-			const hasAccess = await canViewProject(ctx.db, input.id, ctx.userId);
+			const hasAccess = await canViewProject(ctx, input.id);
 			if (!hasAccess) {
 				throw new Error("Project access denied");
 			}
@@ -221,7 +221,7 @@ export const projectsRouter = createTRPCRouter({
 				input.id,
 				ctx.userId,
 			);
-			const canEdit = await canEditProject(ctx.db, input.id, ctx.userId);
+			const canEdit = await canEditProject(ctx, input.id);
 
 			return {
 				...data,
@@ -256,7 +256,7 @@ export const projectsRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const canEdit = await canEditProject(ctx.db, input.projectId, ctx.userId);
+			const canEdit = await canEditProject(ctx, input.projectId);
 			if (!canEdit) {
 				throw new Error(
 					"You don't have permission to add comments to this project",

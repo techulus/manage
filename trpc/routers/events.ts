@@ -70,7 +70,7 @@ export const eventsRouter = createTRPCRouter({
 			const { date, projectId } = input;
 
 			// Check if user has permission to view this project
-			const hasAccess = await canViewProject(ctx.db, projectId, ctx.userId);
+			const hasAccess = await canViewProject(ctx, projectId);
 			if (!hasAccess) {
 				throw new Error("Project access denied");
 			}
@@ -96,7 +96,7 @@ export const eventsRouter = createTRPCRouter({
 			const { projectId } = input;
 
 			// Check if user has permission to view this project
-			const hasAccess = await canViewProject(ctx.db, projectId, ctx.userId);
+			const hasAccess = await canViewProject(ctx, projectId);
 			if (!hasAccess) {
 				throw new Error("Project access denied");
 			}
@@ -153,11 +153,7 @@ export const eventsRouter = createTRPCRouter({
 			}
 
 			// Check if user has edit permission for this project
-			const canEdit = await canEditProject(
-				ctx.db,
-				existingEvent.projectId,
-				ctx.userId,
-			);
+			const canEdit = await canEditProject(ctx, existingEvent.projectId);
 			if (!canEdit) {
 				throw new Error("Project edit access denied");
 			}
@@ -214,7 +210,7 @@ export const eventsRouter = createTRPCRouter({
 			} = input;
 
 			// Check if user has edit permission for this project
-			const canEdit = await canEditProject(ctx.db, projectId, ctx.userId);
+			const canEdit = await canEditProject(ctx, projectId);
 			if (!canEdit) {
 				throw new Error("Project edit access denied");
 			}
