@@ -147,8 +147,83 @@ UPSTASH_SEARCH_TOKEN=
 - **Error Handling**: Standardized error handling across search operations
 - **Performance**: Optimized search indexing with automatic content updates
 
-## Development Workflow Guidance
-- Do not build the app after every change you make, only rebuild the app when I ask you to or after making large changes spanning many files
+## Development Workflow Guidance - CRITICAL BUILD AND TEST RESTRICTIONS
+
+### ⚠️ WHEN NOT TO BUILD OR TEST (99% of the time)
+
+**DO NOT run `bun run build`, `bun run test`, or any testing commands unless EXPLICITLY requested by the user.**
+
+This is absolutely critical for the following reasons:
+
+#### Performance and Resource Management
+- **Builds are expensive**: Each build takes 20-40 seconds and consumes significant CPU/memory
+- **Unnecessary resource waste**: Most code changes don't require validation through full builds
+- **Development server already validates**: The `bun dev` server catches most issues in real-time
+- **TypeScript catches errors**: The IDE and development server provide immediate type checking
+
+#### User Experience and Workflow
+- **Interrupts development flow**: Unexpected builds break the user's mental model and workflow
+- **Creates false urgency**: Running builds suggests something is broken when it isn't
+- **User controls their workflow**: Developers know when they want to test their changes
+- **Build timing is contextual**: Users build when ready to deploy, test, or validate large changes
+
+#### Technical Reasons
+- **TypeScript already validates**: Most errors are caught by the TypeScript compiler in the editor
+- **Hot reload exists**: Development server provides instant feedback on changes
+- **Builds don't catch runtime issues**: Many bugs only appear during actual usage, not builds
+- **False confidence**: A successful build doesn't guarantee the code works as intended
+
+#### Professional Development Practices
+- **Respect user autonomy**: Developers decide when to run builds and tests
+- **Avoid assumption-driven actions**: Don't assume code needs validation through builds
+- **Focus on code quality**: Write good code rather than relying on builds to catch issues
+- **Trust the development environment**: Modern tooling catches most issues without full builds
+
+### ✅ WHEN TO BUILD (Rare exceptions)
+
+Only run builds in these specific situations:
+
+1. **User explicitly requests it**: "Can you build this?" or "Run the build command"
+2. **Major refactoring across many files**: When changing 10+ files that interact with each other
+3. **Type system changes**: When modifying TypeScript configurations or complex type definitions
+4. **Production deployment preparation**: When user specifically mentions deployment or production
+5. **Debugging build-specific issues**: When the user reports build failures or deployment problems
+
+### Alternative Approaches Instead of Building
+
+#### For Code Validation
+- **Read the files**: Examine the code structure and logic directly
+- **Check TypeScript types**: Review type definitions and interfaces
+- **Review imports/exports**: Verify module dependencies and structure
+- **Analyze function signatures**: Ensure API contracts are correct
+
+#### For Issue Detection
+- **Use static analysis**: Examine code patterns and potential issues
+- **Check for common mistakes**: Look for typical bugs like unused variables, incorrect types
+- **Verify logic flow**: Trace through code execution paths mentally
+- **Review error handling**: Check if proper error cases are covered
+
+#### For Confidence Building
+- **Code review approach**: Examine code like you're reviewing a pull request
+- **Focus on clarity**: Ensure code is readable and maintainable
+- **Check best practices**: Verify adherence to project conventions and patterns
+- **Document assumptions**: Note any assumptions or potential edge cases
+
+### Impact of Unnecessary Builds
+
+#### On Development Velocity
+- **Context switching**: Builds interrupt the natural development flow
+- **Waiting time**: 30+ seconds per build adds up quickly over multiple changes
+- **Mental overhead**: Constantly waiting for builds creates cognitive load
+- **Reduced experimentation**: Developers avoid trying things if builds are frequent
+
+#### On User Trust
+- **Perceived inefficiency**: Unnecessary builds make the assistant seem inefficient
+- **Loss of control**: Users feel like the assistant is doing things they didn't ask for
+- **Workflow disruption**: Breaks the user's established development rhythm
+- **Professional credibility**: Shows lack of understanding of development workflows
+
+Remember: The goal is to write good code and make requested changes efficiently. Builds should be a deliberate choice, not a reflexive action after every change.
 
 ## Code Style Guidelines
 - **No obvious comments**: Never add comments for obvious code. Comments should only provide context or insights that aren't clear from reading the code itself
