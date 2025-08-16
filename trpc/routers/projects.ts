@@ -112,7 +112,6 @@ export const projectsRouter = createTRPCRouter({
 				),
 		)
 		.mutation(async ({ ctx, input }) => {
-			// Check if user has edit permission for this project
 			const canEdit = await canEditProject(ctx, +input.id);
 			if (!canEdit) {
 				throw new TRPCError({
@@ -173,7 +172,6 @@ export const projectsRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			// Check if user has edit permission for this project (needed to delete)
 			const canEdit = await canEditProject(ctx, input.id);
 			if (!canEdit) {
 				throw new TRPCError({
@@ -209,7 +207,6 @@ export const projectsRouter = createTRPCRouter({
 			}),
 		)
 		.query(async ({ ctx, input }) => {
-			// Check if user has permission to view this project
 			const hasAccess = await canViewProject(ctx, input.id);
 			if (!hasAccess) {
 				throw new TRPCError({

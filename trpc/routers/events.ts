@@ -70,7 +70,6 @@ export const eventsRouter = createTRPCRouter({
 		.query(async ({ ctx, input }) => {
 			const { date, projectId } = input;
 
-			// Check if user has permission to view this project
 			const hasAccess = await canViewProject(ctx, projectId);
 			if (!hasAccess) {
 				throw new TRPCError({
@@ -99,7 +98,6 @@ export const eventsRouter = createTRPCRouter({
 		.query(async ({ ctx, input }) => {
 			const { projectId } = input;
 
-			// Check if user has permission to view this project
 			const hasAccess = await canViewProject(ctx, projectId);
 			if (!hasAccess) {
 				throw new TRPCError({
@@ -159,7 +157,6 @@ export const eventsRouter = createTRPCRouter({
 				throw new Error("Event not found");
 			}
 
-			// Check if user has edit permission for this project
 			const canEdit = await canEditProject(ctx, existingEvent.projectId);
 			if (!canEdit) {
 				throw new TRPCError({
@@ -219,7 +216,6 @@ export const eventsRouter = createTRPCRouter({
 				repeatUntil,
 			} = input;
 
-			// Check if user has edit permission for this project
 			const canEdit = await canEditProject(ctx, projectId);
 			if (!canEdit) {
 				throw new TRPCError({

@@ -28,7 +28,6 @@ export const tasksRouter = createTRPCRouter({
 			}),
 		)
 		.query(async ({ ctx, input }) => {
-			// Check if user has permission to view this project
 			const hasAccess = await canViewProject(ctx, input.projectId);
 			if (!hasAccess) {
 				throw new TRPCError({
@@ -72,7 +71,6 @@ export const tasksRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			// Check if user has edit permission for this project
 			const canEdit = await canEditProject(ctx, input.projectId);
 			if (!canEdit) {
 				throw new TRPCError({
@@ -173,7 +171,6 @@ export const tasksRouter = createTRPCRouter({
 				throw new Error("Task list not found");
 			}
 
-			// Check if user has edit permission for this project
 			const canEdit = await canEditProject(ctx, oldTaskList.projectId);
 			if (!canEdit) {
 				throw new Error(
@@ -227,7 +224,6 @@ export const tasksRouter = createTRPCRouter({
 				throw new Error("Task list not found");
 			}
 
-			// Check if user has edit permission for this project
 			const canEdit = await canEditProject(ctx, taskListToDelete.projectId);
 			if (!canEdit) {
 				throw new Error(
@@ -317,7 +313,6 @@ export const tasksRouter = createTRPCRouter({
 				throw new Error("Task list not found");
 			}
 
-			// Check if user has edit permission for this project
 			const canEdit = await canEditProject(ctx, taskListDetails.projectId);
 			if (!canEdit) {
 				throw new Error(
@@ -439,7 +434,6 @@ export const tasksRouter = createTRPCRouter({
 				throw new Error("Task not found");
 			}
 
-			// Check if user has edit permission for this project
 			const canEdit = await canEditProject(ctx, oldTask.taskList.projectId);
 			if (!canEdit) {
 				throw new Error(
@@ -511,7 +505,6 @@ export const tasksRouter = createTRPCRouter({
 				throw new Error("Task not found");
 			}
 
-			// Check if user has edit permission for this project
 			const canEdit = await canEditProject(ctx, currentTask.taskList.projectId);
 			if (!canEdit) {
 				throw new Error(
@@ -549,7 +542,6 @@ export const tasksRouter = createTRPCRouter({
 				throw new Error("Task list not found");
 			}
 
-			// Check if user has edit permission for this project
 			const canEdit = await canEditProject(ctx, taskListDetails.projectId);
 			if (!canEdit) {
 				throw new Error(
