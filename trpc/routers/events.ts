@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { calendarEvent } from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
 import { canEditProject, canViewProject } from "@/lib/permissions";
@@ -72,7 +73,10 @@ export const eventsRouter = createTRPCRouter({
 			// Check if user has permission to view this project
 			const hasAccess = await canViewProject(ctx, projectId);
 			if (!hasAccess) {
-				throw new Error("Project access denied");
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Project access denied",
+				});
 			}
 
 			const { startOfDay, endOfDay } = getStartEndDateRangeInUtc(
@@ -98,7 +102,10 @@ export const eventsRouter = createTRPCRouter({
 			// Check if user has permission to view this project
 			const hasAccess = await canViewProject(ctx, projectId);
 			if (!hasAccess) {
-				throw new Error("Project access denied");
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Project access denied",
+				});
 			}
 
 			const now = new Date();
@@ -155,7 +162,10 @@ export const eventsRouter = createTRPCRouter({
 			// Check if user has edit permission for this project
 			const canEdit = await canEditProject(ctx, existingEvent.projectId);
 			if (!canEdit) {
-				throw new Error("Project edit access denied");
+				throw new TRPCError({
+					code: "FORBIDDEN", 
+					message: "Project edit access denied",
+				});
 			}
 
 			const event = await ctx.db
@@ -212,7 +222,10 @@ export const eventsRouter = createTRPCRouter({
 			// Check if user has edit permission for this project
 			const canEdit = await canEditProject(ctx, projectId);
 			if (!canEdit) {
-				throw new Error("Project edit access denied");
+				throw new TRPCError({
+					code: "FORBIDDEN", 
+					message: "Project edit access denied",
+				});
 			}
 
 			if (allDay) {

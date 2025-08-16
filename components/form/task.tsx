@@ -19,15 +19,19 @@ export default function InlineTaskForm({
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (e.key === "n" && !e.metaKey && !e.ctrlKey && !e.altKey) {
+			if ((e.key === "n" || e.key === "N") && !e.metaKey && !e.ctrlKey && !e.altKey && !e.repeat) {
 				const target = e.target as HTMLElement;
+				
+				// Check if we're in an input field, textarea, or any contentEditable element
 				if (
-					target.tagName === "INPUT" ||
+					target.tagName === "INPUT" || 
 					target.tagName === "TEXTAREA" ||
-					target.contentEditable === "true"
+					target.isContentEditable ||
+					target.closest('[contenteditable="true"]')
 				) {
 					return;
 				}
+				
 				e.preventDefault();
 				setIsCreating(true);
 			}

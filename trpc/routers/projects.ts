@@ -1,4 +1,5 @@
 import { and, desc, eq } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import {
 	activity,
@@ -32,7 +33,10 @@ export const projectsRouter = createTRPCRouter({
 		.mutation(async ({ ctx, input }) => {
 			// Check if user is in an organization and if they're an admin
 			if (ctx.orgId && !ctx.isOrgAdmin) {
-				throw new Error("Only organization admins can create projects");
+				throw new TRPCError({
+				code: "FORBIDDEN",
+				message: "Only organization admins can create projects",
+			});
 			}
 
 			const newProject = await ctx.db
@@ -111,7 +115,10 @@ export const projectsRouter = createTRPCRouter({
 			// Check if user has edit permission for this project
 			const canEdit = await canEditProject(ctx, +input.id);
 			if (!canEdit) {
-				throw new Error("Project edit access denied");
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Project edit access denied",
+				});
 			}
 
 			const currentProject = await ctx.db.query.project
@@ -169,7 +176,10 @@ export const projectsRouter = createTRPCRouter({
 			// Check if user has edit permission for this project (needed to delete)
 			const canEdit = await canEditProject(ctx, input.id);
 			if (!canEdit) {
-				throw new Error("Project delete access denied");
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Project delete access denied",
+				});
 			}
 
 			const deletedProject = await ctx.db
@@ -202,7 +212,10 @@ export const projectsRouter = createTRPCRouter({
 			// Check if user has permission to view this project
 			const hasAccess = await canViewProject(ctx, input.id);
 			if (!hasAccess) {
-				throw new Error("Project access denied");
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Project access denied",
+				});
 			}
 
 			const data = await ctx.db.query.project
@@ -221,7 +234,9 @@ export const projectsRouter = createTRPCRouter({
 				input.id,
 				ctx.userId,
 			);
-			const canEdit = await canEditProject(ctx, input.id);
+			
+			// Compute canEdit in-memory to avoid redundant DB query
+			const canEdit = ctx.isOrgAdmin || userRole === "editor" || data.createdByUser === ctx.userId;
 
 			return {
 				...data,

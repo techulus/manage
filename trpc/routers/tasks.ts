@@ -1,4 +1,5 @@
 import { and, asc, desc, eq, or } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { task, taskList } from "@/drizzle/schema";
 import { TaskListStatus, TaskStatus } from "@/drizzle/types";
@@ -30,7 +31,10 @@ export const tasksRouter = createTRPCRouter({
 			// Check if user has permission to view this project
 			const hasAccess = await canViewProject(ctx, input.projectId);
 			if (!hasAccess) {
-				throw new Error("Project access denied");
+				throw new TRPCError({
+				code: "FORBIDDEN",
+				message: "Project access denied",
+			});
 			}
 
 			const data = await ctx.db.query.taskList
@@ -71,7 +75,10 @@ export const tasksRouter = createTRPCRouter({
 			// Check if user has edit permission for this project
 			const canEdit = await canEditProject(ctx, input.projectId);
 			if (!canEdit) {
-				throw new Error("Project edit access denied");
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Project edit access denied",
+				});
 			}
 
 			const createdTaskList = await ctx.db

@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { project, projectPermission } from "@/drizzle/schema";
 import type { Database } from "@/drizzle/types";
 
-type PermissionContext = {
+export type PermissionContext = {
 	db: Database;
 	userId: string;
 	isOrgAdmin: boolean;
