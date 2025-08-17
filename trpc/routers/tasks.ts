@@ -1,4 +1,5 @@
 import { and, asc, desc, eq, or } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { task, taskList } from "@/drizzle/schema";
 import { TaskListStatus, TaskStatus } from "@/drizzle/types";
@@ -27,14 +28,12 @@ export const tasksRouter = createTRPCRouter({
 			}),
 		)
 		.query(async ({ ctx, input }) => {
-			// Check if user has permission to view this project
-			const hasAccess = await canViewProject(
-				ctx.db,
-				input.projectId,
-				ctx.userId,
-			);
+			const hasAccess = await canViewProject(ctx, input.projectId);
 			if (!hasAccess) {
-				throw new Error("Project access denied");
+				throw new TRPCError({
+				code: "FORBIDDEN",
+				message: "Project access denied",
+			});
 			}
 
 			const data = await ctx.db.query.taskList
@@ -72,10 +71,12 @@ export const tasksRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			// Check if user has edit permission for this project
-			const canEdit = await canEditProject(ctx.db, input.projectId, ctx.userId);
+			const canEdit = await canEditProject(ctx, input.projectId);
 			if (!canEdit) {
-				throw new Error("Project edit access denied");
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Project edit access denied",
+				});
 			}
 
 			const createdTaskList = await ctx.db
@@ -170,12 +171,7 @@ export const tasksRouter = createTRPCRouter({
 				throw new Error("Task list not found");
 			}
 
-			// Check if user has edit permission for this project
-			const canEdit = await canEditProject(
-				ctx.db,
-				oldTaskList.projectId,
-				ctx.userId,
-			);
+			const canEdit = await canEditProject(ctx, oldTaskList.projectId);
 			if (!canEdit) {
 				throw new Error(
 					"You don't have permission to update task lists in this project",
@@ -228,12 +224,7 @@ export const tasksRouter = createTRPCRouter({
 				throw new Error("Task list not found");
 			}
 
-			// Check if user has edit permission for this project
-			const canEdit = await canEditProject(
-				ctx.db,
-				taskListToDelete.projectId,
-				ctx.userId,
-			);
+			const canEdit = await canEditProject(ctx, taskListToDelete.projectId);
 			if (!canEdit) {
 				throw new Error(
 					"You don't have permission to delete task lists in this project",
@@ -322,12 +313,7 @@ export const tasksRouter = createTRPCRouter({
 				throw new Error("Task list not found");
 			}
 
-			// Check if user has edit permission for this project
-			const canEdit = await canEditProject(
-				ctx.db,
-				taskListDetails.projectId,
-				ctx.userId,
-			);
+			const canEdit = await canEditProject(ctx, taskListDetails.projectId);
 			if (!canEdit) {
 				throw new Error(
 					"You don't have permission to add tasks to this project",
@@ -448,12 +434,7 @@ export const tasksRouter = createTRPCRouter({
 				throw new Error("Task not found");
 			}
 
-			// Check if user has edit permission for this project
-			const canEdit = await canEditProject(
-				ctx.db,
-				oldTask.taskList.projectId,
-				ctx.userId,
-			);
+			const canEdit = await canEditProject(ctx, oldTask.taskList.projectId);
 			if (!canEdit) {
 				throw new Error(
 					"You don't have permission to update tasks in this project",
@@ -524,12 +505,7 @@ export const tasksRouter = createTRPCRouter({
 				throw new Error("Task not found");
 			}
 
-			// Check if user has edit permission for this project
-			const canEdit = await canEditProject(
-				ctx.db,
-				currentTask.taskList.projectId,
-				ctx.userId,
-			);
+			const canEdit = await canEditProject(ctx, currentTask.taskList.projectId);
 			if (!canEdit) {
 				throw new Error(
 					"You don't have permission to delete tasks in this project",
@@ -566,12 +542,7 @@ export const tasksRouter = createTRPCRouter({
 				throw new Error("Task list not found");
 			}
 
-			// Check if user has edit permission for this project
-			const canEdit = await canEditProject(
-				ctx.db,
-				taskListDetails.projectId,
-				ctx.userId,
-			);
+			const canEdit = await canEditProject(ctx, taskListDetails.projectId);
 			if (!canEdit) {
 				throw new Error(
 					"You don't have permission to modify tasks in this project",

@@ -2,6 +2,12 @@ import { and, eq } from "drizzle-orm";
 import { project, projectPermission } from "@/drizzle/schema";
 import type { Database } from "@/drizzle/types";
 
+export type PermissionContext = {
+	db: Database;
+	userId: string;
+	isOrgAdmin: boolean;
+};
+
 export type ProjectRole = "editor" | "reader";
 
 export interface ProjectPermission {
@@ -40,37 +46,41 @@ export async function getUserProjectIds(
 }
 
 export async function canEditProject(
-	db: Database,
+	ctx: PermissionContext,
 	projectId: number,
-	userId: string,
 ): Promise<boolean> {
+	// Organization admins have edit access to all projects
+	if (ctx.isOrgAdmin) return true;
+
 	// Check explicit permission first
-	const role = await checkProjectPermission(db, projectId, userId);
+	const role = await checkProjectPermission(ctx.db, projectId, ctx.userId);
 	if (role === "editor") return true;
 
 	// For backward compatibility, check if user is the creator
-	const proj = await db.query.project.findFirst({
+	const proj = await ctx.db.query.project.findFirst({
 		where: eq(project.id, projectId),
 		columns: { createdByUser: true },
 	});
 
-	return proj?.createdByUser === userId;
+	return proj?.createdByUser === ctx.userId;
 }
 
 export async function canViewProject(
-	db: Database,
+	ctx: PermissionContext,
 	projectId: number,
-	userId: string,
 ): Promise<boolean> {
+	// Organization admins have view access to all projects
+	if (ctx.isOrgAdmin) return true;
+
 	// Check explicit permission first
-	const role = await checkProjectPermission(db, projectId, userId);
+	const role = await checkProjectPermission(ctx.db, projectId, ctx.userId);
 	if (role !== null) return true;
 
 	// For backward compatibility, check if user is the creator
-	const proj = await db.query.project.findFirst({
+	const proj = await ctx.db.query.project.findFirst({
 		where: eq(project.id, projectId),
 		columns: { createdByUser: true },
 	});
 
-	return proj?.createdByUser === userId;
+	return proj?.createdByUser === ctx.userId;
 }
