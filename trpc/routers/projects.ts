@@ -34,9 +34,9 @@ export const projectsRouter = createTRPCRouter({
 			// Check if user is in an organization and if they're an admin
 			if (ctx.orgId && !ctx.isOrgAdmin) {
 				throw new TRPCError({
-				code: "FORBIDDEN",
-				message: "Only organization admins can create projects",
-			});
+					code: "FORBIDDEN",
+					message: "Only organization admins can create projects",
+				});
 			}
 
 			const newProject = await ctx.db
@@ -231,9 +231,12 @@ export const projectsRouter = createTRPCRouter({
 				input.id,
 				ctx.userId,
 			);
-			
+
 			// Compute canEdit in-memory to avoid redundant DB query
-			const canEdit = ctx.isOrgAdmin || userRole === "editor" || data.createdByUser === ctx.userId;
+			const canEdit =
+				ctx.isOrgAdmin ||
+				userRole === "editor" ||
+				data.createdByUser === ctx.userId;
 
 			return {
 				...data,

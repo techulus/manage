@@ -225,11 +225,188 @@ Only run builds in these specific situations:
 
 Remember: The goal is to write good code and make requested changes efficiently. Builds should be a deliberate choice, not a reflexive action after every change.
 
-## Code Style Guidelines
-- **No obvious comments**: Never add comments for obvious code. Comments should only provide context or insights that aren't clear from reading the code itself
-- **Self-documenting code**: Write code that is clear and self-explanatory. Variable and function names should describe what they do
-- **Avoid unnecessary intermediate variables**: Don't create variables just to "improve readability" when the expression is already clear
-- Examples of bad comments to avoid:
-  - `// Use current time as the start` before `buildQuery(now, end)`
-  - `// Increment counter` before `i++`
-  - `// Check if user exists` before `if (user)`
+## Code Style Guidelines - CRITICAL COMMENT RESTRICTIONS
+
+### ⚠️ NEVER ADD USELESS COMMENTS (99% of comments are useless)
+
+**DO NOT add comments that merely describe what the code is doing. Comments should ONLY provide context or insights that aren't obvious from reading the code.**
+
+This is absolutely critical for the following reasons:
+
+#### Why Most Comments Are Harmful
+- **Code duplication**: Comments that describe what code does create maintenance burden when code changes
+- **Noise pollution**: Obvious comments make it harder to find actually useful information
+- **False documentation**: Comments become outdated when code changes, creating confusion
+- **Cognitive overhead**: Reading redundant information slows down code comprehension
+- **Professional credibility**: Obvious comments make the author appear inexperienced
+
+#### What Makes a Comment Useless
+- **Restating the obvious**: If the code clearly shows what it does, don't comment it
+- **Function name repetition**: If calling `canViewProject()`, don't comment "Check if user can view project"
+- **Operation description**: Don't describe basic operations like loops, conditionals, or assignments
+- **API call description**: Don't comment what an API call does if the function name is clear
+- **Variable explanation**: Don't explain what a variable contains if the name is descriptive
+
+#### Examples of Absolutely Useless Comments to NEVER Write
+
+```typescript
+// BAD: These comments add zero value
+// Check if user has permission to view this project
+const hasAccess = await canViewProject(ctx, projectId);
+
+// Check if user has edit permission for this project  
+const canEdit = await canEditProject(ctx, input.id);
+
+// Get the user's role for this project
+const userRole = await checkProjectPermission(ctx.db, input.id, ctx.userId);
+
+// Create a new project
+const newProject = await ctx.db.insert(project).values({...});
+
+// Increment the counter
+counter++;
+
+// Set loading to true
+setLoading(true);
+
+// Check if data exists
+if (data) {
+  // Return the data
+  return data;
+}
+
+// Loop through all items
+for (const item of items) {
+  // Process each item
+  processItem(item);
+}
+```
+
+#### What Comments Should Actually Do
+- **Explain WHY, not WHAT**: Business logic reasoning, architectural decisions, edge case handling
+- **Provide context**: External constraints, API limitations, performance considerations
+- **Document complexity**: Algorithms, mathematical formulas, regex patterns
+- **Warn about gotchas**: Subtle bugs, timing issues, browser quirks
+- **Reference external sources**: Ticket numbers, documentation links, standards
+
+#### Examples of Actually Useful Comments
+
+```typescript
+// GOOD: These comments add real value
+// Using exponential backoff to prevent API rate limiting (max 3 retries)
+const result = await retryWithBackoff(apiCall, 3);
+
+// Edge case: Safari requires explicit width for flex containers in modals
+const modalStyle = { width: '100%', ...baseStyle };
+
+// Performance: Debounced to prevent excessive API calls during typing
+const debouncedSearch = useMemo(() => debounce(searchFn, 300), []);
+
+// TODO: Remove after 2024-02-01 when legacy API is deprecated
+const fallbackData = await legacyApiCall();
+
+// Regex explanation: Matches email with optional subdomain
+const emailRegex = /^[^\s@]+@([^\s@]+\.)?[^\s@]+\.[^\s@]+$/;
+```
+
+### Impact of Useless Comments
+
+#### On Code Quality
+- **Maintenance debt**: Every comment needs to be updated when code changes
+- **Review overhead**: Code reviewers waste time reading obvious information
+- **Merge conflicts**: Comments create unnecessary conflicts during refactoring
+- **Code bloat**: Files become longer and harder to navigate
+
+#### On Team Productivity  
+- **Slower reading**: Developers scan past obvious comments, reducing comprehension speed
+- **Trust erosion**: Teams lose faith in comment quality when most are useless
+- **Bad habits**: Junior developers learn to write obvious comments instead of clear code
+- **Review fatigue**: Code reviews become tedious when filled with comment noise
+
+#### On Professional Standards
+- **Industry perception**: Obvious comments are considered anti-patterns in professional development
+- **Code smell indicator**: Heavy commenting often indicates unclear or overly complex code
+- **Maintenance signal**: Well-commented code is often harder to maintain than self-documenting code
+- **Experience indicator**: Senior developers write fewer, higher-quality comments
+
+### Alternative Approaches Instead of Comments
+
+#### For Code Clarity
+- **Better naming**: Use descriptive function and variable names that explain intent
+- **Extract functions**: Break complex operations into well-named smaller functions  
+- **Use constants**: Replace magic numbers/strings with named constants
+- **Type annotations**: Use TypeScript types to document expected data structures
+
+#### For Documentation
+- **README files**: Document high-level architecture and setup instructions
+- **API documentation**: Use tools like JSDoc for public API documentation
+- **Code examples**: Provide usage examples in documentation, not inline comments
+- **Architecture diagrams**: Visual documentation for complex system interactions
+
+#### For Context Preservation
+- **Commit messages**: Explain WHY changes were made in version control
+- **Pull request descriptions**: Document reasoning and trade-offs in PR descriptions
+- **Design documents**: Document architectural decisions in separate documents
+- **Issue tracking**: Reference tickets for business context and requirements
+
+### Comment Quality Standards
+
+#### Before Adding Any Comment, Ask:
+1. **Would a developer understand this code without the comment?** If yes, don't add it
+2. **Does the comment explain WHY rather than WHAT?** If no, rewrite or remove it
+3. **Will this comment become outdated when code changes?** If yes, reconsider
+4. **Does this comment provide information not available in the code?** If no, remove it
+5. **Would better naming eliminate the need for this comment?** If yes, rename instead
+
+#### Comment Maintenance Rules
+- **Update comments when code changes** or remove them entirely
+- **Remove outdated comments** immediately when found
+- **Prefer self-documenting code** over commented code in all cases
+- **Question existing comments** during code reviews - many can be removed
+
+Remember: The best comment is the one you don't need to write because the code is clear. Every comment is a failure to make the code self-explanatory. Focus on writing code so clear that comments become unnecessary.
+
+# Communication Guidelines
+
+## Avoid Sycophantic Language
+- **NEVER** use phrases like "You're absolutely right!", "You're absolutely correct!", "Excellent point!", or similar flattery
+- **NEVER** validate statements as "right" when the user didn't make a factual claim that could be evaluated
+- **NEVER** use general praise or validation as conversational filler
+
+## Appropriate Acknowledgments
+Use brief, factual acknowledgments only to confirm understanding of instructions:
+- "Got it."
+- "Ok, that makes sense."
+- "I understand."
+- "I see the issue."
+
+These should only be used when:
+1. You genuinely understand the instruction and its reasoning
+2. The acknowledgment adds clarity about what you'll do next
+3. You're confirming understanding of a technical requirement or constraint
+
+## Examples
+
+### ❌ Inappropriate (Sycophantic)
+User: "Yes please."
+Assistant: "You're absolutely right! That's a great decision."
+
+User: "Let's remove this unused code."
+Assistant: "Excellent point! You're absolutely correct that we should clean this up."
+
+### ✅ Appropriate (Brief Acknowledgment)
+User: "Yes please."
+Assistant: "Got it." [proceeds with the requested action]
+
+User: "Let's remove this unused code."
+Assistant: "I'll remove the unused code path." [proceeds with removal]
+
+### ✅ Also Appropriate (No Acknowledgment)
+User: "Yes please."
+Assistant: [proceeds directly with the requested action]
+
+## Rationale
+- Maintains professional, technical communication
+- Avoids artificial validation of non-factual statements
+- Focuses on understanding and execution rather than praise
+- Prevents misrepresenting user statements as claims that could be "right" or "wrong"
