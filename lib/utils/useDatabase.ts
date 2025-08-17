@@ -8,6 +8,7 @@ import { addUserToOpsDb } from "@/ops/useOps";
 import * as schema from "../../drizzle/schema";
 import { getOwner } from "./useOwner";
 import { addUserToTenantDb } from "./useUser";
+import { upstashCache } from "drizzle-orm/cache/upstash";
 
 function handleError(message: string) {
 	return (error: unknown) => {
@@ -99,6 +100,11 @@ export async function getDatabaseForOwner(ownerId: string): Promise<Database> {
 	const tenantDb = drizzle(
 		`${process.env.DATABASE_URL}/${databaseName}${sslMode}`,
 		{
+			cache: upstashCache({
+				url: process.env.UPSTASH_REDIS_REST_URL!,
+				token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+				global: true,
+			}),
 			schema,
 		},
 	);
