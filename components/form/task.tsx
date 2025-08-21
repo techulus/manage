@@ -2,10 +2,11 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Kbd } from "@/components/ui/kbd";
 import { cn } from "@/lib/utils";
+import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 import { Button } from "../ui/button";
 
 export default function InlineTaskForm({
@@ -17,29 +18,7 @@ export default function InlineTaskForm({
 	const [value, setValue] = useState("");
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if ((e.key === "n" || e.key === "N") && !e.metaKey && !e.ctrlKey && !e.altKey && !e.repeat) {
-				const target = e.target as HTMLElement;
-				
-				// Check if we're in an input field, textarea, or any contentEditable element
-				if (
-					target.tagName === "INPUT" || 
-					target.tagName === "TEXTAREA" ||
-					target.isContentEditable ||
-					target.closest('[contenteditable="true"]')
-				) {
-					return;
-				}
-				
-				e.preventDefault();
-				setIsCreating(true);
-			}
-		};
-
-		document.addEventListener("keydown", handleKeyDown);
-		return () => document.removeEventListener("keydown", handleKeyDown);
-	}, []);
+	useKeyboardShortcut("n", () => setIsCreating(true));
 
 	const handleSubmit = useCallback(async () => {
 		await action(value);
