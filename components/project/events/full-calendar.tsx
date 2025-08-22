@@ -25,10 +25,7 @@ import {
 	startOfToday,
 	startOfWeek,
 } from "date-fns";
-import {
-	ChevronLeftIcon,
-	ChevronRightIcon,
-} from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useCallback, useMemo, useState } from "react";
 import { rrulestr } from "rrule";
@@ -77,7 +74,8 @@ export function FullCalendar({
 		parseAsBoolean.withDefault(false),
 	);
 
-	useKeyboardShortcut("n", () => setCreate(true));
+	const openCreate = useCallback(() => setCreate(true), [setCreate]);
+	useKeyboardShortcut("n", () => openCreate);
 
 	const [selectedDay, setSelectedDay] = useState(today);
 	const [currentMonth, setCurrentMonth] = useState(format(today, "MMM-yyyy"));
@@ -237,6 +235,7 @@ export function FullCalendar({
 					<Button
 						className="w-full gap-2 md:w-auto"
 						onClick={() => setCreate(true)}
+						aria-keyshortcuts="N"
 					>
 						<span>New</span>
 						<Kbd className="hidden md:inline-flex">N</Kbd>

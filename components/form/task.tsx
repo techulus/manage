@@ -18,7 +18,8 @@ export default function InlineTaskForm({
 	const [value, setValue] = useState("");
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	useKeyboardShortcut("n", () => setIsCreating(true));
+	const openCreate = useCallback(() => setIsCreating(true), []);
+	useKeyboardShortcut("n", () => openCreate, !isCreating);
 
 	const handleSubmit = useCallback(async () => {
 		await action(value);
@@ -37,6 +38,7 @@ export default function InlineTaskForm({
 						setIsCreating(true);
 					}}
 					className="flex items-center gap-2"
+					aria-keyshortcuts="N"
 				>
 					Add task
 					<Kbd className="hidden md:inline-flex">N</Kbd>
