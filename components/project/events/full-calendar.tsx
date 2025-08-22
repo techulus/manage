@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Kbd } from "@/components/ui/kbd";
 import type { CalendarEvent } from "@/drizzle/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -24,14 +25,11 @@ import {
 	startOfToday,
 	startOfWeek,
 } from "date-fns";
-import {
-	ChevronLeftIcon,
-	ChevronRightIcon,
-	PlusCircleIcon,
-} from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useCallback, useMemo, useState } from "react";
 import { rrulestr } from "rrule";
+import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 
 interface Event {
 	id: number;
@@ -75,6 +73,9 @@ export function FullCalendar({
 		"create",
 		parseAsBoolean.withDefault(false),
 	);
+
+	const openCreate = useCallback(() => setCreate(true), [setCreate]);
+	useKeyboardShortcut("n", () => openCreate);
 
 	const [selectedDay, setSelectedDay] = useState(today);
 	const [currentMonth, setCurrentMonth] = useState(format(today, "MMM-yyyy"));
@@ -234,9 +235,10 @@ export function FullCalendar({
 					<Button
 						className="w-full gap-2 md:w-auto"
 						onClick={() => setCreate(true)}
+						aria-keyshortcuts="N"
 					>
-						<PlusCircleIcon size={16} strokeWidth={2} aria-hidden="true" />
 						<span>New</span>
+						<Kbd className="hidden md:inline-flex">N</Kbd>
 					</Button>
 				</div>
 			</div>
