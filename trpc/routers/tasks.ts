@@ -31,9 +31,9 @@ export const tasksRouter = createTRPCRouter({
 			const hasAccess = await canViewProject(ctx, input.projectId);
 			if (!hasAccess) {
 				throw new TRPCError({
-				code: "FORBIDDEN",
-				message: "Project access denied",
-			});
+					code: "FORBIDDEN",
+					message: "Project access denied",
+				});
 			}
 
 			const data = await ctx.db.query.taskList

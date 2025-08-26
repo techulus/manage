@@ -18,8 +18,7 @@ export default function InlineTaskForm({
 	const [value, setValue] = useState("");
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	const openCreate = useCallback(() => setIsCreating(true), []);
-	useKeyboardShortcut("n", () => openCreate, !isCreating);
+	useKeyboardShortcut("n", () => setIsCreating(true));
 
 	const handleSubmit = useCallback(async () => {
 		await action(value);

@@ -74,8 +74,7 @@ export function FullCalendar({
 		parseAsBoolean.withDefault(false),
 	);
 
-	const openCreate = useCallback(() => setCreate(true), [setCreate]);
-	useKeyboardShortcut("n", () => openCreate);
+	useKeyboardShortcut("n", () => setCreate(true));
 
 	const [selectedDay, setSelectedDay] = useState(today);
 	const [currentMonth, setCurrentMonth] = useState(format(today, "MMM-yyyy"));
