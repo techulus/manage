@@ -1,6 +1,8 @@
-import type { CalendarEvent, EventWithCreator } from "@/drizzle/types";
 import { endOfMonth, isSameDay, startOfMonth } from "date-fns";
+import type * as ical from "node-ical";
 import { rrulestr } from "rrule";
+import type { calendarEvent } from "@/drizzle/schema";
+import type { CalendarEvent, EventWithCreator } from "@/drizzle/types";
 import {
 	getEndOfWeek,
 	getStartOfWeek,
@@ -12,6 +14,11 @@ import {
 	toTimeZone,
 	toUTC,
 } from "./date";
+
+export type ImportedEvent = Pick<
+	typeof calendarEvent.$inferInsert,
+	"name" | "description" | "start" | "end" | "allDay" | "repeatRule"
+>;
 
 export const filterByRepeatRule = (
 	event: CalendarEvent | EventWithCreator,
@@ -107,3 +114,62 @@ export const eventToHumanReadableString = (
 
 	return `${toDateTimeString(event.start, timezone)}`;
 };
+
+export function parseRecurrenceRule(rrule?: string): string | null {
+	if (!rrule) return null;
+
+	try {
+		// If it's already an RRule string, validate and return it
+		if (rrule.startsWith("RRULE:")) {
+			const parsedRule = rrulestr(rrule);
+			return parsedRule.toString();
+		}
+		return null;
+	} catch {
+		return null;
+	}
+}
+
+export function convertIcsEventToImportedEvent(
+	event: ical.CalendarComponent,
+	timezone: string,
+): ImportedEvent | null {
+	if (event.type !== "VEVENT") return null;
+
+	const summary = event.summary || "Untitled Event";
+	const description = event.description || "";
+
+	let start: Date;
+	let end: Date | undefined;
+	let allDay = false;
+
+	// Check if this is an all-day event by examining the start time
+	// VEvent has start as DateWithTimeZone, but we need to check if it's date-only
+	// biome-ignore lint/suspicious/noExplicitAny: node-ical types are incomplete for dateOnly property
+	if (event.start && (event.start as any).dateOnly) {
+		allDay = true;
+		start = toUTC(toStartOfDay(toTimeZone(event.start, timezone)), timezone);
+		end = event.end
+			? toUTC(toEndOfDay(toTimeZone(event.end, timezone)), timezone)
+			: undefined;
+	} else if (event.start) {
+		start = new Date(event.start);
+		end = event.end ? new Date(event.end) : undefined;
+	} else {
+		// No start date, invalid event
+		return null;
+	}
+
+	const repeatRule = event.rrule
+		? parseRecurrenceRule(event.rrule.toString()) || undefined
+		: undefined;
+
+	return {
+		name: summary,
+		description,
+		start,
+		end,
+		allDay,
+		repeatRule,
+	};
+}

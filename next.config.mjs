@@ -28,7 +28,7 @@ const nextConfig = {
 	// output: "standalone", // Uncomment this to enable standalone mode in Docker
 };
 
-const config = withSentryConfig(nextConfig, {
+export default withSentryConfig(nextConfig, {
 	org: process.env.SENTRY_ORG,
 	project: process.env.SENTRY_PROJECT,
 
@@ -49,5 +49,3 @@ const config = withSentryConfig(nextConfig, {
 	disableLogger: true,
 	automaticVercelMonitors: false,
 });
-
-export default config;

@@ -1,5 +1,14 @@
 "use client";
 
+import { useSession } from "@clerk/nextjs";
+import { Title } from "@radix-ui/react-dialog";
+import { useQuery } from "@tanstack/react-query";
+import { RssIcon, Upload } from "lucide-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { parseAsBoolean, useQueryState } from "nuqs";
+import { useMemo, useState } from "react";
+import { ImportIcsDialog } from "@/components/core/import-ics-dialog";
 import { SpinnerWithSpacing } from "@/components/core/loaders";
 import { Panel } from "@/components/core/panel";
 import PageSection from "@/components/core/section";
@@ -11,14 +20,6 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import type { EventWithCreator } from "@/drizzle/types";
 import { toDateString, toUTC } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
-import { useSession } from "@clerk/nextjs";
-import { Title } from "@radix-ui/react-dialog";
-import { useQuery } from "@tanstack/react-query";
-import { RssIcon } from "lucide-react";
-import Link from "next/link";
-import { useParams } from "next/navigation";
-import { parseAsBoolean, useQueryState } from "nuqs";
-import { useMemo, useState } from "react";
 
 export default function Events() {
 	const { session } = useSession();
@@ -68,12 +69,20 @@ export default function Events() {
 						<span className="inline-flex space-x-1">
 							<Link
 								href={calendarSubscriptionUrl}
-								className={buttonVariants({ variant: "link" })}
+								className={buttonVariants({ variant: "outline" })}
 							>
-								<RssIcon className="mr-2 h-5 w-5" />
+								<RssIcon className="mr-1 h-5 w-5" />
 								Calendar Subscription
 							</Link>
 						</span>
+					</div>
+					<div className="isolate inline-flex sm:space-x-3">
+						<ImportIcsDialog projectId={+projectId!}>
+							<Button variant="outline">
+								<Upload className="mr-1 h-5 w-5" />
+								Import Event
+							</Button>
+						</ImportIcsDialog>
 					</div>
 				</div>
 			</PageSection>

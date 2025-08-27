@@ -1,3 +1,7 @@
+import { clerkClient } from "@clerk/nextjs/server";
+import { serve } from "@upstash/workflow/nextjs";
+import { and, eq, isNull, lte } from "drizzle-orm";
+import { Resend } from "resend";
 import {
 	SevenDayWarning,
 	sevenDayWarningPlainText,
@@ -8,10 +12,6 @@ import {
 } from "@/components/emails/thirty-day-deletion-notice";
 import { opsUser } from "@/ops/drizzle/schema";
 import { getOpsDatabase } from "@/ops/useOps";
-import { clerkClient } from "@clerk/nextjs/server";
-import { serve } from "@upstash/workflow/nextjs";
-import { and, eq, isNull, lte } from "drizzle-orm";
-import { Resend } from "resend";
 
 async function getUserDetails(user: {
 	id: string;

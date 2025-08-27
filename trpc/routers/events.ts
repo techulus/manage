@@ -11,6 +11,8 @@ import {
 	getStartEndDateRangeInUtc,
 	getStartEndMonthRangeInUtc,
 	getStartEndWeekRangeInUtc,
+	convertIcsEventToImportedEvent,
+	type ImportedEvent,
 } from "@/lib/utils/useEvents";
 import { isAfter } from "date-fns";
 import {
@@ -24,10 +26,11 @@ import {
 	lt,
 	or,
 } from "drizzle-orm";
-import { Frequency, RRule } from "rrule";
+import { Frequency, RRule, } from "rrule";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
 import { sendMentionNotifications } from "@/lib/utils/mentionNotifications";
+import * as ical from "node-ical";
 
 const buildEventsQuery = (projectId: number, start: Date, end: Date) => {
 	return {
@@ -355,5 +358,105 @@ export const eventsRouter = createTRPCRouter({
 			}
 
 			return { id: eventId, ...eventData };
+		}),
+	importFromIcs: protectedProcedure
+		.input(
+			z.object({
+				projectId: z.number(),
+				icsContent: z.string().min(1, { message: "ICS content is required" }),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const { projectId, icsContent } = input;
+
+			const canEdit = await canEditProject(ctx, projectId);
+			if (!canEdit) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Project edit access denied",
+				});
+			}
+
+			try {
+				const events = ical.parseICS(icsContent);
+				
+				const importedEvents: ImportedEvent[] = [];
+				const errors: string[] = [];
+
+				for (const [key, event] of Object.entries(events)) {
+					try {
+						const importedEvent = convertIcsEventToImportedEvent(event, ctx.timezone);
+						if (importedEvent) {
+							importedEvents.push(importedEvent);
+						}
+					} catch (error) {
+						errors.push(`Failed to parse event ${key}: ${error}`);
+					}
+				}
+
+				if (importedEvents.length === 0) {
+					throw new TRPCError({
+						code: "BAD_REQUEST",
+						message: "No valid events found in ICS file",
+					});
+				}
+
+				const createdEvents = [];
+
+				for (const event of importedEvents) {
+					try {
+						const newEvent = await ctx.db
+							.insert(calendarEvent)
+							.values({
+								...event,
+								projectId,
+								createdByUser: ctx.userId,
+							})
+							.returning()
+							.execute();
+
+						if (newEvent[0]) {
+							createdEvents.push(newEvent[0]);
+
+							await logActivity({
+								action: "created",
+								type: "event",
+								projectId,
+								newValue: newEvent[0],
+							});
+
+							await indexEventWithProjectFetch(ctx.db, ctx.search, newEvent[0]);
+
+							if (event.description) {
+								await sendMentionNotifications(event.description, {
+									type: "event",
+									entityName: event.name,
+									entityId: newEvent[0].id,
+									projectId,
+									orgSlug: ctx.orgSlug,
+									fromUserId: ctx.userId,
+								});
+							}
+						}
+					} catch (error) {
+						errors.push(`Failed to create event "${event.name}": ${error}`);
+					}
+				}
+
+				return {
+					success: true,
+					imported: createdEvents.length,
+					total: importedEvents.length,
+					errors: errors.length > 0 ? errors : undefined,
+				};
+			} catch (error) {
+				if (error instanceof TRPCError) {
+					throw error;
+				}
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Failed to import events",
+				});
+			}
 		}),
 });

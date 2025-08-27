@@ -1,3 +1,7 @@
+import { verifyWebhook } from "@clerk/nextjs/webhooks";
+import { eq } from "drizzle-orm";
+import type { NextRequest } from "next/server";
+import { Resend } from "resend";
 import {
 	AccountDeleted,
 	accountDeletedPlainText,
@@ -7,10 +11,6 @@ import { deleteDatabase } from "@/lib/utils/useDatabase";
 import { triggerBlobDeletionWorkflow } from "@/lib/utils/workflow";
 import { opsOrganization, opsUser } from "@/ops/drizzle/schema";
 import { getOpsDatabase } from "@/ops/useOps";
-import { verifyWebhook } from "@clerk/nextjs/webhooks";
-import { eq } from "drizzle-orm";
-import type { NextRequest } from "next/server";
-import { Resend } from "resend";
 
 type ClerkOrgData = {
 	createdBy?: {
