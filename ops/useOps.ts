@@ -1,5 +1,5 @@
 import path from "node:path";
-import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
+import { auth, clerkClient, type currentUser } from "@clerk/nextjs/server";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import * as schema from "./drizzle/schema";
@@ -18,9 +18,11 @@ export async function getOpsDatabase(): Promise<OpsDatabase> {
 	return ownerDb;
 }
 
-export async function addUserToOpsDb() {
+export async function addUserToOpsDb(
+	userData?: Awaited<ReturnType<typeof currentUser>>,
+) {
 	const { orgId } = await auth();
-	const userData = await currentUser();
+
 	if (!userData) {
 		throw new Error("No user found");
 	}
@@ -29,7 +31,9 @@ export async function addUserToOpsDb() {
 	}
 
 	const db = await getOpsDatabase();
-	db.insert(schema.opsUser)
+
+	await db
+		.insert(schema.opsUser)
 		.values({
 			id: userData.id,
 			email: userData.emailAddresses?.[0].emailAddress,

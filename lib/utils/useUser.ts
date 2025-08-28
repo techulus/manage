@@ -1,11 +1,12 @@
+import type { currentUser } from "@clerk/nextjs/server";
 import { user } from "@/drizzle/schema";
 import type { User } from "@/drizzle/types";
-import { currentUser } from "@clerk/nextjs/server";
 import { database } from "./useDatabase";
 import { getOwner } from "./useOwner";
 
-export async function addUserToTenantDb() {
-	const userData = await currentUser();
+export async function addUserToTenantDb(
+	userData?: Awaited<ReturnType<typeof currentUser>>,
+) {
 	if (!userData) {
 		throw new Error("No user found");
 	}
@@ -15,7 +16,9 @@ export async function addUserToTenantDb() {
 	}
 
 	const db = await database();
-	db.insert(user)
+
+	await db
+		.insert(user)
 		.values({
 			id: userData.id,
 			email: userData.emailAddresses?.[0].emailAddress,

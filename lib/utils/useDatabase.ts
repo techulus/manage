@@ -1,5 +1,7 @@
 import path from "node:path";
+import { currentUser } from "@clerk/nextjs/server";
 import { sql } from "drizzle-orm";
+import { upstashCache } from "drizzle-orm/cache/upstash";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { err, ok, type Result, ResultAsync } from "neverthrow";
@@ -8,7 +10,9 @@ import { addUserToOpsDb } from "@/ops/useOps";
 import * as schema from "../../drizzle/schema";
 import { getOwner } from "./useOwner";
 import { addUserToTenantDb } from "./useUser";
-import { upstashCache } from "drizzle-orm/cache/upstash";
+
+const connectionPool = new Map<string, Database>();
+const connectionTimestamps = new Map<string, number>();
 
 function handleError(message: string) {
 	return (error: unknown) => {
@@ -25,44 +29,49 @@ function getDatabaseName(ownerId: string): Result<string, string> {
 }
 
 export async function isDatabaseReady(): Promise<boolean> {
-	return await ResultAsync.fromPromise(
-		migrateDatabase(),
-		handleError("Migration failed"),
-	)
-		.andThen(() =>
-			ResultAsync.fromPromise(
-				addUserToTenantDb(),
-				handleError("Failed to add user to tenant database"),
-			),
-		)
-		.andThen(() =>
-			ResultAsync.fromPromise(
-				addUserToOpsDb(),
-				handleError("Failed to add user to ops database"),
-			),
-		)
-		.match(
-			() => true,
-			() => false,
-		);
+	try {
+		const migrationResult = await migrateDatabase();
+
+		if (!migrationResult) {
+			return false;
+		}
+
+		const userData = await currentUser();
+		if (!userData) {
+			throw new Error("No user found");
+		}
+
+		await Promise.all([addUserToTenantDb(userData), addUserToOpsDb(userData)]);
+
+		return true;
+	} catch (error) {
+		console.error("Database setup failed:", error);
+		return false;
+	}
 }
 
 async function migrateDatabase(): Promise<boolean> {
-	return await ResultAsync.fromPromise(
+	const dbResult = await ResultAsync.fromPromise(
 		database(),
 		handleError("Failed to get database"),
-	)
-		.andThen((db) => {
-			const migrationsFolder = path.resolve(process.cwd(), "drizzle");
-			return ResultAsync.fromPromise(
-				migrate(db, { migrationsFolder: migrationsFolder }),
-				handleError("Failed to migrate database"),
-			);
-		})
-		.match(
-			() => true,
-			() => false,
-		);
+	);
+
+	if (dbResult.isErr()) {
+		return false;
+	}
+
+	const db = dbResult.value;
+	const migrationsFolder = path.resolve(process.cwd(), "drizzle");
+
+	const migrateResult = await ResultAsync.fromPromise(
+		migrate(db, { migrationsFolder: migrationsFolder }),
+		handleError("Failed to migrate database"),
+	);
+
+	return migrateResult.match(
+		() => true,
+		() => false,
+	);
 }
 
 export async function database(): Promise<Database> {
@@ -75,6 +84,12 @@ export async function database(): Promise<Database> {
 }
 
 export async function getDatabaseForOwner(ownerId: string): Promise<Database> {
+	const cachedConnection = connectionPool.get(ownerId);
+	if (cachedConnection) {
+		connectionTimestamps.set(ownerId, Date.now());
+		return cachedConnection;
+	}
+
 	const databaseName = getDatabaseName(ownerId).match(
 		(value) => {
 			return value;
@@ -109,6 +124,9 @@ export async function getDatabaseForOwner(ownerId: string): Promise<Database> {
 		},
 	);
 
+	connectionPool.set(ownerId, tenantDb);
+	connectionTimestamps.set(ownerId, Date.now());
+
 	return tenantDb;
 }
 
@@ -121,6 +139,9 @@ export async function deleteDatabase(ownerId: string) {
 			throw new Error("Database name not found");
 		},
 	);
+
+	connectionPool.delete(ownerId);
+	connectionTimestamps.delete(ownerId);
 
 	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
 
