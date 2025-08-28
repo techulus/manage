@@ -19,12 +19,15 @@ export default async function ConsoleLayout(props: {
 		redirect("/start");
 	}
 
-	const ready = await isDatabaseReady();
+	// Parallelize database ready check and notifications wire setup
+	const [ready, notificationsWire] = await Promise.all([
+		isDatabaseReady(),
+		caller.user.getNotificationsWire(),
+	]);
+
 	if (!ready) {
 		redirect("/start");
 	}
-
-	const notificationsWire = await caller.user.getNotificationsWire();
 
 	return (
 		<TRPCReactProvider>
