@@ -1,6 +1,8 @@
 import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig = {
+	typedRoutes: true,
+
 	rewrites: async () => {
 		return [
 			{

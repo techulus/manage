@@ -1,17 +1,17 @@
-import {
-	SevenDayWarning,
-	sevenDayWarningPlainText,
-} from "@/components/emails/seven-day-warning";
-import {
-	ThirtyDayDeletionNotice,
-	thirtyDayDeletionNoticePlainText,
-} from "@/components/emails/thirty-day-deletion-notice";
-import { opsOrganization } from "@/ops/drizzle/schema";
-import { getOpsDatabase } from "@/ops/useOps";
 import { clerkClient } from "@clerk/nextjs/server";
 import { serve } from "@upstash/workflow/nextjs";
 import { and, eq, isNull, lte } from "drizzle-orm";
 import { Resend } from "resend";
+import {
+	OrgDeletionNotice,
+	thirtyDayDeletionNoticePlainText,
+} from "@/components/emails/org-deletion-notice";
+import {
+	SevenDayWarning,
+	sevenDayWarningPlainText,
+} from "@/components/emails/seven-day-warning";
+import { opsOrganization } from "@/ops/drizzle/schema";
+import { getOpsDatabase } from "@/ops/useOps";
 
 type ClerkOrgData = {
 	createdBy?: string;
@@ -66,20 +66,20 @@ export const { POST } = serve(async (context) => {
 		new Date().toISOString(),
 	);
 	const db = await getOpsDatabase();
-	const thirtyDaysAgo = new Date(Date.now() - 1000 * 60 * 60 * 24 * 30);
+	const sixtyDaysAgo = new Date(Date.now() - 1000 * 60 * 60 * 24 * 60);
 	console.log(
 		"[OrgDeletion] Looking for orgs inactive since:",
-		thirtyDaysAgo.toISOString(),
+		sixtyDaysAgo.toISOString(),
 	);
 
-	// Step 1: Mark organizations for deletion (30 days inactive)
+	// Step 1: Mark organizations for deletion (60 days inactive)
 	const orgsToMark = await context.run("fetch-orgs-to-mark", async () => {
 		const orgs = await db
 			.select()
 			.from(opsOrganization)
 			.where(
 				and(
-					lte(opsOrganization.lastActiveAt, thirtyDaysAgo),
+					lte(opsOrganization.lastActiveAt, sixtyDaysAgo),
 					isNull(opsOrganization.markedForDeletionAt),
 				),
 			);
@@ -104,7 +104,7 @@ export const { POST } = serve(async (context) => {
 		return orgs;
 	});
 
-	// Step 2: Send 30-day deletion notice and mark organizations
+	// Step 2: Send 60-day deletion notice and mark organizations
 	await context.run("mark-orgs-for-deletion", async () => {
 		if (orgsToMark.length === 0) {
 			console.log(
@@ -114,7 +114,7 @@ export const { POST } = serve(async (context) => {
 		}
 
 		console.log(
-			`[OrgDeletion] Processing ${orgsToMark.length} organizations for 30-day deletion notices`,
+			`[OrgDeletion] Processing ${orgsToMark.length} organizations for 60-day deletion notices`,
 		);
 		for (const org of orgsToMark) {
 			try {
@@ -129,15 +129,15 @@ export const { POST } = serve(async (context) => {
 					JSON.stringify(org.rawData, null, 2),
 				);
 
-				// Send 30-day deletion notice
+				// Send 60-day deletion notice
 				console.log(
-					`[OrgDeletion] Sending 30-day notice email to ${contactEmail} for org ${org.name}`,
+					`[OrgDeletion] Sending 60-day notice email to ${contactEmail} for org ${org.name}`,
 				);
 				const emailResult = await resend.emails.send({
 					from: "Manage Team <noreply@email.managee.xyz>",
 					to: contactEmail,
-					subject: "Organization Deletion Notice - 30 Days",
-					react: ThirtyDayDeletionNotice({
+					subject: "Organization Deletion Notice - 60 Days",
+					react: OrgDeletionNotice({
 						firstName: firstName,
 						email: contactEmail,
 						organizationName: org.name,
@@ -171,19 +171,17 @@ export const { POST } = serve(async (context) => {
 		}
 	});
 
-	// Step 3: Send 7-day warning to organizations marked 23 days ago
+	// Step 3: Send 7-day warning to organizations marked 53 days ago
 	const orgsFor7DayWarning = await context.run(
 		"fetch-orgs-for-7-day-warning",
 		async () => {
-			const twentyThreeDaysAgo = new Date(
-				Date.now() - 1000 * 60 * 60 * 24 * 23,
-			);
+			const fiftyThreeDaysAgo = new Date(Date.now() - 1000 * 60 * 60 * 24 * 53);
 			const orgs = await db
 				.select()
 				.from(opsOrganization)
 				.where(
 					and(
-						lte(opsOrganization.markedForDeletionAt, twentyThreeDaysAgo),
+						lte(opsOrganization.markedForDeletionAt, fiftyThreeDaysAgo),
 						isNull(opsOrganization.finalWarningAt),
 					),
 				);
@@ -271,18 +269,18 @@ export const { POST } = serve(async (context) => {
 		}
 	});
 
-	// Step 4: Trigger deletion for organizations marked 30 days ago
+	// Step 4: Trigger deletion for organizations marked 60 days ago
 	const orgsToTriggerDeletion = await context.run(
 		"fetch-orgs-to-trigger-deletion",
 		async () => {
-			const thirtyDaysAgoForDeletion = new Date(
-				Date.now() - 1000 * 60 * 60 * 24 * 30,
+			const sixtyDaysAgoForDeletion = new Date(
+				Date.now() - 1000 * 60 * 60 * 24 * 60,
 			);
 			const orgs = await db
 				.select()
 				.from(opsOrganization)
 				.where(
-					lte(opsOrganization.markedForDeletionAt, thirtyDaysAgoForDeletion),
+					lte(opsOrganization.markedForDeletionAt, sixtyDaysAgoForDeletion),
 				);
 
 			console.log(
