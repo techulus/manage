@@ -157,7 +157,7 @@ const footer = {
 	margin: "32px 0 0",
 };
 
-export function thirtyDayDeletionNoticePlainText({
+export function DeletionNoticePlainText({
 	firstName,
 	email,
 	organizationName,

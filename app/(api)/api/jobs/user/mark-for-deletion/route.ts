@@ -3,8 +3,8 @@ import { serve } from "@upstash/workflow/nextjs";
 import { and, eq, isNull, lte } from "drizzle-orm";
 import { Resend } from "resend";
 import {
+	DeletionNoticePlainText,
 	OrgDeletionNotice,
-	thirtyDayDeletionNoticePlainText,
 } from "@/components/emails/org-deletion-notice";
 import {
 	SevenDayWarning,
@@ -156,7 +156,7 @@ export const { POST } = serve(async (context) => {
 						email: contactEmail,
 						// organizationName is undefined for user deletion
 					}),
-					text: thirtyDayDeletionNoticePlainText({
+					text: DeletionNoticePlainText({
 						firstName: firstName,
 						email: contactEmail,
 						// organizationName is undefined for user deletion

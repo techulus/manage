@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { and, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import {
 	activity,
@@ -259,22 +259,25 @@ export const projectsRouter = createTRPCRouter({
 				},
 			});
 
-			const commentsWithReplyCount = await Promise.all(
-				comments.map(async (commentItem) => {
-					const replyCount = await ctx.db.query.comment.findMany({
-						where: eq(comment.roomId, `comment-${commentItem.id}`),
-						columns: { id: true },
-					});
+			const replyRoomIds = comments.map((c) => `comment-${c.id}`);
 
-					return {
-						...commentItem,
-						replyCount: replyCount.length,
-						replies: [], // Always empty, loaded on demand
-					};
-				}),
+			const counts = replyRoomIds.length
+				? await ctx.db
+						.select({ roomId: comment.roomId, cnt: count() })
+						.from(comment)
+						.where(inArray(comment.roomId, replyRoomIds))
+						.groupBy(comment.roomId)
+				: [];
+
+			const countByRoomId = new Map(
+				counts.map((r) => [r.roomId, Number(r.cnt)]),
 			);
 
-			return commentsWithReplyCount;
+			return comments.map((commentItem) => ({
+				...commentItem,
+				replyCount: countByRoomId.get(`comment-${commentItem.id}`) ?? 0,
+				replies: [], // Always empty, loaded on demand
+			}));
 		}),
 	addComment: protectedProcedure
 		.input(

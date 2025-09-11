@@ -1,7 +1,10 @@
 import Link from "next/link";
 
-export function TaskItem(
-	tenant: string,
+export function TaskItem({
+	task,
+	tenant,
+}: {
+	tenant: string;
 	task: {
 		name: string;
 		id: number;
@@ -11,12 +14,11 @@ export function TaskItem(
 			status: string;
 			project: { id: number; name: string };
 		};
-	},
-) {
+	};
+}) {
 	return (
 		<Link
 			href={`/${tenant}/projects/${task.taskList.project.id}/tasklists/${task.taskList.id}`}
-			key={task.id}
 		>
 			<div className="px-4 py-2 hover:bg-muted/50 transition-colors border-none">
 				<div className="flex items-start justify-between">

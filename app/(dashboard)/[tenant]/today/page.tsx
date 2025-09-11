@@ -152,7 +152,9 @@ export default function Today() {
 					titleClassName="text-red-600 dark:text-red-500"
 					titleIcon={<AlertTriangleIcon className="w-5 h-5" />}
 				>
-					{overDue.map((task) => TaskItem(tenant, task))}
+					{overDue.map((task) => (
+						<TaskItem key={task.id} tenant={tenant} task={task} />
+					))}
 				</PageSection>
 			) : null}
 
@@ -162,7 +164,9 @@ export default function Today() {
 					titleClassName="text-orange-600 dark:text-orange-500"
 					titleIcon={<InfoIcon className="w-5 h-5" />}
 				>
-					{dueToday.map((task) => TaskItem(tenant, task))}
+					{dueToday.map((task) => (
+						<TaskItem key={task.id} tenant={tenant} task={task} />
+					))}
 				</PageSection>
 			) : null}
 
