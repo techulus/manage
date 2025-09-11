@@ -1,12 +1,16 @@
 "use client";
 
+import { usePathname, useSearchParams } from "next/navigation";
 import posthog from "posthog-js";
 import { PostHogProvider as PHProvider, usePostHog } from "posthog-js/react";
 import { Suspense, useEffect } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
 	useEffect(() => {
+		if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) {
+			return;
+		}
+
 		posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
 			api_host: "/ingest",
 			ui_host: "https://us.posthog.com",
@@ -16,11 +20,13 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
 		});
 	}, []);
 
-	return (
+	return process.env.NEXT_PUBLIC_POSTHOG_KEY ? (
 		<PHProvider client={posthog}>
 			<SuspendedPostHogPageView />
 			{children}
 		</PHProvider>
+	) : (
+		children
 	);
 }
 

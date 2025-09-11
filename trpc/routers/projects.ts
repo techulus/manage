@@ -1,5 +1,5 @@
-import { and, desc, eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
+import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import {
 	activity,
@@ -259,7 +259,22 @@ export const projectsRouter = createTRPCRouter({
 				},
 			});
 
-			return comments;
+			const commentsWithReplyCount = await Promise.all(
+				comments.map(async (commentItem) => {
+					const replyCount = await ctx.db.query.comment.findMany({
+						where: eq(comment.roomId, `comment-${commentItem.id}`),
+						columns: { id: true },
+					});
+
+					return {
+						...commentItem,
+						replyCount: replyCount.length,
+						replies: [], // Always empty, loaded on demand
+					};
+				}),
+			);
+
+			return commentsWithReplyCount;
 		}),
 	addComment: protectedProcedure
 		.input(
