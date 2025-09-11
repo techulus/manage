@@ -16,15 +16,15 @@ interface ThirtyDayDeletionNoticeProps {
 	organizationName?: string;
 }
 
-export const ThirtyDayDeletionNotice = ({
+export const OrgDeletionNotice = ({
 	firstName,
 	email,
 	organizationName,
 }: ThirtyDayDeletionNoticeProps) => {
 	const isOrganization = !!organizationName;
 	const previewText = isOrganization
-		? `Your Manage organization "${organizationName}" will be deleted in 30 days due to inactivity`
-		: "Your Manage account will be deleted in 30 days due to inactivity";
+		? `Your Manage organization "${organizationName}" will be deleted in 60 days due to inactivity`
+		: "Your Manage account will be deleted in 60 days due to inactivity";
 
 	return (
 		<Html>
@@ -45,26 +45,26 @@ export const ThirtyDayDeletionNotice = ({
 
 						<Text style={text}>
 							{isOrganization
-								? `We noticed that your Manage organization "${organizationName}" has been inactive for 30 days. 
+								? `We noticed that your Manage organization "${organizationName}" has been inactive for 60 days. 
                 To keep our platform secure and efficient, we automatically remove inactive organizations.`
-								: `We noticed that your Manage account (${email}) has been inactive for 30 days. 
+								: `We noticed that your Manage account (${email}) has been inactive for 60 days. 
                 To keep our platform secure and efficient, we automatically remove inactive accounts.`}
 						</Text>
 
 						<Text style={text}>
 							<strong>
 								{isOrganization
-									? `Your organization "${organizationName}" will be permanently deleted in 30 days`
-									: "Your account will be permanently deleted in 30 days"}
+									? `Your organization "${organizationName}" will be permanently deleted in 60 days`
+									: "Your account will be permanently deleted in 60 days"}
 							</strong>{" "}
 							unless you log in and use the platform.
 						</Text>
 
 						<Text style={text}>
 							{isOrganization
-								? `If you'd like to keep your organization, simply log in to Manage within the next 30 days. 
+								? `If you'd like to keep your organization, simply log in to Manage within the next 60 days. 
                 All your projects, tasks, and data will remain intact.`
-								: `If you'd like to keep your account, simply log in to Manage within the next 30 days. 
+								: `If you'd like to keep your account, simply log in to Manage within the next 60 days. 
                 All your projects, tasks, and data will remain intact.`}
 						</Text>
 
@@ -157,7 +157,7 @@ const footer = {
 	margin: "32px 0 0",
 };
 
-export function thirtyDayDeletionNoticePlainText({
+export function DeletionNoticePlainText({
 	firstName,
 	email,
 	organizationName,
@@ -170,20 +170,20 @@ Hello ${firstName || "there"},
 
 ${
 	isOrganization
-		? `We noticed that your Manage organization "${organizationName}" has been inactive for 30 days. To keep our platform secure and efficient, we automatically remove inactive organizations.`
-		: `We noticed that your Manage account (${email}) has been inactive for 30 days. To keep our platform secure and efficient, we automatically remove inactive accounts.`
+		? `We noticed that your Manage organization "${organizationName}" has been inactive for 60 days. To keep our platform secure and efficient, we automatically remove inactive organizations.`
+		: `We noticed that your Manage account (${email}) has been inactive for 60 days. To keep our platform secure and efficient, we automatically remove inactive accounts.`
 }
 
 ${
 	isOrganization
-		? `Your organization "${organizationName}" will be permanently deleted in 30 days`
-		: "Your account will be permanently deleted in 30 days"
+		? `Your organization "${organizationName}" will be permanently deleted in 60 days`
+		: "Your account will be permanently deleted in 60 days"
 } unless you log in and use the platform.
 
 ${
 	isOrganization
-		? `If you'd like to keep your organization, simply log in to Manage within the next 30 days. All your projects, tasks, and data will remain intact.`
-		: `If you'd like to keep your account, simply log in to Manage within the next 30 days. All your projects, tasks, and data will remain intact.`
+		? `If you'd like to keep your organization, simply log in to Manage within the next 60 days. All your projects, tasks, and data will remain intact.`
+		: `If you'd like to keep your account, simply log in to Manage within the next 60 days. All your projects, tasks, and data will remain intact.`
 }
 
 ${isOrganization ? "Keep My Organization Active" : "Keep My Account Active"}: https://managee.xyz/start
@@ -198,4 +198,4 @@ Best regards,
 The Manage Team`;
 }
 
-export default ThirtyDayDeletionNotice;
+export default OrgDeletionNotice;

@@ -3,13 +3,13 @@ import { serve } from "@upstash/workflow/nextjs";
 import { and, eq, isNull, lte } from "drizzle-orm";
 import { Resend } from "resend";
 import {
+	DeletionNoticePlainText,
+	OrgDeletionNotice,
+} from "@/components/emails/org-deletion-notice";
+import {
 	SevenDayWarning,
 	sevenDayWarningPlainText,
 } from "@/components/emails/seven-day-warning";
-import {
-	ThirtyDayDeletionNotice,
-	thirtyDayDeletionNoticePlainText,
-} from "@/components/emails/thirty-day-deletion-notice";
 import { opsUser } from "@/ops/drizzle/schema";
 import { getOpsDatabase } from "@/ops/useOps";
 
@@ -67,20 +67,20 @@ export const { POST } = serve(async (context) => {
 		new Date().toISOString(),
 	);
 	const db = await getOpsDatabase();
-	const thirtyDaysAgo = new Date(Date.now() - 1000 * 60 * 60 * 24 * 30);
+	const sixtyDaysAgo = new Date(Date.now() - 1000 * 60 * 60 * 24 * 60);
 	console.log(
 		"[UserDeletion] Looking for users inactive since:",
-		thirtyDaysAgo.toISOString(),
+		sixtyDaysAgo.toISOString(),
 	);
 
-	// Step 1: Mark users for deletion (30 days inactive, not part of any org)
+	// Step 1: Mark users for deletion (60 days inactive, not part of any org)
 	const usersToMark = await context.run("fetch-users-to-mark", async () => {
 		const users = await db
 			.select()
 			.from(opsUser)
 			.where(
 				and(
-					lte(opsUser.lastActiveAt, thirtyDaysAgo),
+					lte(opsUser.lastActiveAt, sixtyDaysAgo),
 					isNull(opsUser.markedForDeletionAt),
 				),
 			);
@@ -122,7 +122,7 @@ export const { POST } = serve(async (context) => {
 		return eligibleUsers;
 	});
 
-	// Step 2: Send 30-day deletion notice and mark users
+	// Step 2: Send 60-day deletion notice and mark users
 	await context.run("mark-users-for-deletion", async () => {
 		if (usersToMark.length === 0) {
 			console.log(
@@ -132,7 +132,7 @@ export const { POST } = serve(async (context) => {
 		}
 
 		console.log(
-			`[UserDeletion] Processing ${usersToMark.length} users for 30-day deletion notices`,
+			`[UserDeletion] Processing ${usersToMark.length} users for 60-day deletion notices`,
 		);
 		for (const user of usersToMark) {
 			try {
@@ -143,20 +143,20 @@ export const { POST } = serve(async (context) => {
 					`[UserDeletion] Processing user ${user.id}, contact email: ${contactEmail}`,
 				);
 
-				// Send 30-day deletion notice
+				// Send 60-day deletion notice
 				console.log(
-					`[UserDeletion] Sending 30-day notice email to ${contactEmail} for user ${user.id}`,
+					`[UserDeletion] Sending 60-day notice email to ${contactEmail} for user ${user.id}`,
 				);
 				const emailResult = await resend.emails.send({
 					from: "Manage Team <noreply@email.managee.xyz>",
 					to: contactEmail,
-					subject: "Account Deletion Notice - 30 Days",
-					react: ThirtyDayDeletionNotice({
+					subject: "Account Deletion Notice - 60 Days",
+					react: OrgDeletionNotice({
 						firstName: firstName,
 						email: contactEmail,
 						// organizationName is undefined for user deletion
 					}),
-					text: thirtyDayDeletionNoticePlainText({
+					text: DeletionNoticePlainText({
 						firstName: firstName,
 						email: contactEmail,
 						// organizationName is undefined for user deletion
@@ -185,19 +185,17 @@ export const { POST } = serve(async (context) => {
 		}
 	});
 
-	// Step 3: Send 7-day warning to users marked 23 days ago
+	// Step 3: Send 7-day warning to users marked 53 days ago
 	const usersFor7DayWarning = await context.run(
 		"fetch-users-for-7-day-warning",
 		async () => {
-			const twentyThreeDaysAgo = new Date(
-				Date.now() - 1000 * 60 * 60 * 24 * 23,
-			);
+			const fiftyThreeDaysAgo = new Date(Date.now() - 1000 * 60 * 60 * 24 * 53);
 			const users = await db
 				.select()
 				.from(opsUser)
 				.where(
 					and(
-						lte(opsUser.markedForDeletionAt, twentyThreeDaysAgo),
+						lte(opsUser.markedForDeletionAt, fiftyThreeDaysAgo),
 						isNull(opsUser.finalWarningAt),
 					),
 				);
@@ -283,17 +281,17 @@ export const { POST } = serve(async (context) => {
 		}
 	});
 
-	// Step 4: Trigger deletion for users marked 30 days ago
+	// Step 4: Trigger deletion for users marked 60 days ago
 	const usersToTriggerDeletion = await context.run(
 		"fetch-users-to-trigger-deletion",
 		async () => {
-			const thirtyDaysAgoForDeletion = new Date(
-				Date.now() - 1000 * 60 * 60 * 24 * 30,
+			const sixtyDaysAgoForDeletion = new Date(
+				Date.now() - 1000 * 60 * 60 * 24 * 60,
 			);
 			const users = await db
 				.select()
 				.from(opsUser)
-				.where(lte(opsUser.markedForDeletionAt, thirtyDaysAgoForDeletion));
+				.where(lte(opsUser.markedForDeletionAt, sixtyDaysAgoForDeletion));
 
 			console.log(
 				`[UserDeletion] Found ${users.length} users ready for deletion`,

@@ -22,6 +22,7 @@ import { SaveButton } from "@/components/form/button";
 import SharedForm from "@/components/form/shared";
 import PageTitle from "@/components/layout/page-title";
 import { ProjecItem } from "@/components/project/project-item";
+import { TaskItem } from "@/components/today/task-item";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toDateStringWithDay } from "@/lib/utils/date";
@@ -151,7 +152,9 @@ export default function Today() {
 					titleClassName="text-red-600 dark:text-red-500"
 					titleIcon={<AlertTriangleIcon className="w-5 h-5" />}
 				>
-					{overDue.map((task) => TaskItem(tenant, task))}
+					{overDue.map((task) => (
+						<TaskItem key={task.id} tenant={tenant} task={task} />
+					))}
 				</PageSection>
 			) : null}
 
@@ -161,7 +164,9 @@ export default function Today() {
 					titleClassName="text-orange-600 dark:text-orange-500"
 					titleIcon={<InfoIcon className="w-5 h-5" />}
 				>
-					{dueToday.map((task) => TaskItem(tenant, task))}
+					{dueToday.map((task) => (
+						<TaskItem key={task.id} tenant={tenant} task={task} />
+					))}
 				</PageSection>
 			) : null}
 
@@ -265,38 +270,5 @@ export default function Today() {
 				</form>
 			</Panel>
 		</>
-	);
-}
-
-function TaskItem(
-	tenant: string,
-	task: {
-		name: string;
-		id: number;
-		taskList: {
-			id: number;
-			name: string;
-			status: string;
-			project: { id: number; name: string };
-		};
-	},
-) {
-	return (
-		<Link
-			href={`/${tenant}/projects/${task.taskList.project.id}/tasklists/${task.taskList.id}`}
-			key={task.id}
-		>
-			<div className="px-4 py-2 hover:bg-muted/50 transition-colors border-none">
-				<div className="flex items-start justify-between">
-					<div className="space-y-1">
-						<h4 className="font-medium">{task.name}</h4>
-						<div className="text-sm text-muted-foreground">
-							<span className="text-primary">{task.taskList.project.name}</span>{" "}
-							• {task.taskList.name}
-						</div>
-					</div>
-				</div>
-			</div>
-		</Link>
 	);
 }

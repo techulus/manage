@@ -11,7 +11,21 @@ import { Button } from "@/components/ui/button";
 import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
 
-export default function CommentForm({ roomId }: { roomId: string }) {
+interface CommentFormProps {
+	roomId: string;
+	parentCommentId?: number;
+	onCancel?: () => void;
+	onSuccess?: () => void;
+	isReply?: boolean;
+}
+
+export default function CommentForm({
+	roomId,
+	parentCommentId,
+	onCancel,
+	onSuccess,
+	isReply = false,
+}: CommentFormProps) {
 	const { projectId } = useParams();
 	const { user: creator } = useUser();
 	const [content, setContent] = useState<string>("");
@@ -25,29 +39,39 @@ export default function CommentForm({ roomId }: { roomId: string }) {
 		}),
 	);
 
+	const submitRoomId = parentCommentId ? `comment-${parentCommentId}` : roomId;
+
 	return (
 		<form
 			ref={formRef}
-			className="pb-12"
+			className={isReply ? "mt-4 pl-4" : "pb-12"}
 			action={async (formData: FormData) => {
 				await addComment.mutateAsync({
-					roomId,
+					roomId: submitRoomId,
 					content: formData.get("content") as string,
 					metadata: formData.get("metadata") as string,
 					projectId: +projectId!,
 				});
+
 				queryClient.invalidateQueries({
-					queryKey: trpc.projects.getComments.queryKey({
-						roomId,
-					}),
+					queryKey: trpc.projects.getComments.queryKey({ roomId }),
 				});
+
+				if (parentCommentId) {
+					queryClient.invalidateQueries({
+						queryKey: trpc.projects.getComments.queryKey({
+							roomId: `comment-${parentCommentId}`,
+						}),
+					});
+				}
+
 				setContent("");
 				formRef.current?.reset();
+				onSuccess?.();
+				if (isReply) onCancel?.();
 			}}
 		>
 			<div className="flex w-full flex-row space-x-4">
-				<div className="hidden min-w-[160px] md:block" />
-
 				{creator ? <UserAvatar user={creator} /> : null}
 
 				<div className="relative w-full">
@@ -56,17 +80,40 @@ export default function CommentForm({ roomId }: { roomId: string }) {
 						allowImageUpload
 						onContentChange={setContent}
 					/>
-					<Button
-						size="sm"
-						className="absolute -bottom-12 left-0"
-						type="submit"
-						disabled={!content.trim() || addComment.isPending}
-					>
-						{addComment.isPending ? (
-							<Spinner className="mr-2 h-4 w-4 text-muted" />
-						) : null}
-						Comment
-					</Button>
+					{isReply ? (
+						<div className="flex space-x-2 mt-2">
+							<Button
+								size="sm"
+								type="submit"
+								disabled={!content.trim() || addComment.isPending}
+							>
+								{addComment.isPending ? (
+									<Spinner className="mr-2 h-4 w-4 text-muted" />
+								) : null}
+								Reply
+							</Button>
+							<Button
+								size="sm"
+								variant="ghost"
+								type="button"
+								onClick={onCancel}
+							>
+								Cancel
+							</Button>
+						</div>
+					) : (
+						<Button
+							size="sm"
+							className="absolute -bottom-12 left-0"
+							type="submit"
+							disabled={!content.trim() || addComment.isPending}
+						>
+							{addComment.isPending ? (
+								<Spinner className="mr-2 h-4 w-4 text-muted" />
+							) : null}
+							Comment
+						</Button>
+					)}
 				</div>
 			</div>
 		</form>
