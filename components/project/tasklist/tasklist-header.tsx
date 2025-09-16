@@ -12,7 +12,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { TaskList } from "@/drizzle/types";
+import { type TaskList, TaskListStatus } from "@/drizzle/types";
 import { useTaskLists } from "@/hooks/use-tasklist";
 
 export const TaskListHeader = ({
@@ -76,17 +76,21 @@ export const TaskListHeader = ({
 									updateTaskList.mutateAsync({
 										id: taskList.id,
 										status:
-											taskList.status === "active" ? "archived" : "active",
+											taskList.status === TaskListStatus.ACTIVE
+												? TaskListStatus.ARCHIVED
+												: TaskListStatus.ACTIVE,
 									}),
 									{
-										loading: "Updating list...",
-										success: "List updated.",
-										error: "Failed to update list.",
+										loading: "Updating status...",
+										success: "Status updated.",
+										error: "Failed to update status.",
 									},
 								);
 							}}
 						>
-							{taskList.status === "active" ? "Archive" : "Unarchive"}
+							{taskList.status === TaskListStatus.ACTIVE
+								? "Archive"
+								: "Unarchive"}
 						</Button>
 					</DropdownMenuItem>
 					<DropdownMenuItem className="w-full p-0">
