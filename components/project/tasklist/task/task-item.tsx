@@ -29,6 +29,7 @@ import { cn } from "@/lib/utils";
 import { toDateStringWithDay, toStartOfDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 import { Checkbox } from "../../../ui/checkbox";
+import { CommentsSection } from "../../comment/comments-section";
 import { DateTimePicker } from "../../events/date-time-picker";
 import { AssignToUser } from "../../shared/assign-to-user";
 import { UserBadge } from "../../shared/user-badge";
@@ -389,6 +390,8 @@ export const TaskItem = ({
 								) : null}
 							</div>
 						</div>
+
+						<CommentsSection roomId={`task-${task.id}`} />
 					</div>
 				</div>
 			</Panel>

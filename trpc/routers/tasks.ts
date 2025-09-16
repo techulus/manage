@@ -1,5 +1,5 @@
-import { and, asc, desc, eq, or } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
+import { and, asc, desc, eq, or } from "drizzle-orm";
 import { z } from "zod";
 import { task, taskList } from "@/drizzle/schema";
 import { TaskListStatus, TaskStatus } from "@/drizzle/types";
@@ -141,20 +141,20 @@ export const tasksRouter = createTRPCRouter({
 				.or(
 					z.object({
 						id: z.number(),
-						dueDate: z
-							.string()
-							.nullable()
+						status: z
+							.nativeEnum(TaskListStatus)
 							.optional()
-							.transform((val) => (val?.trim()?.length ? new Date(val) : null)),
+							.default(TaskListStatus.ACTIVE),
 					}),
 				)
 				.or(
 					z.object({
 						id: z.number(),
-						status: z
-							.nativeEnum(TaskListStatus)
+						dueDate: z
+							.string()
+							.nullable()
 							.optional()
-							.default(TaskListStatus.ACTIVE),
+							.transform((val) => (val?.trim()?.length ? new Date(val) : null)),
 					}),
 				),
 		)
@@ -383,15 +383,6 @@ export const tasksRouter = createTRPCRouter({
 				.or(
 					z.object({
 						id: z.number(),
-						dueDate: z
-							.string()
-							.nullable()
-							.transform((val) => (val ? new Date(val) : null)),
-					}),
-				)
-				.or(
-					z.object({
-						id: z.number(),
 						description: z.string(),
 					}),
 				)
@@ -411,6 +402,15 @@ export const tasksRouter = createTRPCRouter({
 					z.object({
 						id: z.number(),
 						taskListId: z.number(),
+					}),
+				)
+				.or(
+					z.object({
+						id: z.number(),
+						dueDate: z
+							.string()
+							.nullable()
+							.transform((val) => (val ? new Date(val) : null)),
 					}),
 				),
 		)

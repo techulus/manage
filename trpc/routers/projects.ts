@@ -101,13 +101,13 @@ export const projectsRouter = createTRPCRouter({
 				.or(
 					z.object({
 						id: z.number(),
-						dueDate: z.date().nullable(),
+						status: z.enum(["active", "archived"]),
 					}),
 				)
 				.or(
 					z.object({
 						id: z.number(),
-						status: z.enum(["active", "archived"]),
+						dueDate: z.date().nullable(),
 					}),
 				),
 		)
