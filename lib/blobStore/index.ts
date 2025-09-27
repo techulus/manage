@@ -1,4 +1,3 @@
-import type { Blob as ManageBlob } from "@/drizzle/types";
 import {
 	DeleteObjectCommand,
 	GetObjectCommand,
@@ -7,9 +6,10 @@ import {
 	S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import type { Blob as ManageBlob } from "@/drizzle/types";
 
 const blobStorage = new S3Client({
-	region: "auto",
+	region: process.env.S3_REGION ?? "auto",
 	endpoint: process.env.S3_ENDPOINT ?? "",
 	credentials: {
 		accessKeyId: process.env.S3_ACCESS_KEY_ID ?? "",
