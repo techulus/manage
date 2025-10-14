@@ -9,6 +9,16 @@ function getDatabaseName(ownerId: string): string {
 	return ownerId.toLowerCase().replace(/ /g, "_");
 }
 
+function maskId(id: string): string {
+	if (id.length <= 8) return "***";
+	return `${id.slice(0, 4)}...${id.slice(-4)}`;
+}
+
+function sanitizeError(error: string, tenantId: string): string {
+	const databaseName = getDatabaseName(tenantId);
+	return error.replace(new RegExp(tenantId, "g"), maskId(tenantId)).replace(new RegExp(databaseName, "g"), "tenant_db");
+}
+
 async function getOpsDatabase() {
 	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
 	return drizzle(`${process.env.DATABASE_URL}/manage${sslMode}`, {
@@ -96,8 +106,9 @@ async function main() {
 
 	for (let i = 0; i < tenantIds.length; i++) {
 		const tenantId = tenantIds[i];
+		const maskedId = maskId(tenantId);
 		const progress = `[${i + 1}/${tenantIds.length}]`;
-		process.stdout.write(`${progress} Migrating ${tenantId}... `);
+		process.stdout.write(`${progress} Migrating ${maskedId}... `);
 
 		const result = await migrateTenantDatabase(tenantId);
 
@@ -111,9 +122,10 @@ async function main() {
 			}
 		} else {
 			console.log("✗");
-			console.log(`  Error: ${result.error}`);
+			const sanitizedError = sanitizeError(result.error || "Unknown error", tenantId);
+			console.log(`  Error: ${sanitizedError}`);
 			failureCount++;
-			failures.push({ tenantId, error: result.error || "Unknown error" });
+			failures.push({ tenantId: maskedId, error: sanitizedError });
 		}
 	}
 
@@ -137,6 +149,8 @@ async function main() {
 }
 
 main().catch((error) => {
-	console.error("Fatal error:", error);
+	const errorMessage = error instanceof Error ? error.message : String(error);
+	const sanitized = errorMessage.replace(/user_[a-zA-Z0-9]+/g, "user_***").replace(/org_[a-zA-Z0-9]+/g, "org_***");
+	console.error("Fatal error:", sanitized);
 	process.exit(1);
 });
