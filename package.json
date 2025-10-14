@@ -10,7 +10,8 @@
     "format": "biome format --write",
     "lint:fix": "biome lint --write",
     "fix": "biome format --write && biome lint --write",
-    "generate:migrations": "drizzle-kit generate"
+    "generate:migrations": "drizzle-kit generate",
+    "migrate:tenants": "bun scripts/migrate-all-tenants.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.623.0",

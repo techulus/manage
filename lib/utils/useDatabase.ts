@@ -1,10 +1,8 @@
-import path from "node:path";
 import { currentUser } from "@clerk/nextjs/server";
 import { sql } from "drizzle-orm";
 import { upstashCache } from "drizzle-orm/cache/upstash";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { migrate } from "drizzle-orm/node-postgres/migrator";
-import { err, ok, type Result, ResultAsync } from "neverthrow";
+import { err, ok, type Result } from "neverthrow";
 import type { Database } from "@/drizzle/types";
 import { addUserToOpsDb } from "@/ops/useOps";
 import * as schema from "../../drizzle/schema";
@@ -13,13 +11,6 @@ import { addUserToTenantDb } from "./useUser";
 
 const connectionPool = new Map<string, Database>();
 const connectionTimestamps = new Map<string, number>();
-
-function handleError(message: string) {
-	return (error: unknown) => {
-		console.error(message, error);
-		return false;
-	};
-}
 
 function getDatabaseName(ownerId: string): Result<string, string> {
 	if (!ownerId.startsWith("org_") && !ownerId.startsWith("user_")) {
@@ -30,12 +21,6 @@ function getDatabaseName(ownerId: string): Result<string, string> {
 
 export async function isDatabaseReady(): Promise<boolean> {
 	try {
-		const migrationResult = await migrateDatabase();
-
-		if (!migrationResult) {
-			return false;
-		}
-
 		const userData = await currentUser();
 		if (!userData) {
 			throw new Error("No user found");
@@ -48,30 +33,6 @@ export async function isDatabaseReady(): Promise<boolean> {
 		console.error("Database setup failed:", error);
 		return false;
 	}
-}
-
-async function migrateDatabase(): Promise<boolean> {
-	const dbResult = await ResultAsync.fromPromise(
-		database(),
-		handleError("Failed to get database"),
-	);
-
-	if (dbResult.isErr()) {
-		return false;
-	}
-
-	const db = dbResult.value;
-	const migrationsFolder = path.resolve(process.cwd(), "drizzle");
-
-	const migrateResult = await ResultAsync.fromPromise(
-		migrate(db, { migrationsFolder: migrationsFolder }),
-		handleError("Failed to migrate database"),
-	);
-
-	return migrateResult.match(
-		() => true,
-		() => false,
-	);
 }
 
 export async function database(): Promise<Database> {
