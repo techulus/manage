@@ -1,7 +1,7 @@
 import path from "node:path";
+import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
-import { sql } from "drizzle-orm";
 import * as schema from "../drizzle/schema";
 import * as opsSchema from "../ops/drizzle/schema";
 
@@ -17,8 +17,8 @@ function maskId(id: string): string {
 function sanitizeError(error: string, tenantId: string): string {
 	const databaseName = getDatabaseName(tenantId);
 	return error
-		.replace(new RegExp(tenantId, "g"), maskId(tenantId))
-		.replace(new RegExp(databaseName, "g"), "tenant_db");
+		.replaceAll(tenantId, maskId(tenantId))
+		.replaceAll(databaseName, "tenant_db");
 }
 
 async function getOpsDatabase() {
@@ -134,7 +134,7 @@ async function main() {
 		}
 	}
 
-	console.log("\n" + "=".repeat(60));
+	console.log(`\n${"=".repeat(60)}`);
 	console.log("Migration Summary:");
 	console.log(`  Total: ${tenantIds.length}`);
 	console.log(`  Success: ${successCount}`);

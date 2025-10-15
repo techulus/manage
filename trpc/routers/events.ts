@@ -1,19 +1,4 @@
 import { TRPCError } from "@trpc/server";
-import { calendarEvent } from "@/drizzle/schema";
-import { logActivity } from "@/lib/activity";
-import { canEditProject, canViewProject } from "@/lib/permissions";
-import {
-	deleteSearchItem,
-	indexEventWithProjectFetch,
-} from "@/lib/search/helpers";
-import { toEndOfDay, toStartOfDay, toTimeZone, toUTC } from "@/lib/utils/date";
-import {
-	getStartEndDateRangeInUtc,
-	getStartEndMonthRangeInUtc,
-	getStartEndWeekRangeInUtc,
-	convertIcsEventToImportedEvent,
-	type ImportedEvent,
-} from "@/lib/utils/useEvents";
 import { isAfter } from "date-fns";
 import {
 	and,
@@ -26,11 +11,26 @@ import {
 	lt,
 	or,
 } from "drizzle-orm";
+import * as ical from "node-ical";
 import { Frequency, RRule } from "rrule";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../init";
+import { calendarEvent } from "@/drizzle/schema";
+import { logActivity } from "@/lib/activity";
+import { canEditProject, canViewProject } from "@/lib/permissions";
+import {
+	deleteSearchItem,
+	indexEventWithProjectFetch,
+} from "@/lib/search/helpers";
+import { toEndOfDay, toStartOfDay, toTimeZone, toUTC } from "@/lib/utils/date";
 import { sendMentionNotifications } from "@/lib/utils/mentionNotifications";
-import * as ical from "node-ical";
+import {
+	convertIcsEventToImportedEvent,
+	getStartEndDateRangeInUtc,
+	getStartEndMonthRangeInUtc,
+	getStartEndWeekRangeInUtc,
+	type ImportedEvent,
+} from "@/lib/utils/useEvents";
+import { createTRPCRouter, protectedProcedure } from "../init";
 
 const buildEventsQuery = (projectId: number, start: Date, end: Date) => {
 	return {
@@ -260,7 +260,7 @@ export const eventsRouter = createTRPCRouter({
 			}
 
 			let repeatRule: string | null = null;
-			if (repeat) {
+			if (repeat !== null && repeat !== undefined) {
 				repeatRule = new RRule({
 					freq: repeat,
 					dtstart: start,
