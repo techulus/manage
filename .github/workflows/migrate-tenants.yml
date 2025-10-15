@@ -1,4 +1,6 @@
 name: Migrate Tenant Databases
+permissions:
+  contents: read
 
 on:
   push:
