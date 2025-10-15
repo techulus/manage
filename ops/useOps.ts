@@ -1,7 +1,5 @@
-import path from "node:path";
 import type { UserJSON } from "@clerk/nextjs/server";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { migrate } from "drizzle-orm/node-postgres/migrator";
 import * as schema from "./drizzle/schema";
 import type { OpsDatabase } from "./drizzle/types";
 
@@ -11,9 +9,6 @@ export async function getOpsDatabase(): Promise<OpsDatabase> {
 	const ownerDb = drizzle(`${process.env.DATABASE_URL}/manage${sslMode}`, {
 		schema,
 	});
-
-	const migrationsFolder = path.resolve(process.cwd(), "ops/drizzle");
-	await migrate(ownerDb, { migrationsFolder: migrationsFolder });
 
 	return ownerDb;
 }
