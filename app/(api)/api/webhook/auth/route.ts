@@ -1,16 +1,25 @@
+import path from "node:path";
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
 import type { NextRequest } from "next/server";
 import { Resend } from "resend";
 import {
 	AccountDeleted,
 	accountDeletedPlainText,
 } from "@/components/emails/account-deleted";
+import * as schema from "@/drizzle/schema";
 import { SearchService } from "@/lib/search";
-import { deleteDatabase } from "@/lib/utils/useDatabase";
+import {
+	deleteDatabase,
+	getDatabaseForOwner,
+	getDatabaseName,
+} from "@/lib/utils/useDatabase";
+import { addUserToTenantDb } from "@/lib/utils/useUser";
 import { triggerBlobDeletionWorkflow } from "@/lib/utils/workflow";
 import { opsOrganization, opsUser } from "@/ops/drizzle/schema";
-import { getOpsDatabase } from "@/ops/useOps";
+import { addUserToOpsDb, getOpsDatabase } from "@/ops/useOps";
 
 type ClerkOrgData = {
 	createdBy?: {
@@ -25,9 +34,43 @@ enum WebhookEventType {
 	organizationCreated = "organization.created",
 	organizationDeleted = "organization.deleted",
 	organizationUpdated = "organization.updated",
+	organizationInvitationAccepted = "organizationInvitation.accepted",
 	userCreated = "user.created",
 	userDeleted = "user.deleted",
 	userUpdated = "user.updated",
+}
+
+async function createTenantDatabase(ownerId: string): Promise<void> {
+	const databaseName = getDatabaseName(ownerId).match(
+		(value) => value,
+		() => {
+			throw new Error("Database name not found");
+		},
+	);
+
+	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
+
+	const ownerDb = drizzle(`${process.env.DATABASE_URL}/manage${sslMode}`, {
+		schema,
+	});
+
+	const checkDb = await ownerDb.execute(
+		sql`SELECT 1 FROM pg_database WHERE datname = ${databaseName}`,
+	);
+
+	if (checkDb.rowCount === 0) {
+		await ownerDb.execute(sql`CREATE DATABASE ${sql.identifier(databaseName)}`);
+		console.log(`Created database for tenant: ${databaseName}`);
+	}
+
+	const tenantDb = drizzle(
+		`${process.env.DATABASE_URL}/${databaseName}${sslMode}`,
+		{ schema },
+	);
+
+	const migrationsFolder = path.resolve(process.cwd(), "drizzle");
+	await migrate(tenantDb, { migrationsFolder });
+	console.log(`Migrated database for tenant: ${databaseName}`);
 }
 
 export async function POST(req: NextRequest) {
@@ -44,6 +87,179 @@ export async function POST(req: NextRequest) {
 		}
 
 		switch (eventType) {
+			case WebhookEventType.userCreated:
+				try {
+					const userData = evt.data;
+					await createTenantDatabase(id);
+					await Promise.all([
+						addUserToTenantDb(userData),
+						addUserToOpsDb(userData),
+					]);
+					console.log("User created - database and data synced successfully");
+				} catch (err) {
+					console.error("Error creating user and database:", err);
+				}
+				break;
+			case WebhookEventType.userUpdated:
+				try {
+					const userData = evt.data;
+					await Promise.all([
+						addUserToTenantDb(userData),
+						addUserToOpsDb(userData),
+					]);
+					console.log("User updated - data synced successfully");
+				} catch (err) {
+					console.error("Error syncing user data:", err);
+				}
+				break;
+			case WebhookEventType.organizationCreated:
+				try {
+					const orgData = evt.data;
+					await createTenantDatabase(id);
+					const db = await getOpsDatabase();
+					await db
+						.insert(opsOrganization)
+						.values({
+							id: orgData.id,
+							name: orgData.name,
+							rawData: orgData,
+							lastActiveAt: new Date(),
+						})
+						.execute();
+
+					if (orgData.created_by) {
+						try {
+							const creatorData = await db
+								.select()
+								.from(opsUser)
+								.where(eq(opsUser.id, orgData.created_by))
+								.limit(1);
+
+							if (creatorData.length > 0) {
+								const creator = creatorData[0];
+								const orgDb = await getDatabaseForOwner(id);
+								await orgDb
+									.insert(schema.user)
+									.values({
+										id: creator.id,
+										email: creator.email,
+										firstName: creator.firstName,
+										lastName: creator.lastName,
+										imageUrl: creator.imageUrl,
+										rawData: creator.rawData,
+										lastActiveAt: new Date(),
+									})
+									.onConflictDoUpdate({
+										target: schema.user.id,
+										set: {
+											email: creator.email,
+											firstName: creator.firstName,
+											lastName: creator.lastName,
+											imageUrl: creator.imageUrl,
+											rawData: creator.rawData,
+											lastActiveAt: new Date(),
+										},
+									})
+									.execute();
+								console.log(
+									`Added creator ${creator.id} to organization database`,
+								);
+							}
+						} catch (creatorErr) {
+							console.error(
+								"Error adding creator to org database:",
+								creatorErr,
+							);
+						}
+					}
+
+					console.log(
+						"Organization created - database and data synced successfully",
+					);
+				} catch (err) {
+					console.error("Error creating organization and database:", err);
+				}
+				break;
+			case WebhookEventType.organizationUpdated:
+				try {
+					const orgData = evt.data;
+					const db = await getOpsDatabase();
+					await db
+						.insert(opsOrganization)
+						.values({
+							id: orgData.id,
+							name: orgData.name,
+							rawData: orgData,
+							lastActiveAt: new Date(),
+						})
+						.onConflictDoUpdate({
+							target: opsOrganization.id,
+							set: {
+								name: orgData.name,
+								rawData: orgData,
+								lastActiveAt: new Date(),
+								markedForDeletionAt: null,
+								finalWarningAt: null,
+							},
+						})
+						.execute();
+					console.log("Organization updated - data synced successfully");
+				} catch (err) {
+					console.error("Error syncing org data:", err);
+				}
+				break;
+			case WebhookEventType.organizationInvitationAccepted:
+				try {
+					const invitationData = evt.data;
+					const orgId = invitationData.organization_id;
+					const emailAddress = invitationData.email_address;
+
+					if (!orgId || !emailAddress) {
+						console.error("Missing organization or email in invitation data");
+						break;
+					}
+
+					const db = await getOpsDatabase();
+					const userData = await db
+						.select()
+						.from(opsUser)
+						.where(eq(opsUser.email, emailAddress))
+						.limit(1);
+
+					if (userData.length > 0) {
+						const user = userData[0];
+						const orgDb = await getDatabaseForOwner(orgId);
+						await orgDb
+							.insert(schema.user)
+							.values({
+								id: user.id,
+								email: user.email,
+								firstName: user.firstName,
+								lastName: user.lastName,
+								imageUrl: user.imageUrl,
+								rawData: user.rawData,
+								lastActiveAt: new Date(),
+							})
+							.onConflictDoUpdate({
+								target: schema.user.id,
+								set: {
+									email: user.email,
+									firstName: user.firstName,
+									lastName: user.lastName,
+									imageUrl: user.imageUrl,
+									rawData: user.rawData,
+									lastActiveAt: new Date(),
+								},
+							})
+							.execute();
+						console.log(
+							`Added user ${user.id} to organization ${orgId} database after invitation acceptance`,
+						);
+					}
+				} catch (err) {
+					console.error("Error adding user to org after invitation:", err);
+				}
+				break;
 			case WebhookEventType.userDeleted:
 				// For individual users, delete database immediately
 				// This happens when a user without an organization deletes their account

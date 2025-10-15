@@ -2,13 +2,13 @@
 
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
-import { useQueries, useQueryClient } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -45,14 +45,6 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 	const [searchOpen, setSearchOpen] = useState(false);
 
 	const trpc = useTRPC();
-
-	const queryClient = useQueryClient();
-
-	useEffect(() => {
-		queryClient.invalidateQueries({
-			refetchType: "all",
-		});
-	}, [queryClient]);
 
 	const [{ data: projects = [] }, { data: tasklists = [] }] = useQueries({
 		queries: [

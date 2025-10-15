@@ -1,5 +1,5 @@
-import { Spinner } from "@/components/core/loaders";
 import Image from "next/image";
+import { Spinner } from "@/components/core/loaders";
 import logo from "../public/images/logo.png";
 
 export default function Loading() {

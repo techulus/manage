@@ -11,7 +11,10 @@ bun run build             # Build for production
 bun start                 # Start production server
 bun run lint              # Run Biome linter
 bun run generate:migrations # Generate Drizzle migrations
+bun run migrate:tenants   # Migrate all tenant databases (CI/CD - IDs are masked in logs)
 ```
+
+**Security Note:** The `migrate:tenants` script masks all tenant IDs in logs for privacy protection since GitHub Actions logs are public.
 
 ## Project Architecture
 

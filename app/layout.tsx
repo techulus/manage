@@ -1,10 +1,10 @@
+import { ClerkProvider } from "@clerk/nextjs";
+import { Geist } from "next/font/google";
 import { PostHogProvider } from "@/components/core/posthog-provider";
 import { ThemeProvider } from "@/components/core/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SITE_METADATA } from "@/data/marketing";
 import { cn } from "@/lib/utils";
-import { ClerkProvider } from "@clerk/nextjs";
-import { Geist } from "next/font/google";
 import "./globals.css";
 
 const mainFont = Geist({

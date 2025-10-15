@@ -10,7 +10,8 @@
     "format": "biome format --write",
     "lint:fix": "biome lint --write",
     "fix": "biome format --write && biome lint --write",
-    "generate:migrations": "drizzle-kit generate"
+    "generate:migrations": "drizzle-kit generate",
+    "migrate:tenants": "bun scripts/migrate-all-tenants.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.623.0",
@@ -61,12 +62,12 @@
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.44.5",
     "es-toolkit": "^1.39.8",
-    "eslint-config-next": "15.5.1",
+    "eslint-config-next": "15.5.5",
     "ical-generator": "^8.0.1",
     "lucide-react": "^0.503.0",
     "mime-types": "^2.1.35",
     "neverthrow": "^8.2.0",
-    "next": "15.5.1",
+    "next": "15.5.5",
     "next-themes": "^0.3.0",
     "node-ical": "^0.20.1",
     "nuqs": "^2.4.1",
@@ -74,9 +75,9 @@
     "postcss": "8.4.23",
     "posthog-js": "^1.242.2",
     "posthog-node": "^4.17.1",
-    "react": "19.1.1",
+    "react": "19.2.0",
     "react-day-picker": "^8.10.1",
-    "react-dom": "19.1.1",
+    "react-dom": "19.2.0",
     "react-email": "^4.0.17",
     "react-markdown": "^10.1.0",
     "resend": "^4.1.2",
@@ -100,15 +101,15 @@
     "@tailwindcss/typography": "^0.5.13",
     "@types/mime-types": "^2.1.4",
     "@types/node": "20.1.0",
-    "@types/react": "19.1.11",
-    "@types/react-dom": "19.1.8",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
     "drizzle-kit": "^0.31.4",
     "encoding": "^0.1.13",
     "typescript": "5.7.2"
   },
   "overrides": {
-    "@types/react": "19.1.11",
-    "@types/react-dom": "19.1.8"
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2"
   },
   "trustedDependencies": [
     "@sentry/cli"

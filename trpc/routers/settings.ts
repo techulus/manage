@@ -1,10 +1,10 @@
+import { eq, sql } from "drizzle-orm";
+import { cookies } from "next/headers";
+import { z } from "zod";
 import { blob, user } from "@/drizzle/schema";
 import type { User } from "@/drizzle/types";
 import { opsUser } from "@/ops/drizzle/schema";
 import { getOpsDatabase } from "@/ops/useOps";
-import { eq, sql } from "drizzle-orm";
-import { cookies } from "next/headers";
-import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const settingsRouter = createTRPCRouter({
@@ -35,7 +35,7 @@ export const settingsRouter = createTRPCRouter({
 			// Update main user database
 			await ctx.db
 				.update(user)
-				.set({ timeZone: input })
+				.set({ timeZone: input, lastActiveAt: new Date() })
 				.where(eq(user.id, ctx.userId))
 				.execute();
 
@@ -44,7 +44,7 @@ export const settingsRouter = createTRPCRouter({
 				const opsDb = await getOpsDatabase();
 				await opsDb
 					.update(opsUser)
-					.set({ timeZone: input })
+					.set({ timeZone: input, lastActiveAt: new Date() })
 					.where(eq(opsUser.id, ctx.userId))
 					.execute();
 			} catch (error) {

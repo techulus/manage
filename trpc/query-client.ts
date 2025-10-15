@@ -1,9 +1,9 @@
-import { toMs } from "@/lib/utils/date";
 import {
-	QueryClient,
 	defaultShouldDehydrateQuery,
+	QueryClient,
 } from "@tanstack/react-query";
 import superjson from "superjson";
+import { toMs } from "@/lib/utils/date";
 
 export function makeQueryClient() {
 	return new QueryClient({

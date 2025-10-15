@@ -22,7 +22,6 @@ export async function getTodayDataForUser(
 	const { startOfDay, endOfDay } = getStartEndDateRangeInUtc(timezone, date);
 
 	const [tasksDueToday, overDueTasks, events] = await Promise.all([
-		// Tasks due today
 		db.query.task.findMany({
 			where: and(
 				between(task.dueDate, startOfDay, endOfDay),
@@ -53,7 +52,6 @@ export async function getTodayDataForUser(
 				},
 			},
 		}),
-		// Overdue tasks
 		db.query.task.findMany({
 			where: and(
 				lt(task.dueDate, startOfDay),
@@ -84,7 +82,6 @@ export async function getTodayDataForUser(
 				},
 			},
 		}),
-		// Today's events
 		db.query.calendarEvent.findMany({
 			where: and(
 				or(
@@ -111,7 +108,6 @@ export async function getTodayDataForUser(
 		}),
 	]);
 
-	// Filter out archived task lists
 	const dueToday = tasksDueToday.filter(
 		(t) => t.taskList?.status !== TaskListStatus.ARCHIVED,
 	);
@@ -120,7 +116,6 @@ export async function getTodayDataForUser(
 		(t) => t.taskList?.status !== TaskListStatus.ARCHIVED,
 	);
 
-	// Filter events by repeat rule
 	const filteredEvents = events.filter((event) =>
 		filterByRepeatRule(event, date, timezone),
 	);
