@@ -1,16 +1,16 @@
 import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { ClientRedirect } from "@/components/core/client-redirect";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 
 export default async function Home() {
 	const { userId } = await auth();
-
 	if (userId) {
-		redirect("/start");
+		return <ClientRedirect path="/start" />;
 	}
+
 	return (
 		<div className="min-h-screen">
 			<Header />

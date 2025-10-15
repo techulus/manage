@@ -1,16 +1,21 @@
+import path from "node:path";
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
 import type { NextRequest } from "next/server";
 import { Resend } from "resend";
 import {
 	AccountDeleted,
 	accountDeletedPlainText,
 } from "@/components/emails/account-deleted";
+import * as schema from "@/drizzle/schema";
 import { SearchService } from "@/lib/search";
-import { deleteDatabase } from "@/lib/utils/useDatabase";
+import { deleteDatabase, getDatabaseName } from "@/lib/utils/useDatabase";
+import { addUserToTenantDb } from "@/lib/utils/useUser";
 import { triggerBlobDeletionWorkflow } from "@/lib/utils/workflow";
 import { opsOrganization, opsUser } from "@/ops/drizzle/schema";
-import { getOpsDatabase } from "@/ops/useOps";
+import { addUserToOpsDb, getOpsDatabase } from "@/ops/useOps";
 
 type ClerkOrgData = {
 	createdBy?: {
@@ -30,6 +35,39 @@ enum WebhookEventType {
 	userUpdated = "user.updated",
 }
 
+async function createTenantDatabase(ownerId: string): Promise<void> {
+	const databaseName = getDatabaseName(ownerId).match(
+		(value) => value,
+		() => {
+			throw new Error("Database name not found");
+		},
+	);
+
+	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
+
+	const ownerDb = drizzle(`${process.env.DATABASE_URL}/manage${sslMode}`, {
+		schema,
+	});
+
+	const checkDb = await ownerDb.execute(
+		sql`SELECT 1 FROM pg_database WHERE datname = ${databaseName}`,
+	);
+
+	if (checkDb.rowCount === 0) {
+		await ownerDb.execute(sql`CREATE DATABASE ${sql.identifier(databaseName)}`);
+		console.log(`Created database for tenant: ${databaseName}`);
+	}
+
+	const tenantDb = drizzle(
+		`${process.env.DATABASE_URL}/${databaseName}${sslMode}`,
+		{ schema },
+	);
+
+	const migrationsFolder = path.resolve(process.cwd(), "drizzle");
+	await migrate(tenantDb, { migrationsFolder });
+	console.log(`Migrated database for tenant: ${databaseName}`);
+}
+
 export async function POST(req: NextRequest) {
 	try {
 		const evt = await verifyWebhook(req);
@@ -44,6 +82,80 @@ export async function POST(req: NextRequest) {
 		}
 
 		switch (eventType) {
+			case WebhookEventType.userCreated:
+				try {
+					const userData = evt.data;
+					await createTenantDatabase(id);
+					await Promise.all([
+						addUserToTenantDb(userData),
+						addUserToOpsDb(userData),
+					]);
+					console.log("User created - database and data synced successfully");
+				} catch (err) {
+					console.error("Error creating user and database:", err);
+				}
+				break;
+			case WebhookEventType.userUpdated:
+				try {
+					const userData = evt.data;
+					await Promise.all([
+						addUserToTenantDb(userData),
+						addUserToOpsDb(userData),
+					]);
+					console.log("User updated - data synced successfully");
+				} catch (err) {
+					console.error("Error syncing user data:", err);
+				}
+				break;
+			case WebhookEventType.organizationCreated:
+				try {
+					const orgData = evt.data;
+					await createTenantDatabase(id);
+					const db = await getOpsDatabase();
+					await db
+						.insert(opsOrganization)
+						.values({
+							id: orgData.id,
+							name: orgData.name,
+							rawData: orgData,
+							lastActiveAt: new Date(),
+						})
+						.execute();
+					console.log(
+						"Organization created - database and data synced successfully",
+					);
+				} catch (err) {
+					console.error("Error creating organization and database:", err);
+				}
+				break;
+			case WebhookEventType.organizationUpdated:
+				try {
+					const orgData = evt.data;
+					const db = await getOpsDatabase();
+					await db
+						.insert(opsOrganization)
+						.values({
+							id: orgData.id,
+							name: orgData.name,
+							rawData: orgData,
+							lastActiveAt: new Date(),
+						})
+						.onConflictDoUpdate({
+							target: opsOrganization.id,
+							set: {
+								name: orgData.name,
+								rawData: orgData,
+								lastActiveAt: new Date(),
+								markedForDeletionAt: null,
+								finalWarningAt: null,
+							},
+						})
+						.execute();
+					console.log("Organization updated - data synced successfully");
+				} catch (err) {
+					console.error("Error syncing org data:", err);
+				}
+				break;
 			case WebhookEventType.userDeleted:
 				// For individual users, delete database immediately
 				// This happens when a user without an organization deletes their account
