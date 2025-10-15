@@ -1,7 +1,7 @@
 import type { UserJSON } from "@clerk/nextjs/server";
 import { user } from "@/drizzle/schema";
 import type { User } from "@/drizzle/types";
-import { database } from "./useDatabase";
+import { database, getDatabaseForOwner } from "./useDatabase";
 import { getOwner } from "./useOwner";
 
 export async function addUserToTenantDb(userData: UserJSON) {
@@ -13,7 +13,7 @@ export async function addUserToTenantDb(userData: UserJSON) {
 		throw new Error("The user has no associated email addresses.");
 	}
 
-	const db = await database();
+	const db = await getDatabaseForOwner(userData.id);
 
 	await db
 		.insert(user)
