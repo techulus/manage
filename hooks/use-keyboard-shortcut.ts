@@ -36,4 +36,3 @@ export function useKeyboardShortcut(
 		return () => document.removeEventListener("keydown", handleKeyDown);
 	}, [key, callback, enabled]);
 }
-

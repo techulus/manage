@@ -11,7 +11,11 @@ import {
 } from "@/components/emails/account-deleted";
 import * as schema from "@/drizzle/schema";
 import { SearchService } from "@/lib/search";
-import { deleteDatabase, getDatabaseName } from "@/lib/utils/useDatabase";
+import {
+	deleteDatabase,
+	getDatabaseForOwner,
+	getDatabaseName,
+} from "@/lib/utils/useDatabase";
 import { addUserToTenantDb } from "@/lib/utils/useUser";
 import { triggerBlobDeletionWorkflow } from "@/lib/utils/workflow";
 import { opsOrganization, opsUser } from "@/ops/drizzle/schema";
@@ -30,6 +34,7 @@ enum WebhookEventType {
 	organizationCreated = "organization.created",
 	organizationDeleted = "organization.deleted",
 	organizationUpdated = "organization.updated",
+	organizationInvitationAccepted = "organizationInvitation.accepted",
 	userCreated = "user.created",
 	userDeleted = "user.deleted",
 	userUpdated = "user.updated",
@@ -121,6 +126,53 @@ export async function POST(req: NextRequest) {
 							lastActiveAt: new Date(),
 						})
 						.execute();
+
+					if (orgData.created_by) {
+						try {
+							const creatorData = await db
+								.select()
+								.from(opsUser)
+								.where(eq(opsUser.id, orgData.created_by))
+								.limit(1);
+
+							if (creatorData.length > 0) {
+								const creator = creatorData[0];
+								const orgDb = await getDatabaseForOwner(id);
+								await orgDb
+									.insert(schema.user)
+									.values({
+										id: creator.id,
+										email: creator.email,
+										firstName: creator.firstName,
+										lastName: creator.lastName,
+										imageUrl: creator.imageUrl,
+										rawData: creator.rawData,
+										lastActiveAt: new Date(),
+									})
+									.onConflictDoUpdate({
+										target: schema.user.id,
+										set: {
+											email: creator.email,
+											firstName: creator.firstName,
+											lastName: creator.lastName,
+											imageUrl: creator.imageUrl,
+											rawData: creator.rawData,
+											lastActiveAt: new Date(),
+										},
+									})
+									.execute();
+								console.log(
+									`Added creator ${creator.id} to organization database`,
+								);
+							}
+						} catch (creatorErr) {
+							console.error(
+								"Error adding creator to org database:",
+								creatorErr,
+							);
+						}
+					}
+
 					console.log(
 						"Organization created - database and data synced successfully",
 					);
@@ -154,6 +206,58 @@ export async function POST(req: NextRequest) {
 					console.log("Organization updated - data synced successfully");
 				} catch (err) {
 					console.error("Error syncing org data:", err);
+				}
+				break;
+			case WebhookEventType.organizationInvitationAccepted:
+				try {
+					const invitationData = evt.data;
+					const orgId = invitationData.organization_id;
+					const emailAddress = invitationData.email_address;
+
+					if (!orgId || !emailAddress) {
+						console.error("Missing organization or email in invitation data");
+						break;
+					}
+
+					const db = await getOpsDatabase();
+					const userData = await db
+						.select()
+						.from(opsUser)
+						.where(eq(opsUser.email, emailAddress))
+						.limit(1);
+
+					if (userData.length > 0) {
+						const user = userData[0];
+						const orgDb = await getDatabaseForOwner(orgId);
+						await orgDb
+							.insert(schema.user)
+							.values({
+								id: user.id,
+								email: user.email,
+								firstName: user.firstName,
+								lastName: user.lastName,
+								imageUrl: user.imageUrl,
+								rawData: user.rawData,
+								lastActiveAt: new Date(),
+							})
+							.onConflictDoUpdate({
+								target: schema.user.id,
+								set: {
+									email: user.email,
+									firstName: user.firstName,
+									lastName: user.lastName,
+									imageUrl: user.imageUrl,
+									rawData: user.rawData,
+									lastActiveAt: new Date(),
+								},
+							})
+							.execute();
+						console.log(
+							`Added user ${user.id} to organization ${orgId} database after invitation acceptance`,
+						);
+					}
+				} catch (err) {
+					console.error("Error adding user to org after invitation:", err);
 				}
 				break;
 			case WebhookEventType.userDeleted:

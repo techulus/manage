@@ -26,7 +26,7 @@ import {
 	lt,
 	or,
 } from "drizzle-orm";
-import { Frequency, RRule, } from "rrule";
+import { Frequency, RRule } from "rrule";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../init";
 import { sendMentionNotifications } from "@/lib/utils/mentionNotifications";
@@ -379,13 +379,16 @@ export const eventsRouter = createTRPCRouter({
 
 			try {
 				const events = ical.parseICS(icsContent);
-				
+
 				const importedEvents: ImportedEvent[] = [];
 				const errors: string[] = [];
 
 				for (const [key, event] of Object.entries(events)) {
 					try {
-						const importedEvent = convertIcsEventToImportedEvent(event, ctx.timezone);
+						const importedEvent = convertIcsEventToImportedEvent(
+							event,
+							ctx.timezone,
+						);
 						if (importedEvent) {
 							importedEvents.push(importedEvent);
 						}

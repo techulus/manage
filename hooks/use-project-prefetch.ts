@@ -56,4 +56,3 @@ export function useProjectPrefetch(projectId: number) {
 		prefetchData();
 	}, [projectId, queryClient, trpc]);
 }
-

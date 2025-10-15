@@ -16,7 +16,9 @@ function maskId(id: string): string {
 
 function sanitizeError(error: string, tenantId: string): string {
 	const databaseName = getDatabaseName(tenantId);
-	return error.replace(new RegExp(tenantId, "g"), maskId(tenantId)).replace(new RegExp(databaseName, "g"), "tenant_db");
+	return error
+		.replace(new RegExp(tenantId, "g"), maskId(tenantId))
+		.replace(new RegExp(databaseName, "g"), "tenant_db");
 }
 
 async function getOpsDatabase() {
@@ -122,7 +124,10 @@ async function main() {
 			}
 		} else {
 			console.log("✗");
-			const sanitizedError = sanitizeError(result.error || "Unknown error", tenantId);
+			const sanitizedError = sanitizeError(
+				result.error || "Unknown error",
+				tenantId,
+			);
 			console.log(`  Error: ${sanitizedError}`);
 			failureCount++;
 			failures.push({ tenantId: maskedId, error: sanitizedError });
@@ -150,7 +155,9 @@ async function main() {
 
 main().catch((error) => {
 	const errorMessage = error instanceof Error ? error.message : String(error);
-	const sanitized = errorMessage.replace(/user_[a-zA-Z0-9]+/g, "user_***").replace(/org_[a-zA-Z0-9]+/g, "org_***");
+	const sanitized = errorMessage
+		.replace(/user_[a-zA-Z0-9]+/g, "user_***")
+		.replace(/org_[a-zA-Z0-9]+/g, "org_***");
 	console.error("Fatal error:", sanitized);
 	process.exit(1);
 });
