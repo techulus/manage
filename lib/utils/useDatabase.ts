@@ -1,5 +1,4 @@
 import { sql } from "drizzle-orm";
-import { upstashCache } from "drizzle-orm/cache/upstash";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { err, ok, type Result } from "neverthrow";
 import { cache } from "react";
@@ -34,11 +33,6 @@ export async function getDatabaseForOwner(ownerId: string): Promise<Database> {
 	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
 
 	return drizzle(`${process.env.DATABASE_URL}/${databaseName}${sslMode}`, {
-		cache: upstashCache({
-			url: process.env.UPSTASH_REDIS_REST_URL!,
-			token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-			global: true,
-		}),
 		schema,
 	});
 }
