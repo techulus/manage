@@ -1,10 +1,11 @@
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { err, ok, type Result } from "neverthrow";
-import { cache } from "react";
 import type { Database } from "@/drizzle/types";
 import * as schema from "../../drizzle/schema";
 import { getOwner } from "./useOwner";
+
+const dbInstances = new Map<string, Database>();
 
 export function getDatabaseName(ownerId: string): Result<string, string> {
 	if (!ownerId.startsWith("org_") && !ownerId.startsWith("user_")) {
@@ -13,14 +14,14 @@ export function getDatabaseName(ownerId: string): Result<string, string> {
 	return ok(ownerId.toLowerCase().replace(/ /g, "_"));
 }
 
-export const database = cache(async (): Promise<Database> => {
+export async function database(): Promise<Database> {
 	const { ownerId } = await getOwner();
 	if (!ownerId) {
 		throw new Error("Owner ID not found");
 	}
 
 	return getDatabaseForOwner(ownerId);
-});
+}
 
 export async function getDatabaseForOwner(ownerId: string): Promise<Database> {
 	const databaseName = getDatabaseName(ownerId).match(
@@ -31,10 +32,18 @@ export async function getDatabaseForOwner(ownerId: string): Promise<Database> {
 	);
 
 	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
+	const connectionString = `${process.env.DATABASE_URL}/${databaseName}${sslMode}`;
 
-	return drizzle(`${process.env.DATABASE_URL}/${databaseName}${sslMode}`, {
-		schema,
-	});
+	if (!dbInstances.has(ownerId)) {
+		dbInstances.set(
+			ownerId,
+			drizzle(connectionString, {
+				schema,
+			}),
+		);
+	}
+
+	return dbInstances.get(ownerId)!;
 }
 
 export async function deleteDatabase(ownerId: string) {
