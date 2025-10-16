@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import { upstashCache } from "drizzle-orm/cache/upstash";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { err, ok, type Result } from "neverthrow";
+import { cache } from "react";
 import type { Database } from "@/drizzle/types";
 import * as schema from "../../drizzle/schema";
 import { getOwner } from "./useOwner";
@@ -13,14 +14,14 @@ export function getDatabaseName(ownerId: string): Result<string, string> {
 	return ok(ownerId.toLowerCase().replace(/ /g, "_"));
 }
 
-export async function database(): Promise<Database> {
+export const database = cache(async (): Promise<Database> => {
 	const { ownerId } = await getOwner();
 	if (!ownerId) {
 		throw new Error("Owner ID not found");
 	}
 
 	return getDatabaseForOwner(ownerId);
-}
+});
 
 export async function getDatabaseForOwner(ownerId: string): Promise<Database> {
 	const databaseName = getDatabaseName(ownerId).match(
@@ -35,12 +36,12 @@ export async function getDatabaseForOwner(ownerId: string): Promise<Database> {
 	const tenantDb = drizzle(
 		`${process.env.DATABASE_URL}/${databaseName}${sslMode}`,
 		{
-			cache: upstashCache({
-				url: process.env.UPSTASH_REDIS_REST_URL!,
-				token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-				global: true,
-			}),
-			schema,
+		cache: upstashCache({
+			url: process.env.UPSTASH_REDIS_REST_URL!,
+			token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+			global: true,
+		}),
+		schema,
 		},
 	);
 
