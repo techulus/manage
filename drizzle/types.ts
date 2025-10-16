@@ -1,5 +1,5 @@
 import type { InferSelectModel } from "drizzle-orm";
-import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type * as dbSchema from "./schema";
 import type {
 	activity,
@@ -12,7 +12,7 @@ import type {
 	user,
 } from "./schema";
 
-export type Database = NeonHttpDatabase<typeof dbSchema>;
+export type Database = NodePgDatabase<typeof dbSchema>;
 
 export type User = InferSelectModel<typeof user>;
 export type Project = InferSelectModel<typeof project>;

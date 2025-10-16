@@ -1,13 +1,11 @@
 import type { UserJSON } from "@clerk/nextjs/server";
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
+import { drizzle } from "drizzle-orm/node-postgres";
 import * as schema from "./drizzle/schema";
 import type { OpsDatabase } from "./drizzle/types";
 
 export async function getOpsDatabase(): Promise<OpsDatabase> {
 	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
-	const client = neon(`${process.env.DATABASE_URL}/manage${sslMode}`);
-	return drizzle({ client, schema });
+	return drizzle(`${process.env.DATABASE_URL}/manage${sslMode}`, { schema });
 }
 
 export async function addUserToOpsDb(userData: UserJSON) {
