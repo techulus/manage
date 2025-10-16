@@ -1,6 +1,7 @@
+import { neon } from "@neondatabase/serverless";
 import { sql } from "drizzle-orm";
 import { upstashCache } from "drizzle-orm/cache/upstash";
-import { drizzle } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/neon-http";
 import { err, ok, type Result } from "neverthrow";
 import { cache } from "react";
 import type { Database } from "@/drizzle/types";
@@ -32,6 +33,7 @@ export async function getDatabaseForOwner(ownerId: string): Promise<Database> {
 	);
 
 	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
+	const client = neon(`${process.env.DATABASE_URL}/${databaseName}${sslMode}`);
 
 	const tenantDb = drizzle(
 		`${process.env.DATABASE_URL}/${databaseName}${sslMode}`,
@@ -57,10 +59,8 @@ export async function deleteDatabase(ownerId: string) {
 	);
 
 	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
-
-	const ownerDb = drizzle(`${process.env.DATABASE_URL}/manage${sslMode}`, {
-		schema,
-	});
+	const client = neon(`${process.env.DATABASE_URL}/manage${sslMode}`);
+	const ownerDb = drizzle({ client, schema });
 
 	// Terminate all connections to the database before dropping
 	await ownerDb.execute(sql`
