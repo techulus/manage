@@ -1,13 +1,12 @@
 import { auth } from "@clerk/nextjs/server";
 import { initTRPC, TRPCError } from "@trpc/server";
-import { cache } from "react";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { SearchService } from "@/lib/search";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 
-export const createTRPCContext = cache(async () => {
+export const createTRPCContext = async () => {
 	const timezone = await getTimezone();
 	const { orgSlug, ownerId } = await getOwner();
 	const db = await database();
@@ -18,7 +17,7 @@ export const createTRPCContext = cache(async () => {
 		ownerId,
 		orgSlug,
 	};
-});
+};
 
 export type Context = Awaited<ReturnType<typeof createTRPCContext>>;
 // Avoid exporting the entire t-object
