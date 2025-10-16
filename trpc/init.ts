@@ -8,11 +8,15 @@ import { database } from "@/lib/utils/useDatabase";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 
 export const createTRPCContext = cache(async () => {
-	/**
-	 * @see: https://trpc.io/docs/server/context
-	 */
+	const timezone = await getTimezone();
+	const { orgSlug, ownerId } = await getOwner();
+	const db = await database();
+
 	return {
-		timezone: await getTimezone(),
+		timezone,
+		db,
+		ownerId,
+		orgSlug,
 	};
 });
 
@@ -49,29 +53,23 @@ export const createTRPCRouter = t.router;
 export const createCallerFactory = t.createCallerFactory;
 
 export const publicProcedure = t.procedure;
-export const protectedProcedure = t.procedure.use(async ({ next }) => {
+export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
 	const { sessionId, has } = await auth();
 	if (!sessionId) {
 		throw new TRPCError({ code: "UNAUTHORIZED" });
 	}
 
-	const { orgSlug, ownerId, orgId, userId } = await getOwner();
+	const { orgId, userId } = await getOwner();
 
-	// For personal accounts (no orgId), user is always admin
-	// For organizations, check if user has org:admin role
 	const isOrgAdmin = !orgId ? true : has({ role: "org:admin" });
-
-	const db = await database();
-	const search = new SearchService(ownerId, orgSlug);
+	const search = new SearchService(ctx.ownerId, ctx.orgSlug);
 
 	return next({
 		ctx: {
+			...ctx,
 			sessionId,
 			userId,
 			orgId,
-			orgSlug,
-			ownerId,
-			db,
 			search,
 			isOrgAdmin,
 		},
