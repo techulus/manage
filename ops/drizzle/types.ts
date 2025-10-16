@@ -1,4 +1,4 @@
-import type { NodePgDatabase } from "drizzle-orm/node-postgres";
+import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import type * as dbSchema from "./schema";
 
-export type OpsDatabase = NodePgDatabase<typeof dbSchema>;
+export type OpsDatabase = NeonHttpDatabase<typeof dbSchema>;
