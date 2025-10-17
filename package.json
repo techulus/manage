@@ -52,6 +52,7 @@
     "@upstash/redis": "^1.35.3",
     "@upstash/search": "^0.1.5",
     "@upstash/workflow": "^0.2.16",
+    "@vercel/functions": "^3.1.4",
     "autoprefixer": "10.4.14",
     "caniuse-lite": "^1.0.30001737",
     "class-variance-authority": "^0.7.1",

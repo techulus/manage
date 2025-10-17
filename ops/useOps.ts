@@ -1,11 +1,30 @@
+import { attachDatabasePool } from "@vercel/functions";
 import type { UserJSON } from "@clerk/nextjs/server";
 import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 import * as schema from "./drizzle/schema";
 import type { OpsDatabase } from "./drizzle/types";
 
+let opsPool: Pool | null = null;
+let opsDb: OpsDatabase | null = null;
+
 export async function getOpsDatabase(): Promise<OpsDatabase> {
-	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
-	return drizzle(`${process.env.DATABASE_URL}/manage${sslMode}`, { schema });
+	if (!opsDb) {
+		const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
+		const connectionString = `${process.env.DATABASE_URL}/manage${sslMode}`;
+
+		opsPool = new Pool({
+			connectionString,
+			min: 1,
+			idleTimeoutMillis: 5000,
+			connectionTimeoutMillis: 5000,
+		});
+
+		attachDatabasePool(opsPool);
+		opsDb = drizzle(opsPool, { schema });
+	}
+
+	return opsDb;
 }
 
 export async function addUserToOpsDb(userData: UserJSON) {
