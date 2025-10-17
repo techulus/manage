@@ -41,6 +41,7 @@
         "@upstash/redis": "^1.35.3",
         "@upstash/search": "^0.1.5",
         "@upstash/workflow": "^0.2.16",
+        "@vercel/functions": "^3.1.4",
         "autoprefixer": "10.4.14",
         "caniuse-lite": "^1.0.30001737",
         "class-variance-authority": "^0.7.1",
@@ -1082,6 +1083,10 @@
     "@upstash/vector": ["@upstash/vector@1.2.2", "", {}, "sha512-ptQ9xnxtKqmpNK52PCcHCszlPOLxIBfjsv7ty8RoF95pkjctS9rSjTQ3Pl9bx5VFbpDj+0dMXw88WLt6swDkgQ=="],
 
     "@upstash/workflow": ["@upstash/workflow@0.2.16", "", { "dependencies": { "@ai-sdk/openai": "^1.2.1", "@upstash/qstash": "^2.8.1", "ai": "^4.1.54", "zod": "^3.24.1" } }, "sha512-9mqC3p5B9i92gf1KMEZhDcU5YMEut0hkWxmf2gsDcJVCcbLD958MEDT2q2wGZa7MnKAuvEOYNDSefi0x2a5pGQ=="],
+
+    "@vercel/functions": ["@vercel/functions@3.1.4", "", { "dependencies": { "@vercel/oidc": "3.0.3" }, "peerDependencies": { "@aws-sdk/credential-provider-web-identity": "*" }, "optionalPeers": ["@aws-sdk/credential-provider-web-identity"] }, "sha512-1dEfZkb7qxsA+ilo+1uBUCEgr7e90vHcimpDYkUB84DM051wQ5amJDk9x+cnaI29paZb5XukXwGl8yk3Udb/DQ=="],
+
+    "@vercel/oidc": ["@vercel/oidc@3.0.3", "", {}, "sha512-yNEQvPcVrK9sIe637+I0jD6leluPxzwJKx/Haw6F4H77CdDsszUn5V3o96LPziXkSNE2B83+Z3mjqGKBK/R6Gg=="],
 
     "@webassemblyjs/ast": ["@webassemblyjs/ast@1.14.1", "", { "dependencies": { "@webassemblyjs/helper-numbers": "1.13.2", "@webassemblyjs/helper-wasm-bytecode": "1.13.2" } }, "sha512-nuBEDgQfm1ccRp/8bCQrx1frohyufl4JlbMMZ4P1wpeOfDhF6FQkxZJ1b/e+PLwr6X1Nhw6OLme5usuBWYBvuQ=="],
 

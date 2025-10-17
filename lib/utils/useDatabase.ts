@@ -1,11 +1,13 @@
+import { attachDatabasePool } from "@vercel/functions";
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { err, ok, type Result } from "neverthrow";
+import { Pool } from "pg";
 import type { Database } from "@/drizzle/types";
 import * as schema from "../../drizzle/schema";
 import { getOwner } from "./useOwner";
 
-const dbInstances = new Map<string, Database>();
+const poolInstances = new Map<string, Pool>();
 
 export function getDatabaseName(ownerId: string): Result<string, string> {
 	if (!ownerId.startsWith("org_") && !ownerId.startsWith("user_")) {
@@ -31,19 +33,22 @@ export async function getDatabaseForOwner(ownerId: string): Promise<Database> {
 		},
 	);
 
-	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
-	const connectionString = `${process.env.DATABASE_URL}/${databaseName}${sslMode}`;
+	if (!poolInstances.has(ownerId)) {
+		const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
+		const connectionString = `${process.env.DATABASE_URL}/${databaseName}${sslMode}`;
 
-	if (!dbInstances.has(ownerId)) {
-		dbInstances.set(
-			ownerId,
-			drizzle(connectionString, {
-				schema,
-			}),
-		);
+		const pool = new Pool({
+			connectionString,
+			min: 1,
+			idleTimeoutMillis: 5000,
+			connectionTimeoutMillis: 5000,
+		});
+
+		attachDatabasePool(pool);
+		poolInstances.set(ownerId, pool);
 	}
 
-	return dbInstances.get(ownerId)!;
+	return drizzle(poolInstances.get(ownerId)!, { schema });
 }
 
 export async function deleteDatabase(ownerId: string) {
@@ -54,13 +59,22 @@ export async function deleteDatabase(ownerId: string) {
 		},
 	);
 
-	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
+	const pool = poolInstances.get(ownerId);
+	if (pool) {
+		await pool.end();
+		poolInstances.delete(ownerId);
+	}
 
-	const ownerDb = drizzle(`${process.env.DATABASE_URL}/manage${sslMode}`, {
-		schema,
+	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
+	const managePool = new Pool({
+		connectionString: `${process.env.DATABASE_URL}/manage${sslMode}`,
+		min: 1,
+		idleTimeoutMillis: 5000,
+		connectionTimeoutMillis: 5000,
 	});
 
-	// Terminate all connections to the database before dropping
+	const ownerDb = drizzle(managePool, { schema });
+
 	await ownerDb.execute(sql`
 		SELECT pg_terminate_backend(pid)
 		FROM pg_stat_activity
@@ -68,8 +82,9 @@ export async function deleteDatabase(ownerId: string) {
 		  AND pid <> pg_backend_pid()
 	`);
 
-	// Drop the database with FORCE option (PostgreSQL 13+)
 	await ownerDb.execute(
 		sql`DROP DATABASE ${sql.identifier(databaseName)} WITH (FORCE)`,
 	);
+
+	await managePool.end();
 }
