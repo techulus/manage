@@ -1,0 +1,65 @@
+name: Post-Upgrade Maintenance
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to run maintenance on'
+        required: true
+        type: choice
+        options:
+          - staging
+          - prod
+
+jobs:
+  maintenance-staging:
+    name: Run Staging Post-Upgrade Maintenance
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    environment: staging
+    if: github.event.inputs.environment == 'staging'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run post-upgrade maintenance (Staging)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_SSL: ${{ secrets.DATABASE_SSL }}
+        run: bun run post-upgrade:maintenance
+
+  maintenance-prod:
+    name: Run Prod Post-Upgrade Maintenance
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    environment: prod
+    if: github.event.inputs.environment == 'prod'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run post-upgrade maintenance (Prod)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_SSL: ${{ secrets.DATABASE_SSL }}
+        run: bun run post-upgrade:maintenance
