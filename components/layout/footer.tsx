@@ -2,7 +2,6 @@ import Link from "next/link";
 
 const navigation = {
 	main: [
-		{ name: "Status", href: "https://manage.openstatus.dev" },
 		{ name: "Terms", href: "/terms" },
 		{ name: "Privacy", href: "/privacy" },
 		{ name: "Source code", href: "https://github.com/techulus/manage" },
