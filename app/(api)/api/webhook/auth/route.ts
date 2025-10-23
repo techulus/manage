@@ -1,8 +1,8 @@
 import path from "node:path";
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
 import { eq, sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/node-postgres";
-import { migrate } from "drizzle-orm/node-postgres/migrator";
+import { drizzle } from "drizzle-orm/postgres-js";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
 import type { NextRequest } from "next/server";
 import { Resend } from "resend";
 import {
@@ -48,9 +48,11 @@ async function createTenantDatabase(ownerId: string): Promise<void> {
 		},
 	);
 
-	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
-
-	const ownerDb = drizzle(`${process.env.DATABASE_URL}/manage${sslMode}`, {
+	const ownerDb = drizzle({
+		connection: {
+			url: `${process.env.DATABASE_URL}/manage`,
+			ssl: process.env.DATABASE_SSL === "true",
+		},
 		schema,
 	});
 
@@ -58,15 +60,18 @@ async function createTenantDatabase(ownerId: string): Promise<void> {
 		sql`SELECT 1 FROM pg_database WHERE datname = ${databaseName}`,
 	);
 
-	if (checkDb.rowCount === 0) {
+	if (checkDb.count === 0) {
 		await ownerDb.execute(sql`CREATE DATABASE ${sql.identifier(databaseName)}`);
 		console.log(`Created database for tenant: ${databaseName}`);
 	}
 
-	const tenantDb = drizzle(
-		`${process.env.DATABASE_URL}/${databaseName}${sslMode}`,
-		{ schema },
-	);
+	const tenantDb = drizzle({
+		connection: {
+			url: `${process.env.DATABASE_URL}/${databaseName}`,
+			ssl: process.env.DATABASE_SSL === "true",
+		},
+		schema,
+	});
 
 	const migrationsFolder = path.resolve(process.cwd(), "drizzle");
 	await migrate(tenantDb, { migrationsFolder });

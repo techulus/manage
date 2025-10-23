@@ -1,6 +1,6 @@
 import path from "node:path";
-import { drizzle } from "drizzle-orm/node-postgres";
-import { migrate } from "drizzle-orm/node-postgres/migrator";
+import { drizzle } from "drizzle-orm/postgres-js";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
 import * as opsSchema from "../ops/drizzle/schema";
 
 async function migrateOpsDatabase(): Promise<{
@@ -8,10 +8,11 @@ async function migrateOpsDatabase(): Promise<{
 	error?: string;
 }> {
 	try {
-		const sslMode =
-			process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
-
-		const opsDb = drizzle(`${process.env.DATABASE_URL}/manage${sslMode}`, {
+		const opsDb = drizzle({
+			connection: {
+				url: `${process.env.DATABASE_URL}/manage`,
+				ssl: process.env.DATABASE_SSL === "true",
+			},
 			schema: opsSchema,
 		});
 

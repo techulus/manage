@@ -1,7 +1,7 @@
 import path from "node:path";
 import { sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/node-postgres";
-import { migrate } from "drizzle-orm/node-postgres/migrator";
+import { drizzle } from "drizzle-orm/postgres-js";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
 import * as schema from "../drizzle/schema";
 import * as opsSchema from "../ops/drizzle/schema";
 
@@ -22,9 +22,12 @@ function sanitizeError(error: string, tenantId: string): string {
 }
 
 async function getOpsDatabase() {
-	const sslMode = process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
-	return drizzle(`${process.env.DATABASE_URL}/manage${sslMode}`, {
-		schema: opsSchema,
+	return drizzle({
+		connection: {
+			url: `${process.env.DATABASE_URL}/manage`,
+			ssl: process.env.DATABASE_SSL === "true",
+		},
+		schema,
 	});
 }
 
@@ -64,7 +67,7 @@ async function migrateTenantDatabase(ownerId: string): Promise<{
 			sql`SELECT 1 FROM pg_database WHERE datname = ${databaseName}`,
 		);
 
-		if (checkDb.rowCount === 0) {
+		if (checkDb.count === 0) {
 			return { success: true, skipped: true };
 		}
 
