@@ -1,7 +1,5 @@
-import path from "node:path";
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
-import { migrate } from "drizzle-orm/postgres-js/migrator";
 import * as schema from "../drizzle/schema";
 import * as opsSchema from "../ops/drizzle/schema";
 
@@ -27,7 +25,7 @@ async function getOpsDatabase() {
 			url: `${process.env.DATABASE_URL}/manage`,
 			ssl: process.env.DATABASE_SSL === "true",
 		},
-		schema,
+		schema: opsSchema,
 	});
 }
 
@@ -49,7 +47,7 @@ async function getAllTenantIds(): Promise<string[]> {
 	return tenantIds;
 }
 
-async function migrateTenantDatabase(ownerId: string): Promise<{
+async function performPostUpgradeMaintenance(ownerId: string): Promise<{
 	success: boolean;
 	skipped?: boolean;
 	error?: string;
@@ -76,8 +74,12 @@ async function migrateTenantDatabase(ownerId: string): Promise<{
 			{ schema },
 		);
 
-		const migrationsFolder = path.resolve(process.cwd(), "drizzle");
-		await migrate(tenantDb, { migrationsFolder });
+		await tenantDb.execute(
+			sql.raw(`REINDEX DATABASE CONCURRENTLY ${databaseName}`),
+		);
+		await tenantDb.execute(
+			sql.raw(`ALTER DATABASE ${databaseName} REFRESH COLLATION VERSION`),
+		);
 
 		return { success: true };
 	} catch (error) {
@@ -89,7 +91,7 @@ async function migrateTenantDatabase(ownerId: string): Promise<{
 }
 
 async function main() {
-	console.log("Starting tenant database migrations...\n");
+	console.log("Starting post-upgrade maintenance for tenant databases...\n");
 
 	if (!process.env.DATABASE_URL) {
 		console.error("ERROR: DATABASE_URL environment variable is not set");
@@ -97,10 +99,10 @@ async function main() {
 	}
 
 	const tenantIds = await getAllTenantIds();
-	console.log(`Found ${tenantIds.length} tenant(s) to migrate\n`);
+	console.log(`Found ${tenantIds.length} tenant(s) to process\n`);
 
 	if (tenantIds.length === 0) {
-		console.log("No tenants found. Nothing to migrate.");
+		console.log("No tenants found. Nothing to process.");
 		return;
 	}
 
@@ -113,9 +115,9 @@ async function main() {
 		const tenantId = tenantIds[i];
 		const maskedId = maskId(tenantId);
 		const progress = `[${i + 1}/${tenantIds.length}]`;
-		process.stdout.write(`${progress} Migrating ${maskedId}... `);
+		process.stdout.write(`${progress} Processing ${maskedId}... `);
 
-		const result = await migrateTenantDatabase(tenantId);
+		const result = await performPostUpgradeMaintenance(tenantId);
 
 		if (result.success) {
 			if (result.skipped) {
@@ -138,22 +140,22 @@ async function main() {
 	}
 
 	console.log(`\n${"=".repeat(60)}`);
-	console.log("Migration Summary:");
+	console.log("Post-Upgrade Maintenance Summary:");
 	console.log(`  Total: ${tenantIds.length}`);
 	console.log(`  Success: ${successCount}`);
 	console.log(`  Skipped: ${skippedCount} (no database created yet)`);
 	console.log(`  Failed: ${failureCount}`);
 
 	if (failures.length > 0) {
-		console.log("\nFailed migrations:");
+		console.log("\nFailed operations:");
 		for (const failure of failures) {
 			console.log(`  - ${failure.tenantId}: ${failure.error}`);
 		}
-		console.log("\n✗ Some migrations failed!");
+		console.log("\n✗ Some operations failed!");
 		process.exit(1);
 	}
 
-	console.log("\n✓ All tenant databases migrated successfully!");
+	console.log("\n✓ All tenant databases processed successfully!");
 }
 
 main().catch((error) => {

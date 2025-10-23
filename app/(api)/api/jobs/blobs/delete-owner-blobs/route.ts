@@ -1,9 +1,9 @@
+import { serve } from "@upstash/workflow/nextjs";
+import { inArray } from "drizzle-orm";
 import { blob } from "@/drizzle/schema";
 import { deleteFile, listFiles } from "@/lib/blobStore";
 import { getDatabaseForOwner } from "@/lib/utils/useDatabase";
 import { triggerWorkflow } from "@/lib/utils/workflow";
-import { serve } from "@upstash/workflow/nextjs";
-import { inArray } from "drizzle-orm";
 
 type WorkflowPayload = {
 	ownerId: string;
@@ -117,7 +117,7 @@ export const { POST } = serve<WorkflowPayload>(async (context) => {
 				.execute();
 
 			console.log(
-				`[BlobDeletion] Cleaned up ${result.rowCount || 0} blob records from database for owner: ${ownerId}`,
+				`[BlobDeletion] Cleaned up ${result.count || 0} blob records from database for owner: ${ownerId}`,
 			);
 		} catch (error) {
 			console.error(

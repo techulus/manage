@@ -1,4 +1,4 @@
-import type { NodePgDatabase } from "drizzle-orm/node-postgres";
+import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import type * as dbSchema from "./schema";
 
-export type OpsDatabase = NodePgDatabase<typeof dbSchema>;
+export type OpsDatabase = PostgresJsDatabase<typeof dbSchema>;

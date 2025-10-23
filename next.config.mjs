@@ -2,6 +2,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig = {
 	typedRoutes: false,
+	reactCompiler: true,
 
 	rewrites: async () => {
 		return [
