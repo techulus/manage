@@ -1,6 +1,6 @@
 import { ClerkProvider } from "@clerk/nextjs";
+import { Analytics } from "@vercel/analytics/next";
 import { Geist } from "next/font/google";
-import { PostHogProvider } from "@/components/core/posthog-provider";
 import { ThemeProvider } from "@/components/core/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SITE_METADATA } from "@/data/marketing";
@@ -322,14 +322,13 @@ export default function RootLayout({
 				/>
 			</head>
 			<body className="min-h-full min-w-full flex-1">
-				<PostHogProvider>
-					<ClerkProvider>
-						<ThemeProvider>
-							<Toaster position="top-center" />
-							{children}
-						</ThemeProvider>
-					</ClerkProvider>
-				</PostHogProvider>
+				<ClerkProvider>
+					<ThemeProvider>
+						<Toaster position="top-center" />
+						{children}
+					</ThemeProvider>
+				</ClerkProvider>
+				<Analytics />
 			</body>
 		</html>
 	);
