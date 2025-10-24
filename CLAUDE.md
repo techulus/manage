@@ -29,7 +29,7 @@ bun run migrate:tenants   # Migrate all tenant databases (CI/CD - IDs are masked
 - **Email**: React Email + Resend
 - **File Storage**: S3-compatible storage
 - **Search**: Upstash Search for full-text search with filtering
-- **Monitoring**: Sentry + PostHog
+- **Monitoring**: Sentry
 - **Linting**: Biome (not ESLint)
 
 ### Directory Structure
