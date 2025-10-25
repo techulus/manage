@@ -70,3 +70,4 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DATABASE_SSL: ${{ secrets.DATABASE_SSL }}
         run: bun run migrate:tenants
+
