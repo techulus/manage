@@ -71,20 +71,3 @@ jobs:
           DATABASE_SSL: ${{ secrets.DATABASE_SSL }}
         run: bun run migrate:tenants
 
-  migration-status:
-    name: Migration Status
-    runs-on: ubuntu-latest
-    needs: [migrate-prod]
-    environment: prod
-    if: (github.event_name == 'push' && github.ref == 'refs/heads/release') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'prod')
-
-    steps:
-      - name: Check migration status
-        run: |
-          if [[ "${{ needs.migrate-prod.result }}" == "success" ]] || [[ "${{ needs.migrate-prod.result }}" == "skipped" ]]; then
-            echo "Migrations completed successfully or were skipped"
-            exit 0
-          else
-            echo "Migrations failed"
-            exit 1
-          fi
