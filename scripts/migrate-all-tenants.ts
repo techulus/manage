@@ -2,6 +2,7 @@ import path from "node:path";
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
+import postgres from "postgres";
 import * as schema from "../drizzle/schema";
 import * as opsSchema from "../ops/drizzle/schema";
 
@@ -22,18 +23,20 @@ function sanitizeError(error: string, tenantId: string): string {
 }
 
 async function getOpsDatabase() {
-	return drizzle({
-		connection: {
-			url: `${process.env.DATABASE_URL}/manage`,
-			ssl: process.env.DATABASE_SSL === "true",
-		},
-		schema,
+	const client = postgres(`${process.env.DATABASE_URL}/manage`, {
+		ssl: process.env.DATABASE_SSL === "true" ? "require" : false,
+		max: 1,
 	});
+
+	return {
+		db: drizzle({ client, schema: opsSchema }),
+		client,
+	};
 }
 
-async function getAllTenantIds(): Promise<string[]> {
-	const opsDb = await getOpsDatabase();
-
+async function getAllTenantIds(
+	opsDb: ReturnType<typeof drizzle<typeof opsSchema>>,
+): Promise<string[]> {
 	const [users, organizations] = await Promise.all([
 		opsDb.select({ id: opsSchema.opsUser.id }).from(opsSchema.opsUser),
 		opsDb
@@ -49,21 +52,18 @@ async function getAllTenantIds(): Promise<string[]> {
 	return tenantIds;
 }
 
-async function migrateTenantDatabase(ownerId: string): Promise<{
+async function migrateTenantDatabase(
+	ownerId: string,
+	opsDb: ReturnType<typeof drizzle<typeof opsSchema>>,
+): Promise<{
 	success: boolean;
 	skipped?: boolean;
 	error?: string;
 }> {
+	let tenantClient: ReturnType<typeof postgres> | null = null;
+
 	try {
 		const databaseName = getDatabaseName(ownerId);
-
-		const opsDb = drizzle({
-			connection: {
-				url: `${process.env.DATABASE_URL}/manage`,
-				ssl: process.env.DATABASE_SSL === "true",
-			},
-			schema: opsSchema,
-		});
 
 		const checkDb = await opsDb.execute(
 			sql`SELECT 1 FROM pg_database WHERE datname = ${databaseName}`,
@@ -73,13 +73,12 @@ async function migrateTenantDatabase(ownerId: string): Promise<{
 			return { success: true, skipped: true };
 		}
 
-		const tenantDb = drizzle({
-			connection: {
-				url: `${process.env.DATABASE_URL}/${databaseName}`,
-				ssl: process.env.DATABASE_SSL === "true",
-			},
-			schema,
+		tenantClient = postgres(`${process.env.DATABASE_URL}/${databaseName}`, {
+			ssl: process.env.DATABASE_SSL === "true" ? "require" : false,
+			max: 1,
 		});
+
+		const tenantDb = drizzle({ client: tenantClient, schema });
 
 		const migrationsFolder = path.resolve(process.cwd(), "drizzle");
 		await migrate(tenantDb, { migrationsFolder });
@@ -90,6 +89,10 @@ async function migrateTenantDatabase(ownerId: string): Promise<{
 			success: false,
 			error: error instanceof Error ? error.message : String(error),
 		};
+	} finally {
+		if (tenantClient) {
+			await tenantClient.end();
+		}
 	}
 }
 
@@ -101,65 +104,71 @@ async function main() {
 		process.exit(1);
 	}
 
-	const tenantIds = await getAllTenantIds();
-	console.log(`Found ${tenantIds.length} tenant(s) to migrate\n`);
+	const { db: opsDb, client: opsClient } = await getOpsDatabase();
 
-	if (tenantIds.length === 0) {
-		console.log("No tenants found. Nothing to migrate.");
-		return;
-	}
+	try {
+		const tenantIds = await getAllTenantIds(opsDb);
+		console.log(`Found ${tenantIds.length} tenant(s) to migrate\n`);
 
-	let successCount = 0;
-	let skippedCount = 0;
-	let failureCount = 0;
-	const failures: Array<{ tenantId: string; error: string }> = [];
+		if (tenantIds.length === 0) {
+			console.log("No tenants found. Nothing to migrate.");
+			return;
+		}
 
-	for (let i = 0; i < tenantIds.length; i++) {
-		const tenantId = tenantIds[i];
-		const maskedId = maskId(tenantId);
-		const progress = `[${i + 1}/${tenantIds.length}]`;
-		process.stdout.write(`${progress} Migrating ${maskedId}... `);
+		let successCount = 0;
+		let skippedCount = 0;
+		let failureCount = 0;
+		const failures: Array<{ tenantId: string; error: string }> = [];
 
-		const result = await migrateTenantDatabase(tenantId);
+		for (let i = 0; i < tenantIds.length; i++) {
+			const tenantId = tenantIds[i];
+			const maskedId = maskId(tenantId);
+			const progress = `[${i + 1}/${tenantIds.length}]`;
+			process.stdout.write(`${progress} Migrating ${maskedId}... `);
 
-		if (result.success) {
-			if (result.skipped) {
-				console.log("⊘ (no database)");
-				skippedCount++;
+			const result = await migrateTenantDatabase(tenantId, opsDb);
+
+			if (result.success) {
+				if (result.skipped) {
+					console.log("⊘ (no database)");
+					skippedCount++;
+				} else {
+					console.log("✓");
+					successCount++;
+				}
 			} else {
-				console.log("✓");
-				successCount++;
+				console.log("✗");
+				const sanitizedError = sanitizeError(
+					result.error || "Unknown error",
+					tenantId,
+				);
+				console.log(`  Error: ${sanitizedError}`);
+				failureCount++;
+				failures.push({ tenantId: maskedId, error: sanitizedError });
 			}
-		} else {
-			console.log("✗");
-			const sanitizedError = sanitizeError(
-				result.error || "Unknown error",
-				tenantId,
-			);
-			console.log(`  Error: ${sanitizedError}`);
-			failureCount++;
-			failures.push({ tenantId: maskedId, error: sanitizedError });
 		}
-	}
 
-	console.log(`\n${"=".repeat(60)}`);
-	console.log("Migration Summary:");
-	console.log(`  Total: ${tenantIds.length}`);
-	console.log(`  Success: ${successCount}`);
-	console.log(`  Skipped: ${skippedCount} (no database created yet)`);
-	console.log(`  Failed: ${failureCount}`);
+		console.log(`\n${"=".repeat(60)}`);
+		console.log("Migration Summary:");
+		console.log(`  Total: ${tenantIds.length}`);
+		console.log(`  Success: ${successCount}`);
+		console.log(`  Skipped: ${skippedCount} (no database created yet)`);
+		console.log(`  Failed: ${failureCount}`);
 
-	if (failures.length > 0) {
-		console.log("\nFailed migrations:");
-		for (const failure of failures) {
-			console.log(`  - ${failure.tenantId}: ${failure.error}`);
+		if (failures.length > 0) {
+			console.log("\nFailed migrations:");
+			for (const failure of failures) {
+				console.log(`  - ${failure.tenantId}: ${failure.error}`);
+			}
+			console.log("\n✗ Some migrations failed!");
+			process.exit(1);
 		}
-		console.log("\n✗ Some migrations failed!");
-		process.exit(1);
-	}
 
-	console.log("\n✓ All tenant databases migrated successfully!");
-	process.exit(0);
+		console.log("\n✓ All tenant databases migrated successfully!");
+		process.exit(0);
+	} finally {
+		await opsClient.end();
+	}
 }
 
 main().catch((error) => {
