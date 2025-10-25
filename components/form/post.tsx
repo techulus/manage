@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
+import { Spinner } from "../core/loaders";
 import Editor from "../editor";
 import { Button } from "../ui/button";
 
@@ -160,31 +161,42 @@ const PostForm = memo(
 					>
 						Cancel
 					</Button>
-					<Button
-						type="button"
-						variant="outline"
-						onClick={() => {
-							const form = formRef.current;
-							if (form) {
-								const formData = new FormData(form);
-								savePost(formData, true);
-							}
-						}}
-					>
-						Save as Draft
-					</Button>
-					<Button
-						type="button"
-						onClick={() => {
-							const form = formRef.current;
-							if (form) {
-								const formData = new FormData(form);
-								savePost(formData);
-							}
-						}}
-					>
-						Publish
-					</Button>
+
+					<div className="ml-auto space-x-4">
+						{upsertPost.isPending ? (
+							<Spinner />
+						) : (
+							<>
+								<Button
+									type="button"
+									disabled={upsertPost.isPending}
+									variant="outline"
+									onClick={() => {
+										const form = formRef.current;
+										if (form) {
+											const formData = new FormData(form);
+											savePost(formData, true);
+										}
+									}}
+								>
+									Save draft
+								</Button>
+								<Button
+									type="button"
+									disabled={upsertPost.isPending}
+									onClick={() => {
+										const form = formRef.current;
+										if (form) {
+											const formData = new FormData(form);
+											savePost(formData);
+										}
+									}}
+								>
+									Publish
+								</Button>
+							</>
+						)}
+					</div>
 				</div>
 			</form>
 		);
