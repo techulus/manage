@@ -36,6 +36,8 @@ export enum TaskStatus {
 	DELETED = "deleted",
 }
 
+export type PostCategory = "announcement" | "fyi" | "question";
+
 export type ProjectWithCreator = Project & { creator: User };
 
 export type TaskWithDetails = Task & {

@@ -19,6 +19,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import type { PostCategory } from "@/drizzle/types";
 import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
 import { Spinner } from "../core/loaders";
@@ -79,10 +80,8 @@ const PostForm = memo(
 		);
 
 		const [title, setTitle] = useState(item?.title ?? "");
-		const [category, setCategory] = useState<
-			"announcement" | "fyi" | "question"
-		>(
-			(item?.category as "announcement" | "fyi" | "question") ?? "announcement",
+		const [category, setCategory] = useState<PostCategory>(
+			(item?.category as PostCategory) ?? "announcement",
 		);
 
 		const formRef = useRef<HTMLFormElement>(null);
@@ -106,23 +105,11 @@ const PostForm = memo(
 			<form className="flex-1 overflow-hidden overflow-y-auto" ref={formRef}>
 				<div className="px-6 space-y-6">
 					<div className="space-y-2">
-						<Label htmlFor="title">Title</Label>
-						<Input
-							type="text"
-							name="title"
-							id="title"
-							value={title}
-							onChange={(e) => setTitle(e.target.value)}
-							required
-						/>
-					</div>
-
-					<div className="space-y-2">
 						<Label htmlFor="category">Category</Label>
 						<Select
 							name="category"
 							value={category}
-							onValueChange={(value: any) => setCategory(value)}
+							onValueChange={(value: PostCategory) => setCategory(value)}
 						>
 							<SelectTrigger id="category">
 								<SelectValue />
@@ -133,6 +120,18 @@ const PostForm = memo(
 								<SelectItem value="question">Question</SelectItem>
 							</SelectContent>
 						</Select>
+					</div>
+
+					<div className="space-y-2">
+						<Label htmlFor="title">Title</Label>
+						<Input
+							type="text"
+							name="title"
+							id="title"
+							value={title}
+							onChange={(e) => setTitle(e.target.value)}
+							required
+						/>
 					</div>
 
 					<div className="space-y-2">
@@ -164,7 +163,7 @@ const PostForm = memo(
 
 					<div className="ml-auto space-x-4">
 						{upsertPost.isPending ? (
-							<Spinner />
+							<Spinner message="Saving.." />
 						) : (
 							<>
 								<Button

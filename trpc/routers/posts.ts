@@ -16,10 +16,12 @@ export const postsRouter = createTRPCRouter({
 		.input(
 			z.object({
 				projectId: z.number(),
+				limit: z.number().default(10),
+				offset: z.number().default(0),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
-			const { projectId } = input;
+			const { projectId, limit, offset } = input;
 
 			const hasAccess = await canViewProject(ctx, projectId);
 			if (!hasAccess) {
@@ -32,40 +34,8 @@ export const postsRouter = createTRPCRouter({
 			const posts = await ctx.db.query.post.findMany({
 				where: and(eq(post.projectId, projectId), eq(post.isDraft, false)),
 				orderBy: [desc(post.publishedAt)],
-				with: {
-					creator: {
-						columns: {
-							id: true,
-							firstName: true,
-							lastName: true,
-							imageUrl: true,
-						},
-					},
-				},
-			});
-
-			return posts;
-		}),
-	listAll: protectedProcedure
-		.input(
-			z.object({
-				projectId: z.number(),
-			}),
-		)
-		.query(async ({ ctx, input }) => {
-			const { projectId } = input;
-
-			const canEdit = await canEditProject(ctx, projectId);
-			if (!canEdit) {
-				throw new TRPCError({
-					code: "FORBIDDEN",
-					message: "Project edit access denied",
-				});
-			}
-
-			const posts = await ctx.db.query.post.findMany({
-				where: eq(post.projectId, projectId),
-				orderBy: [desc(post.updatedAt)],
+				limit,
+				offset,
 				with: {
 					creator: {
 						columns: {

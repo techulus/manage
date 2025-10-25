@@ -32,6 +32,12 @@ const categoryColors = {
 		"bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
 };
 
+const categoryEmojis = {
+	announcement: "📢",
+	fyi: "ℹ️",
+	question: "❓",
+};
+
 const formatCategory = (category: string) => {
 	if (category === "fyi") return "FYI";
 	return category.charAt(0).toUpperCase() + category.slice(1);
@@ -97,6 +103,13 @@ export default function PostsList({
 									}
 									variant="secondary"
 								>
+									<span className="mr-1">
+										{
+											categoryEmojis[
+												post.category as keyof typeof categoryEmojis
+											]
+										}
+									</span>
 									{formatCategory(post.category)}
 								</Badge>
 								{post.isDraft && <Badge variant="outline">Draft</Badge>}
