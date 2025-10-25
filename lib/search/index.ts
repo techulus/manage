@@ -1,11 +1,11 @@
 import { Search } from "@upstash/search";
-import type { calendarEvent, project, task, taskList } from "@/drizzle/schema";
+import type { calendarEvent, post, project, task, taskList } from "@/drizzle/schema";
 
 const client = Search.fromEnv();
 
 export interface SearchableItem {
 	id: string;
-	type: "project" | "task" | "tasklist" | "event";
+	type: "project" | "task" | "tasklist" | "event" | "post";
 	title: string;
 	description?: string;
 	projectId?: number;
@@ -237,10 +237,56 @@ export class SearchService {
 		});
 	}
 
+	async indexPost(
+		postData: typeof post.$inferSelect,
+		projectData: typeof project.$inferSelect,
+	) {
+		const index = this.index;
+		const searchableItem: SearchableItem = {
+			id: `post-${postData.id}`,
+			type: "post",
+			title: postData.title,
+			description: postData.content || undefined,
+			projectId: projectData.id,
+			projectName: projectData.name,
+			url: `/${this.orgSlug}/projects/${projectData.id}/posts`,
+			createdAt: postData.createdAt,
+			metadata: {
+				projectName: projectData.name,
+				category: postData.category,
+				isDraft: postData.isDraft,
+				publishedAt: postData.publishedAt?.toISOString(),
+				createdByUser: postData.createdByUser,
+			},
+		};
+
+		const content = this.truncateContentObject({
+			title: searchableItem.title,
+			description: searchableItem.description || "",
+			type: searchableItem.type,
+			category: postData.category,
+			projectName: searchableItem.projectName || "",
+			projectId: searchableItem.projectId,
+		});
+
+		await index.upsert({
+			id: searchableItem.id,
+			content,
+			metadata: {
+				url: searchableItem.url,
+				createdAt: searchableItem.createdAt.toISOString(),
+				category: searchableItem.metadata?.category,
+				isDraft: searchableItem.metadata?.isDraft,
+				publishedAt: searchableItem.metadata?.publishedAt,
+				createdByUser: searchableItem.metadata?.createdByUser,
+			},
+		});
+	}
+
 	async search(
 		query: string,
 		options?: {
-			type?: "project" | "task" | "tasklist" | "event";
+			type?: "project" | "task" | "tasklist" | "event" | "post";
 			projectId?: number;
 			status?: string;
 			limit?: number;
@@ -260,7 +306,7 @@ export class SearchService {
 		const filters: string[] = [];
 
 		if (options?.type) {
-			const allowedTypes = ["project", "task", "tasklist", "event"] as const;
+			const allowedTypes = ["project", "task", "tasklist", "event", "post"] as const;
 			if (allowedTypes.includes(options.type)) {
 				filters.push(`type = '${options.type}'`);
 			}
@@ -309,7 +355,8 @@ export class SearchService {
 					| "project"
 					| "task"
 					| "tasklist"
-					| "event",
+					| "event"
+					| "post",
 				status: result.content?.status || "",
 				projectName: result.content?.projectName || "",
 				url: result.metadata?.url || "",

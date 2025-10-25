@@ -95,6 +95,13 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 					),
 				},
 				{
+					href: `/${tenant}/projects/${projectId}/posts`,
+					label: "Posts",
+					active: pathname.startsWith(
+						`/${tenant}/projects/${projectId}/posts`,
+					),
+				},
+				{
 					href: `/${tenant}/projects/${projectId}/activity`,
 					label: "Activity",
 					active: pathname === `/${tenant}/projects/${projectId}/activity`,

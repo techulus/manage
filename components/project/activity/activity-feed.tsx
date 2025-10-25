@@ -1,23 +1,25 @@
 "use client";
 
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { formatDistanceToNow } from "date-fns";
+import {
+	ActivityIcon,
+	PencilIcon,
+	PlusCircleIcon,
+	TrashIcon,
+} from "lucide-react";
+import { useParams } from "next/navigation";
+import { useMemo } from "react";
+import Markdown from "react-markdown";
 import { Spinner, SpinnerWithSpacing } from "@/components/core/loaders";
 import { UserAvatar } from "@/components/core/user-avatar";
 import { Button } from "@/components/ui/button";
 import type { ActivityWithActor } from "@/drizzle/types";
 import { generateObjectDiffMessage } from "@/lib/activity/message";
 import { guessTimezone, toDateTimeString } from "@/lib/utils/date";
-import { formatDistanceToNow } from "date-fns";
-import { useTRPC } from "@/trpc/client";
-import { useQuery } from "@tanstack/react-query";
-import {
-	PencilIcon,
-	PlusCircleIcon,
-	TrashIcon,
-	ActivityIcon,
-} from "lucide-react";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import Markdown from "react-markdown";
+import { useTRPCClient } from "@/trpc/client";
+
+const ACTIVITIES_LIMIT = 25;
 
 export function ActivityItem({
 	item,
@@ -122,38 +124,35 @@ export function ActivityItem({
 
 export function ActivityFeed() {
 	const { projectId } = useParams();
-	const [hasMore, setHasMore] = useState(true);
-	const [offset, setOffset] = useState(0);
-	const [allActivities, setAllActivities] = useState<ActivityWithActor[]>([]);
+	const trpcClient = useTRPCClient();
 
-	const trpc = useTRPC();
-	const { data: activities = [], isLoading } = useQuery({
-		...trpc.projects.getActivities.queryOptions({
-			projectId: +projectId!,
-			offset,
-		}),
-		staleTime: 0,
-		gcTime: 0,
+	const {
+		data: activitiesData,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+		isPending,
+	} = useInfiniteQuery({
+		queryKey: ["projects", "getActivities", +projectId!],
+		queryFn: async ({ pageParam }) => {
+			return await trpcClient.projects.getActivities.query({
+				projectId: +projectId!,
+				offset: pageParam,
+			});
+		},
+		initialPageParam: 0,
+		getNextPageParam: (lastPage, allPages) => {
+			if (lastPage.length < ACTIVITIES_LIMIT) return undefined;
+			return allPages.length * ACTIVITIES_LIMIT;
+		},
 	});
 
-	useEffect(() => {
-		const existingActivityIds = allActivities.map((activity) => activity.id);
-		const newActivities = activities.filter(
-			(activity) => !existingActivityIds.includes(activity.id),
-		);
-		if (newActivities.length > 0) {
-			setAllActivities((prev) => [...prev, ...newActivities]);
-			setHasMore(newActivities.length === 25);
-		} else {
-			setHasMore(false);
-		}
-	}, [activities, allActivities]);
+	const allActivities = useMemo(
+		() => activitiesData?.pages.flat() ?? [],
+		[activitiesData],
+	);
 
-	const loadMore = () => {
-		setOffset((prev) => prev + 25);
-	};
-
-	if (isLoading && !allActivities.length) {
+	if (isPending) {
 		return <SpinnerWithSpacing />;
 	}
 
@@ -170,11 +169,11 @@ export function ActivityFeed() {
 							/>
 						))}
 					</ul>
-					{!isLoading ? (
+					{!isFetchingNextPage && (
 						<div className="flex justify-center p-4 border-t border-border/50 mt-2">
-							{hasMore ? (
+							{hasNextPage ? (
 								<Button
-									onClick={loadMore}
+									onClick={() => fetchNextPage()}
 									variant="outline"
 									size="sm"
 									className="w-full max-w-xs shadow-sm hover:shadow-md transition-shadow duration-200"
@@ -189,12 +188,12 @@ export function ActivityFeed() {
 								</div>
 							)}
 						</div>
-					) : null}
-					{isLoading ? (
+					)}
+					{isFetchingNextPage && (
 						<div className="flex justify-center py-4">
 							<Spinner className="mx-auto" />
 						</div>
-					) : null}
+					)}
 				</>
 			) : (
 				<div className="flex flex-col items-center justify-center py-12 px-4 text-center">

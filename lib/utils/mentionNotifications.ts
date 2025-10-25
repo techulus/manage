@@ -5,7 +5,7 @@ import { database } from "./useDatabase";
 import { notifyUser } from "./useNotification";
 
 interface MentionContext {
-	type: "project" | "task" | "tasklist" | "event" | "comment";
+	type: "project" | "task" | "tasklist" | "event" | "comment" | "post";
 	entityName: string;
 	entityId: number;
 	projectId?: number; // For linking back to project
@@ -63,6 +63,11 @@ export async function sendMentionNotifications(
 		case "comment":
 			message = `${fromUserName} mentioned you in a comment on "${context.entityName}"`;
 			target = `/${context.orgSlug}/projects/${context.projectId}`;
+			break;
+
+		case "post":
+			message = `${fromUserName} mentioned you in post "${context.entityName}"`;
+			target = `/${context.orgSlug}/projects/${context.projectId}/posts`;
 			break;
 
 		default:
