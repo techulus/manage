@@ -161,6 +161,7 @@ async function main() {
 	}
 
 	console.log("\n✓ All tenant databases processed successfully!");
+	process.exit(0);
 }
 
 main().catch((error) => {

@@ -40,6 +40,7 @@ async function main() {
 
 	if (result.success) {
 		console.log("✓ Ops database migrated successfully!\n");
+		process.exit(0);
 	} else {
 		console.log(`✗ Migration failed: ${result.error || "Unknown error"}\n`);
 		process.exit(1);

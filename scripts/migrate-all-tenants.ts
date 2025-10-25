@@ -159,6 +159,7 @@ async function main() {
 	}
 
 	console.log("\n✓ All tenant databases migrated successfully!");
+	process.exit(0);
 }
 
 main().catch((error) => {
