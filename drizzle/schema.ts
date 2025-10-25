@@ -52,6 +52,7 @@ export const projectRelations = relations(project, ({ many, one }) => ({
 	taskLists: many(taskList),
 	events: many(calendarEvent),
 	permissions: many(projectPermission),
+	posts: many(post),
 }));
 
 export const task = pgTable("Task", {
@@ -280,3 +281,32 @@ export const projectPermissionRelations = relations(
 		}),
 	}),
 );
+
+export const post = pgTable("Post", {
+	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+	title: text("title").notNull(),
+	content: text("content"),
+	metadata: jsonb("metadata"),
+	category: text("category").notNull(),
+	isDraft: boolean("isDraft").notNull().default(true),
+	publishedAt: timestamp("publishedAt"),
+	createdAt: timestamp().notNull().defaultNow(),
+	updatedAt: timestamp().notNull().defaultNow(),
+	projectId: integer("projectId")
+		.notNull()
+		.references(() => project.id, { onDelete: "cascade", onUpdate: "cascade" }),
+	createdByUser: text("createdByUser")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
+});
+
+export const postRelations = relations(post, ({ one }) => ({
+	creator: one(user, {
+		fields: [post.createdByUser],
+		references: [user.id],
+	}),
+	project: one(project, {
+		fields: [post.projectId],
+		references: [project.id],
+	}),
+}));

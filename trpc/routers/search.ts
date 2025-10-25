@@ -1,16 +1,18 @@
+import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../init";
+import { post, project } from "@/drizzle/schema";
 import { runAndLogError } from "@/lib/error";
 import { getUserProjectIds } from "@/lib/permissions";
-import { eq } from "drizzle-orm";
-import { project } from "@/drizzle/schema";
+import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const searchRouter = createTRPCRouter({
 	searchQuery: protectedProcedure
 		.input(
 			z.object({
 				query: z.string().min(1),
-				type: z.enum(["project", "task", "tasklist", "event"]).optional(),
+				type: z
+					.enum(["project", "task", "tasklist", "event", "post"])
+					.optional(),
 				projectId: z.number().optional(),
 				status: z.string().optional(),
 				limit: z.number().min(1).max(50).default(20),
@@ -51,7 +53,7 @@ export const searchRouter = createTRPCRouter({
 					return accessibleProjectIds.includes(result.projectId);
 				}
 
-				// For tasks, tasklists, and events, check if their project is accessible
+				// For tasks, tasklists, events, and posts, check if their project is accessible
 				return (
 					result.projectId && accessibleProjectIds.includes(result.projectId)
 				);
@@ -128,6 +130,21 @@ export const searchRouter = createTRPCRouter({
 			),
 		);
 
+		const posts = await ctx.db.query.post.findMany({
+			where: eq(post.isDraft, false),
+			with: {
+				project: true,
+			},
+		});
+
+		await Promise.allSettled(
+			posts.map((postItem) =>
+				runAndLogError(`indexing post ${postItem.id}`, async () => {
+					await ctx.search.indexPost(postItem, postItem.project);
+				}),
+			),
+		);
+
 		return {
 			success: true,
 			indexed: {
@@ -135,6 +152,7 @@ export const searchRouter = createTRPCRouter({
 				taskLists: taskLists.length,
 				tasks: tasks.length,
 				events: events.length,
+				posts: posts.length,
 			},
 		};
 	}),

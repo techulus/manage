@@ -57,6 +57,13 @@
       "when": 1753692074530,
       "tag": "0007_brainy_freak",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1761372492707,
+      "tag": "0008_soft_serpent_society",
+      "breakpoints": true
     }
   ]
 }

@@ -2,6 +2,7 @@ import type { inferRouterOutputs } from "@trpc/server";
 import { createTRPCRouter } from "../init";
 import { eventsRouter } from "./events";
 import { permissionsRouter } from "./permissions";
+import { postsRouter } from "./posts";
 import { projectsRouter } from "./projects";
 import { searchRouter } from "./search";
 import { settingsRouter } from "./settings";
@@ -14,6 +15,7 @@ export const appRouter = createTRPCRouter({
 	projects: projectsRouter,
 	tasks: tasksRouter,
 	events: eventsRouter,
+	posts: postsRouter,
 	search: searchRouter,
 	permissions: permissionsRouter,
 });
