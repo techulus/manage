@@ -97,9 +97,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				{
 					href: `/${tenant}/projects/${projectId}/posts`,
 					label: "Posts",
-					active: pathname.startsWith(
-						`/${tenant}/projects/${projectId}/posts`,
-					),
+					active: pathname.startsWith(`/${tenant}/projects/${projectId}/posts`),
 				},
 				{
 					href: `/${tenant}/projects/${projectId}/activity`,
@@ -119,11 +117,6 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 				href: `/${tenant}/today`,
 				label: "Today",
 				active: pathname === `/${tenant}/today`,
-			},
-			{
-				href: `/${tenant}/notifications`,
-				label: "Notifications",
-				active: pathname === `/${tenant}/notifications`,
 			},
 			{
 				href: `/${tenant}/settings`,
