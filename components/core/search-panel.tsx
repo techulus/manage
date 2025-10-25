@@ -10,6 +10,7 @@ import {
 	FileText,
 	Filter,
 	FolderOpen,
+	MessagesSquare,
 	RefreshCw,
 	Search,
 	X,
@@ -36,7 +37,7 @@ interface SearchResult {
 	id: string;
 	title: string;
 	description?: string;
-	type: "project" | "task" | "tasklist" | "event";
+	type: "project" | "task" | "tasklist" | "event" | "post";
 	status?: string;
 	projectName?: string;
 	url: string;
@@ -56,6 +57,8 @@ const getTypeIcon = (type: string) => {
 			return <FileText className="h-4 w-4" />;
 		case "event":
 			return <Calendar className="h-4 w-4" />;
+		case "post":
+			return <MessagesSquare className="h-4 w-4" />;
 		default:
 			return <Search className="h-4 w-4" />;
 	}
@@ -71,6 +74,8 @@ const getTypeLabel = (type: string) => {
 			return "Task List";
 		case "event":
 			return "Event";
+		case "post":
+			return "Post";
 		default:
 			return type;
 	}
@@ -105,7 +110,7 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 
 	const [query, setQuery] = useState("");
 	const [typeFilter, setTypeFilter] = useState<
-		"project" | "task" | "tasklist" | "event" | undefined
+		"project" | "task" | "tasklist" | "event" | "post" | undefined
 	>();
 	const [projectFilter, setProjectFilter] = useState<number | undefined>();
 	const [statusFilter, setStatusFilter] = useState<string | undefined>();
@@ -146,7 +151,7 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 		try {
 			const result = await indexAllMutation.mutateAsync();
 			toast.success("Content reindexed successfully!", {
-				description: `Indexed ${result.indexed.projects} projects, ${result.indexed.taskLists} task lists, ${result.indexed.tasks} tasks, and ${result.indexed.events} events.`,
+				description: `Indexed ${result.indexed.projects} projects, ${result.indexed.taskLists} task lists, ${result.indexed.tasks} tasks, ${result.indexed.events} events, and ${result.indexed.posts} posts.`,
 			});
 		} catch (err) {
 			console.error("Error reindexing content:", err);
@@ -185,7 +190,7 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 
 	const groupedResults = groupBy<
 		SearchResult,
-		"project" | "task" | "tasklist" | "event"
+		"project" | "task" | "tasklist" | "event" | "post"
 	>(searchResults, (item) => item.type);
 
 	// Reset search when sheet closes
@@ -203,7 +208,7 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 					<div>
 						<h2 className="text-lg font-semibold">Search</h2>
 						<p className="text-sm text-muted-foreground">
-							Search across all your projects, tasks, events, and more
+							Search across all your projects, tasks, events, posts, and more
 						</p>
 					</div>
 					<Button
@@ -222,7 +227,7 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 					<div className="relative">
 						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 						<Input
-							placeholder="Search projects, tasks, events..."
+							placeholder="Search projects, tasks, events, posts..."
 							value={query}
 							onChange={(e) => setQuery(e.target.value)}
 							className="pl-10 pr-4 h-10"
@@ -311,6 +316,10 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 										<DropdownMenuItem onClick={() => setTypeFilter("event")}>
 											<Calendar className="mr-2 h-4 w-4" />
 											Events
+										</DropdownMenuItem>
+										<DropdownMenuItem onClick={() => setTypeFilter("post")}>
+											<MessagesSquare className="mr-2 h-4 w-4" />
+											Posts
 										</DropdownMenuItem>
 									</DropdownMenuContent>
 								</DropdownMenu>
@@ -402,7 +411,7 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 									</h3>
 									<p className="text-muted-foreground max-w-md">
 										Type in the search box above to find projects, tasks,
-										events, and more across your workspace.
+										events, posts, and more across your workspace.
 									</p>
 								</div>
 							</div>
@@ -444,7 +453,7 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 									{searchResults.length !== 1 ? "s" : ""} for "{debouncedQuery}"
 								</div>
 
-								{["project", "tasklist", "task", "event"].map((type) => {
+								{["project", "tasklist", "task", "event", "post"].map((type) => {
 									const results =
 										groupedResults[type as keyof typeof groupedResults];
 									if (!results || results.length === 0) return null;

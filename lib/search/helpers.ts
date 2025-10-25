@@ -1,5 +1,6 @@
 import {
 	type calendarEvent,
+	post,
 	project,
 	type task,
 	taskList,
@@ -140,6 +141,29 @@ export async function indexEventWithProjectFetch(
 		const projectData = await getProjectForIndexing(db, eventData.projectId);
 		if (projectData) {
 			await search.indexEvent(eventData, projectData);
+		}
+	});
+}
+
+export async function indexPost(
+	search: SearchService,
+	postData: typeof post.$inferSelect,
+	projectData: typeof project.$inferSelect,
+) {
+	await runAndLogError("indexing post for search", async () => {
+		await search.indexPost(postData, projectData);
+	});
+}
+
+export async function indexPostWithProjectFetch(
+	db: Database,
+	search: SearchService,
+	postData: typeof post.$inferSelect,
+) {
+	await runAndLogError("indexing post for search", async () => {
+		const projectData = await getProjectForIndexing(db, postData.projectId);
+		if (projectData) {
+			await search.indexPost(postData, projectData);
 		}
 	});
 }

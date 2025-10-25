@@ -54,14 +54,16 @@ async function performPostUpgradeMaintenance(ownerId: string): Promise<{
 }> {
 	try {
 		const databaseName = getDatabaseName(ownerId);
-		const sslMode =
-			process.env.DATABASE_SSL === "true" ? "?sslmode=require" : "";
 
-		const ownerDb = drizzle(`${process.env.DATABASE_URL}/manage${sslMode}`, {
-			schema,
+		const opsDb = drizzle({
+			connection: {
+				url: `${process.env.DATABASE_URL}/manage`,
+				ssl: process.env.DATABASE_SSL === "true",
+			},
+			schema: opsSchema,
 		});
 
-		const checkDb = await ownerDb.execute(
+		const checkDb = await opsDb.execute(
 			sql`SELECT 1 FROM pg_database WHERE datname = ${databaseName}`,
 		);
 
@@ -69,10 +71,13 @@ async function performPostUpgradeMaintenance(ownerId: string): Promise<{
 			return { success: true, skipped: true };
 		}
 
-		const tenantDb = drizzle(
-			`${process.env.DATABASE_URL}/${databaseName}${sslMode}`,
-			{ schema },
-		);
+		const tenantDb = drizzle({
+			connection: {
+				url: `${process.env.DATABASE_URL}/${databaseName}`,
+				ssl: process.env.DATABASE_SSL === "true",
+			},
+			schema,
+		});
 
 		await tenantDb.execute(
 			sql.raw(`REINDEX DATABASE CONCURRENTLY ${databaseName}`),
