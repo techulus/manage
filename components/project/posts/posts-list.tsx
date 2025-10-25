@@ -22,6 +22,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { PostWithCreator } from "@/drizzle/types";
+import { cn } from "@/lib/utils";
 import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
 
@@ -82,8 +83,9 @@ export default function PostsList({
 		<div className="w-full space-y-2">
 			{posts.map((post) => (
 				<div key={post.id}>
-					<div
-						className="relative flex items-center justify-between p-3 bg-muted rounded-lg hover:bg-muted/80 cursor-pointer transition-colors"
+					<button
+						type="button"
+						className="relative flex items-center justify-between p-3 bg-muted rounded-lg hover:bg-muted/80 cursor-pointer transition-colors w-full text-left"
 						onClick={() => setViewing(post.id)}
 					>
 						<div className="flex items-center gap-3 flex-1">
@@ -114,7 +116,7 @@ export default function PostsList({
 								{post.isDraft && <Badge variant="outline">Draft</Badge>}
 							</div>
 						</div>
-					</div>
+					</button>
 
 					<Panel open={viewing === post.id} setOpen={() => setViewing(null)}>
 						<Title>
@@ -193,11 +195,12 @@ export default function PostsList({
 										</div>
 									</div>
 									<Badge
-										className={
+										className={cn(
+											"ml-auto",
 											categoryColors[
 												viewingPost.category as keyof typeof categoryColors
-											]
-										}
+											],
+										)}
 									>
 										{formatCategory(viewingPost.category)}
 									</Badge>

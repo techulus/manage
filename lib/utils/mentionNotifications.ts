@@ -65,6 +65,11 @@ export async function sendMentionNotifications(
 			target = `/${context.orgSlug}/projects/${context.projectId}`;
 			break;
 
+		case "post":
+			message = `${fromUserName} mentioned you in post "${context.entityName}"`;
+			target = `/${context.orgSlug}/projects/${context.projectId}/posts`;
+			break;
+
 		default:
 			message = `${fromUserName} mentioned you`;
 			target = `/${context.orgSlug}`;

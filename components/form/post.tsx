@@ -1,5 +1,15 @@
 "use client";
 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
+import { parseAsBoolean, useQueryState } from "nuqs";
+import {
+	type Dispatch,
+	memo,
+	type SetStateAction,
+	useRef,
+	useState,
+} from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -11,19 +21,14 @@ import {
 } from "@/components/ui/select";
 import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
-import { parseAsBoolean, useQueryState } from "nuqs";
-import { type Dispatch, type SetStateAction, memo, useState } from "react";
 import Editor from "../editor";
 import { Button } from "../ui/button";
-import { SaveButton } from "./button";
 
 interface Post {
 	id: number;
 	title: string;
 	content: string | null;
-	metadata: any;
+	metadata: unknown;
 	category: string;
 	isDraft: boolean;
 }
@@ -73,11 +78,15 @@ const PostForm = memo(
 		);
 
 		const [title, setTitle] = useState(item?.title ?? "");
-		const [category, setCategory] = useState<"announcement" | "fyi" | "question">(
+		const [category, setCategory] = useState<
+			"announcement" | "fyi" | "question"
+		>(
 			(item?.category as "announcement" | "fyi" | "question") ?? "announcement",
 		);
 
-		const handleSubmit = (isDraft: boolean) => (formData: FormData) => {
+		const formRef = useRef<HTMLFormElement>(null);
+
+		const savePost = (formData: FormData, isDraft = false) => {
 			const content = formData.get("content") as string;
 			const metadata = formData.get("metadata");
 
@@ -93,7 +102,7 @@ const PostForm = memo(
 		};
 
 		return (
-			<form className="flex-1 overflow-hidden overflow-y-auto">
+			<form className="flex-1 overflow-hidden overflow-y-auto" ref={formRef}>
 				<div className="px-6 space-y-6">
 					<div className="space-y-2">
 						<Label htmlFor="title">Title</Label>
@@ -130,7 +139,9 @@ const PostForm = memo(
 						<Editor
 							key={item?.id ?? "new"}
 							defaultValue={item?.content ?? ""}
-							{...(item?.metadata && Array.isArray(item.metadata) && item.metadata.length > 0
+							{...(item?.metadata &&
+							Array.isArray(item.metadata) &&
+							item.metadata.length > 0
 								? { metadata: item.metadata }
 								: {})}
 							name="content"
@@ -153,10 +164,10 @@ const PostForm = memo(
 						type="button"
 						variant="outline"
 						onClick={() => {
-							const form = document.querySelector('form');
+							const form = formRef.current;
 							if (form) {
 								const formData = new FormData(form);
-								handleSubmit(true)(formData);
+								savePost(formData, true);
 							}
 						}}
 					>
@@ -165,14 +176,14 @@ const PostForm = memo(
 					<Button
 						type="button"
 						onClick={() => {
-							const form = document.querySelector('form');
+							const form = formRef.current;
 							if (form) {
 								const formData = new FormData(form);
-								handleSubmit(false)(formData);
+								savePost(formData);
 							}
 						}}
 					>
-						{item ? "Update" : "Publish"}
+						Publish
 					</Button>
 				</div>
 			</form>

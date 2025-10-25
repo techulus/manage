@@ -30,10 +30,7 @@ export const postsRouter = createTRPCRouter({
 			}
 
 			const posts = await ctx.db.query.post.findMany({
-				where: and(
-					eq(post.projectId, projectId),
-					eq(post.isDraft, false),
-				),
+				where: and(eq(post.projectId, projectId), eq(post.isDraft, false)),
 				orderBy: [desc(post.publishedAt)],
 				with: {
 					creator: {
@@ -232,7 +229,8 @@ export const postsRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const { id, projectId, title, content, metadata, category, isDraft } = input;
+			const { id, projectId, title, content, metadata, category, isDraft } =
+				input;
 
 			if (id) {
 				const existing = await ctx.db.query.post.findFirst({
@@ -289,8 +287,8 @@ export const postsRouter = createTRPCRouter({
 					.where(eq(post.id, id))
 					.returning();
 
-				const { metadata: oldMeta, ...oldValue } = oldPost || {};
-				const { metadata: newMeta, ...newValue } = updatedPost[0] || {};
+				const { metadata: _, ...oldValue } = oldPost || {};
+				const { metadata: __, ...newValue } = updatedPost[0] || {};
 
 				await logActivity({
 					action: "updated",
