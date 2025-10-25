@@ -71,3 +71,7 @@ jobs:
           DATABASE_SSL: ${{ secrets.DATABASE_SSL }}
         run: bun run migrate:tenants
 
+      - name: 'notify vercel'
+        uses: 'vercel/repository-dispatch/actions/status@v1'
+        with:
+          name: Vercel - manage: migrate-tenants
