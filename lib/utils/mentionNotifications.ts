@@ -5,7 +5,7 @@ import { database } from "./useDatabase";
 import { notifyUser } from "./useNotification";
 
 interface MentionContext {
-	type: "project" | "task" | "tasklist" | "event" | "comment";
+	type: "project" | "task" | "tasklist" | "event" | "comment" | "post";
 	entityName: string;
 	entityId: number;
 	projectId?: number; // For linking back to project

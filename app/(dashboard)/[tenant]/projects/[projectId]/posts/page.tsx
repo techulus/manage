@@ -5,16 +5,16 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
+import { useState } from "react";
 import EmptyState from "@/components/core/empty-state";
 import { Panel } from "@/components/core/panel";
 import PageSection from "@/components/core/section";
 import PostForm from "@/components/form/post";
 import PageTitle from "@/components/layout/page-title";
 import PostsList from "@/components/project/posts/posts-list";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTRPC } from "@/trpc/client";
-import { useState } from "react";
 
 export default function Posts() {
 	const { projectId, tenant } = useParams();
@@ -83,7 +83,7 @@ export default function Posts() {
 
 					<TabsContent value="drafts">
 						{myDrafts.length ? (
-							<PostsList posts={myDrafts} projectId={+projectId!} isDraft />
+							<PostsList posts={myDrafts} projectId={+projectId!} />
 						) : (
 							<div className="text-center text-muted-foreground py-8">
 								No draft posts

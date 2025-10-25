@@ -6,6 +6,7 @@ import type {
 	blob,
 	calendarEvent,
 	notification,
+	post,
 	project,
 	task,
 	taskList,
@@ -22,6 +23,7 @@ export type Blob = InferSelectModel<typeof blob>;
 export type CalendarEvent = InferSelectModel<typeof calendarEvent>;
 export type Activity = InferSelectModel<typeof activity>;
 export type Notification = InferSelectModel<typeof notification>;
+export type Post = InferSelectModel<typeof post>;
 
 export enum TaskListStatus {
 	ACTIVE = "active",
@@ -66,4 +68,8 @@ export type ActivityWithActor = Activity & {
 export type NotificationWithUser = Notification & {
 	fromUser: Pick<User, "id" | "firstName" | "imageUrl">;
 	toUser: Pick<User, "id" | "firstName" | "imageUrl">;
+};
+
+export type PostWithCreator = Post & {
+	creator: Pick<User, "id" | "firstName" | "lastName" | "imageUrl">;
 };

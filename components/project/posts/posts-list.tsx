@@ -3,8 +3,8 @@
 import { useUser } from "@clerk/nextjs";
 import { Title } from "@radix-ui/react-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { formatDistanceToNow } from "date-fns";
 import { CircleEllipsisIcon } from "lucide-react";
-import { useParams } from "next/navigation";
 import { useState } from "react";
 import { HtmlPreview } from "@/components/core/html-view";
 import { Panel } from "@/components/core/panel";
@@ -21,14 +21,15 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { PostWithCreator } from "@/drizzle/types";
 import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
-import { formatDistanceToNow } from "date-fns";
 
 const categoryColors = {
 	announcement: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
 	fyi: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-	question: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+	question:
+		"bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
 };
 
 const formatCategory = (category: string) => {
@@ -36,31 +37,12 @@ const formatCategory = (category: string) => {
 	return category.charAt(0).toUpperCase() + category.slice(1);
 };
 
-interface Post {
-	id: number;
-	title: string;
-	content: string | null;
-	metadata: any;
-	category: string;
-	isDraft: boolean;
-	publishedAt: Date | null;
-	updatedAt: Date;
-	creator: {
-		id: string;
-		firstName: string | null;
-		lastName: string | null;
-		imageUrl: string | null;
-	};
-}
-
 export default function PostsList({
 	posts,
 	projectId,
-	isDraft = false,
 }: {
-	posts: Post[];
+	posts: PostWithCreator[];
 	projectId: number;
-	isDraft?: boolean;
 }) {
 	const { user } = useUser();
 	const [editing, setEditing] = useState<number | null>(null);
@@ -105,7 +87,7 @@ export default function PostsList({
 						onClick={() => setViewing(post.id)}
 					>
 						<div className="flex items-center gap-3 flex-1">
-							<UserAvatar user={post.creator} size="sm" />
+							<UserAvatar user={post.creator} />
 							<div className="flex-1 min-w-0">
 								<h3 className="text-sm font-medium truncate">{post.title}</h3>
 								<div className="flex items-center gap-2 mt-0.5">
@@ -121,12 +103,15 @@ export default function PostsList({
 								</div>
 							</div>
 							<div className="flex items-center gap-2">
-								<Badge className={categoryColors[post.category as keyof typeof categoryColors]} variant="secondary">
+								<Badge
+									className={
+										categoryColors[post.category as keyof typeof categoryColors]
+									}
+									variant="secondary"
+								>
 									{formatCategory(post.category)}
 								</Badge>
-								{post.isDraft && (
-									<Badge variant="outline">Draft</Badge>
-								)}
+								{post.isDraft && <Badge variant="outline">Draft</Badge>}
 							</div>
 						</div>
 					</div>
@@ -191,19 +176,29 @@ export default function PostsList({
 									<UserAvatar user={viewingPost.creator} />
 									<div>
 										<div className="font-medium">
-											{viewingPost.creator.firstName} {viewingPost.creator.lastName}
+											{viewingPost.creator.firstName}{" "}
+											{viewingPost.creator.lastName}
 										</div>
 										<div className="text-xs text-muted-foreground">
 											{viewingPost.publishedAt
-												? formatDistanceToNow(new Date(viewingPost.publishedAt), {
-														addSuffix: true,
-													})
+												? formatDistanceToNow(
+														new Date(viewingPost.publishedAt),
+														{
+															addSuffix: true,
+														},
+													)
 												: formatDistanceToNow(new Date(viewingPost.updatedAt), {
 														addSuffix: true,
 													})}
 										</div>
 									</div>
-									<Badge className={categoryColors[viewingPost.category as keyof typeof categoryColors]}>
+									<Badge
+										className={
+											categoryColors[
+												viewingPost.category as keyof typeof categoryColors
+											]
+										}
+									>
 										{formatCategory(viewingPost.category)}
 									</Badge>
 									{viewingPost.isDraft && (
