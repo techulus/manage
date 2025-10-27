@@ -1,10 +1,10 @@
 "use client";
 
+import { Dot } from "lucide-react";
+import Link from "next/link";
 import { UserAvatar } from "@/components/core/user-avatar";
 import type { NotificationWithUser } from "@/drizzle/types";
 import { toDateTimeString } from "@/lib/utils/date";
-import { Dot } from "lucide-react";
-import Link from "next/link";
 
 export function NotificationItem({
 	notification,

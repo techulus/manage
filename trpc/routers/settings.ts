@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { z } from "zod";
 import { blob, user } from "@/drizzle/schema";
 import type { User } from "@/drizzle/types";
-import { opsUser } from "@/ops/drizzle/schema";
+import { opsOrganization, opsUser } from "@/ops/drizzle/schema";
 import { getOpsDatabase } from "@/ops/useOps";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
@@ -32,27 +32,42 @@ export const settingsRouter = createTRPCRouter({
 				maxAge: 60 * 60 * 24 * 365,
 			});
 
-			// Update main user database
 			await ctx.db
 				.update(user)
 				.set({ timeZone: input, lastActiveAt: new Date() })
 				.where(eq(user.id, ctx.userId))
 				.execute();
 
-			// Also update ops user database for email scheduling
 			try {
 				const opsDb = await getOpsDatabase();
+
 				await opsDb
 					.update(opsUser)
-					.set({ timeZone: input, lastActiveAt: new Date() })
+					.set({
+						timeZone: input,
+						lastActiveAt: new Date(),
+						markedForDeletionAt: null,
+						finalWarningAt: null,
+					})
 					.where(eq(opsUser.id, ctx.userId))
 					.execute();
+
+				if (ctx.orgId) {
+					await opsDb
+						.update(opsOrganization)
+						.set({
+							lastActiveAt: new Date(),
+							markedForDeletionAt: null,
+							finalWarningAt: null,
+						})
+						.where(eq(opsUser.id, ctx.orgId))
+						.execute();
+				}
 			} catch (error) {
 				console.error(
 					"[Settings] Error updating timezone in ops database:",
 					error,
 				);
-				// Don't throw error to avoid blocking the main update
 			}
 		}),
 	getTimezone: protectedProcedure.output(z.string()).query(async () => {
