@@ -1,9 +1,8 @@
 "use client";
 
-import { useTRPC } from "@/trpc/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { memo } from "react";
+import { memo, useEffect } from "react";
+import { useTRPC } from "@/trpc/client";
 
 export const ReportTimezone = memo(function ReportTimezone() {
 	const trpc = useTRPC();
