@@ -1,19 +1,20 @@
-import { TurboWireHub } from "@turbowire/serverless";
+import { createTurboWireHub } from "@turbowire/serverless";
+import { realtimeSchema } from "@/data/notification";
 
-export type Event = "notifications";
-
-export async function getSignedWireUrl(room: Event, userId: string) {
-	const turbowire = new TurboWireHub(process.env.TURBOWIRE_DOMAIN!);
-	return turbowire.getSignedWire(`${room}/${userId}`);
+export async function getSignedWireUrl(room: string, userId: string) {
+  const turbowire = createTurboWireHub(process.env.TURBOWIRE_DOMAIN!, {
+    schema: realtimeSchema,
+  });
+  return turbowire.getSignedWire(`${room}/${userId}`);
 }
 
 export async function broadcastEvent(
-	room: Event,
-	actor: string,
-	message: Record<string, string | number> | null = null,
+  room: string,
+  userId: string,
+  content: string | null = null,
 ) {
-	const turbowire = new TurboWireHub(process.env.TURBOWIRE_DOMAIN!, {
-		broadcastUrl: process.env.TURBOWIRE_BROADCAST_URL,
-	});
-	await turbowire.broadcast(`${room}/${actor}`, JSON.stringify(message));
+  const turbowire = createTurboWireHub(process.env.TURBOWIRE_DOMAIN!, {
+    schema: realtimeSchema,
+  });
+  await turbowire.broadcast(`${room}/${userId}`).notification({ content });
 }
