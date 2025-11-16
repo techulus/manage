@@ -67,12 +67,12 @@
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.44.6",
     "es-toolkit": "^1.39.8",
-    "eslint-config-next": "16.0.0",
+    "eslint-config-next": "16.0.3",
     "ical-generator": "^8.0.1",
     "lucide-react": "^0.503.0",
     "mime-types": "^2.1.35",
     "neverthrow": "^8.2.0",
-    "next": "16.0.0",
+    "next": "16.0.3",
     "next-themes": "^0.3.0",
     "node-ical": "^0.20.1",
     "nuqs": "^2.4.1",
@@ -104,15 +104,15 @@
     "@tailwindcss/typography": "^0.5.13",
     "@types/mime-types": "^2.1.4",
     "@types/node": "20.1.0",
-    "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.2",
+    "@types/react": "19.2.5",
+    "@types/react-dom": "19.2.3",
     "drizzle-kit": "^0.31.5",
     "encoding": "^0.1.13",
     "typescript": "5.7.2"
   },
   "overrides": {
-    "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.2"
+    "@types/react": "19.2.5",
+    "@types/react-dom": "19.2.3"
   },
   "trustedDependencies": [
     "@sentry/cli"
