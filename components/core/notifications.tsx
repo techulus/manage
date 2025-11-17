@@ -1,11 +1,11 @@
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { TurboWire } from "@turbowire/web";
+import { useWireEvent } from "@turbowire/react";
 import { Bell, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { realtimeSchema } from "@/data/notification";
+import { type NotificationPayload, realtimeSchema } from "@/data/notification";
 import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
 import { Button } from "../ui/button";
@@ -40,14 +40,8 @@ export function Notifications({
 
   const unreadCount = notifications?.filter((x) => !x.read).length;
 
-  useEffect(() => {
-    if (!notificationsWire) return;
-
-    const wire = new TurboWire(notificationsWire, { schema: realtimeSchema });
-
-    wire.connect();
-
-    wire.on("notification", ({ content }) => {
+  const onNotification = useCallback(
+    ({ content }: NotificationPayload) => {
       try {
         if (!content) return;
         refetchNotifications();
@@ -55,12 +49,16 @@ export function Notifications({
       } catch (error) {
         console.error(error);
       }
-    });
+    },
+    [refetchNotifications],
+  );
 
-    return () => {
-      wire?.disconnect();
-    };
-  }, [notificationsWire, refetchNotifications]);
+  const wireOptions = useMemo(
+    () => ({ schema: realtimeSchema, notification: onNotification }),
+    [onNotification],
+  );
+
+  useWireEvent(notificationsWire, wireOptions);
 
   return (
     <>
