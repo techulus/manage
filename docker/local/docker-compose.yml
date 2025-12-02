@@ -1,4 +1,20 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: managee
+      POSTGRES_PASSWORD: managee_dev_password
+      POSTGRES_DB: managee_dev
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U managee"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   minio:
     image: quay.io/minio/minio
     ports:
@@ -10,13 +26,32 @@ services:
     volumes:
       - ./blob-data:/data
     command: server /data --console-address ":9001"
-  
-  anycable:
-    image: anycable/anycable-go:latest
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  turbowire:
+    image: arjunkomath/turbowire-server:latest
     ports:
       - 8080:8080
     environment:
-      ANYCABLE_HOST: 0.0.0.0
-      ANYCABLE_BROADCAST_ADAPTER: http
-      ANYCABLE_SECRET: ${ANYCABLE_SECRET}
-      ANYCABLE_BROADCAST_KEY: ${ANYCABLE_BROADCAST_KEY}
+      BROADCAST_KEY: "test"
+      SIGNING_KEY: "test"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8080/health",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  postgres-data:
