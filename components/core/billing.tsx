@@ -8,5 +8,5 @@ export function Billing() {
 	const { systemTheme } = useTheme();
 	const appearance = systemTheme === "dark" ? { baseTheme: dark } : undefined;
 
-	return <PricingTable forOrganizations appearance={appearance} />;
+	return <PricingTable appearance={appearance} for="organization" />;
 }
