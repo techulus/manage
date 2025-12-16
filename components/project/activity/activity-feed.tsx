@@ -1,25 +1,12 @@
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
-import {
-	format,
-	formatDistanceToNow,
-	isThisMonth,
-	isThisWeek,
-	isToday,
-	isYesterday,
-} from "date-fns";
-import {
-	ActivityIcon,
-	PencilIcon,
-	PlusCircleIcon,
-	TrashIcon,
-} from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { ActivityIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
 import Markdown from "react-markdown";
 import { Spinner, SpinnerWithSpacing } from "@/components/core/loaders";
-import { UserAvatar } from "@/components/core/user-avatar";
 import { Button } from "@/components/ui/button";
 import type { ActivityWithActor } from "@/drizzle/types";
 import { generateObjectDiffMessage } from "@/lib/activity/message";
@@ -33,78 +20,47 @@ function getActionConfig(action: string) {
 		case "created":
 			return {
 				label: "Created",
-				icon: PlusCircleIcon,
 				bgColor: "bg-emerald-100 dark:bg-emerald-900/50",
-				iconColor: "text-emerald-600 dark:text-emerald-400",
-				borderColor: "border-emerald-200 dark:border-emerald-800",
+				textColor: "text-emerald-600 dark:text-emerald-400",
 			};
 		case "updated":
 			return {
 				label: "Updated",
-				icon: PencilIcon,
 				bgColor: "bg-blue-100 dark:bg-blue-900/50",
-				iconColor: "text-blue-600 dark:text-blue-400",
-				borderColor: "border-blue-200 dark:border-blue-800",
+				textColor: "text-blue-600 dark:text-blue-400",
 			};
 		case "deleted":
 			return {
 				label: "Deleted",
-				icon: TrashIcon,
 				bgColor: "bg-red-100 dark:bg-red-900/50",
-				iconColor: "text-red-600 dark:text-red-400",
-				borderColor: "border-red-200 dark:border-red-800",
+				textColor: "text-red-600 dark:text-red-400",
 			};
 		default:
 			return {
 				label: action,
-				icon: ActivityIcon,
 				bgColor: "bg-muted",
-				iconColor: "text-muted-foreground",
-				borderColor: "border-border",
+				textColor: "text-muted-foreground",
 			};
 	}
 }
 
-function getDateGroup(date: Date): string {
-	if (isToday(date)) return "Today";
-	if (isYesterday(date)) return "Yesterday";
-	if (isThisWeek(date)) return "This Week";
-	if (isThisMonth(date)) return "This Month";
-	return format(date, "MMMM yyyy");
-}
-
 export function ActivityItem({ item }: { item: ActivityWithActor }) {
 	const actionConfig = getActionConfig(item.action);
-	const ActionIcon = actionConfig.icon;
 
 	return (
-		<div className="group relative flex gap-4 py-4 px-4 hover:bg-muted/30 rounded-lg transition-colors">
-			<div className="flex-shrink-0 relative">
-				{item.actor ? (
-					<UserAvatar
-						user={item.actor}
-						className="h-10 w-10 ring-2 ring-background shadow-sm"
-					/>
-				) : null}
-				<div
-					className={`absolute -bottom-1 -right-1 rounded-full p-1.5 ${actionConfig.bgColor} border ${actionConfig.borderColor}`}
-				>
-					<ActionIcon className={`h-3 w-3 ${actionConfig.iconColor}`} />
-				</div>
-			</div>
-
-			<div className="flex-1 min-w-0 space-y-1">
-				<div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+		<div className="py-4 px-4 hover:bg-muted/30 rounded-lg transition-colors">
+			<div className="space-y-1 text-center">
+				<div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
 					<span className="font-semibold text-foreground">
 						{item.actor.firstName}
 					</span>
 					<span
-						className={`text-xs font-medium px-2 py-0.5 rounded ${actionConfig.bgColor} ${actionConfig.iconColor}`}
+						className={`text-xs font-medium px-2 py-0.5 rounded ${actionConfig.bgColor} ${actionConfig.textColor}`}
 					>
 						{actionConfig.label}
 					</span>
 					<span
-						className="text-xs text-muted-foreground ml-auto"
+						className="text-xs text-muted-foreground"
 						title={toDateTimeString(item.createdAt, guessTimezone)}
 					>
 						{formatDistanceToNow(new Date(item.createdAt), {
@@ -128,8 +84,8 @@ export function ActivityItem({ item }: { item: ActivityWithActor }) {
 								<ul className="mt-2 space-y-1 text-sm">{children}</ul>
 							),
 							li: ({ children }) => (
-								<li className="flex items-start gap-2">
-									<span className="text-primary mt-1.5 h-1.5 w-1.5 rounded-full bg-current flex-shrink-0" />
+								<li className="flex items-center justify-center gap-2">
+									<span className="text-primary h-1.5 w-1.5 rounded-full bg-current flex-shrink-0" />
 									<span>{children}</span>
 								</li>
 							),
@@ -139,16 +95,6 @@ export function ActivityItem({ item }: { item: ActivityWithActor }) {
 					</Markdown>
 				</div>
 			</div>
-		</div>
-	);
-}
-
-function DateGroupHeader({ label }: { label: string }) {
-	return (
-		<div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-2 px-4 border-b border-border/50">
-			<span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-				{label}
-			</span>
 		</div>
 	);
 }
@@ -178,21 +124,8 @@ export function ActivityFeed() {
 		},
 	});
 
-	const groupedActivities = useMemo(() => {
-		const activities = activitiesData?.pages.flat() ?? [];
-		const groups: { label: string; items: ActivityWithActor[] }[] = [];
-		let currentGroup: string | null = null;
-
-		for (const activity of activities) {
-			const group = getDateGroup(new Date(activity.createdAt));
-			if (group !== currentGroup) {
-				groups.push({ label: group, items: [activity] });
-				currentGroup = group;
-			} else {
-				groups[groups.length - 1].items.push(activity);
-			}
-		}
-		return groups;
+	const activities = useMemo(() => {
+		return activitiesData?.pages.flat() ?? [];
 	}, [activitiesData]);
 
 	if (isPending) {
@@ -200,18 +133,18 @@ export function ActivityFeed() {
 	}
 
 	return (
-		<div className="flex flex-col w-full">
-			{groupedActivities.length ? (
+		<div className="flex flex-col w-full max-w-2xl mx-auto">
+			{activities.length ? (
 				<>
-					<div className="divide-y divide-border/30">
-						{groupedActivities.map((group) => (
-							<div key={group.label}>
-								<DateGroupHeader label={group.label} />
-								<div className="divide-y divide-border/20">
-									{group.items.map((activityItem) => (
-										<ActivityItem key={activityItem.id} item={activityItem} />
-									))}
-								</div>
+					<div>
+						{activities.map((activityItem, index) => (
+							<div key={activityItem.id}>
+								<ActivityItem item={activityItem} />
+								{index < activities.length - 1 && (
+									<div className="flex justify-center py-2">
+										<div className="w-24 h-px bg-border" />
+									</div>
+								)}
 							</div>
 						))}
 					</div>

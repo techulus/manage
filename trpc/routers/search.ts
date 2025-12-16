@@ -1,18 +1,23 @@
-import { eq, sql } from "drizzle-orm";
+import { and, eq, ilike, inArray, or } from "drizzle-orm";
 import { z } from "zod";
-import { project } from "@/drizzle/schema";
+import {
+	calendarEvent,
+	post,
+	project,
+	task,
+	taskList,
+} from "@/drizzle/schema";
 import { getUserProjectIds } from "@/lib/permissions";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
-interface SearchResultRow {
+interface SearchResult {
 	id: string;
 	title: string;
 	description: string;
 	type: "project" | "task" | "tasklist" | "event" | "post";
 	status: string;
-	project_id: number;
-	project_name: string;
-	rank: number;
+	projectId: number;
+	projectName: string;
 }
 
 export const searchRouter = createTRPCRouter({
@@ -29,152 +34,242 @@ export const searchRouter = createTRPCRouter({
 			}),
 		)
 		.query(async ({ input, ctx }) => {
-			const userProjectIds = await getUserProjectIds(ctx.db, ctx.userId);
+			let accessibleProjectIds: number[];
 
-			const createdProjects = await ctx.db.query.project.findMany({
-				where: eq(project.createdByUser, ctx.userId),
-				columns: { id: true },
-			});
-			const createdProjectIds = createdProjects.map((p) => p.id);
+			if (ctx.isOrgAdmin) {
+				const allProjects = await ctx.db.query.project.findMany({
+					columns: { id: true },
+				});
+				accessibleProjectIds = allProjects.map((p) => p.id);
+			} else {
+				const userProjectIds = await getUserProjectIds(ctx.db, ctx.userId);
 
-			const accessibleProjectIds = [
-				...new Set([...userProjectIds, ...createdProjectIds]),
-			];
+				const createdProjects = await ctx.db.query.project.findMany({
+					where: eq(project.createdByUser, ctx.userId),
+					columns: { id: true },
+				});
+				const createdProjectIds = createdProjects.map((p) => p.id);
+
+				accessibleProjectIds = [
+					...new Set([...userProjectIds, ...createdProjectIds]),
+				];
+			}
 
 			if (accessibleProjectIds.length === 0) {
 				return [];
 			}
 
-			const searchTerms = input.query
-				.trim()
-				.split(/\s+/)
-				.filter((term) => term.length > 0)
-				.map((term) => term.replace(/[^a-zA-Z0-9]/g, ""))
-				.filter((term) => term.length > 0);
+			const searchPattern = `%${input.query.trim()}%`;
+			const results: SearchResult[] = [];
 
-			if (searchTerms.length === 0) {
-				return [];
+			const shouldSearchType = (type: string) =>
+				!input.type || input.type === type;
+
+			const matchesProjectFilter = (projectId: number) =>
+				!input.projectId || input.projectId === projectId;
+
+			const matchesStatusFilter = (status: string) =>
+				!input.status || input.status === status;
+
+			if (shouldSearchType("project")) {
+				const projectResults = await ctx.db
+					.select({
+						id: project.id,
+						name: project.name,
+						description: project.description,
+						status: project.status,
+					})
+					.from(project)
+					.where(
+						and(
+							inArray(project.id, accessibleProjectIds),
+							or(
+								ilike(project.name, searchPattern),
+								ilike(project.description, searchPattern),
+							),
+						),
+					)
+					.limit(input.limit);
+
+				for (const p of projectResults) {
+					if (matchesProjectFilter(p.id) && matchesStatusFilter(p.status)) {
+						results.push({
+							id: `project-${p.id}`,
+							title: p.name,
+							description: p.description || "",
+							type: "project",
+							status: p.status,
+							projectId: p.id,
+							projectName: p.name,
+						});
+					}
+				}
 			}
 
-			const tsQuery = searchTerms.map((term) => `${term}:*`).join(" & ");
+			if (shouldSearchType("task")) {
+				const taskResults = await ctx.db
+					.select({
+						id: task.id,
+						name: task.name,
+						description: task.description,
+						status: task.status,
+						projectId: taskList.projectId,
+						projectName: project.name,
+					})
+					.from(task)
+					.innerJoin(taskList, eq(task.taskListId, taskList.id))
+					.innerJoin(project, eq(taskList.projectId, project.id))
+					.where(
+						and(
+							inArray(taskList.projectId, accessibleProjectIds),
+							or(
+								ilike(task.name, searchPattern),
+								ilike(task.description, searchPattern),
+							),
+						),
+					)
+					.limit(input.limit);
 
-			const projectIdsPlaceholder = accessibleProjectIds.join(",");
-
-			let typeFilter = "";
-			if (input.type) {
-				typeFilter = `AND type = '${input.type}'`;
+				for (const t of taskResults) {
+					if (matchesProjectFilter(t.projectId) && matchesStatusFilter(t.status)) {
+						results.push({
+							id: `task-${t.id}`,
+							title: t.name,
+							description: t.description || "",
+							type: "task",
+							status: t.status,
+							projectId: t.projectId,
+							projectName: t.projectName,
+						});
+					}
+				}
 			}
 
-			let projectFilter = "";
-			if (input.projectId) {
-				projectFilter = `AND project_id = ${input.projectId}`;
+			if (shouldSearchType("tasklist")) {
+				const taskListResults = await ctx.db
+					.select({
+						id: taskList.id,
+						name: taskList.name,
+						description: taskList.description,
+						status: taskList.status,
+						projectId: taskList.projectId,
+						projectName: project.name,
+					})
+					.from(taskList)
+					.innerJoin(project, eq(taskList.projectId, project.id))
+					.where(
+						and(
+							inArray(taskList.projectId, accessibleProjectIds),
+							or(
+								ilike(taskList.name, searchPattern),
+								ilike(taskList.description, searchPattern),
+							),
+						),
+					)
+					.limit(input.limit);
+
+				for (const tl of taskListResults) {
+					if (matchesProjectFilter(tl.projectId) && matchesStatusFilter(tl.status)) {
+						results.push({
+							id: `tasklist-${tl.id}`,
+							title: tl.name,
+							description: tl.description || "",
+							type: "tasklist",
+							status: tl.status,
+							projectId: tl.projectId,
+							projectName: tl.projectName,
+						});
+					}
+				}
 			}
 
-			let statusFilter = "";
-			if (input.status) {
-				statusFilter = `AND status = '${input.status}'`;
+			if (shouldSearchType("event")) {
+				const eventResults = await ctx.db
+					.select({
+						id: calendarEvent.id,
+						name: calendarEvent.name,
+						description: calendarEvent.description,
+						projectId: calendarEvent.projectId,
+						projectName: project.name,
+					})
+					.from(calendarEvent)
+					.innerJoin(project, eq(calendarEvent.projectId, project.id))
+					.where(
+						and(
+							inArray(calendarEvent.projectId, accessibleProjectIds),
+							or(
+								ilike(calendarEvent.name, searchPattern),
+								ilike(calendarEvent.description, searchPattern),
+							),
+						),
+					)
+					.limit(input.limit);
+
+				for (const e of eventResults) {
+					if (matchesProjectFilter(e.projectId)) {
+						results.push({
+							id: `event-${e.id}`,
+							title: e.name,
+							description: e.description || "",
+							type: "event",
+							status: "",
+							projectId: e.projectId,
+							projectName: e.projectName,
+						});
+					}
+				}
 			}
 
-			const query = sql.raw(`
-				WITH search_results AS (
-					SELECT
-						'project-' || id::text as id,
-						name as title,
-						COALESCE(description, '') as description,
-						'project' as type,
-						status,
-						id as project_id,
-						name as project_name,
-						ts_rank(to_tsvector('english', name || ' ' || COALESCE(description, '')), to_tsquery('english', '${tsQuery}')) as rank
-					FROM "Project"
-					WHERE id IN (${projectIdsPlaceholder})
-						AND to_tsvector('english', name || ' ' || COALESCE(description, '')) @@ to_tsquery('english', '${tsQuery}')
+			if (shouldSearchType("post")) {
+				const postResults = await ctx.db
+					.select({
+						id: post.id,
+						title: post.title,
+						content: post.content,
+						projectId: post.projectId,
+						projectName: project.name,
+					})
+					.from(post)
+					.innerJoin(project, eq(post.projectId, project.id))
+					.where(
+						and(
+							inArray(post.projectId, accessibleProjectIds),
+							eq(post.isDraft, false),
+							or(
+								ilike(post.title, searchPattern),
+								ilike(post.content, searchPattern),
+							),
+						),
+					)
+					.limit(input.limit);
 
-					UNION ALL
+				for (const p of postResults) {
+					if (matchesProjectFilter(p.projectId)) {
+						results.push({
+							id: `post-${p.id}`,
+							title: p.title,
+							description: p.content || "",
+							type: "post",
+							status: "",
+							projectId: p.projectId,
+							projectName: p.projectName,
+						});
+					}
+				}
+			}
 
-					SELECT
-						'task-' || t.id::text as id,
-						t.name as title,
-						COALESCE(t.description, '') as description,
-						'task' as type,
-						t.status,
-						p.id as project_id,
-						p.name as project_name,
-						ts_rank(to_tsvector('english', t.name || ' ' || COALESCE(t.description, '')), to_tsquery('english', '${tsQuery}')) as rank
-					FROM "Task" t
-					JOIN "TaskList" tl ON t."taskListId" = tl.id
-					JOIN "Project" p ON tl."projectId" = p.id
-					WHERE p.id IN (${projectIdsPlaceholder})
-						AND to_tsvector('english', t.name || ' ' || COALESCE(t.description, '')) @@ to_tsquery('english', '${tsQuery}')
+			const limitedResults = results.slice(0, input.limit);
 
-					UNION ALL
-
-					SELECT
-						'tasklist-' || tl.id::text as id,
-						tl.name as title,
-						COALESCE(tl.description, '') as description,
-						'tasklist' as type,
-						tl.status,
-						p.id as project_id,
-						p.name as project_name,
-						ts_rank(to_tsvector('english', tl.name || ' ' || COALESCE(tl.description, '')), to_tsquery('english', '${tsQuery}')) as rank
-					FROM "TaskList" tl
-					JOIN "Project" p ON tl."projectId" = p.id
-					WHERE p.id IN (${projectIdsPlaceholder})
-						AND to_tsvector('english', tl.name || ' ' || COALESCE(tl.description, '')) @@ to_tsquery('english', '${tsQuery}')
-
-					UNION ALL
-
-					SELECT
-						'event-' || e.id::text as id,
-						e.name as title,
-						COALESCE(e.description, '') as description,
-						'event' as type,
-						'' as status,
-						p.id as project_id,
-						p.name as project_name,
-						ts_rank(to_tsvector('english', e.name || ' ' || COALESCE(e.description, '')), to_tsquery('english', '${tsQuery}')) as rank
-					FROM "Event" e
-					JOIN "Project" p ON e."projectId" = p.id
-					WHERE p.id IN (${projectIdsPlaceholder})
-						AND to_tsvector('english', e.name || ' ' || COALESCE(e.description, '')) @@ to_tsquery('english', '${tsQuery}')
-
-					UNION ALL
-
-					SELECT
-						'post-' || po.id::text as id,
-						po.title as title,
-						COALESCE(po.content, '') as description,
-						'post' as type,
-						'' as status,
-						p.id as project_id,
-						p.name as project_name,
-						ts_rank(to_tsvector('english', po.title || ' ' || COALESCE(po.content, '')), to_tsquery('english', '${tsQuery}')) as rank
-					FROM "Post" po
-					JOIN "Project" p ON po."projectId" = p.id
-					WHERE p.id IN (${projectIdsPlaceholder})
-						AND po."isDraft" = false
-						AND to_tsvector('english', po.title || ' ' || COALESCE(po.content, '')) @@ to_tsquery('english', '${tsQuery}')
-				)
-				SELECT * FROM search_results
-				WHERE 1=1 ${typeFilter} ${projectFilter} ${statusFilter}
-				ORDER BY rank DESC
-				LIMIT ${input.limit}
-			`);
-
-			const results = await ctx.db.execute(query);
-			const rows = results as unknown as SearchResultRow[];
-
-			return rows.map((row) => ({
+			return limitedResults.map((row) => ({
 				id: row.id,
 				title: row.title,
 				description: row.description,
 				type: row.type,
 				status: row.status,
-				projectId: row.project_id,
-				projectName: row.project_name,
+				projectId: row.projectId,
+				projectName: row.projectName,
 				url: buildUrl(ctx.orgSlug, row),
-				score: row.rank,
+				score: 1,
 				createdAt: new Date(),
 				dueDate: undefined,
 			}));
@@ -183,9 +278,9 @@ export const searchRouter = createTRPCRouter({
 
 function buildUrl(
 	orgSlug: string,
-	row: SearchResultRow,
+	row: SearchResult,
 ): string {
-	const projectId = row.project_id;
+	const projectId = row.projectId;
 	const entityId = row.id.split("-")[1];
 
 	switch (row.type) {
