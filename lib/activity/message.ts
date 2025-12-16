@@ -140,6 +140,7 @@ export function generateObjectDiffMessage(item: ActivityWithActor) {
 			"repeatRule",
 			"creatorId",
 			"id",
+			"metadata",
 		];
 
 		for (const key in oldValue) {

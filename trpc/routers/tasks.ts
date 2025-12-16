@@ -5,11 +5,6 @@ import { task, taskList } from "@/drizzle/schema";
 import { TaskListStatus, TaskStatus } from "@/drizzle/types";
 import { logActivity } from "@/lib/activity";
 import { canEditProject, canViewProject } from "@/lib/permissions";
-import {
-	deleteSearchItem,
-	indexTaskListWithProjectFetch,
-	indexTaskWithDataFetch,
-} from "@/lib/search/helpers";
 import { sendMentionNotifications } from "@/lib/utils/mentionNotifications";
 import { notifyUser } from "@/lib/utils/useNotification";
 import { createTRPCRouter, protectedProcedure } from "../init";
@@ -98,24 +93,15 @@ export const tasksRouter = createTRPCRouter({
 				newValue: createdTaskList[0],
 			});
 
-			if (createdTaskList?.[0]) {
-				await indexTaskListWithProjectFetch(
-					ctx.db,
-					ctx.search,
-					createdTaskList[0],
-				);
-
-				// Send mention notifications if description was provided
-				if (input.description) {
-					await sendMentionNotifications(input.description, {
-						type: "tasklist",
-						entityName: input.name,
-						entityId: createdTaskList[0].id,
-						projectId: input.projectId,
-						orgSlug: ctx.orgSlug,
-						fromUserId: ctx.userId,
-					});
-				}
+			if (createdTaskList?.[0] && input.description) {
+				await sendMentionNotifications(input.description, {
+					type: "tasklist",
+					entityName: input.name,
+					entityId: createdTaskList[0].id,
+					projectId: input.projectId,
+					orgSlug: ctx.orgSlug,
+					fromUserId: ctx.userId,
+				});
 			}
 
 			return createdTaskList?.[0];
@@ -193,20 +179,15 @@ export const tasksRouter = createTRPCRouter({
 					newValue: data[0],
 				});
 
-				if (data?.[0]) {
-					await indexTaskListWithProjectFetch(ctx.db, ctx.search, data[0]);
-
-					// Send mention notifications if description was updated
-					if ("description" in input && input.description) {
-						await sendMentionNotifications(input.description, {
-							type: "tasklist",
-							entityName: oldTaskList.name,
-							entityId: input.id,
-							projectId: oldTaskList.projectId,
-							orgSlug: ctx.orgSlug,
-							fromUserId: ctx.userId,
-						});
-					}
+				if (data?.[0] && "description" in input && input.description) {
+					await sendMentionNotifications(input.description, {
+						type: "tasklist",
+						entityName: oldTaskList.name,
+						entityId: input.id,
+						projectId: oldTaskList.projectId,
+						orgSlug: ctx.orgSlug,
+						fromUserId: ctx.userId,
+					});
 				}
 			}
 
@@ -243,9 +224,6 @@ export const tasksRouter = createTRPCRouter({
 					projectId: data[0].projectId,
 					oldValue: data[0],
 				});
-
-				// Remove task list from search index
-				await deleteSearchItem(ctx.search, `tasklist-${input.id}`, "task list");
 			}
 
 			return data?.[0];
@@ -347,20 +325,15 @@ export const tasksRouter = createTRPCRouter({
 				newValue: createdTask[0],
 			});
 
-			if (createdTask?.[0]) {
-				await indexTaskWithDataFetch(ctx.db, ctx.search, createdTask[0]);
-
-				// Send mention notifications if description was provided
-				if (input.description) {
-					await sendMentionNotifications(input.description, {
-						type: "task",
-						entityName: input.name || "Untitled Task",
-						entityId: createdTask[0].id,
-						projectId: taskListDetails.projectId,
-						orgSlug: ctx.orgSlug,
-						fromUserId: ctx.userId,
-					});
-				}
+			if (createdTask?.[0] && input.description) {
+				await sendMentionNotifications(input.description, {
+					type: "task",
+					entityName: input.name || "Untitled Task",
+					entityId: createdTask[0].id,
+					projectId: taskListDetails.projectId,
+					orgSlug: ctx.orgSlug,
+					fromUserId: ctx.userId,
+				});
 			}
 
 			return createdTask?.[0];
@@ -468,20 +441,15 @@ export const tasksRouter = createTRPCRouter({
 					newValue: updatedTask[0],
 				});
 
-				if (updatedTask?.[0]) {
-					await indexTaskWithDataFetch(ctx.db, ctx.search, updatedTask[0]);
-
-					// Send mention notifications if description was updated
-					if ("description" in input && input.description) {
-						await sendMentionNotifications(input.description, {
-							type: "task",
-							entityName: oldTask.name,
-							entityId: input.id,
-							projectId: oldTask.taskList.projectId,
-							orgSlug: ctx.orgSlug,
-							fromUserId: ctx.userId,
-						});
-					}
+				if (updatedTask?.[0] && "description" in input && input.description) {
+					await sendMentionNotifications(input.description, {
+						type: "task",
+						entityName: oldTask.name,
+						entityId: input.id,
+						projectId: oldTask.taskList.projectId,
+						orgSlug: ctx.orgSlug,
+						fromUserId: ctx.userId,
+					});
 				}
 			}
 
@@ -521,8 +489,6 @@ export const tasksRouter = createTRPCRouter({
 					projectId: currentTask.taskList.projectId,
 					oldValue: currentTask,
 				});
-
-				await deleteSearchItem(ctx.search, `task-${input.id}`, "task");
 			}
 
 			return currentTask;

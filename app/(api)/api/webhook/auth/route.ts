@@ -10,7 +10,6 @@ import {
   accountDeletedPlainText,
 } from "@/components/emails/account-deleted";
 import * as schema from "@/drizzle/schema";
-import { SearchService } from "@/lib/search";
 import {
   deleteDatabase,
   getDatabaseForOwner,
@@ -271,15 +270,6 @@ export async function POST(req: NextRequest) {
           console.error("Error deleting user database:", err);
         }
 
-        // Delete search index for user
-        try {
-          const userSearch = new SearchService(id, "me");
-          await userSearch.deleteTenantIndex();
-          console.log("User search index deleted successfully");
-        } catch (err) {
-          console.error("Error deleting user search index:", err);
-        }
-
         // Also delete user from ops database
         try {
           const db = await getOpsDatabase();
@@ -330,20 +320,6 @@ export async function POST(req: NextRequest) {
         } catch (err) {
           console.error(
             `[Webhook] Error deleting organization database for ID: ${id}:`,
-            err,
-          );
-        }
-
-        // Delete search index for organization
-        try {
-          const orgSearch = new SearchService(id, id); // slug is not relevant for deleting
-          await orgSearch.deleteTenantIndex();
-          console.log(
-            `[Webhook] Organization search index deleted successfully for ID: ${id}`,
-          );
-        } catch (err) {
-          console.error(
-            `[Webhook] Error deleting organization search index for ID: ${id}:`,
             err,
           );
         }

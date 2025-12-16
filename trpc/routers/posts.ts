@@ -4,10 +4,6 @@ import { z } from "zod";
 import { post } from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
 import { canEditProject, canViewProject } from "@/lib/permissions";
-import {
-	deleteSearchItem,
-	indexPostWithProjectFetch,
-} from "@/lib/search/helpers";
 import { sendMentionNotifications } from "@/lib/utils/mentionNotifications";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
@@ -178,8 +174,6 @@ export const postsRouter = createTRPCRouter({
 					projectId: deletedPost[0].projectId,
 					oldValue,
 				});
-
-				await deleteSearchItem(ctx.search, `post-${id}`, "post");
 			}
 
 			return deletedPost[0];
@@ -268,19 +262,15 @@ export const postsRouter = createTRPCRouter({
 					newValue,
 				});
 
-				if (updatedPost?.[0] && !isDraft) {
-					await indexPostWithProjectFetch(ctx.db, ctx.search, updatedPost[0]);
-
-					if (content) {
-						await sendMentionNotifications(content, {
-							type: "post",
-							entityName: title,
-							entityId: id,
-							projectId,
-							orgSlug: ctx.orgSlug,
-							fromUserId: ctx.userId,
-						});
-					}
+				if (updatedPost?.[0] && !isDraft && content) {
+					await sendMentionNotifications(content, {
+						type: "post",
+						entityName: title,
+						entityId: id,
+						projectId,
+						orgSlug: ctx.orgSlug,
+						fromUserId: ctx.userId,
+					});
 				}
 			} else {
 				const newPost = await ctx.db
@@ -303,19 +293,15 @@ export const postsRouter = createTRPCRouter({
 					newValue,
 				});
 
-				if (newPost?.[0] && !isDraft) {
-					await indexPostWithProjectFetch(ctx.db, ctx.search, newPost[0]);
-
-					if (content) {
-						await sendMentionNotifications(content, {
-							type: "post",
-							entityName: title,
-							entityId: postId,
-							projectId,
-							orgSlug: ctx.orgSlug,
-							fromUserId: ctx.userId,
-						});
-					}
+				if (newPost?.[0] && !isDraft && content) {
+					await sendMentionNotifications(content, {
+						type: "post",
+						entityName: title,
+						entityId: postId,
+						projectId,
+						orgSlug: ctx.orgSlug,
+						fromUserId: ctx.userId,
+					});
 				}
 			}
 
