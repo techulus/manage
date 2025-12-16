@@ -17,10 +17,6 @@ import { z } from "zod";
 import { calendarEvent } from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
 import { canEditProject, canViewProject } from "@/lib/permissions";
-import {
-	deleteSearchItem,
-	indexEventWithProjectFetch,
-} from "@/lib/search/helpers";
 import { toEndOfDay, toStartOfDay, toTimeZone, toUTC } from "@/lib/utils/date";
 import { sendMentionNotifications } from "@/lib/utils/mentionNotifications";
 import {
@@ -177,8 +173,6 @@ export const eventsRouter = createTRPCRouter({
 					projectId: event[0].projectId,
 					oldValue: event[0],
 				});
-
-				await deleteSearchItem(ctx.search, `event-${id}`, "event");
 			}
 
 			return event[0];
@@ -306,20 +300,15 @@ export const eventsRouter = createTRPCRouter({
 					newValue: updatedEvent[0],
 				});
 
-				if (updatedEvent?.[0]) {
-					await indexEventWithProjectFetch(ctx.db, ctx.search, updatedEvent[0]);
-
-					// Send mention notifications if description was updated
-					if (description) {
-						await sendMentionNotifications(description, {
-							type: "event",
-							entityName: name,
-							entityId: id,
-							projectId,
-							orgSlug: ctx.orgSlug,
-							fromUserId: ctx.userId,
-						});
-					}
+				if (updatedEvent?.[0] && description) {
+					await sendMentionNotifications(description, {
+						type: "event",
+						entityName: name,
+						entityId: id,
+						projectId,
+						orgSlug: ctx.orgSlug,
+						fromUserId: ctx.userId,
+					});
 				}
 			} else {
 				const newEvent = await ctx.db
@@ -340,20 +329,15 @@ export const eventsRouter = createTRPCRouter({
 					newValue: newEvent[0],
 				});
 
-				if (newEvent?.[0]) {
-					await indexEventWithProjectFetch(ctx.db, ctx.search, newEvent[0]);
-
-					// Send mention notifications if description was provided
-					if (description) {
-						await sendMentionNotifications(description, {
-							type: "event",
-							entityName: name,
-							entityId: eventId,
-							projectId,
-							orgSlug: ctx.orgSlug,
-							fromUserId: ctx.userId,
-						});
-					}
+				if (newEvent?.[0] && description) {
+					await sendMentionNotifications(description, {
+						type: "event",
+						entityName: name,
+						entityId: eventId,
+						projectId,
+						orgSlug: ctx.orgSlug,
+						fromUserId: ctx.userId,
+					});
 				}
 			}
 
@@ -427,8 +411,6 @@ export const eventsRouter = createTRPCRouter({
 								projectId,
 								newValue: newEvent[0],
 							});
-
-							await indexEventWithProjectFetch(ctx.db, ctx.search, newEvent[0]);
 
 							if (event.description) {
 								await sendMentionNotifications(event.description, {

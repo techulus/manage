@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "manage",
@@ -39,8 +40,6 @@
         "@trpc/tanstack-react-query": "^11.0.2",
         "@turbowire/react": "^0.1.0",
         "@turbowire/serverless": "^0.2.0",
-        "@upstash/redis": "^1.35.3",
-        "@upstash/search": "^0.1.5",
         "@upstash/workflow": "^0.2.16",
         "@vercel/analytics": "^1.5.0",
         "autoprefixer": "10.4.14",
@@ -1087,10 +1086,6 @@
     "@upstash/qstash": ["@upstash/qstash@2.8.1", "", { "dependencies": { "crypto-js": ">=4.2.0", "jose": "^5.2.3", "neverthrow": "^7.0.1" } }, "sha512-E+JoLHMqygQksWATjS/9AAo7Mhi/k21Tu0zDwMm9GyNyNVjEJntQvmrH5NC7x6kXwjCDTEWFtIWz0JXu9/9pMQ=="],
 
     "@upstash/redis": ["@upstash/redis@1.35.3", "", { "dependencies": { "uncrypto": "^0.1.3" } }, "sha512-hSjv66NOuahW3MisRGlSgoszU2uONAY2l5Qo3Sae8OT3/Tng9K+2/cBRuyPBX8egwEGcNNCF9+r0V6grNnhL+w=="],
-
-    "@upstash/search": ["@upstash/search@0.1.5", "", { "dependencies": { "@upstash/vector": "^1.2.1" } }, "sha512-+vkNsxC6jRP1m1HZdnJx7MD8KqvKHlqZjZ+eJMhgnTNXIYoqeY63WBorHY8M3nN7Buhns+eRl1YUTRwnZuiwgQ=="],
-
-    "@upstash/vector": ["@upstash/vector@1.2.2", "", {}, "sha512-ptQ9xnxtKqmpNK52PCcHCszlPOLxIBfjsv7ty8RoF95pkjctS9rSjTQ3Pl9bx5VFbpDj+0dMXw88WLt6swDkgQ=="],
 
     "@upstash/workflow": ["@upstash/workflow@0.2.16", "", { "dependencies": { "@ai-sdk/openai": "^1.2.1", "@upstash/qstash": "^2.8.1", "ai": "^4.1.54", "zod": "^3.24.1" } }, "sha512-9mqC3p5B9i92gf1KMEZhDcU5YMEut0hkWxmf2gsDcJVCcbLD958MEDT2q2wGZa7MnKAuvEOYNDSefi0x2a5pGQ=="],
 

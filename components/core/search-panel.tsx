@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { groupBy } from "es-toolkit";
 import {
 	AlertCircle,
@@ -10,14 +10,13 @@ import {
 	FileText,
 	Filter,
 	FolderOpen,
+	Loader2,
 	MessagesSquare,
-	RefreshCw,
 	Search,
 	X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
 import { HtmlPreview } from "@/components/core/html-view";
 import { Badge } from "@/components/ui/badge";
@@ -133,33 +132,13 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 		enabled: debouncedQuery.length > 0 && open,
 	});
 
-	// Fetch projects for project filter
 	const { data: projects = [] } = useQuery(
 		trpc.user.getProjects.queryOptions(),
-	);
-
-	const indexAllMutation = useMutation(
-		trpc.search.indexAllContent.mutationOptions(),
 	);
 
 	const handleItemClick = (url: string) => {
 		onOpenChange(false);
 		router.push(url);
-	};
-
-	const handleReindexAll = async () => {
-		try {
-			const result = await indexAllMutation.mutateAsync();
-			toast.success("Content reindexed successfully!", {
-				description: `Indexed ${result.indexed.projects} projects, ${result.indexed.taskLists} task lists, ${result.indexed.tasks} tasks, ${result.indexed.events} events, and ${result.indexed.posts} posts.`,
-			});
-		} catch (err) {
-			console.error("Error reindexing content:", err);
-			toast.error("Failed to reindex content", {
-				description:
-					"Please try again or contact support if the problem persists.",
-			});
-		}
 	};
 
 	const clearFilter = useCallback(() => {
@@ -382,25 +361,8 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 								)}
 							</div>
 						</div>
-
-						<Button
-							variant="outline"
-							size="sm"
-							onClick={handleReindexAll}
-							disabled={indexAllMutation.isPending}
-							className="gap-2"
-						>
-							<RefreshCw
-								className={cn(
-									"h-4 w-4",
-									indexAllMutation.isPending && "animate-spin",
-								)}
-							/>
-							{indexAllMutation.isPending ? "Indexing..." : "Reindex All"}
-						</Button>
 					</div>
 
-					{/* Results */}
 					<div className="space-y-4">
 						{debouncedQuery.length === 0 ? (
 							<div className="border rounded-lg p-8">
@@ -418,7 +380,7 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 						) : isLoading ? (
 							<div className="border rounded-lg p-8">
 								<div className="flex items-center justify-center">
-									<RefreshCw className="h-6 w-6 animate-spin mr-2" />
+									<Loader2 className="h-6 w-6 animate-spin mr-2" />
 									<span>Searching...</span>
 								</div>
 							</div>

@@ -51,8 +51,6 @@
     "@trpc/tanstack-react-query": "^11.0.2",
     "@turbowire/react": "^0.1.0",
     "@turbowire/serverless": "^0.2.0",
-    "@upstash/redis": "^1.35.3",
-    "@upstash/search": "^0.1.5",
     "@upstash/workflow": "^0.2.16",
     "@vercel/analytics": "^1.5.0",
     "autoprefixer": "10.4.14",

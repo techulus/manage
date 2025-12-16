@@ -13,11 +13,6 @@ import {
 	canViewProject,
 	checkProjectPermission,
 } from "@/lib/permissions";
-import {
-	deleteProjectSearchItems,
-	deleteSearchItem,
-	indexProject,
-} from "@/lib/search/helpers";
 import { sendMentionNotifications } from "@/lib/utils/mentionNotifications";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
@@ -31,7 +26,6 @@ export const projectsRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			// Check if user is in an organization and if they're an admin
 			if (ctx.orgId && !ctx.isOrgAdmin) {
 				throw new TRPCError({
 					code: "FORBIDDEN",
@@ -59,7 +53,6 @@ export const projectsRouter = createTRPCRouter({
 				projectId: newProject?.[0].id,
 			});
 
-			// Grant editor permission to the project creator
 			if (newProject?.[0]) {
 				await ctx.db.insert(projectPermission).values({
 					projectId: newProject[0].id,
@@ -68,10 +61,6 @@ export const projectsRouter = createTRPCRouter({
 					createdByUser: ctx.userId,
 				});
 
-				// Index the project for search
-				await indexProject(ctx.search, newProject[0]);
-
-				// Send mention notifications if description was provided
 				if (input.description) {
 					await sendMentionNotifications(input.description, {
 						type: "project",
@@ -146,12 +135,6 @@ export const projectsRouter = createTRPCRouter({
 					projectId: +input.id,
 				});
 
-				// Re-index the updated project for search
-				if (updatedProject?.[0]) {
-					await indexProject(ctx.search, updatedProject[0]);
-				}
-
-				// Send mention notifications if description was updated
 				if ("description" in input && input.description && currentProject) {
 					await sendMentionNotifications(input.description, {
 						type: "project",
@@ -192,12 +175,6 @@ export const projectsRouter = createTRPCRouter({
 				oldValue: deletedProject[0],
 			});
 
-			// Remove project from search index
-			await deleteSearchItem(ctx.search, `project-${input.id}`, "project");
-
-			// Also remove all related content from search (tasks, tasklists, events)
-			await deleteProjectSearchItems(ctx.search, input.id);
-
 			return deletedProject[0];
 		}),
 	getProjectById: protectedProcedure
@@ -225,14 +202,12 @@ export const projectsRouter = createTRPCRouter({
 				throw new Error(`Project with id ${input.id} not found`);
 			}
 
-			// Get the user's permission for this project
 			const userRole = await checkProjectPermission(
 				ctx.db,
 				input.id,
 				ctx.userId,
 			);
 
-			// Compute canEdit in-memory to avoid redundant DB query
 			const canEdit =
 				ctx.isOrgAdmin ||
 				userRole === "editor" ||
@@ -276,7 +251,7 @@ export const projectsRouter = createTRPCRouter({
 			return comments.map((commentItem) => ({
 				...commentItem,
 				replyCount: countByRoomId.get(`comment-${commentItem.id}`) ?? 0,
-				replies: [], // Always empty, loaded on demand
+				replies: [],
 			}));
 		}),
 	addComment: protectedProcedure

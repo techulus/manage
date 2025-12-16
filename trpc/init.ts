@@ -2,7 +2,6 @@ import { auth } from "@clerk/nextjs/server";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { SearchService } from "@/lib/search";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner, getTimezone } from "@/lib/utils/useOwner";
 
@@ -61,7 +60,6 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
 	const { orgId, userId } = await getOwner();
 
 	const isOrgAdmin = !orgId ? true : has({ role: "org:admin" });
-	const search = new SearchService(ctx.ownerId, ctx.orgSlug);
 
 	return next({
 		ctx: {
@@ -69,7 +67,6 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
 			sessionId,
 			userId,
 			orgId,
-			search,
 			isOrgAdmin,
 		},
 	});
