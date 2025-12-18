@@ -1,15 +1,9 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/next";
-import { Geist } from "next/font/google";
 import { ThemeProvider } from "@/components/core/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SITE_METADATA } from "@/data/marketing";
-import { cn } from "@/lib/utils";
 import "./globals.css";
-
-const mainFont = Geist({
-	subsets: ["latin"],
-});
 
 export const metadata = {
 	metadataBase: new URL(
@@ -85,7 +79,7 @@ export default function RootLayout({
 	return (
 		<html
 			lang="en"
-			className={cn("dark flex min-h-full min-w-full", mainFont.className)}
+			className="dark flex min-h-full min-w-full"
 			suppressHydrationWarning
 		>
 			<head>

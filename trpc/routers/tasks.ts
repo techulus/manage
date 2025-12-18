@@ -331,6 +331,7 @@ export const tasksRouter = createTRPCRouter({
 					entityName: input.name || "Untitled Task",
 					entityId: createdTask[0].id,
 					projectId: taskListDetails.projectId,
+					taskListId: input.taskListId,
 					orgSlug: ctx.orgSlug,
 					fromUserId: ctx.userId,
 				});
@@ -447,6 +448,7 @@ export const tasksRouter = createTRPCRouter({
 						entityName: oldTask.name,
 						entityId: input.id,
 						projectId: oldTask.taskList.projectId,
+						taskListId: oldTask.taskListId,
 						orgSlug: ctx.orgSlug,
 						fromUserId: ctx.userId,
 					});

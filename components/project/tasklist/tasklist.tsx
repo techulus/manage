@@ -31,11 +31,15 @@ export const TaskListItem = ({
 	hideHeader = false,
 	compact = false,
 	canEdit = true,
+	showDeleted,
+	onShowDeletedChange,
 }: {
 	id: number;
 	hideHeader?: boolean;
 	compact?: boolean;
 	canEdit?: boolean;
+	showDeleted?: boolean;
+	onShowDeletedChange?: (showDeleted: boolean) => void;
 }) => {
 	const trpc = useTRPC();
 	const { data: taskList, isLoading } = useQuery(
@@ -63,7 +67,6 @@ export const TaskListItem = ({
 		[taskList?.tasks],
 	);
 
-	const [showDeleted, setShowDeleted] = useState(false);
 	const deletedItems = useMemo(
 		() =>
 			taskList?.tasks.filter((task) => task.status === TaskStatus.DELETED) ??
@@ -204,7 +207,7 @@ export const TaskListItem = ({
 									<Button
 										variant="ghost"
 										size="sm"
-										onClick={() => setShowDeleted((x) => !x)}
+										onClick={() => onShowDeletedChange?.(!showDeleted)}
 									>
 										{showDeleted ? "Hide" : "Show"}
 									</Button>

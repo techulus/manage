@@ -6,7 +6,8 @@ import { Close, Title } from "@radix-ui/react-dialog";
 import { useQueries } from "@tanstack/react-query";
 import { AlignJustifyIcon, CalendarClock, FileIcon, X } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { parseAsInteger, useQueryState } from "nuqs";
+import { useMemo } from "react";
 import { toast } from "sonner";
 import { Panel } from "@/components/core/panel";
 import { ConfirmButton } from "@/components/form/button";
@@ -44,7 +45,11 @@ export const TaskItem = ({
 	canEdit?: boolean;
 }) => {
 	const { projectId } = useParams();
-	const [detailsOpen, setDetailsOpen] = useState(false);
+	const [selectedTaskId, setSelectedTaskId] = useQueryState(
+		"task",
+		parseAsInteger,
+	);
+	const detailsOpen = selectedTaskId === task.id;
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: task.id });
 
@@ -113,7 +118,7 @@ export const TaskItem = ({
 						creating ? "text-muted-foreground" : "",
 					)}
 					onClick={() => {
-						if (!creating) setDetailsOpen(true);
+						if (!creating) setSelectedTaskId(task.id);
 					}}
 				>
 					<div
@@ -155,7 +160,12 @@ export const TaskItem = ({
 				) : null}
 			</div>
 
-			<Panel open={detailsOpen} setOpen={setDetailsOpen}>
+			<Panel
+				open={detailsOpen}
+				setOpen={(open) => {
+					if (!open) setSelectedTaskId(null);
+				}}
+			>
 				<Title>
 					<div className="flex items-center px-4 h-14 border-b">
 						<div className="flex items-center flex-1">
@@ -372,7 +382,7 @@ export const TaskItem = ({
 																				"Error while copying, please try again.",
 																		},
 																	);
-																	setDetailsOpen(false);
+																	setSelectedTaskId(null);
 																}}
 															>
 																<button

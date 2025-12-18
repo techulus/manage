@@ -1,6 +1,7 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { memo } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -10,11 +11,13 @@ export const Panel = memo(function Panel({
 	setOpen,
 	children,
 	className,
+	title = "Panel",
 }: {
 	open: boolean;
 	setOpen?: (open: boolean) => void;
 	children: React.ReactNode;
 	className?: string;
+	title?: string;
 }) {
 	const isMobile = useIsMobile();
 
@@ -31,6 +34,9 @@ export const Panel = memo(function Panel({
 						className,
 					)}
 				>
+					<VisuallyHidden>
+						<Dialog.Title>{title}</Dialog.Title>
+					</VisuallyHidden>
 					{children}
 				</Dialog.Content>
 			</Dialog.Portal>
