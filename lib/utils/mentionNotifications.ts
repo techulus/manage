@@ -8,7 +8,8 @@ interface MentionContext {
 	type: "project" | "task" | "tasklist" | "event" | "comment" | "post";
 	entityName: string;
 	entityId: number;
-	projectId?: number; // For linking back to project
+	projectId?: number;
+	taskListId?: number;
 	orgSlug: string;
 	fromUserId: string;
 }
@@ -47,7 +48,7 @@ export async function sendMentionNotifications(
 
 		case "task":
 			message = `${fromUserName} mentioned you in task "${context.entityName}"`;
-			target = `/${context.orgSlug}/projects/${context.projectId}`;
+			target = `/${context.orgSlug}/projects/${context.projectId}/tasklists/${context.taskListId}?task=${context.entityId}`;
 			break;
 
 		case "tasklist":
