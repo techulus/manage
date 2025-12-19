@@ -314,7 +314,7 @@ export default async function Home() {
 								</div>
 								<div className="flex items-center gap-2">
 									<div className="w-2 h-2 bg-yellow-400" />
-									<span className="text-gray-300">Next.js 15</span>
+									<span className="text-gray-300">Next.js</span>
 								</div>
 							</div>
 						</div>
