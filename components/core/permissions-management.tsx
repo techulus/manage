@@ -5,7 +5,7 @@ import { Plus, Shield, ShieldCheck, Users, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Panel } from "@/components/core/panel";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/core/user-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -256,12 +256,7 @@ export default function PermissionsManagement({
 												{availableUsers.map((user: User) => (
 													<SelectItem key={user.id} value={user.id}>
 														<div className="flex items-center gap-2">
-															<Avatar className="w-6 h-6">
-																<AvatarImage src={user.image || ""} />
-																<AvatarFallback>
-																	{user.firstName?.[0] || user.email[0]}
-																</AvatarFallback>
-															</Avatar>
+															<UserAvatar user={user} className="w-6 h-6" />
 															<span>
 																{user.firstName} {user.lastName} ({user.email})
 															</span>
@@ -354,13 +349,10 @@ export default function PermissionsManagement({
 											className="flex items-center justify-between"
 										>
 											<div className="flex items-center gap-3">
-												<Avatar className="w-8 h-8">
-													<AvatarImage src={permission.user.image || ""} />
-													<AvatarFallback className="text-xs">
-														{permission.user.firstName?.[0] ||
-															permission.user.email[0]}
-													</AvatarFallback>
-												</Avatar>
+												<UserAvatar
+													user={permission.user}
+													className="w-8 h-8"
+												/>
 												<div>
 													<p className="font-medium text-sm">
 														{permission.user.firstName}{" "}

@@ -14,119 +14,119 @@ import { NotificationItem } from "./notification-item";
 import { Panel } from "./panel";
 
 export function Notifications({
-  notificationsWire,
+	notificationsWire,
 }: {
-  notificationsWire: string;
+	notificationsWire: string;
 }) {
-  const [open, setOpen] = useState(false);
-  const trpc = useTRPC();
-  const {
-    data: notifications,
-    isLoading: notificationsLoading,
-    refetch: refetchNotifications,
-  } = useQuery(trpc.user.getUserNotifications.queryOptions());
-  const { data: timezone, isLoading: timezoneLoading } = useQuery(
-    trpc.settings.getTimezone.queryOptions(),
-  );
+	const [open, setOpen] = useState(false);
+	const trpc = useTRPC();
+	const {
+		data: notifications,
+		isLoading: notificationsLoading,
+		refetch: refetchNotifications,
+	} = useQuery(trpc.user.getUserNotifications.queryOptions());
+	const { data: timezone, isLoading: timezoneLoading } = useQuery(
+		trpc.settings.getTimezone.queryOptions(),
+	);
 
-  const markNotificationsAsRead = useMutation(
-    trpc.user.markNotificationsAsRead.mutationOptions({
-      onError: displayMutationError,
-      onSuccess: () => {
-        refetchNotifications();
-      },
-    }),
-  );
+	const markNotificationsAsRead = useMutation(
+		trpc.user.markNotificationsAsRead.mutationOptions({
+			onError: displayMutationError,
+			onSuccess: () => {
+				refetchNotifications();
+			},
+		}),
+	);
 
-  const unreadCount = notifications?.filter((x) => !x.read).length;
+	const unreadCount = notifications?.filter((x) => !x.read).length;
 
-  const onNotification = useCallback(
-    ({ content }: NotificationPayload) => {
-      try {
-        if (!content) return;
-        refetchNotifications();
-        toast.info(content);
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    [refetchNotifications],
-  );
+	const onNotification = useCallback(
+		({ content }: NotificationPayload) => {
+			try {
+				if (!content) return;
+				refetchNotifications();
+				toast.info(content);
+			} catch (error) {
+				console.error(error);
+			}
+		},
+		[refetchNotifications],
+	);
 
-  const wireOptions = useMemo(
-    () => ({ schema: realtimeSchema, notification: onNotification }),
-    [onNotification],
-  );
+	const wireOptions = useMemo(
+		() => ({ schema: realtimeSchema, notification: onNotification }),
+		[onNotification],
+	);
 
-  useWireEvent(notificationsWire, wireOptions);
+	useWireEvent(notificationsWire, wireOptions);
 
-  return (
-    <>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="relative"
-        onClick={() => setOpen(true)}
-      >
-        <Bell className="h-5 w-5" />
-        {unreadCount ? (
-          <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
-        ) : null}
-        <span className="sr-only">Notifications</span>
-      </Button>
+	return (
+		<>
+			<Button
+				variant="ghost"
+				size="icon"
+				className="relative"
+				onClick={() => setOpen(true)}
+			>
+				<Bell className="h-5 w-5" />
+				{unreadCount ? (
+					<span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
+				) : null}
+				<span className="sr-only">Notifications</span>
+			</Button>
 
-      <Panel open={open} setOpen={setOpen}>
-        {notificationsLoading || timezoneLoading ? (
-          <SpinnerWithSpacing />
-        ) : (
-          <div className="flex flex-col h-full">
-            <div className="flex items-center justify-between px-4 py-3 border-b dark:border-white/10">
-              <h3 className="font-semibold text-lg">Notifications</h3>
-              <div className="flex items-center gap-2">
-                {unreadCount ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => markNotificationsAsRead.mutate()}
-                    disabled={markNotificationsAsRead.isPending}
-                  >
-                    {markNotificationsAsRead.isPending ? (
-                      <Spinner className="h-4 w-4" />
-                    ) : (
-                      "Mark all as read"
-                    )}
-                  </Button>
-                ) : null}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setOpen(false)}
-                >
-                  <X className="h-4 w-4" />
-                  <span className="sr-only">Close</span>
-                </Button>
-              </div>
-            </div>
-            <div className="flex-1 overflow-y-auto">
-              {notifications?.length && timezone ? (
-                <div className="flex flex-col divide-y dark:divide-white/10">
-                  {notifications.map((notification) => (
-                    <NotificationItem
-                      key={notification.id}
-                      notification={notification}
-                      timezone={timezone}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-sm text-muted-foreground px-4 py-8 text-center">
-                  You have no new notifications.
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </Panel>
-    </>
-  );
+			<Panel open={open} setOpen={setOpen}>
+				{notificationsLoading || timezoneLoading ? (
+					<SpinnerWithSpacing />
+				) : (
+					<div className="flex flex-col h-full">
+						<div className="flex items-center justify-between px-4 py-3 border-b dark:border-white/10">
+							<h3 className="font-semibold text-lg">Notifications</h3>
+							<div className="flex items-center gap-2">
+								{unreadCount ? (
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => markNotificationsAsRead.mutate()}
+										disabled={markNotificationsAsRead.isPending}
+									>
+										{markNotificationsAsRead.isPending ? (
+											<Spinner className="h-4 w-4" />
+										) : (
+											"Mark all as read"
+										)}
+									</Button>
+								) : null}
+								<Button
+									variant="ghost"
+									size="icon"
+									onClick={() => setOpen(false)}
+								>
+									<X className="h-4 w-4" />
+									<span className="sr-only">Close</span>
+								</Button>
+							</div>
+						</div>
+						<div className="flex-1 overflow-y-auto">
+							{notifications?.length && timezone ? (
+								<div className="flex flex-col divide-y dark:divide-white/10">
+									{notifications.map((notification) => (
+										<NotificationItem
+											key={notification.id}
+											notification={notification}
+											timezone={timezone}
+										/>
+									))}
+								</div>
+							) : (
+								<div className="text-sm text-muted-foreground px-4 py-8 text-center">
+									You have no new notifications.
+								</div>
+							)}
+						</div>
+					</div>
+				)}
+			</Panel>
+		</>
+	);
 }

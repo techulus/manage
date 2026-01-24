@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { projectPermission } from "@/drizzle/schema";
+import { member, projectPermission } from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
@@ -144,6 +144,30 @@ export const permissionsRouter = createTRPCRouter({
 
 			return { success: true };
 		}),
+
+	getOrganizationMembers: protectedProcedure.query(async ({ ctx }) => {
+		if (!ctx.orgId) {
+			return [];
+		}
+
+		const members = await ctx.db.query.member.findMany({
+			where: eq(member.organizationId, ctx.orgId),
+			with: {
+				user: {
+					columns: {
+						id: true,
+						email: true,
+						name: true,
+						firstName: true,
+						lastName: true,
+						image: true,
+					},
+				},
+			},
+		});
+
+		return members;
+	}),
 
 	// Get all users in the organization (for permission management UI)
 	getOrganizationUsers: protectedProcedure.query(async ({ ctx }) => {

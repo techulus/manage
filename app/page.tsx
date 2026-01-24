@@ -5,6 +5,7 @@ import { ClientRedirect } from "@/components/core/client-redirect";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { auth } from "@/lib/auth";
+import { isSignupDisabled } from "@/lib/config";
 
 export default async function Home() {
 	const session = await auth.api.getSession({
@@ -16,7 +17,7 @@ export default async function Home() {
 
 	return (
 		<div className="min-h-screen">
-			<Header />
+			<Header disableSignups={isSignupDisabled()} />
 
 			<section>
 				<div className="mx-auto max-w-7xl relative border border-gray-200 dark:border-gray-800 pb-24 pt-8 px-6">

@@ -20,7 +20,11 @@ import {
 	DialogTitle,
 	DialogFooter,
 } from "@/components/ui/dialog";
-import { authClient, useActiveOrganization, useSession } from "@/lib/auth/client";
+import {
+	authClient,
+	useActiveOrganization,
+	useSession,
+} from "@/lib/auth/client";
 import { toast } from "sonner";
 
 type Organization = {
@@ -79,7 +83,9 @@ export function OrgSwitcher() {
 				slug: newOrgName.trim().toLowerCase().replace(/\s+/g, "-"),
 			});
 			if (result.data) {
-				await authClient.organization.setActive({ organizationId: result.data.id });
+				await authClient.organization.setActive({
+					organizationId: result.data.id,
+				});
 				setCreateDialogOpen(false);
 				setNewOrgName("");
 				toast.success("Workspace created");
@@ -130,7 +136,9 @@ export function OrgSwitcher() {
 						>
 							<Building2 className="mr-2 h-4 w-4" />
 							<span className="truncate">{org.name}</span>
-							{activeOrg?.id === org.id && <Check className="ml-auto h-4 w-4" />}
+							{activeOrg?.id === org.id && (
+								<Check className="ml-auto h-4 w-4" />
+							)}
 						</DropdownMenuItem>
 					))}
 					<DropdownMenuSeparator />
@@ -161,10 +169,16 @@ export function OrgSwitcher() {
 						</div>
 					</div>
 					<DialogFooter>
-						<Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
+						<Button
+							variant="outline"
+							onClick={() => setCreateDialogOpen(false)}
+						>
 							Cancel
 						</Button>
-						<Button onClick={createOrganization} disabled={creating || !newOrgName.trim()}>
+						<Button
+							onClick={createOrganization}
+							disabled={creating || !newOrgName.trim()}
+						>
 							{creating ? "Creating..." : "Create"}
 						</Button>
 					</DialogFooter>

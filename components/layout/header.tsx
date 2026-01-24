@@ -6,8 +6,14 @@ import logo from "../../public/images/logo.png";
 import { buttonVariants } from "../ui/button";
 import { useSession } from "@/lib/auth/client";
 
-export function Header() {
+interface HeaderProps {
+	disableSignups?: boolean;
+}
+
+export function Header({ disableSignups }: HeaderProps) {
 	const { data: session } = useSession();
+
+	const showLoginButton = session || !disableSignups;
 
 	return (
 		<header className="absolute inset-x-0 top-0 z-50 text-black dark:text-white max-w-7xl mx-auto">
@@ -34,9 +40,11 @@ export function Header() {
 					</Link>
 				</div>
 
-				<Link className={buttonVariants()} href="/start">
-					{session ? "Console" : "Sign in"}
-				</Link>
+				{showLoginButton && (
+					<Link className={buttonVariants()} href="/start">
+						{session ? "Console" : "Sign in"}
+					</Link>
+				)}
 			</nav>
 		</header>
 	);

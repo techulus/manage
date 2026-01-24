@@ -51,7 +51,7 @@ export default function Today() {
 		});
 
 	const projects = projectsData?.projects;
-	const isOrgAdmin = projectsData?.isOrgAdmin ?? (tenant === "me");
+	const isOrgAdmin = projectsData?.isOrgAdmin ?? tenant === "me";
 
 	const { dueToday = [], overDue = [], events = [] } = todayData ?? {};
 

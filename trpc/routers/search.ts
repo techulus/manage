@@ -1,12 +1,6 @@
 import { and, eq, ilike, inArray, or } from "drizzle-orm";
 import { z } from "zod";
-import {
-	calendarEvent,
-	post,
-	project,
-	task,
-	taskList,
-} from "@/drizzle/schema";
+import { calendarEvent, post, project, task, taskList } from "@/drizzle/schema";
 import { getUserProjectIds } from "@/lib/permissions";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
@@ -131,7 +125,10 @@ export const searchRouter = createTRPCRouter({
 					.limit(input.limit);
 
 				for (const t of taskResults) {
-					if (matchesProjectFilter(t.projectId) && matchesStatusFilter(t.status)) {
+					if (
+						matchesProjectFilter(t.projectId) &&
+						matchesStatusFilter(t.status)
+					) {
 						results.push({
 							id: `task-${t.id}`,
 							title: t.name,
@@ -169,7 +166,10 @@ export const searchRouter = createTRPCRouter({
 					.limit(input.limit);
 
 				for (const tl of taskListResults) {
-					if (matchesProjectFilter(tl.projectId) && matchesStatusFilter(tl.status)) {
+					if (
+						matchesProjectFilter(tl.projectId) &&
+						matchesStatusFilter(tl.status)
+					) {
 						results.push({
 							id: `tasklist-${tl.id}`,
 							title: tl.name,
@@ -276,10 +276,7 @@ export const searchRouter = createTRPCRouter({
 		}),
 });
 
-function buildUrl(
-	orgSlug: string,
-	row: SearchResult,
-): string {
+function buildUrl(orgSlug: string, row: SearchResult): string {
 	const projectId = row.projectId;
 	const entityId = row.id.split("-")[1];
 

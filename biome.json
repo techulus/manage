@@ -1,6 +1,12 @@
 {
 	"$schema": "https://biomejs.dev/schemas/2.3.5/schema.json",
 	"assist": { "actions": { "source": { "organizeImports": "on" } } },
+	"css": {
+		"parser": {
+			"cssModules": true,
+			"tailwindDirectives": true
+		}
+	},
 	"linter": {
 		"enabled": true,
 		"rules": {

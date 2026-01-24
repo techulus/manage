@@ -132,9 +132,7 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 		enabled: debouncedQuery.length > 0 && open,
 	});
 
-	const { data: projectsData } = useQuery(
-		trpc.user.getProjects.queryOptions(),
-	);
+	const { data: projectsData } = useQuery(trpc.user.getProjects.queryOptions());
 
 	const projects = projectsData?.projects ?? [];
 
@@ -417,76 +415,78 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 									{searchResults.length !== 1 ? "s" : ""} for "{debouncedQuery}"
 								</div>
 
-								{["project", "tasklist", "task", "event", "post"].map((type) => {
-									const results =
-										groupedResults[type as keyof typeof groupedResults];
-									if (!results || results.length === 0) return null;
+								{["project", "tasklist", "task", "event", "post"].map(
+									(type) => {
+										const results =
+											groupedResults[type as keyof typeof groupedResults];
+										if (!results || results.length === 0) return null;
 
-									return (
-										<div key={type} className="space-y-3">
-											<div className="flex items-center gap-2">
-												{getTypeIcon(type)}
-												<h3 className="text-lg font-semibold">
-													{getTypeLabel(type)}s ({results.length})
-												</h3>
-											</div>
-											<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-												{results.map((result) => (
-													<button
-														key={result.id}
-														className="border rounded-lg p-3 hover:bg-muted/50 transition-colors cursor-pointer text-left w-full"
-														onClick={() => handleItemClick(result.url)}
-														type="button"
-													>
-														<div className="space-y-2">
-															<div className="flex items-center gap-2 min-w-0">
-																{getTypeIcon(result.type)}
-																<h4 className="font-medium truncate">
-																	{result.title}
-																</h4>
-																{result.status && (
-																	<Badge
-																		variant="secondary"
-																		className={cn(
-																			"text-xs px-2 py-0",
-																			getStatusColor(result.status),
-																		)}
-																	>
-																		{result.status.toUpperCase()}
-																	</Badge>
-																)}
-															</div>
-															{result.description && (
-																<div className="text-sm text-muted-foreground line-clamp-2">
-																	<HtmlPreview content={result.description} />
-																</div>
-															)}
-															<div className="flex items-center gap-4 text-xs text-muted-foreground">
-																{result.projectName &&
-																	result.type !== "project" && (
-																		<div className="flex items-center gap-1">
-																			<FolderOpen className="h-3 w-3" />
-																			{result.projectName}
-																		</div>
+										return (
+											<div key={type} className="space-y-3">
+												<div className="flex items-center gap-2">
+													{getTypeIcon(type)}
+													<h3 className="text-lg font-semibold">
+														{getTypeLabel(type)}s ({results.length})
+													</h3>
+												</div>
+												<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+													{results.map((result) => (
+														<button
+															key={result.id}
+															className="border rounded-lg p-3 hover:bg-muted/50 transition-colors cursor-pointer text-left w-full"
+															onClick={() => handleItemClick(result.url)}
+															type="button"
+														>
+															<div className="space-y-2">
+																<div className="flex items-center gap-2 min-w-0">
+																	{getTypeIcon(result.type)}
+																	<h4 className="font-medium truncate">
+																		{result.title}
+																	</h4>
+																	{result.status && (
+																		<Badge
+																			variant="secondary"
+																			className={cn(
+																				"text-xs px-2 py-0",
+																				getStatusColor(result.status),
+																			)}
+																		>
+																			{result.status.toUpperCase()}
+																		</Badge>
 																	)}
-																{result.dueDate && (
-																	<div className="flex items-center gap-1">
-																		<Clock className="h-3 w-3" />
-																		Due {result.dueDate.toLocaleDateString()}
+																</div>
+																{result.description && (
+																	<div className="text-sm text-muted-foreground line-clamp-2">
+																		<HtmlPreview content={result.description} />
 																	</div>
 																)}
-																<div className="flex items-center gap-1">
-																	Created{" "}
-																	{result.createdAt.toLocaleDateString()}
+																<div className="flex items-center gap-4 text-xs text-muted-foreground">
+																	{result.projectName &&
+																		result.type !== "project" && (
+																			<div className="flex items-center gap-1">
+																				<FolderOpen className="h-3 w-3" />
+																				{result.projectName}
+																			</div>
+																		)}
+																	{result.dueDate && (
+																		<div className="flex items-center gap-1">
+																			<Clock className="h-3 w-3" />
+																			Due {result.dueDate.toLocaleDateString()}
+																		</div>
+																	)}
+																	<div className="flex items-center gap-1">
+																		Created{" "}
+																		{result.createdAt.toLocaleDateString()}
+																	</div>
 																</div>
 															</div>
-														</div>
-													</button>
-												))}
+														</button>
+													))}
+												</div>
 											</div>
-										</div>
-									);
-								})}
+										);
+									},
+								)}
 							</div>
 						)}
 					</div>

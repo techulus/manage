@@ -4,14 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "TZ=UTC next dev --turbopack",
+		"prebuild": "npm run db:push",
     "build": "next build",
     "start": "next start",
     "lint": "biome lint",
     "format": "biome format --write",
     "lint:fix": "biome lint --write",
     "fix": "biome format --write && biome lint --write",
-    "generate:migrations": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+		"db:push": "drizzle-kit push"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.623.0",
