@@ -3,6 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { magicLink, organization } from "better-auth/plugins";
 import { Resend } from "resend";
 import { database } from "@/lib/utils/useDatabase";
+import { isSignupDisabled } from "@/lib/config";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -59,8 +60,9 @@ export const auth = betterAuth({
 		organization({
 			allowUserToCreateOrganization: true,
 			creatorRole: "owner",
-			sendInvitationEmail: async ({ email, organization, inviter }) => {
-				const acceptUrl = `${process.env.NEXT_PUBLIC_APP_URL}/accept-invite?email=${encodeURIComponent(email)}`;
+			allowSignupOnInvitation: true,
+			sendInvitationEmail: async ({ email, organization, inviter, id }) => {
+				const acceptUrl = `${process.env.NEXT_PUBLIC_APP_URL}/accept-invite?email=${encodeURIComponent(email)}&invitationId=${id}`;
 				await resend.emails.send({
 					from: getFromEmail(),
 					to: email,
@@ -82,7 +84,7 @@ export const auth = betterAuth({
 		}),
 	],
 	user: {
-		denySignUp: process.env.DISABLE_SIGNUPS === "true",
+		denySignUp: isSignupDisabled(),
 		additionalFields: {
 			firstName: {
 				type: "string",

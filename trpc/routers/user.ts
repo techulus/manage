@@ -14,6 +14,22 @@ import { broadcastEvent, getSignedWireUrl } from "@/lib/utils/turbowire";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const userRouter = createTRPCRouter({
+	updateProfile: protectedProcedure
+		.input(
+			z.object({
+				firstName: z.string().min(1),
+				lastName: z.string().min(1),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			await ctx.db
+				.update(user)
+				.set({
+					firstName: input.firstName,
+					lastName: input.lastName,
+				})
+				.where(eq(user.id, ctx.userId));
+		}),
 	getCurrentUser: protectedProcedure.query(async ({ ctx }) => {
 		const session = await auth.api.getSession({
 			headers: await headers(),
@@ -74,7 +90,10 @@ export const userRouter = createTRPCRouter({
 
 			const orgFilter = ctx.orgId
 				? eq(project.organizationId, ctx.orgId)
-				: isNull(project.organizationId);
+				: and(
+						isNull(project.organizationId),
+						eq(project.createdByUser, ctx.userId),
+					);
 
 			const projects = await ctx.db.query.project.findMany({
 				where: and(orgFilter, or(...statusFilter)),
@@ -98,6 +117,18 @@ export const userRouter = createTRPCRouter({
 							(proj.createdByUser === ctx.userId ? "editor" : "editor"),
 					})),
 					isOrgAdmin: true,
+				};
+			}
+
+			if (ctx.orgId) {
+				return {
+					projects: projects.map((proj) => ({
+						...proj,
+						userRole:
+							proj.permissions[0]?.role ||
+							(proj.createdByUser === ctx.userId ? "editor" : "reader"),
+					})),
+					isOrgAdmin: false,
 				};
 			}
 

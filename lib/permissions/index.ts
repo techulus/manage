@@ -6,6 +6,7 @@ export type PermissionContext = {
 	db: Database;
 	userId: string;
 	isOrgAdmin: boolean;
+	orgId?: string | null;
 };
 
 export type ProjectRole = "editor" | "reader";
@@ -76,11 +77,14 @@ export async function canViewProject(
 	const role = await checkProjectPermission(ctx.db, projectId, ctx.userId);
 	if (role !== null) return true;
 
-	// For backward compatibility, check if user is the creator
 	const proj = await ctx.db.query.project.findFirst({
 		where: eq(project.id, projectId),
-		columns: { createdByUser: true },
+		columns: { createdByUser: true, organizationId: true },
 	});
 
+	// Org members can view all projects in their org
+	if (ctx.orgId && proj?.organizationId === ctx.orgId) return true;
+
+	// For backward compatibility, check if user is the creator
 	return proj?.createdByUser === ctx.userId;
 }

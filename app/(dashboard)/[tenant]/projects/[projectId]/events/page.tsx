@@ -33,7 +33,8 @@ export default function Events() {
 	const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
 	const calendarSubscriptionUrl = useMemo(
-		() => `/api/calendar/${tenant}/${projectId}/calendar.ics?userId=${session?.user?.id}`,
+		() =>
+			`/api/calendar/${tenant}/${projectId}/calendar.ics?userId=${session?.user?.id}`,
 		[tenant, projectId, session?.user?.id],
 	);
 

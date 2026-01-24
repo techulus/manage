@@ -1,6 +1,12 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
 
 export function Billing() {
 	return (
@@ -13,8 +19,8 @@ export function Billing() {
 			</CardHeader>
 			<CardContent>
 				<p className="text-sm text-muted-foreground">
-					No billing is required for self-hosted instances.
-					All features are available.
+					No billing is required for self-hosted instances. All features are
+					available.
 				</p>
 			</CardContent>
 		</Card>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { UserAvatar } from "@/components/core/user-avatar";
 import { authClient, useActiveOrganization } from "@/lib/auth/client";
+import { useTRPC } from "@/trpc/client";
 import { toast } from "sonner";
 import { Mail, UserPlus, X } from "lucide-react";
 
@@ -32,6 +34,8 @@ type Member = {
 		name: string;
 		email: string;
 		image?: string | null;
+		firstName?: string | null;
+		lastName?: string | null;
 	};
 };
 
@@ -45,15 +49,20 @@ type Invitation = {
 
 export function TeamSettings() {
 	const { data: activeOrg } = useActiveOrganization();
-	const [members, setMembers] = useState<Member[]>([]);
+	const trpc = useTRPC();
 	const [invitations, setInvitations] = useState<Invitation[]>([]);
 	const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 	const [inviteEmail, setInviteEmail] = useState("");
 	const [inviteRole, setInviteRole] = useState<"member" | "admin">("member");
 	const [isInviting, setIsInviting] = useState(false);
-	const [isLoading, setIsLoading] = useState(true);
 
-	const fetchMembers = useCallback(async () => {
+	const {
+		data: members = [],
+		isLoading,
+		refetch: refetchMembers,
+	} = useQuery(trpc.permissions.getOrganizationMembers.queryOptions());
+
+	const fetchInvitations = useCallback(async () => {
 		if (!activeOrg?.id) return;
 
 		try {
@@ -62,19 +71,16 @@ export function TeamSettings() {
 			});
 
 			if (result.data) {
-				setMembers(result.data.members || []);
 				setInvitations(result.data.invitations || []);
 			}
 		} catch (error) {
-			console.error("Failed to fetch members:", error);
-		} finally {
-			setIsLoading(false);
+			console.error("Failed to fetch invitations:", error);
 		}
 	}, [activeOrg?.id]);
 
 	useEffect(() => {
-		fetchMembers();
-	}, [fetchMembers]);
+		fetchInvitations();
+	}, [fetchInvitations]);
 
 	async function inviteMember() {
 		if (!inviteEmail.trim() || !activeOrg?.id) return;
@@ -94,7 +100,7 @@ export function TeamSettings() {
 				setInviteDialogOpen(false);
 				setInviteEmail("");
 				setInviteRole("member");
-				fetchMembers();
+				fetchInvitations();
 			}
 		} catch (error) {
 			console.error("Invite error:", error);
@@ -112,7 +118,7 @@ export function TeamSettings() {
 				invitationId,
 			});
 			toast.success("Invitation cancelled");
-			fetchMembers();
+			fetchInvitations();
 		} catch (error) {
 			console.error("Cancel invitation error:", error);
 			toast.error("Failed to cancel invitation");
@@ -128,7 +134,7 @@ export function TeamSettings() {
 				organizationId: activeOrg.id,
 			});
 			toast.success("Member removed");
-			fetchMembers();
+			refetchMembers();
 		} catch (error) {
 			console.error("Remove member error:", error);
 			toast.error("Failed to remove member");
@@ -145,7 +151,7 @@ export function TeamSettings() {
 				organizationId: activeOrg.id,
 			});
 			toast.success("Role updated");
-			fetchMembers();
+			refetchMembers();
 		} catch (error) {
 			console.error("Update role error:", error);
 			toast.error("Failed to update role");
@@ -189,13 +195,20 @@ export function TeamSettings() {
 							<UserAvatar
 								user={{
 									id: member.user.id,
+									firstName: member.user.firstName,
 									name: member.user.name,
 									email: member.user.email,
 								}}
 							/>
 							<div>
-								<p className="font-medium">{member.user.name || member.user.email}</p>
-								<p className="text-sm text-muted-foreground">{member.user.email}</p>
+								<p className="font-medium">
+									{member.user.firstName || member.user.lastName
+										? `${member.user.firstName ?? ""} ${member.user.lastName ?? ""}`.trim()
+										: member.user.name || member.user.email}
+								</p>
+								<p className="text-sm text-muted-foreground">
+									{member.user.email}
+								</p>
 							</div>
 						</div>
 						<div className="flex items-center gap-2">
@@ -207,7 +220,9 @@ export function TeamSettings() {
 								<>
 									<Select
 										value={member.role}
-										onValueChange={(value) => updateMemberRole(member.id, value)}
+										onValueChange={(value) =>
+											updateMemberRole(member.id, value)
+										}
 									>
 										<SelectTrigger className="w-24">
 											<SelectValue />
@@ -301,7 +316,10 @@ export function TeamSettings() {
 						</div>
 					</div>
 					<DialogFooter>
-						<Button variant="outline" onClick={() => setInviteDialogOpen(false)}>
+						<Button
+							variant="outline"
+							onClick={() => setInviteDialogOpen(false)}
+						>
 							Cancel
 						</Button>
 						<Button
