@@ -12,7 +12,7 @@ import {
 
 interface OtpVerificationFormProps {
 	email: string;
-	onSuccess: () => void;
+	onSuccess: () => void | Promise<void>;
 	onBack: () => void;
 }
 
@@ -39,7 +39,7 @@ export function OtpVerificationForm({
 				toast.error(result.error.message || "Invalid verification code");
 			} else {
 				toast.success("Signed in successfully");
-				onSuccess();
+				await onSuccess();
 			}
 		} catch {
 			toast.error("Failed to verify code. Please try again.");

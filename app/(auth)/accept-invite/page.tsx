@@ -67,6 +67,7 @@ export default function AcceptInvitePage() {
 	}
 
 	async function handleOtpSuccess() {
+		router.refresh();
 		await refetch();
 	}
 
