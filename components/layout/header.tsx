@@ -1,13 +1,13 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "../../public/images/logo.png";
 import { buttonVariants } from "../ui/button";
+import { useSession } from "@/lib/auth/client";
 
 export function Header() {
-	const user = useUser();
+	const { data: session } = useSession();
 
 	return (
 		<header className="absolute inset-x-0 top-0 z-50 text-black dark:text-white max-w-7xl mx-auto">
@@ -35,7 +35,7 @@ export function Header() {
 				</div>
 
 				<Link className={buttonVariants()} href="/start">
-					{user ? "Console" : "Sign in"}
+					{session ? "Console" : "Sign in"}
 				</Link>
 			</nav>
 		</header>

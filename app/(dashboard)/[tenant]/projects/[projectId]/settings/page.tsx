@@ -5,18 +5,15 @@ import PermissionsManagement from "@/components/core/permissions-management";
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { useTRPC } from "@/trpc/client";
-import { useUser } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
 import { Shield, Settings2 } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useMemo } from "react";
 
 export default function ProjectSettings() {
 	const params = useParams();
 	const projectId = +params.projectId!;
 	const tenant = params.tenant as string;
 	const trpc = useTRPC();
-	const { user } = useUser();
 
 	const { data: project, isLoading } = useQuery(
 		trpc.projects.getProjectById.queryOptions({
@@ -24,20 +21,7 @@ export default function ProjectSettings() {
 		}),
 	);
 
-	// Check if user is org admin - same logic as in today page
-	const isOrgAdmin = useMemo(() => {
-		// Check if current tenant matches any organization the user belongs to
-		const orgMembership = user?.organizationMemberships?.find(
-			(membership) => membership.organization.slug === tenant,
-		);
-
-		if (orgMembership) {
-			// This is an organization tenant - check if user has org:admin role
-			return orgMembership.role === "org:admin";
-		}
-		// This is a personal account tenant (no matching organization) - user is admin
-		return true;
-	}, [user, tenant]);
+	const isOrgAdmin = tenant === "me";
 
 	if (isLoading || !project) return <PageLoading />;
 

@@ -3,8 +3,6 @@ import { cookies } from "next/headers";
 import { z } from "zod";
 import { blob, user } from "@/drizzle/schema";
 import type { User } from "@/drizzle/types";
-import { opsOrganization, opsUser } from "@/ops/drizzle/schema";
-import { getOpsDatabase } from "@/ops/useOps";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const settingsRouter = createTRPCRouter({
@@ -37,38 +35,6 @@ export const settingsRouter = createTRPCRouter({
 				.set({ timeZone: input, lastActiveAt: new Date() })
 				.where(eq(user.id, ctx.userId))
 				.execute();
-
-			try {
-				const opsDb = await getOpsDatabase();
-
-				await opsDb
-					.update(opsUser)
-					.set({
-						timeZone: input,
-						lastActiveAt: new Date(),
-						markedForDeletionAt: null,
-						finalWarningAt: null,
-					})
-					.where(eq(opsUser.id, ctx.userId))
-					.execute();
-
-				if (ctx.orgId) {
-					await opsDb
-						.update(opsOrganization)
-						.set({
-							lastActiveAt: new Date(),
-							markedForDeletionAt: null,
-							finalWarningAt: null,
-						})
-						.where(eq(opsUser.id, ctx.orgId))
-						.execute();
-				}
-			} catch (error) {
-				console.error(
-					"[Settings] Error updating timezone in ops database:",
-					error,
-				);
-			}
 		}),
 	getTimezone: protectedProcedure.output(z.string()).query(async () => {
 		const cookieStore = await cookies();

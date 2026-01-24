@@ -1,13 +1,16 @@
-import { auth } from "@clerk/nextjs/server";
+import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { ClientRedirect } from "@/components/core/client-redirect";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
+import { auth } from "@/lib/auth";
 
 export default async function Home() {
-	const { userId } = await auth();
-	if (userId) {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	});
+	if (session?.user) {
 		return <ClientRedirect path="/start" />;
 	}
 

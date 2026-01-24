@@ -1,27 +1,33 @@
-import { auth } from "@clerk/nextjs/server";
+import { headers } from "next/headers";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 
 type Result = {
-	ownerId: string;
 	userId: string;
 	orgId: string | null;
 	orgSlug: string;
+	ownerId: string;
 };
 
 export async function getOwner(): Promise<Result> {
-	const { userId, orgId, orgSlug } = await auth();
-	if (!userId) {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	});
+
+	if (!session?.user) {
 		console.warn("No session, redirecting to sign-in");
 		redirect("/sign-in");
 	}
 
+	const activeOrg = session.session.activeOrganizationId;
+
 	return {
-		ownerId: orgId ?? userId,
-		userId,
-		orgId,
-		orgSlug: orgSlug ?? "me",
-	} as Result;
+		userId: session.user.id,
+		orgId: activeOrg ?? null,
+		orgSlug: activeOrg ?? "me",
+		ownerId: activeOrg ?? session.user.id,
+	};
 }
 
 export async function getTimezone() {

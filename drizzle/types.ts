@@ -5,9 +5,12 @@ import type {
 	activity,
 	blob,
 	calendarEvent,
+	member,
 	notification,
+	organization,
 	post,
 	project,
+	session,
 	task,
 	taskList,
 	user,
@@ -16,6 +19,9 @@ import type {
 export type Database = PostgresJsDatabase<typeof dbSchema>;
 
 export type User = InferSelectModel<typeof user>;
+export type Session = InferSelectModel<typeof session>;
+export type Organization = InferSelectModel<typeof organization>;
+export type Member = InferSelectModel<typeof member>;
 export type Project = InferSelectModel<typeof project>;
 export type TaskList = InferSelectModel<typeof taskList>;
 export type Task = InferSelectModel<typeof task>;
@@ -43,11 +49,11 @@ export type ProjectWithCreator = Project & { creator: User };
 export type TaskWithDetails = Task & {
 	creator: {
 		firstName: string | null;
-		imageUrl: string | null;
+		image: string | null;
 	};
 	assignee: {
 		firstName: string | null;
-		imageUrl: string | null;
+		image: string | null;
 	} | null;
 };
 
@@ -56,22 +62,22 @@ export type TaskListWithTasks = TaskList & {
 };
 
 export type BlobWithCreater = Blob & {
-	creator: Pick<User, "firstName" | "imageUrl">;
+	creator: Pick<User, "firstName" | "image">;
 };
 
 export type EventWithCreator = CalendarEvent & {
-	creator: Pick<User, "id" | "firstName" | "imageUrl">;
+	creator: Pick<User, "id" | "firstName" | "image">;
 };
 
 export type ActivityWithActor = Activity & {
-	actor: Pick<User, "id" | "firstName" | "imageUrl">;
+	actor: Pick<User, "id" | "firstName" | "image">;
 };
 
 export type NotificationWithUser = Notification & {
-	fromUser: Pick<User, "id" | "firstName" | "imageUrl">;
-	toUser: Pick<User, "id" | "firstName" | "imageUrl">;
+	fromUser: Pick<User, "id" | "firstName" | "image">;
+	toUser: Pick<User, "id" | "firstName" | "image">;
 };
 
 export type PostWithCreator = Post & {
-	creator: Pick<User, "id" | "firstName" | "lastName" | "imageUrl">;
+	creator: Pick<User, "id" | "firstName" | "lastName" | "image">;
 };

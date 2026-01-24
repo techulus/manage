@@ -5,9 +5,9 @@ import {
 	TaskStatus,
 	type TaskWithDetails,
 } from "@/drizzle/types";
+import { useSession } from "@/lib/auth/client";
 import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
-import { useUser } from "@clerk/nextjs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type ReactNode, createContext, useCallback, useContext } from "react";
 
@@ -25,7 +25,7 @@ export function TasksProvider({
 }) {
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
-	const { user } = useUser();
+	const { data: session } = useSession();
 
 	const invalidateData = useCallback(
 		(listId = -1) => {
@@ -86,8 +86,8 @@ export function TasksProvider({
 							position: 0,
 							assignedToUser: null,
 							creator: {
-								firstName: user?.firstName || null,
-								imageUrl: user?.imageUrl || null,
+								firstName: session?.user?.name || null,
+								image: session?.user?.image || null,
 							},
 							assignee: null,
 						};

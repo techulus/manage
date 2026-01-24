@@ -1,6 +1,5 @@
 "use client";
 
-import { useSession } from "@clerk/nextjs";
 import { Title } from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { RssIcon, Upload } from "lucide-react";
@@ -18,13 +17,13 @@ import EventsList from "@/components/project/events/events-list";
 import { FullCalendar } from "@/components/project/events/full-calendar";
 import { Button, buttonVariants } from "@/components/ui/button";
 import type { EventWithCreator } from "@/drizzle/types";
+import { useSession } from "@/lib/auth/client";
 import { toDateString, toUTC } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
 
 export default function Events() {
-	const { session } = useSession();
-	const { projectId } = useParams();
-	const { user, lastActiveOrganizationId } = session ?? {};
+	const { data: session } = useSession();
+	const { tenant, projectId } = useParams();
 
 	const [create, setCreate] = useQueryState(
 		"create",
@@ -34,9 +33,8 @@ export default function Events() {
 	const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
 	const calendarSubscriptionUrl = useMemo(
-		() =>
-			`/api/calendar/${lastActiveOrganizationId ?? user?.id}/${projectId}/calendar.ics?userId=${user?.id}`,
-		[lastActiveOrganizationId, projectId, user?.id],
+		() => `/api/calendar/${tenant}/${projectId}/calendar.ics?userId=${session?.user?.id}`,
+		[tenant, projectId, session?.user?.id],
 	);
 
 	const trpc = useTRPC();

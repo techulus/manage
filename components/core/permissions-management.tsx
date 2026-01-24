@@ -22,7 +22,7 @@ interface User {
 	email: string;
 	firstName?: string | null;
 	lastName?: string | null;
-	imageUrl?: string | null;
+	image?: string | null;
 }
 
 interface Project {
@@ -56,12 +56,13 @@ export default function PermissionsManagement({
 
 	const trpc = useTRPC();
 
-	// Get ALL projects for the dropdown (admins can manage permissions for any project)
-	const { data: projects = [] } = useQuery(
+	const { data: projectsData } = useQuery(
 		trpc.user.getProjects.queryOptions({
 			statuses: ["active", "archived"],
 		}),
 	);
+
+	const projects = projectsData?.projects ?? [];
 
 	// Get organization users
 	const { data: orgUsers = [] } = useQuery(
@@ -256,7 +257,7 @@ export default function PermissionsManagement({
 													<SelectItem key={user.id} value={user.id}>
 														<div className="flex items-center gap-2">
 															<Avatar className="w-6 h-6">
-																<AvatarImage src={user.imageUrl || ""} />
+																<AvatarImage src={user.image || ""} />
 																<AvatarFallback>
 																	{user.firstName?.[0] || user.email[0]}
 																</AvatarFallback>
@@ -354,7 +355,7 @@ export default function PermissionsManagement({
 										>
 											<div className="flex items-center gap-3">
 												<Avatar className="w-8 h-8">
-													<AvatarImage src={permission.user.imageUrl || ""} />
+													<AvatarImage src={permission.user.image || ""} />
 													<AvatarFallback className="text-xs">
 														{permission.user.firstName?.[0] ||
 															permission.user.email[0]}

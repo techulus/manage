@@ -5,7 +5,7 @@ export const CreatorDetails = ({
 	user,
 	updatedAt,
 }: {
-	user: Pick<User, "firstName" | "imageUrl">;
+	user: Pick<User, "firstName" | "image">;
 	updatedAt: Date;
 }) => {
 	return (

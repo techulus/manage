@@ -1,12 +1,22 @@
 "use client";
 
-import { PricingTable } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
-import { useTheme } from "next-themes";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function Billing() {
-	const { systemTheme } = useTheme();
-	const appearance = systemTheme === "dark" ? { baseTheme: dark } : undefined;
-
-	return <PricingTable appearance={appearance} for="organization" />;
+	return (
+		<Card>
+			<CardHeader>
+				<CardTitle>Self-Hosted Instance</CardTitle>
+				<CardDescription>
+					You are running a self-hosted instance of Manage.
+				</CardDescription>
+			</CardHeader>
+			<CardContent>
+				<p className="text-sm text-muted-foreground">
+					No billing is required for self-hosted instances.
+					All features are available.
+				</p>
+			</CardContent>
+		</Card>
+	);
 }

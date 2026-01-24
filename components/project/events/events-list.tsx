@@ -1,6 +1,5 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import { Title } from "@radix-ui/react-dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CircleEllipsisIcon } from "lucide-react";
@@ -21,6 +20,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { EventWithCreator } from "@/drizzle/types";
+import { useSession } from "@/lib/auth/client";
 import { displayMutationError } from "@/lib/utils/error";
 import {
 	eventToHumanReadableString,
@@ -41,7 +41,7 @@ export default function EventsList({
 	timezone: string;
 	compact?: boolean;
 }) {
-	const { user } = useUser();
+	const { data: session } = useSession();
 	const { tenant } = useParams();
 	const filteredEvents = events.filter((x) =>
 		filterByRepeatRule(x, new Date(date), timezone),
@@ -108,7 +108,7 @@ export default function EventsList({
 								</div>
 							) : null}
 
-							{event.creator.id === user?.id ? (
+							{event.creator.id === session?.user?.id ? (
 								<DropdownMenu>
 									<DropdownMenuTrigger className="absolute right-1 top-1.5">
 										<CircleEllipsisIcon className="h-6 w-6" />

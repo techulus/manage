@@ -1,5 +1,5 @@
-import { currentUser } from "@clerk/nextjs/server";
-import { desc, eq, or } from "drizzle-orm";
+import { headers } from "next/headers";
+import { and, desc, eq, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 import {
 	notification,
@@ -8,19 +8,22 @@ import {
 	user,
 } from "@/drizzle/schema";
 import type { NotificationWithUser } from "@/drizzle/types";
+import { auth } from "@/lib/auth";
 import { getTodayDataForUser } from "@/lib/utils/todayData";
 import { broadcastEvent, getSignedWireUrl } from "@/lib/utils/turbowire";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const userRouter = createTRPCRouter({
 	getCurrentUser: protectedProcedure.query(async ({ ctx }) => {
-		const userData = await currentUser();
-		if (!userData) {
+		const session = await auth.api.getSession({
+			headers: await headers(),
+		});
+		if (!session?.user) {
 			throw new Error("User not found");
 		}
 
 		const userDetails = await ctx.db.query.user.findFirst({
-			where: eq(user.id, userData.id),
+			where: eq(user.id, session.user.id),
 		});
 		if (!userDetails) {
 			throw new Error("User not found");
@@ -69,8 +72,12 @@ export const userRouter = createTRPCRouter({
 				eq(project.status, status),
 			);
 
+			const orgFilter = ctx.orgId
+				? eq(project.organizationId, ctx.orgId)
+				: isNull(project.organizationId);
+
 			const projects = await ctx.db.query.project.findMany({
-				where: or(...statusFilter),
+				where: and(orgFilter, or(...statusFilter)),
 				with: {
 					creator: true,
 					permissions: {
@@ -83,12 +90,15 @@ export const userRouter = createTRPCRouter({
 			});
 
 			if (ctx.isOrgAdmin) {
-				return projects.map((proj) => ({
-					...proj,
-					userRole:
-						proj.permissions[0]?.role ||
-						(proj.createdByUser === ctx.userId ? "editor" : "editor"),
-				}));
+				return {
+					projects: projects.map((proj) => ({
+						...proj,
+						userRole:
+							proj.permissions[0]?.role ||
+							(proj.createdByUser === ctx.userId ? "editor" : "editor"),
+					})),
+					isOrgAdmin: true,
+				};
 			}
 
 			const userProjects = projects.filter(
@@ -96,12 +106,15 @@ export const userRouter = createTRPCRouter({
 					proj.permissions.length > 0 || proj.createdByUser === ctx.userId,
 			);
 
-			return userProjects.map((proj) => ({
-				...proj,
-				userRole:
-					proj.permissions[0]?.role ||
-					(proj.createdByUser === ctx.userId ? "editor" : undefined),
-			}));
+			return {
+				projects: userProjects.map((proj) => ({
+					...proj,
+					userRole:
+						proj.permissions[0]?.role ||
+						(proj.createdByUser === ctx.userId ? "editor" : undefined),
+				})),
+				isOrgAdmin: false,
+			};
 		}),
 	searchUsersForMention: protectedProcedure
 		.input(
@@ -116,7 +129,7 @@ export const userRouter = createTRPCRouter({
 					email: true,
 					firstName: true,
 					lastName: true,
-					imageUrl: true,
+					image: true,
 				},
 			});
 

@@ -1,4 +1,3 @@
-import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/core/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -23,7 +22,7 @@ export const metadata = {
 		"calendar",
 		"file sharing",
 		"activity tracking",
-		"multi-tenant",
+		"self-hosted",
 	],
 	authors: [{ name: "Techulus", url: "https://github.com/techulus" }],
 	creator: "Techulus",
@@ -83,10 +82,6 @@ export default function RootLayout({
 			suppressHydrationWarning
 		>
 			<head>
-				{/* <script
-					crossOrigin="anonymous"
-					src="//unpkg.com/react-scan/dist/auto.global.js"
-				/> */}
 				<meta
 					name="viewport"
 					content="width=device-width, initial-scale=1, maximum-scale=1"
@@ -316,12 +311,10 @@ export default function RootLayout({
 				/>
 			</head>
 			<body className="min-h-full min-w-full flex-1">
-				<ClerkProvider>
-					<ThemeProvider>
-						<Toaster position="top-center" />
-						{children}
-					</ThemeProvider>
-				</ClerkProvider>
+				<ThemeProvider>
+					<Toaster position="top-center" />
+					{children}
+				</ThemeProvider>
 				<Analytics />
 			</body>
 		</html>

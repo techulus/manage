@@ -9,33 +9,7 @@ Manage is an open-source project management platform. With its intuitive interfa
 ### Environment
 
 ```
-# Auth
-NEXT_PUBLIC_APP_URL=
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
-
-# Database
-DATABASE_URL=
-
-# Any S3 compatible storage
-S3_ENDPOINT="
-S3_ACCESS_KEY_ID=""
-S3_SECRET_ACCESS_KEY=""
-S3_BUCKET_NAME=""
-
-# TurboWire for Websockets
-TURBOWIRE_DOMAIN=
-TURBOWIRE_SIGNING_KEY=
-TURBOWIRE_BROADCAST_KEY=
-
-# Email
-RESEND_API_KEY=
-
-# Workflows
-QSTASH_URL=
-QSTASH_TOKEN=
-QSTASH_CURRENT_SIGNING_KEY=
-QSTASH_NEXT_SIGNING_KEY=
+# See .env.example for all available environment variables
 ```
 
 ### Run using Docker
