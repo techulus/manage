@@ -65,7 +65,10 @@ export default function SignInPage() {
 					<CardContent>
 						<OtpVerificationForm
 							email={email}
-							onSuccess={() => router.push(redirect)}
+							onSuccess={async () => {
+								router.refresh();
+								router.push(redirect);
+							}}
 							onBack={() => setSent(false)}
 						/>
 					</CardContent>

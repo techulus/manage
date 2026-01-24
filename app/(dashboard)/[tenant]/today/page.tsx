@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useQueryState } from "nuqs";
+import { parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 import { Greeting } from "@/components/core/greeting";
 import { PageLoading } from "@/components/core/loaders";
@@ -35,9 +35,10 @@ export default function Today() {
 
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
-	const [statuses] = useQueryState("status", {
-		defaultValue: "active",
-	});
+	const [statuses] = useQueryState(
+		"status",
+		parseAsString.withDefault("active"),
+	);
 
 	const [{ data: todayData }, { data: projectsData }, { data: timezone }] =
 		useQueries({

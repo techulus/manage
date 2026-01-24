@@ -12,12 +12,6 @@ Manage is an open-source project management platform. With its intuitive interfa
 # See .env.example for all available environment variables
 ```
 
-### Run using Docker
-
-```bash
-docker-compose up
-```
-
 ## Deployment
 
 <a href="https://railway.com?referralCode=techulus">

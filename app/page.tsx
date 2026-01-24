@@ -15,9 +15,11 @@ export default async function Home() {
 		return <ClientRedirect path="/start" />;
 	}
 
+	const signupsDisabled = isSignupDisabled();
+
 	return (
 		<div className="min-h-screen">
-			<Header disableSignups={isSignupDisabled()} />
+			<Header disableSignups={signupsDisabled} />
 
 			<section>
 				<div className="mx-auto max-w-7xl relative border border-gray-200 dark:border-gray-800 pb-24 pt-8 px-6">
@@ -49,12 +51,14 @@ export default async function Home() {
 							tech stack and open source values.
 						</p>
 						<div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-							<Link
-								href="/start"
-								className="inline-block bg-green-600 text-white px-6 py-3 rounded-full text-lg font-semibold shadow-sm shadow-green-600/25 border-b-4 border-green-700 hover:bg-green-500 hover:border-green-600 active:border-green-600 active:shadow-sm active:translate-y-0.5 transition-all duration-150 dark:bg-green-600 dark:border-green-700 dark:hover:bg-green-500 dark:hover:border-green-600"
-							>
-								Try Manage →
-							</Link>
+							{!signupsDisabled && (
+								<Link
+									href="/start"
+									className="inline-block bg-green-600 text-white px-6 py-3 rounded-full text-lg font-semibold shadow-sm shadow-green-600/25 border-b-4 border-green-700 hover:bg-green-500 hover:border-green-600 active:border-green-600 active:shadow-sm active:translate-y-0.5 transition-all duration-150 dark:bg-green-600 dark:border-green-700 dark:hover:bg-green-500 dark:hover:border-green-600"
+								>
+									Try Manage →
+								</Link>
+							)}
 							<Link
 								href="https://github.com/techulus/manage"
 								className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-lg font-semibold border-2 border-neutral-300 dark:border-neutral-600 hover:border-neutral-400 dark:hover:border-neutral-500 transition-colors"
@@ -447,14 +451,16 @@ export default async function Home() {
 						?
 					</h2>
 
-					<div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-						<Link
-							href="/start"
-							className="inline-block bg-green-600 text-white px-6 py-3 rounded-full text-lg font-semibold shadow-sm shadow-green-600/25 border-b-4 border-green-700 hover:bg-green-500 hover:border-green-600 active:border-green-600 active:shadow-sm active:translate-y-0.5 transition-all duration-150 dark:bg-green-600 dark:border-green-700 dark:hover:bg-green-500 dark:hover:border-green-600"
-						>
-							Get started →
-						</Link>
-					</div>
+					{!signupsDisabled && (
+						<div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+							<Link
+								href="/start"
+								className="inline-block bg-green-600 text-white px-6 py-3 rounded-full text-lg font-semibold shadow-sm shadow-green-600/25 border-b-4 border-green-700 hover:bg-green-500 hover:border-green-600 active:border-green-600 active:shadow-sm active:translate-y-0.5 transition-all duration-150 dark:bg-green-600 dark:border-green-700 dark:hover:bg-green-500 dark:hover:border-green-600"
+							>
+								Get started →
+							</Link>
+						</div>
+					)}
 				</div>
 			</section>
 
