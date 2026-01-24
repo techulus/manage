@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient, useSession } from "@/lib/auth/client";
 import { toast } from "sonner";
+import { OtpVerificationForm } from "@/components/auth/otp-verification-form";
 
 export default function AcceptInvitePage() {
 	const router = useRouter();
@@ -17,7 +18,7 @@ export default function AcceptInvitePage() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isAccepting, setIsAccepting] = useState(false);
 	const [sent, setSent] = useState(false);
-	const { data: session, isPending } = useSession();
+	const { data: session, isPending, refetch } = useSession();
 
 	async function handleAcceptInvitation() {
 		setIsAccepting(true);
@@ -33,14 +34,13 @@ export default function AcceptInvitePage() {
 				router.push("/start");
 			}
 		} catch (error) {
-			console.error("Accept invitation error:", error);
 			toast.error("Failed to accept invitation");
 		} finally {
 			setIsAccepting(false);
 		}
 	}
 
-	async function handleSignIn() {
+	async function handleSendOtp() {
 		if (!email) {
 			toast.error("Please enter your email");
 			return;
@@ -48,23 +48,26 @@ export default function AcceptInvitePage() {
 
 		setIsLoading(true);
 		try {
-			const result = await authClient.signIn.magicLink({
+			const result = await authClient.emailOtp.sendVerificationOtp({
 				email,
-				callbackURL: `/accept-invite?email=${encodeURIComponent(email)}${invitationId ? `&invitationId=${invitationId}` : ""}`,
+				type: "sign-in",
 			});
 
 			if (result.error) {
-				toast.error(result.error.message || "Failed to send sign in link");
+				toast.error(result.error.message || "Failed to send verification code");
 			} else {
 				setSent(true);
-				toast.success("Check your email for the sign in link");
+				toast.success("Check your email for the verification code");
 			}
 		} catch (error) {
-			console.error("Sign in error:", error);
-			toast.error("Failed to send sign in link");
+			toast.error("Failed to send verification code");
 		} finally {
 			setIsLoading(false);
 		}
+	}
+
+	async function handleOtpSuccess() {
+		await refetch();
 	}
 
 	if (isPending) {
@@ -105,14 +108,17 @@ export default function AcceptInvitePage() {
 			<div className="flex min-h-screen items-center justify-center">
 				<div className="w-full max-w-md space-y-6 p-8">
 					<div className="text-center space-y-2">
-						<h1 className="text-2xl font-bold">Check your email</h1>
+						<h1 className="text-2xl font-bold">Enter verification code</h1>
 						<p className="text-muted-foreground">
-							We sent a sign in link to <strong>{email}</strong>
-						</p>
-						<p className="text-sm text-muted-foreground">
-							Click the link in the email to sign in and join the workspace.
+							We sent a 6-digit code to <strong>{email}</strong>
 						</p>
 					</div>
+
+					<OtpVerificationForm
+						email={email}
+						onSuccess={handleOtpSuccess}
+						onBack={() => setSent(false)}
+					/>
 				</div>
 			</div>
 		);
@@ -141,11 +147,11 @@ export default function AcceptInvitePage() {
 					</div>
 
 					<Button
-						onClick={handleSignIn}
+						onClick={handleSendOtp}
 						disabled={isLoading || !email}
 						className="w-full"
 					>
-						{isLoading ? "Sending..." : "Sign in to accept invitation"}
+						{isLoading ? "Sending..." : "Send verification code"}
 					</Button>
 				</div>
 			</div>

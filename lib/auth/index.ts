@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { magicLink, organization } from "better-auth/plugins";
+import { emailOTP, organization } from "better-auth/plugins";
 import { Resend } from "resend";
 import { database } from "@/lib/utils/useDatabase";
 import { isSignupDisabled } from "@/lib/config";
@@ -28,33 +28,30 @@ export const auth = betterAuth({
 		},
 	},
 	plugins: [
-		magicLink({
-			sendMagicLink: async ({ email, url }) => {
-				console.log("[Magic Link] Sending to:", email);
-				const response = await resend.emails.send({
+		emailOTP({
+			otpLength: 6,
+			expiresIn: 600,
+			sendVerificationOTP: async ({ email, otp }) => {
+				await resend.emails.send({
 					from: getFromEmail(),
 					to: email,
-					subject: "Sign in to Manage",
+					subject: "Your verification code for Manage",
 					html: `
 						<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-							<h2>Sign in to Manage</h2>
-							<p>Click the button below to sign in to your account:</p>
-							<a href="${url}" style="display: inline-block; background: #171717; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 16px 0;">
-								Sign in
-							</a>
+							<h2>Your verification code</h2>
+							<p>Enter this code to sign in to Manage:</p>
+							<div style="background: #f4f4f5; padding: 16px 24px; border-radius: 6px; margin: 16px 0; text-align: center;">
+								<span style="font-size: 32px; font-weight: bold; letter-spacing: 8px; font-family: monospace;">${otp}</span>
+							</div>
 							<p style="color: #666; font-size: 14px;">
-								If you didn't request this email, you can safely ignore it.
+								If you didn't request this code, you can safely ignore it.
 							</p>
 							<p style="color: #666; font-size: 14px;">
-								This link will expire in 15 minutes.
+								This code will expire in 10 minutes.
 							</p>
 						</div>
 					`,
 				});
-				console.log(
-					"[Magic Link] Resend response:",
-					JSON.stringify(response, null, 2),
-				);
 			},
 		}),
 		organization({
