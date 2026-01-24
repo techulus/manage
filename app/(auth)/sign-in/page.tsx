@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,8 +15,10 @@ import {
 import { authClient } from "@/lib/auth/client";
 import { toast } from "sonner";
 import { Loader2, Mail } from "lucide-react";
+import { OtpVerificationForm } from "@/components/auth/otp-verification-form";
 
 export default function SignInPage() {
+	const router = useRouter();
 	const searchParams = useSearchParams();
 	const redirect = searchParams.get("redirect") || "/start";
 
@@ -24,20 +26,24 @@ export default function SignInPage() {
 	const [loading, setLoading] = useState(false);
 	const [sent, setSent] = useState(false);
 
-	async function handleSubmit(e: React.FormEvent) {
+	async function handleSendOtp(e: React.FormEvent) {
 		e.preventDefault();
 		setLoading(true);
 
 		try {
-			await authClient.signIn.magicLink({
+			const result = await authClient.emailOtp.sendVerificationOtp({
 				email,
-				callbackURL: redirect,
+				type: "sign-in",
 			});
-			setSent(true);
-			toast.success("Check your email for the sign-in link");
+
+			if (result.error) {
+				toast.error(result.error.message || "Failed to send verification code");
+			} else {
+				setSent(true);
+				toast.success("Check your email for the verification code");
+			}
 		} catch (error) {
-			toast.error("Failed to send sign-in link. Please try again.");
-			console.error(error);
+			toast.error("Failed to send verification code. Please try again.");
 		} finally {
 			setLoading(false);
 		}
@@ -51,25 +57,17 @@ export default function SignInPage() {
 						<div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
 							<Mail className="h-6 w-6 text-primary" />
 						</div>
-						<CardTitle>Check your email</CardTitle>
+						<CardTitle>Enter verification code</CardTitle>
 						<CardDescription>
-							We sent a sign-in link to <strong>{email}</strong>
+							We sent a 6-digit code to <strong>{email}</strong>
 						</CardDescription>
 					</CardHeader>
-					<CardContent className="text-center">
-						<p className="text-sm text-muted-foreground mb-4">
-							Click the link in the email to sign in. The link will expire in 15
-							minutes.
-						</p>
-						<Button
-							variant="outline"
-							onClick={() => {
-								setSent(false);
-								setEmail("");
-							}}
-						>
-							Use a different email
-						</Button>
+					<CardContent>
+						<OtpVerificationForm
+							email={email}
+							onSuccess={() => router.push(redirect)}
+							onBack={() => setSent(false)}
+						/>
 					</CardContent>
 				</Card>
 			</div>
@@ -82,11 +80,11 @@ export default function SignInPage() {
 				<CardHeader className="text-center">
 					<CardTitle>Sign in to Manage</CardTitle>
 					<CardDescription>
-						Enter your email to receive a sign-in link
+						Enter your email to receive a verification code
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<form onSubmit={handleSubmit} className="space-y-4">
+					<form onSubmit={handleSendOtp} className="space-y-4">
 						<div className="space-y-2">
 							<Label htmlFor="email">Email</Label>
 							<Input
@@ -101,7 +99,7 @@ export default function SignInPage() {
 						</div>
 						<Button type="submit" className="w-full" disabled={loading}>
 							{loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-							Send sign-in link
+							Send verification code
 						</Button>
 					</form>
 				</CardContent>

@@ -4,14 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "TZ=UTC next dev --turbopack",
-		"prebuild": "npm run db:push",
+    "prebuild": "npm run db:push",
     "build": "next build",
     "start": "next start",
     "lint": "biome lint",
     "format": "biome format --write",
     "lint:fix": "biome lint --write",
     "fix": "biome format --write && biome lint --write",
-		"db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.623.0",
@@ -61,6 +61,7 @@
     "drizzle-orm": "^0.44.6",
     "es-toolkit": "^1.39.8",
     "ical-generator": "^8.0.1",
+    "input-otp": "^1.4.2",
     "lucide-react": "^0.503.0",
     "mime-types": "^2.1.35",
     "neverthrow": "^8.2.0",
