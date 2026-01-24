@@ -1,13 +1,14 @@
+import { Building2, ChartBar, User2, Users } from "lucide-react";
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
+import { ProfileSettings } from "@/components/settings/profile-settings";
 import { TeamSettings } from "@/components/settings/team-settings";
+import { WorkspaceSettings } from "@/components/settings/workspace-settings";
 import { bytesToMegabytes } from "@/lib/blobStore";
 import { caller } from "@/trpc/server";
-import { ChartBar, User2, Users } from "lucide-react";
 
 export default async function Settings() {
-	const [user, storage, timezone, projectsData] = await Promise.all([
-		caller.user.getCurrentUser(),
+	const [storage, timezone, projectsData] = await Promise.all([
 		caller.settings.getStorageUsage(),
 		caller.settings.getTimezone(),
 		caller.user.getProjects({ statuses: ["active", "archived"] }),
@@ -18,6 +19,14 @@ export default async function Settings() {
 	return (
 		<>
 			<PageTitle title="Settings" />
+
+			<PageSection
+				title="Workspace"
+				titleIcon={<Building2 className="w-5 h-5" />}
+				bottomMargin
+			>
+				<WorkspaceSettings />
+			</PageSection>
 
 			<PageSection
 				title="Team"
@@ -60,38 +69,22 @@ export default async function Settings() {
 				</div>
 			</PageSection>
 
-			{user ? (
-				<PageSection
-					title="Profile"
-					titleIcon={<User2 className="w-5 h-5" />}
-					bottomMargin
-				>
-					<div className="p-4 sm:flex items-center">
-						<p className="font-semibold text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
-							Name
-						</p>
-						<p>
-							{user.firstName} {user.lastName}
-						</p>
-					</div>
+			<PageSection
+				title="Profile"
+				titleIcon={<User2 className="w-5 h-5" />}
+				bottomMargin
+			>
+				<ProfileSettings />
 
-					<div className="p-4 sm:flex items-center">
+				{timezone ? (
+					<div className="p-4 sm:flex">
 						<p className="font-semibold text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
-							Email address
+							Timezone
 						</p>
-						<p>{user.email}</p>
+						<div className="text-gray-900 dark:text-gray-200">{timezone}</div>
 					</div>
-
-					{timezone ? (
-						<div className="p-4 sm:flex">
-							<p className="font-semibold text-gray-900 dark:text-gray-200 sm:w-64 sm:flex-none sm:pr-6">
-								Timezone
-							</p>
-							<div className="text-gray-900 dark:text-gray-200">{timezone}</div>
-						</div>
-					) : null}
-				</PageSection>
-			) : null}
+				) : null}
+			</PageSection>
 		</>
 	);
 }

@@ -1,31 +1,30 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Building2, ChevronDown, Plus, User, Check } from "lucide-react";
+import { Building2, Check, ChevronDown, Plus, User } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-	DialogFooter,
-} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
 	authClient,
 	useActiveOrganization,
 	useSession,
 } from "@/lib/auth/client";
-import { toast } from "sonner";
 
 type Organization = {
 	id: string;
@@ -39,6 +38,8 @@ export function OrgSwitcher() {
 	const [orgs, setOrgs] = useState<Organization[]>([]);
 	const [createDialogOpen, setCreateDialogOpen] = useState(false);
 	const [newOrgName, setNewOrgName] = useState("");
+	const [newOrgSlug, setNewOrgSlug] = useState("");
+	const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
 	const [creating, setCreating] = useState(false);
 
 	const fetchOrgs = useCallback(async () => {
@@ -58,6 +59,25 @@ export function OrgSwitcher() {
 		}
 	}, [session?.user, fetchOrgs]);
 
+	const generateSlug = (name: string) =>
+		name
+			.trim()
+			.toLowerCase()
+			.replace(/[^a-z0-9\s-]/g, "")
+			.replace(/\s+/g, "-");
+
+	const handleNameChange = (name: string) => {
+		setNewOrgName(name);
+		if (!slugManuallyEdited) {
+			setNewOrgSlug(generateSlug(name));
+		}
+	};
+
+	const handleSlugChange = (slug: string) => {
+		setSlugManuallyEdited(true);
+		setNewOrgSlug(slug.toLowerCase().replace(/[^a-z0-9-]/g, ""));
+	};
+
 	if (!session?.user) {
 		return null;
 	}
@@ -75,12 +95,12 @@ export function OrgSwitcher() {
 	}
 
 	async function createOrganization() {
-		if (!newOrgName.trim()) return;
+		if (!newOrgName.trim() || !newOrgSlug.trim()) return;
 		setCreating(true);
 		try {
 			const result = await authClient.organization.create({
 				name: newOrgName.trim(),
-				slug: newOrgName.trim().toLowerCase().replace(/\s+/g, "-"),
+				slug: newOrgSlug.trim(),
 			});
 			if (result.data) {
 				await authClient.organization.setActive({
@@ -88,6 +108,8 @@ export function OrgSwitcher() {
 				});
 				setCreateDialogOpen(false);
 				setNewOrgName("");
+				setNewOrgSlug("");
+				setSlugManuallyEdited(false);
 				toast.success("Workspace created");
 				window.location.href = "/start";
 			} else if (result.error) {
@@ -118,8 +140,6 @@ export function OrgSwitcher() {
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="start" className="w-56">
-					<DropdownMenuLabel>Switch workspace</DropdownMenuLabel>
-					<DropdownMenuSeparator />
 					<DropdownMenuItem
 						onClick={switchToPersonal}
 						className="cursor-pointer"
@@ -152,7 +172,17 @@ export function OrgSwitcher() {
 				</DropdownMenuContent>
 			</DropdownMenu>
 
-			<Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+			<Dialog
+				open={createDialogOpen}
+				onOpenChange={(open) => {
+					setCreateDialogOpen(open);
+					if (!open) {
+						setNewOrgName("");
+						setNewOrgSlug("");
+						setSlugManuallyEdited(false);
+					}
+				}}
+			>
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle>Create workspace</DialogTitle>
@@ -163,9 +193,21 @@ export function OrgSwitcher() {
 							<Input
 								id="org-name"
 								value={newOrgName}
-								onChange={(e) => setNewOrgName(e.target.value)}
+								onChange={(e) => handleNameChange(e.target.value)}
 								placeholder="My Team"
 							/>
+						</div>
+						<div className="space-y-2">
+							<Label htmlFor="org-slug">Slug</Label>
+							<Input
+								id="org-slug"
+								value={newOrgSlug}
+								onChange={(e) => handleSlugChange(e.target.value)}
+								placeholder="my-team"
+							/>
+							<p className="text-xs text-muted-foreground">
+								Used in URLs. Only lowercase letters, numbers, and hyphens.
+							</p>
 						</div>
 					</div>
 					<DialogFooter>
@@ -177,7 +219,7 @@ export function OrgSwitcher() {
 						</Button>
 						<Button
 							onClick={createOrganization}
-							disabled={creating || !newOrgName.trim()}
+							disabled={creating || !newOrgName.trim() || !newOrgSlug.trim()}
 						>
 							{creating ? "Creating..." : "Create"}
 						</Button>

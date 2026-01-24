@@ -1,7 +1,9 @@
-import { headers } from "next/headers";
-import { cookies } from "next/headers";
+import { eq } from "drizzle-orm";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { organization } from "@/drizzle/auth-schema";
 import { auth } from "@/lib/auth";
+import { database } from "@/lib/utils/useDatabase";
 
 type Result = {
 	userId: string;
@@ -20,13 +22,26 @@ export async function getOwner(): Promise<Result> {
 		redirect("/sign-in");
 	}
 
-	const activeOrg = session.session.activeOrganizationId;
+	const activeOrgId = session.session.activeOrganizationId;
+
+	let orgSlug = "me";
+	if (activeOrgId) {
+		const db = database();
+		const org = await db
+			.select({ slug: organization.slug })
+			.from(organization)
+			.where(eq(organization.id, activeOrgId))
+			.limit(1);
+		if (org[0]) {
+			orgSlug = org[0].slug;
+		}
+	}
 
 	return {
 		userId: session.user.id,
-		orgId: activeOrg ?? null,
-		orgSlug: activeOrg ?? "me",
-		ownerId: activeOrg ?? session.user.id,
+		orgId: activeOrgId ?? null,
+		orgSlug,
+		ownerId: activeOrgId ?? session.user.id,
 	};
 }
 

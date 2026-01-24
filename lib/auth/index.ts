@@ -1,19 +1,9 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { emailOTP, organization } from "better-auth/plugins";
-import { Resend } from "resend";
 import { database } from "@/lib/utils/useDatabase";
 import { isSignupDisabled } from "@/lib/config";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-function getFromEmail() {
-	const from = process.env.EMAIL_FROM;
-	if (!from) {
-		throw new Error("EMAIL_FROM environment variable is required");
-	}
-	return from;
-}
+import { sendEmail } from "@/lib/email";
 
 export const auth = betterAuth({
 	database: drizzleAdapter(database(), {
@@ -32,8 +22,7 @@ export const auth = betterAuth({
 			otpLength: 6,
 			expiresIn: 600,
 			sendVerificationOTP: async ({ email, otp }) => {
-				await resend.emails.send({
-					from: getFromEmail(),
+				await sendEmail({
 					to: email,
 					subject: "Your verification code for Manage",
 					html: `
@@ -60,8 +49,7 @@ export const auth = betterAuth({
 			allowSignupOnInvitation: true,
 			sendInvitationEmail: async ({ email, organization, inviter, id }) => {
 				const acceptUrl = `${process.env.NEXT_PUBLIC_APP_URL}/accept-invite?email=${encodeURIComponent(email)}&invitationId=${id}`;
-				await resend.emails.send({
-					from: getFromEmail(),
+				await sendEmail({
 					to: email,
 					subject: `You're invited to join ${organization.name}`,
 					html: `
