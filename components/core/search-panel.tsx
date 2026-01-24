@@ -132,9 +132,11 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 		enabled: debouncedQuery.length > 0 && open,
 	});
 
-	const { data: projects = [] } = useQuery(
+	const { data: projectsData } = useQuery(
 		trpc.user.getProjects.queryOptions(),
 	);
+
+	const projects = projectsData?.projects ?? [];
 
 	const handleItemClick = (url: string) => {
 		onOpenChange(false);

@@ -37,7 +37,7 @@ export function CommandMenu({
 	}, []);
 
 	const trpc = useTRPC();
-	const [{ data: projects = [] }, { data: tasklists = [] }] = useQueries({
+	const [{ data: projectsData }, { data: tasklists = [] }] = useQueries({
 		queries: [
 			trpc.user.getProjects.queryOptions({
 				statuses: ["active"],
@@ -50,6 +50,8 @@ export function CommandMenu({
 			},
 		],
 	});
+
+	const projects = projectsData?.projects ?? [];
 
 	return (
 		<>

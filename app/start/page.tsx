@@ -1,13 +1,20 @@
-import { auth } from "@clerk/nextjs/server";
+import { headers } from "next/headers";
 import { ClientRedirect } from "@/components/core/client-redirect";
+import { auth } from "@/lib/auth";
 
 export const fetchCache = "force-no-store";
 export const dynamic = "force-dynamic";
 
 export default async function Start() {
-	const { userId, orgSlug } = await auth();
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	});
+
+	const activeOrg = session?.session?.activeOrganizationId;
 
 	return (
-		<ClientRedirect path={userId ? `/${orgSlug ?? "me"}/today` : "/sign-in"} />
+		<ClientRedirect
+			path={session?.user ? `/${activeOrg ?? "me"}/today` : "/sign-in"}
+		/>
 	);
 }

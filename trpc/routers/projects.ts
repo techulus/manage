@@ -41,6 +41,7 @@ export const projectsRouter = createTRPCRouter({
 					dueDate: input.dueDate,
 					status: "active",
 					createdByUser: ctx.userId,
+					organizationId: ctx.orgId,
 				})
 				.returning()
 				.execute();
@@ -336,7 +337,7 @@ export const projectsRouter = createTRPCRouter({
 							columns: {
 								id: true,
 								firstName: true,
-								imageUrl: true,
+								image: true,
 							},
 						},
 					},

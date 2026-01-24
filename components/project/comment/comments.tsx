@@ -1,6 +1,5 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CircleEllipsisIcon, MessageSquareIcon } from "lucide-react";
 import { useParams } from "next/navigation";
@@ -15,6 +14,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useSession } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
 import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
@@ -38,7 +38,7 @@ function CommentThread({
 	projectId: string;
 	onRefresh: () => void;
 }) {
-	const { user } = useUser();
+	const { data: session } = useSession();
 	const [showReplyForm, setShowReplyForm] = useState(false);
 	const [showReplies, setShowReplies] = useState(false);
 
@@ -142,7 +142,7 @@ function CommentThread({
 						/>
 					)}
 
-					{comment.creator?.id === user?.id ? (
+					{comment.creator?.id === session?.user?.id ? (
 						<DropdownMenu>
 							<DropdownMenuTrigger className="absolute right-2 top-[8px]">
 								<CircleEllipsisIcon className="h-5 w-5" />

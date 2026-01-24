@@ -1,6 +1,5 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import { Title } from "@radix-ui/react-dialog";
 import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
 import {
@@ -13,7 +12,7 @@ import {
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Greeting } from "@/components/core/greeting";
 import { PageLoading } from "@/components/core/loaders";
 import { Panel } from "@/components/core/panel";
@@ -33,7 +32,6 @@ import { useTRPC } from "@/trpc/client";
 export default function Today() {
 	const params = useParams();
 	const tenant = params.tenant as string;
-	const { user } = useUser();
 
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
@@ -41,22 +39,7 @@ export default function Today() {
 		defaultValue: "active",
 	});
 
-	// Check if user is org admin - memoized to avoid recalculation on every render
-	const isOrgAdmin = useMemo(() => {
-		// Check if current tenant matches any organization the user belongs to
-		const orgMembership = user?.organizationMemberships?.find(
-			(membership) => membership.organization.slug === tenant,
-		);
-
-		if (orgMembership) {
-			// This is an organization tenant - check if user has org:admin role
-			return orgMembership.role === "org:admin";
-		}
-		// This is a personal account tenant (no matching organization) - user is admin
-		return true;
-	}, [user, tenant]);
-
-	const [{ data: todayData }, { data: projects }, { data: timezone }] =
+	const [{ data: todayData }, { data: projectsData }, { data: timezone }] =
 		useQueries({
 			queries: [
 				trpc.user.getTodayData.queryOptions(),
@@ -66,6 +49,9 @@ export default function Today() {
 				trpc.settings.getTimezone.queryOptions(),
 			],
 		});
+
+	const projects = projectsData?.projects;
+	const isOrgAdmin = projectsData?.isOrgAdmin ?? (tenant === "me");
 
 	const { dueToday = [], overDue = [], events = [] } = todayData ?? {};
 

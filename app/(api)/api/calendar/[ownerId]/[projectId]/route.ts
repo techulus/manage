@@ -1,5 +1,5 @@
 import { calendarEvent, project, task, taskList, user } from "@/drizzle/schema";
-import { getDatabaseForOwner } from "@/lib/utils/useDatabase";
+import { database } from "@/lib/utils/useDatabase";
 import { and, desc, eq, lte } from "drizzle-orm";
 import ical, { ICalCalendarMethod } from "ical-generator";
 import type { NextRequest } from "next/server";
@@ -15,9 +15,9 @@ export async function GET(
 ) {
 	const params = await props.params;
 	const searchParams = request.nextUrl.searchParams;
-	const { projectId, ownerId } = params;
+	const { projectId } = params;
 
-	const db = await getDatabaseForOwner(ownerId);
+	const db = database();
 
 	let timezone: string | undefined | null;
 	const userId = searchParams.get("userId");
@@ -99,7 +99,7 @@ export async function GET(
 				end: timezone
 					? task.dueDate.toLocaleString("en-US", { timeZone: timezone })
 					: task.dueDate,
-				summary: `❏ [${tasklist.name}] ${task.name}`,
+				summary: `[${tasklist.name}] ${task.name}`,
 				description: `${task.description}`,
 				allDay: true,
 				created: task.createdAt,

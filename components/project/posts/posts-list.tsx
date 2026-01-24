@@ -1,6 +1,5 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import { Title } from "@radix-ui/react-dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
@@ -22,6 +21,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { PostWithCreator } from "@/drizzle/types";
+import { useSession } from "@/lib/auth/client";
 import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
 
@@ -50,7 +50,7 @@ export default function PostsList({
 	posts: PostWithCreator[];
 	projectId: number;
 }) {
-	const { user } = useUser();
+	const { data: session } = useSession();
 	const [editing, setEditing] = useState<number | null>(null);
 
 	const trpc = useTRPC();
@@ -115,7 +115,7 @@ export default function PostsList({
 								{post.isDraft && <Badge variant="outline">Draft</Badge>}
 							</div>
 
-							{user?.id === post.createdByUser ? (
+							{session?.user?.id === post.createdByUser ? (
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>
 										<Button variant="ghost" size="icon">

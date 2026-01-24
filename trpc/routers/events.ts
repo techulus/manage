@@ -51,7 +51,7 @@ const buildEventsQuery = (projectId: number, start: Date, end: Date) => {
 				columns: {
 					id: true,
 					firstName: true,
-					imageUrl: true,
+					image: true,
 				},
 			},
 		},

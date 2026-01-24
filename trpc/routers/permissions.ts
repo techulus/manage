@@ -31,7 +31,7 @@ export const permissionsRouter = createTRPCRouter({
 							email: true,
 							firstName: true,
 							lastName: true,
-							imageUrl: true,
+							image: true,
 						},
 					},
 				},
@@ -156,16 +156,13 @@ export const permissionsRouter = createTRPCRouter({
 		}
 
 		// Get all users in the organization
-		// For personal accounts (no orgId), we return all users in the database
-		// For organizations, we should ideally use Clerk's API to get org members
-		// But for now, we return all users who have been created
 		const allUsers = await ctx.db.query.user.findMany({
 			columns: {
 				id: true,
 				email: true,
 				firstName: true,
 				lastName: true,
-				imageUrl: true,
+				image: true,
 			},
 		});
 

@@ -7,12 +7,11 @@
 - **Framework**: Next.js 16 with App Router
 - **Language**: TypeScript
 - **Database**: PostgreSQL with Drizzle ORM
-- **Authentication**: Clerk (with organization support)
+- **Authentication**: Better-auth
 - **Styling**: Tailwind CSS + Shadcn
 - **Real-time**: TurboWire for WebSockets
 - **Email**: React Email + Resend
 - **File Storage**: S3-compatible storage
-- **Search**: Upstash Search for full-text search with filtering
 - **Monitoring**: Sentry
 - **Linting**: Biome
 - Bun as the runtime and package manager

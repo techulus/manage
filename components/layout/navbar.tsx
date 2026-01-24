@@ -1,13 +1,10 @@
 "use client";
 
-import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
 import { useQueries } from "@tanstack/react-query";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +21,8 @@ import { CommandMenu } from "../core/cmd-menu";
 import { GlobalSearch } from "../core/global-search";
 import { Notifications } from "../core/notifications";
 import { SearchSheet } from "../core/search-panel";
+import { OrgSwitcher } from "../core/org-switcher";
+import { UserMenu } from "../core/user-menu";
 
 interface NavLink {
 	href: string;
@@ -37,8 +36,6 @@ interface NavLink {
 
 export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 	const isMobile = useIsMobile();
-	const { systemTheme } = useTheme();
-	const appearance = systemTheme === "dark" ? { baseTheme: dark } : undefined;
 	const router = useRouter();
 	const { tenant, projectId } = useParams();
 	const pathname = usePathname();
@@ -46,7 +43,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 
 	const trpc = useTRPC();
 
-	const [{ data: projects = [] }, { data: tasklists = [] }] = useQueries({
+	const [{ data: projectsData }, { data: tasklists = [] }] = useQueries({
 		queries: [
 			trpc.user.getProjects.queryOptions({
 				statuses: ["active"],
@@ -59,6 +56,8 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 			},
 		],
 	});
+
+	const projects = projectsData?.projects ?? [];
 
 	const activeProject = useMemo(() => {
 		if (!projectId) {
@@ -154,12 +153,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 						/>
 					</svg>
 
-					<OrganizationSwitcher
-						appearance={appearance}
-						afterSelectOrganizationUrl="/start"
-						afterLeaveOrganizationUrl="/start"
-						afterSelectPersonalUrl="/start"
-					/>
+					<OrgSwitcher />
 
 					<svg
 						height="16"
@@ -225,7 +219,7 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 					<Notifications notificationsWire={notificationsWire} />
 
 					<div className="pl-2 flex items-center">
-						<UserButton appearance={appearance} />
+						<UserMenu />
 					</div>
 				</div>
 			</div>

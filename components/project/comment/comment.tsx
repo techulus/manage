@@ -1,6 +1,5 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useRef, useState } from "react";
@@ -8,6 +7,7 @@ import { Spinner } from "@/components/core/loaders";
 import { UserAvatar } from "@/components/core/user-avatar";
 import Editor from "@/components/editor";
 import { Button } from "@/components/ui/button";
+import { useSession } from "@/lib/auth/client";
 import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
 
@@ -27,7 +27,7 @@ export default function CommentForm({
 	isReply = false,
 }: CommentFormProps) {
 	const { projectId } = useParams();
-	const { user: creator } = useUser();
+	const { data: session } = useSession();
 	const [content, setContent] = useState<string>("");
 	const formRef = useRef<HTMLFormElement>(null);
 
@@ -72,7 +72,7 @@ export default function CommentForm({
 			}}
 		>
 			<div className="flex w-full flex-row space-x-4">
-				{creator ? <UserAvatar user={creator} /> : null}
+				{session?.user ? <UserAvatar user={session.user} /> : null}
 
 				<div className="relative w-full">
 					<Editor

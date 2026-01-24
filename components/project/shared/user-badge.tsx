@@ -8,7 +8,7 @@ export function UserBadge({
 	imageOnly = false,
 }: {
 	className?: string;
-	user: Pick<User, "firstName" | "imageUrl">;
+	user: Pick<User, "firstName" | "image">;
 	imageOnly?: boolean;
 }) {
 	return (

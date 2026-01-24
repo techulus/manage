@@ -9,17 +9,94 @@ import {
 	timestamp,
 } from "drizzle-orm/pg-core";
 
-export const user = pgTable("User", {
+export const user = pgTable("user", {
 	id: text("id").primaryKey().notNull(),
+	name: text("name"),
 	email: text("email").notNull().unique(),
+	emailVerified: boolean("emailVerified").notNull().default(false),
+	image: text("image"),
 	firstName: text("firstName"),
 	lastName: text("lastName"),
-	imageUrl: text("imageUrl"),
 	timeZone: text("timeZone"),
-	rawData: jsonb("rawData").notNull(),
-	lastActiveAt: timestamp(),
-	createdAt: timestamp().notNull().defaultNow(),
-	updatedAt: timestamp().notNull().defaultNow(),
+	lastActiveAt: timestamp("lastActiveAt"),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
+
+export const session = pgTable("session", {
+	id: text("id").primaryKey().notNull(),
+	expiresAt: timestamp("expiresAt").notNull(),
+	token: text("token").notNull().unique(),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+	ipAddress: text("ipAddress"),
+	userAgent: text("userAgent"),
+	userId: text("userId")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
+	activeOrganizationId: text("activeOrganizationId"),
+});
+
+export const account = pgTable("account", {
+	id: text("id").primaryKey().notNull(),
+	accountId: text("accountId").notNull(),
+	providerId: text("providerId").notNull(),
+	userId: text("userId")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
+	accessToken: text("accessToken"),
+	refreshToken: text("refreshToken"),
+	idToken: text("idToken"),
+	accessTokenExpiresAt: timestamp("accessTokenExpiresAt"),
+	refreshTokenExpiresAt: timestamp("refreshTokenExpiresAt"),
+	scope: text("scope"),
+	password: text("password"),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
+
+export const verification = pgTable("verification", {
+	id: text("id").primaryKey().notNull(),
+	identifier: text("identifier").notNull(),
+	value: text("value").notNull(),
+	expiresAt: timestamp("expiresAt").notNull(),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+});
+
+export const organization = pgTable("organization", {
+	id: text("id").primaryKey().notNull(),
+	name: text("name").notNull(),
+	slug: text("slug").unique(),
+	logo: text("logo"),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	metadata: text("metadata"),
+});
+
+export const member = pgTable("member", {
+	id: text("id").primaryKey().notNull(),
+	organizationId: text("organizationId")
+		.notNull()
+		.references(() => organization.id, { onDelete: "cascade" }),
+	userId: text("userId")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
+	role: text("role").notNull(),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+});
+
+export const invitation = pgTable("invitation", {
+	id: text("id").primaryKey().notNull(),
+	organizationId: text("organizationId")
+		.notNull()
+		.references(() => organization.id, { onDelete: "cascade" }),
+	email: text("email").notNull(),
+	role: text("role"),
+	status: text("status").notNull(),
+	expiresAt: timestamp("expiresAt").notNull(),
+	inviterId: text("inviterId")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
 });
 
 export const userRelations = relations(user, ({ many }) => ({
@@ -29,16 +106,64 @@ export const userRelations = relations(user, ({ many }) => ({
 	projectPermissions: many(projectPermission, {
 		relationName: "permissionUser",
 	}),
+	sessions: many(session),
+	accounts: many(account),
+	memberships: many(member),
 }));
 
-export const project = pgTable("Project", {
+export const sessionRelations = relations(session, ({ one }) => ({
+	user: one(user, {
+		fields: [session.userId],
+		references: [user.id],
+	}),
+}));
+
+export const accountRelations = relations(account, ({ one }) => ({
+	user: one(user, {
+		fields: [account.userId],
+		references: [user.id],
+	}),
+}));
+
+export const organizationRelations = relations(organization, ({ many }) => ({
+	members: many(member),
+	invitations: many(invitation),
+	projects: many(project),
+}));
+
+export const memberRelations = relations(member, ({ one }) => ({
+	organization: one(organization, {
+		fields: [member.organizationId],
+		references: [organization.id],
+	}),
+	user: one(user, {
+		fields: [member.userId],
+		references: [user.id],
+	}),
+}));
+
+export const invitationRelations = relations(invitation, ({ one }) => ({
+	organization: one(organization, {
+		fields: [invitation.organizationId],
+		references: [organization.id],
+	}),
+	inviter: one(user, {
+		fields: [invitation.inviterId],
+		references: [user.id],
+	}),
+}));
+
+export const project = pgTable("project", {
 	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	name: text("name").notNull(),
 	description: text("description"),
 	status: text("status").notNull(),
-	dueDate: timestamp(),
-	createdAt: timestamp().notNull().defaultNow(),
-	updatedAt: timestamp().notNull().defaultNow(),
+	dueDate: timestamp("dueDate"),
+	organizationId: text("organizationId").references(() => organization.id, {
+		onDelete: "cascade",
+	}),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 	createdByUser: text("createdByUser")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
@@ -49,13 +174,17 @@ export const projectRelations = relations(project, ({ many, one }) => ({
 		fields: [project.createdByUser],
 		references: [user.id],
 	}),
+	organization: one(organization, {
+		fields: [project.organizationId],
+		references: [organization.id],
+	}),
 	taskLists: many(taskList),
 	events: many(calendarEvent),
 	permissions: many(projectPermission),
 	posts: many(post),
 }));
 
-export const task = pgTable("Task", {
+export const task = pgTable("task", {
 	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	taskListId: integer("taskListId")
 		.notNull()
@@ -66,10 +195,10 @@ export const task = pgTable("Task", {
 	name: text("name").notNull(),
 	description: text("description"),
 	status: text("status").notNull(),
-	dueDate: timestamp(),
+	dueDate: timestamp("dueDate"),
 	position: real("position").notNull(),
-	createdAt: timestamp().notNull().defaultNow(),
-	updatedAt: timestamp().notNull().defaultNow(),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 	assignedToUser: text("assignedToUser").references(() => user.id, {
 		onDelete: "cascade",
 		onUpdate: "cascade",
@@ -96,14 +225,14 @@ export const taskRelations = relations(task, ({ one }) => ({
 	}),
 }));
 
-export const taskList = pgTable("TaskList", {
+export const taskList = pgTable("taskList", {
 	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	name: text("name").notNull(),
 	description: text("description"),
 	status: text("status").notNull(),
-	dueDate: timestamp(),
-	createdAt: timestamp().notNull().defaultNow(),
-	updatedAt: timestamp().notNull().defaultNow(),
+	dueDate: timestamp("dueDate"),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 	projectId: integer("projectId")
 		.notNull()
 		.references(() => project.id, { onDelete: "cascade", onUpdate: "cascade" }),
@@ -124,7 +253,7 @@ export const taskListRelations = relations(taskList, ({ many, one }) => ({
 	tasks: many(task),
 }));
 
-export const blob = pgTable("Blob", {
+export const blob = pgTable("blob", {
 	id: text("id").notNull().primaryKey(),
 	key: text("key").unique().notNull(),
 	blockId: text("blockId").unique(),
@@ -134,8 +263,8 @@ export const blob = pgTable("Blob", {
 	createdByUser: text("createdByUser")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
-	createdAt: timestamp().notNull().defaultNow(),
-	updatedAt: timestamp().notNull().defaultNow(),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
 
 export const blobsRelations = relations(blob, ({ one }) => ({
@@ -145,16 +274,16 @@ export const blobsRelations = relations(blob, ({ one }) => ({
 	}),
 }));
 
-export const calendarEvent = pgTable("Event", {
+export const calendarEvent = pgTable("calendarEvent", {
 	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	name: text("name").notNull(),
 	description: text("description"),
-	start: timestamp().notNull(),
-	end: timestamp(),
+	start: timestamp("start").notNull(),
+	end: timestamp("end"),
 	allDay: boolean("allDay").notNull().default(false),
 	repeatRule: text("repeatRule"),
-	createdAt: timestamp().notNull().defaultNow(),
-	updatedAt: timestamp().notNull().defaultNow(),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 	projectId: integer("projectId")
 		.notNull()
 		.references(() => project.id, { onDelete: "cascade", onUpdate: "cascade" }),
@@ -162,6 +291,7 @@ export const calendarEvent = pgTable("Event", {
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
 });
+
 export const calendarEventRelations = relations(calendarEvent, ({ one }) => ({
 	creator: one(user, {
 		fields: [calendarEvent.createdByUser],
@@ -173,13 +303,13 @@ export const calendarEventRelations = relations(calendarEvent, ({ one }) => ({
 	}),
 }));
 
-export const comment = pgTable("Comment", {
+export const comment = pgTable("comment", {
 	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	roomId: text("roomId").notNull(),
 	content: text("content").notNull(),
 	metadata: jsonb("metadata").notNull(),
-	createdAt: timestamp().notNull().defaultNow(),
-	updatedAt: timestamp().notNull().defaultNow(),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 	createdByUser: text("createdByUser")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
@@ -192,7 +322,7 @@ export const commentRelations = relations(comment, ({ one }) => ({
 	}),
 }));
 
-export const activity = pgTable("Activity", {
+export const activity = pgTable("activity", {
 	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	action: text("action").notNull(),
 	type: text("type").notNull(),
@@ -205,7 +335,7 @@ export const activity = pgTable("Activity", {
 	userId: text("userId")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
-	createdAt: timestamp().notNull().defaultNow(),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
 });
 
 export const activityRelations = relations(activity, ({ one }) => ({
@@ -219,13 +349,13 @@ export const activityRelations = relations(activity, ({ one }) => ({
 	}),
 }));
 
-export const notification = pgTable("Notification", {
+export const notification = pgTable("notification", {
 	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	type: text("type"),
 	message: text("message").notNull(),
 	target: text("target"),
 	read: boolean("read").notNull().default(false),
-	createdAt: timestamp().notNull().defaultNow(),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
 	fromUser: text("fromUser").references(() => user.id, {
 		onDelete: "cascade",
 		onUpdate: "cascade",
@@ -246,7 +376,7 @@ export const notificationRelations = relations(notification, ({ one }) => ({
 	}),
 }));
 
-export const projectPermission = pgTable("ProjectPermission", {
+export const projectPermission = pgTable("projectPermission", {
 	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	projectId: integer("projectId")
 		.notNull()
@@ -254,9 +384,9 @@ export const projectPermission = pgTable("ProjectPermission", {
 	userId: text("userId")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
-	role: text("role").notNull(), // 'editor' or 'reader'
-	createdAt: timestamp().notNull().defaultNow(),
-	updatedAt: timestamp().notNull().defaultNow(),
+	role: text("role").notNull(),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 	createdByUser: text("createdByUser")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
@@ -282,7 +412,7 @@ export const projectPermissionRelations = relations(
 	}),
 );
 
-export const post = pgTable("Post", {
+export const post = pgTable("post", {
 	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	title: text("title").notNull(),
 	content: text("content"),
@@ -290,8 +420,8 @@ export const post = pgTable("Post", {
 	category: text("category").notNull(),
 	isDraft: boolean("isDraft").notNull().default(true),
 	publishedAt: timestamp("publishedAt"),
-	createdAt: timestamp().notNull().defaultNow(),
-	updatedAt: timestamp().notNull().defaultNow(),
+	createdAt: timestamp("createdAt").notNull().defaultNow(),
+	updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 	projectId: integer("projectId")
 		.notNull()
 		.references(() => project.id, { onDelete: "cascade", onUpdate: "cascade" }),

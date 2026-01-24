@@ -1,29 +1,31 @@
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
+import { TeamSettings } from "@/components/settings/team-settings";
 import { bytesToMegabytes } from "@/lib/blobStore";
 import { caller } from "@/trpc/server";
-import { ChartBar, User2 } from "lucide-react";
+import { ChartBar, User2, Users } from "lucide-react";
 
 export default async function Settings() {
-	const [user, storage, timezone, projects] = await Promise.all([
+	const [user, storage, timezone, projectsData] = await Promise.all([
 		caller.user.getCurrentUser(),
 		caller.settings.getStorageUsage(),
 		caller.settings.getTimezone(),
 		caller.user.getProjects({ statuses: ["active", "archived"] }),
 	]);
 
+	const projects = projectsData.projects;
+
 	return (
 		<>
 			<PageTitle title="Settings" />
 
-			{/* <PageSection
-				title="Billing"
-				titleIcon={<CreditCard className="w-5 h-5" />}
+			<PageSection
+				title="Team"
+				titleIcon={<Users className="w-5 h-5" />}
 				bottomMargin
-				transparent
 			>
-				<Billing />
-			</PageSection> */}
+				<TeamSettings />
+			</PageSection>
 
 			<PageSection
 				title="Usage"

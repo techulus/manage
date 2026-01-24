@@ -8,7 +8,7 @@ interface User {
 	id: string;
 	firstName: string | null;
 	lastName: string | null;
-	imageUrl: string | null;
+	image: string | null;
 	email: string;
 }
 
