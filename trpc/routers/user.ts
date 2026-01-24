@@ -17,8 +17,8 @@ export const userRouter = createTRPCRouter({
 	updateProfile: protectedProcedure
 		.input(
 			z.object({
-				firstName: z.string().min(1),
-				lastName: z.string().min(1),
+				firstName: z.string(),
+				lastName: z.string(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
