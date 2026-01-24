@@ -159,11 +159,7 @@ export function TeamSettings() {
 	}
 
 	if (!activeOrg) {
-		return (
-			<div className="p-4 text-muted-foreground">
-				Team settings are only available for workspaces.
-			</div>
-		);
+		return null;
 	}
 
 	if (isLoading) {
