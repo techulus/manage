@@ -193,7 +193,6 @@ export function TeamSettings() {
 									id: member.user.id,
 									firstName: member.user.firstName,
 									name: member.user.name,
-									email: member.user.email,
 								}}
 							/>
 							<div>

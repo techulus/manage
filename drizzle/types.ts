@@ -48,11 +48,15 @@ export type ProjectWithCreator = Project & { creator: User };
 
 export type TaskWithDetails = Task & {
 	creator: {
+		id: string;
 		firstName: string | null;
+		email: string;
 		image: string | null;
 	};
 	assignee: {
+		id: string;
 		firstName: string | null;
+		email: string;
 		image: string | null;
 	} | null;
 };
@@ -62,7 +66,7 @@ export type TaskListWithTasks = TaskList & {
 };
 
 export type BlobWithCreater = Blob & {
-	creator: Pick<User, "firstName" | "image">;
+	creator: Pick<User, "id" | "firstName" | "image">;
 };
 
 export type EventWithCreator = CalendarEvent & {
