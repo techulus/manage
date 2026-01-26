@@ -8,13 +8,15 @@ export function UserBadge({
 	imageOnly = false,
 }: {
 	className?: string;
-	user: Pick<User, "firstName" | "image">;
+	user: Pick<User, "firstName" | "image" | "id"> & { email?: string };
 	imageOnly?: boolean;
 }) {
 	return (
 		<div className={cn("flex items-center", className)}>
 			<UserAvatar className="h-5 w-5" user={user} />
-			{!imageOnly ? <p className="ml-2">{user?.firstName}</p> : null}
+			{!imageOnly ? (
+				<p className="ml-2">{user?.firstName || user?.email}</p>
+			) : null}
 		</div>
 	);
 }

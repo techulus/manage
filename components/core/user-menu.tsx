@@ -40,7 +40,7 @@ export function UserMenu() {
 			<DropdownMenuTrigger asChild>
 				<button type="button" className="cursor-pointer">
 					<UserAvatar
-						user={{ id: user.id, name: user.name, email: user.email }}
+						user={{ id: user.id, name: user.name }}
 						className="h-8 w-8"
 					/>
 				</button>

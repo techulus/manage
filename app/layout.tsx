@@ -1,4 +1,3 @@
-import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/core/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SITE_METADATA } from "@/data/marketing";
@@ -315,7 +314,6 @@ export default function RootLayout({
 					<Toaster position="top-center" />
 					{children}
 				</ThemeProvider>
-				<Analytics />
 			</body>
 		</html>
 	);

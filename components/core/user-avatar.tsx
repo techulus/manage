@@ -5,8 +5,7 @@ type UserAvatarProps = {
 	user?: {
 		firstName?: string | null;
 		name?: string | null;
-		email?: string | null;
-		id?: string | null;
+		id: string;
 	} | null;
 	className?: string;
 	compact?: boolean;
@@ -21,8 +20,7 @@ export const UserAvatar = ({
 	className,
 	compact = false,
 }: UserAvatarProps) => {
-	const seed =
-		user?.id || user?.email || user?.firstName || user?.name || "default";
+	const seed = user?.id || "default";
 	const fallbackText = user?.firstName?.[0] || user?.name?.[0] || "U";
 
 	return (

@@ -5,7 +5,7 @@ import { ClientRedirect } from "@/components/core/client-redirect";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { auth } from "@/lib/auth";
-import { isSignupDisabled } from "@/lib/config";
+import { isSelfHosted, isSignupDisabled } from "@/lib/config";
 
 export default async function Home() {
 	const session = await auth.api.getSession({
@@ -13,6 +13,10 @@ export default async function Home() {
 	});
 	if (session?.user) {
 		return <ClientRedirect path="/start" />;
+	}
+
+	if (isSelfHosted()) {
+		return <ClientRedirect path="/sign-in" />;
 	}
 
 	const signupsDisabled = isSignupDisabled();
@@ -289,6 +293,19 @@ export default async function Home() {
 								growing community. No vendor lock-in, no hidden costs.
 							</p>
 							<div className="flex flex-col sm:flex-row gap-4 mb-8">
+								<Link
+									href="https://railway.com/deploy/manage"
+									className="inline-flex items-center gap-3 px-6 py-3 rounded-full font-semibold bg-green-600 text-white shadow-sm shadow-green-600/25 border-b-4 border-green-700 hover:bg-green-500 hover:border-green-600 active:border-green-600 active:shadow-sm active:translate-y-0.5 transition-all duration-150"
+								>
+									<svg
+										className="w-5 h-5"
+										fill="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path d="M.113 10.27A.691.691 0 0 1 0 9.92c0-.12.034-.24.113-.35A9.9 9.9 0 0 1 3.537 6.07a9.95 9.95 0 0 1 5.18-2.012 10.1 10.1 0 0 1 5.516.927c.41.193.59.713.404 1.16s-.626.644-1.036.45a8.2 8.2 0 0 0-4.482-.753 8.08 8.08 0 0 0-4.207 1.635 8.05 8.05 0 0 0-2.78 3.568.82.82 0 0 1-.362.42.75.75 0 0 1-.542.084.75.75 0 0 1-.47-.281l.113.35zm22.14.12c.098.152.147.333.14.517a9.88 9.88 0 0 1-1.836 5.137 9.92 9.92 0 0 1-4.408 3.422 9.95 9.95 0 0 1-5.533.644 10.03 10.03 0 0 1-4.92-2.26c-.346-.29-.41-.835-.143-1.22s.722-.47 1.068-.18a8.12 8.12 0 0 0 3.995 1.836 8.08 8.08 0 0 0 4.495-.523 8.05 8.05 0 0 0 3.58-2.78 8.02 8.02 0 0 0 1.49-4.173.82.82 0 0 1 .227-.495.75.75 0 0 1 .492-.225.75.75 0 0 1 .509.172l-.156-.872zm-9.907-6.15c.17 0 .335.077.447.21l2.845 3.39c.187.223.182.565-.012.782l-2.546 2.843c-.193.216-.505.249-.735.077l-.083-.077-2.546-2.843c-.193-.216-.2-.558-.012-.782l2.845-3.39a.54.54 0 0 1 .362-.184l.085-.006.35-.02zm-.7 1.636l-1.794 2.138 1.795 2.003 1.795-2.003-1.795-2.138zm.35 8.93a.54.54 0 0 1 .447.21l2.845 3.39c.187.223.182.565-.012.782l-2.546 2.843c-.193.216-.505.249-.735.077l-.083-.077-2.546-2.843c-.193-.216-.2-.558-.012-.782l2.845-3.39a.54.54 0 0 1 .362-.184l.085-.006.35-.02zm-.7 1.636l-1.794 2.138 1.795 2.003 1.795-2.003-1.795-2.138z" />
+									</svg>
+									Deploy on Railway
+								</Link>
 								<Link
 									href="https://github.com/techulus/manage"
 									className="inline-flex items-center gap-3 px-6 py-3 rounded-full font-semibold border-2 border-neutral-300 dark:border-neutral-600 hover:border-neutral-400 dark:hover:border-neutral-500 transition-colors"

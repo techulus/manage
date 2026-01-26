@@ -240,13 +240,17 @@ export const tasksRouter = createTRPCRouter({
 							with: {
 								creator: {
 									columns: {
+										id: true,
 										firstName: true,
+										email: true,
 										image: true,
 									},
 								},
 								assignee: {
 									columns: {
+										id: true,
 										firstName: true,
+										email: true,
 										image: true,
 									},
 								},

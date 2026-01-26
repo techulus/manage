@@ -86,7 +86,9 @@ export function TasksProvider({
 							position: 0,
 							assignedToUser: null,
 							creator: {
+								id: session?.user?.id || "",
 								firstName: session?.user?.name || null,
+								email: session?.user?.email || "",
 								image: session?.user?.image || null,
 							},
 							assignee: null,

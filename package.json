@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "TZ=UTC next dev --turbopack",
-    "prebuild": "npm run db:push",
     "build": "next build",
     "start": "next start",
     "lint": "biome lint",
@@ -45,7 +44,6 @@
     "@trpc/tanstack-react-query": "^11.0.2",
     "@turbowire/react": "^0.1.0",
     "@turbowire/serverless": "^0.2.0",
-    "@vercel/analytics": "^1.5.0",
     "autoprefixer": "10.4.14",
     "babel-plugin-react-compiler": "^1.0.0",
     "baseline-browser-mapping": "^2.9.10",
