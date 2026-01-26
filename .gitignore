@@ -41,5 +41,3 @@ sqlite
 
 # blob
 blob-data
-# Sentry Config File
-.env.sentry-build-plugin

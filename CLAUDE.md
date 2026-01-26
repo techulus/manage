@@ -12,7 +12,6 @@
 - **Real-time**: TurboWire for WebSockets
 - **Email**: React Email + SMTP (nodemailer)
 - **File Storage**: S3-compatible storage
-- **Monitoring**: Sentry
 - **Linting**: Biome
 - Bun as the runtime and package manager
 
