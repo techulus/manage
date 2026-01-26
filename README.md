@@ -12,7 +12,23 @@ Manage is an open-source project management platform. With its intuitive interfa
 # See .env.example for all available environment variables
 ```
 
-## Deployment
+## Self-Hosting
+
+Deploy your own instance of Manage with one click:
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/manage)
+
+### Manual Deployment
+
+Manage can be deployed on any platform that supports Node.js/Bun. You'll need:
+
+- PostgreSQL database
+- S3-compatible storage (optional, for file uploads)
+- SMTP server (for email notifications)
+
+See `.env.example` for all required environment variables.
+
+## Hosting
 
 <a href="https://railway.com?referralCode=techulus">
   <img src="https://railway.com/brand/logotype-light.png" alt="Railway" height="70" />
