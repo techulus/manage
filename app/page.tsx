@@ -55,14 +55,26 @@ export default async function Home() {
 							tech stack and open source values.
 						</p>
 						<div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-							{!signupsDisabled && (
-								<Link
-									href="/start"
-									className="inline-block bg-green-600 text-white px-6 py-3 rounded-full text-lg font-semibold shadow-sm shadow-green-600/25 border-b-4 border-green-700 hover:bg-green-500 hover:border-green-600 active:border-green-600 active:shadow-sm active:translate-y-0.5 transition-all duration-150 dark:bg-green-600 dark:border-green-700 dark:hover:bg-green-500 dark:hover:border-green-600"
+							<Link
+								href="https://railway.com/deploy/manage"
+								className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-lg font-semibold bg-violet-600 text-white shadow-sm shadow-violet-600/25 border-b-4 border-violet-700 hover:bg-violet-500 hover:border-violet-600 active:border-violet-600 active:shadow-sm active:translate-y-0.5 transition-all duration-150"
+							>
+								<svg
+									className="w-5 h-5"
+									viewBox="0 0 1024 1024"
+									fill="none"
 								>
-									Try Manage →
-								</Link>
-							)}
+									<path
+										d="M4.756 438.175A520.713 520.713 0 0 0 0 489.735h777.799c-2.716-5.306-6.365-10.09-10.045-14.772-132.97-171.791-204.498-156.896-306.819-161.26-34.114-1.403-57.249-1.967-193.037-1.967-72.677 0-151.688.185-228.628.39-9.96 26.884-19.566 52.942-24.243 74.14h398.571v51.909H4.756ZM783.93 541.696H.399c.82 13.851 2.112 27.517 3.978 40.999h723.39c32.248 0 50.299-18.297 56.162-40.999ZM45.017 724.306S164.941 1018.77 511.46 1024c207.112 0 385.071-123.006 465.907-299.694H45.017Z"
+										fill="currentColor"
+									/>
+									<path
+										d="M511.454 0C319.953 0 153.311 105.16 65.31 260.612c68.771-.144 202.704-.226 202.704-.226h.031v-.051c158.309 0 164.193.707 195.118 1.998l19.149.706c66.7 2.224 148.683 9.384 213.19 58.19 35.015 26.471 85.571 84.896 115.708 126.52 27.861 38.499 35.876 82.756 16.933 125.158-17.436 38.97-54.952 62.215-100.383 62.215H16.69s4.233 17.944 10.58 37.751h970.632A510.385 510.385 0 0 0 1024 512.218C1024.01 229.355 794.532 0 511.454 0Z"
+										fill="currentColor"
+									/>
+								</svg>
+								Deploy on Railway
+							</Link>
 							<Link
 								href="https://github.com/techulus/manage"
 								className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-lg font-semibold border-2 border-neutral-300 dark:border-neutral-600 hover:border-neutral-400 dark:hover:border-neutral-500 transition-colors"
@@ -295,20 +307,27 @@ export default async function Home() {
 							<div className="flex flex-col sm:flex-row gap-4 mb-8">
 								<Link
 									href="https://railway.com/deploy/manage"
-									className="inline-flex items-center gap-3 px-6 py-3 rounded-full font-semibold bg-green-600 text-white shadow-sm shadow-green-600/25 border-b-4 border-green-700 hover:bg-green-500 hover:border-green-600 active:border-green-600 active:shadow-sm active:translate-y-0.5 transition-all duration-150"
+									className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold bg-violet-600 text-white shadow-sm shadow-violet-600/25 border-b-4 border-violet-700 hover:bg-violet-500 hover:border-violet-600 active:border-violet-600 active:shadow-sm active:translate-y-0.5 transition-all duration-150"
 								>
 									<svg
 										className="w-5 h-5"
-										fill="currentColor"
-										viewBox="0 0 24 24"
+										viewBox="0 0 1024 1024"
+										fill="none"
 									>
-										<path d="M.113 10.27A.691.691 0 0 1 0 9.92c0-.12.034-.24.113-.35A9.9 9.9 0 0 1 3.537 6.07a9.95 9.95 0 0 1 5.18-2.012 10.1 10.1 0 0 1 5.516.927c.41.193.59.713.404 1.16s-.626.644-1.036.45a8.2 8.2 0 0 0-4.482-.753 8.08 8.08 0 0 0-4.207 1.635 8.05 8.05 0 0 0-2.78 3.568.82.82 0 0 1-.362.42.75.75 0 0 1-.542.084.75.75 0 0 1-.47-.281l.113.35zm22.14.12c.098.152.147.333.14.517a9.88 9.88 0 0 1-1.836 5.137 9.92 9.92 0 0 1-4.408 3.422 9.95 9.95 0 0 1-5.533.644 10.03 10.03 0 0 1-4.92-2.26c-.346-.29-.41-.835-.143-1.22s.722-.47 1.068-.18a8.12 8.12 0 0 0 3.995 1.836 8.08 8.08 0 0 0 4.495-.523 8.05 8.05 0 0 0 3.58-2.78 8.02 8.02 0 0 0 1.49-4.173.82.82 0 0 1 .227-.495.75.75 0 0 1 .492-.225.75.75 0 0 1 .509.172l-.156-.872zm-9.907-6.15c.17 0 .335.077.447.21l2.845 3.39c.187.223.182.565-.012.782l-2.546 2.843c-.193.216-.505.249-.735.077l-.083-.077-2.546-2.843c-.193-.216-.2-.558-.012-.782l2.845-3.39a.54.54 0 0 1 .362-.184l.085-.006.35-.02zm-.7 1.636l-1.794 2.138 1.795 2.003 1.795-2.003-1.795-2.138zm.35 8.93a.54.54 0 0 1 .447.21l2.845 3.39c.187.223.182.565-.012.782l-2.546 2.843c-.193.216-.505.249-.735.077l-.083-.077-2.546-2.843c-.193-.216-.2-.558-.012-.782l2.845-3.39a.54.54 0 0 1 .362-.184l.085-.006.35-.02zm-.7 1.636l-1.794 2.138 1.795 2.003 1.795-2.003-1.795-2.138z" />
+										<path
+											d="M4.756 438.175A520.713 520.713 0 0 0 0 489.735h777.799c-2.716-5.306-6.365-10.09-10.045-14.772-132.97-171.791-204.498-156.896-306.819-161.26-34.114-1.403-57.249-1.967-193.037-1.967-72.677 0-151.688.185-228.628.39-9.96 26.884-19.566 52.942-24.243 74.14h398.571v51.909H4.756ZM783.93 541.696H.399c.82 13.851 2.112 27.517 3.978 40.999h723.39c32.248 0 50.299-18.297 56.162-40.999ZM45.017 724.306S164.941 1018.77 511.46 1024c207.112 0 385.071-123.006 465.907-299.694H45.017Z"
+											fill="currentColor"
+										/>
+										<path
+											d="M511.454 0C319.953 0 153.311 105.16 65.31 260.612c68.771-.144 202.704-.226 202.704-.226h.031v-.051c158.309 0 164.193.707 195.118 1.998l19.149.706c66.7 2.224 148.683 9.384 213.19 58.19 35.015 26.471 85.571 84.896 115.708 126.52 27.861 38.499 35.876 82.756 16.933 125.158-17.436 38.97-54.952 62.215-100.383 62.215H16.69s4.233 17.944 10.58 37.751h970.632A510.385 510.385 0 0 0 1024 512.218C1024.01 229.355 794.532 0 511.454 0Z"
+											fill="currentColor"
+										/>
 									</svg>
 									Deploy on Railway
 								</Link>
 								<Link
 									href="https://github.com/techulus/manage"
-									className="inline-flex items-center gap-3 px-6 py-3 rounded-full font-semibold border-2 border-neutral-300 dark:border-neutral-600 hover:border-neutral-400 dark:hover:border-neutral-500 transition-colors"
+									className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold border-2 border-neutral-300 dark:border-neutral-600 hover:border-neutral-400 dark:hover:border-neutral-500 transition-colors"
 								>
 									<svg
 										className="w-5 h-5"
@@ -321,7 +340,7 @@ export default async function Home() {
 											clipRule="evenodd"
 										/>
 									</svg>
-									Star on GitHub <span>→</span>
+									Star on GitHub →
 								</Link>
 							</div>
 							<div className="grid grid-cols-2 gap-6 text-sm">
