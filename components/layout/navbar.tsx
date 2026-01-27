@@ -5,7 +5,7 @@ import { ChevronDown, HelpCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -58,6 +58,43 @@ export function Navbar({ notificationsWire }: { notificationsWire: string }) {
 	});
 
 	const projects = projectsData?.projects ?? [];
+
+	const projectsRef = useRef(projects);
+	projectsRef.current = projects;
+
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.metaKey || e.ctrlKey || e.altKey || e.repeat) return;
+
+			const digit = Number.parseInt(e.key, 10);
+			if (Number.isNaN(digit) || digit < 0 || digit > 5) return;
+
+			const target = e.target as HTMLElement;
+			if (
+				target.tagName === "INPUT" ||
+				target.tagName === "TEXTAREA" ||
+				target.isContentEditable ||
+				target.closest('[contenteditable="true"]')
+			) {
+				return;
+			}
+
+			if (digit === 0) {
+				e.preventDefault();
+				router.push(`/${tenant}/today`);
+				return;
+			}
+
+			const project = projectsRef.current[digit - 1];
+			if (project) {
+				e.preventDefault();
+				router.push(`/${tenant}/projects/${project.id}`);
+			}
+		};
+
+		document.addEventListener("keydown", handleKeyDown);
+		return () => document.removeEventListener("keydown", handleKeyDown);
+	}, [tenant, router]);
 
 	const activeProject = useMemo(() => {
 		if (!projectId) {
