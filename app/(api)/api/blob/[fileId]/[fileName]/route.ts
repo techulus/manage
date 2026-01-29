@@ -1,9 +1,9 @@
+import { eq } from "drizzle-orm";
+import type { NextRequest } from "next/server";
 import { blob } from "@/drizzle/schema";
 import { getUrl } from "@/lib/blobStore";
 import { database } from "@/lib/utils/useDatabase";
 import { getOwner } from "@/lib/utils/useOwner";
-import { eq } from "drizzle-orm";
-import type { NextRequest } from "next/server";
 
 export async function GET(
 	_: NextRequest,
@@ -11,7 +11,7 @@ export async function GET(
 ) {
 	const params = await props.params;
 	const { ownerId } = await getOwner();
-	const db = await database();
+	const db = database();
 	const { fileId } = params;
 	const key = `${ownerId}/${fileId}`;
 
@@ -30,7 +30,7 @@ export async function GET(
 		const headers = new Headers();
 		headers.set("Content-Type", fileDetails.contentType);
 
-		return new Response(await file.blob(), {
+		return new Response(file.body, {
 			headers,
 		});
 	} catch (_e) {
