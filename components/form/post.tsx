@@ -145,7 +145,7 @@ const PostForm = memo(
 								? { metadata: item.metadata }
 								: {})}
 							name="content"
-							allowImageUpload={true}
+							allowImageUpload
 						/>
 					</div>
 				</div>
