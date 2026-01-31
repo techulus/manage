@@ -1,5 +1,9 @@
 "use client";
 
+import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
+import { CalendarIcon, ListIcon } from "lucide-react";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
 import EmptyState from "@/components/core/empty-state";
 import { PageLoading } from "@/components/core/loaders";
 import PageSection from "@/components/core/section";
@@ -11,14 +15,10 @@ import { CommentsSection } from "@/components/project/comment/comments-section";
 import WeekCalendar from "@/components/project/events/week-calendar";
 import { TaskListHeader } from "@/components/project/tasklist/tasklist-header";
 import { buttonVariants } from "@/components/ui/button";
+import { TaskStatus } from "@/drizzle/types";
 import { toStartOfDay } from "@/lib/utils/date";
 import { displayMutationError } from "@/lib/utils/error";
 import { useTRPC } from "@/trpc/client";
-import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
-import { CalendarIcon, ListIcon } from "lucide-react";
-import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { TaskStatus } from "@/drizzle/types";
 
 export default function ProjectDetails() {
 	const router = useRouter();

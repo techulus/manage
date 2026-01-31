@@ -38,7 +38,10 @@ export async function POST(request: NextRequest) {
 	}
 
 	if (!ALLOWED_TYPES.includes(contentType)) {
-		return NextResponse.json({ error: "File type not allowed" }, { status: 400 });
+		return NextResponse.json(
+			{ error: "File type not allowed" },
+			{ status: 400 },
+		);
 	}
 
 	if (contentSize > MAX_FILE_SIZE) {

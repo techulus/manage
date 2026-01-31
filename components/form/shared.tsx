@@ -52,7 +52,7 @@ export default function SharedForm({
 					<div className="mt-2 max-w-xs sm:col-span-2 sm:mt-0">
 						<DateTimePicker
 							name="dueDate"
-							// @ts-ignore
+							// @ts-expect-error
 							defaultValue={item?.dueDate}
 							dateOnly
 						/>

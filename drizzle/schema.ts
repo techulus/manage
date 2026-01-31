@@ -10,26 +10,26 @@ import {
 } from "drizzle-orm/pg-core";
 
 export {
-	user,
-	session,
 	account,
-	verification,
-	organization,
-	member,
-	invitation,
-	sessionRelations,
 	accountRelations,
-	memberRelations,
+	invitation,
 	invitationRelations,
+	member,
+	memberRelations,
+	organization,
+	session,
+	sessionRelations,
+	user,
+	verification,
 } from "./auth-schema";
 
 import {
-	user,
-	session,
 	account,
-	organization,
-	member,
 	invitation,
+	member,
+	organization,
+	session,
+	user,
 } from "./auth-schema";
 
 export const userRelations = relations(user, ({ many }) => ({
@@ -55,6 +55,7 @@ export const project = pgTable("project", {
 	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	name: text("name").notNull(),
 	description: text("description"),
+	metadata: jsonb("metadata"),
 	status: text("status").notNull(),
 	dueDate: timestamp("dueDate"),
 	organizationId: text("organizationId").references(() => organization.id, {
@@ -92,6 +93,7 @@ export const task = pgTable("task", {
 		}),
 	name: text("name").notNull(),
 	description: text("description"),
+	metadata: jsonb("metadata"),
 	status: text("status").notNull(),
 	dueDate: timestamp("dueDate"),
 	position: real("position").notNull(),
@@ -127,6 +129,7 @@ export const taskList = pgTable("taskList", {
 	id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
 	name: text("name").notNull(),
 	description: text("description"),
+	metadata: jsonb("metadata"),
 	status: text("status").notNull(),
 	dueDate: timestamp("dueDate"),
 	createdAt: timestamp("createdAt").notNull().defaultNow(),

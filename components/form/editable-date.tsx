@@ -1,8 +1,8 @@
 "use client";
 
-import { toDateStringWithDay } from "@/lib/utils/date";
 import { Check, ClockIcon, TrashIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toDateStringWithDay } from "@/lib/utils/date";
 import { DateTimePicker } from "../project/events/date-time-picker";
 
 export default function EditableDate({

@@ -3,6 +3,10 @@ import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { post } from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
+import {
+	cleanupContentBlobs,
+	cleanupRemovedBlobs,
+} from "@/lib/blobStore/cleanup";
 import { canEditProject, canViewProject } from "@/lib/permissions";
 import { sendMentionNotifications } from "@/lib/utils/mentionNotifications";
 import { createTRPCRouter, protectedProcedure } from "../init";
@@ -174,6 +178,8 @@ export const postsRouter = createTRPCRouter({
 					projectId: deletedPost[0].projectId,
 					oldValue,
 				});
+
+				await cleanupContentBlobs(ctx.db, existingPost.content);
 			}
 
 			return deletedPost[0];
@@ -261,6 +267,8 @@ export const postsRouter = createTRPCRouter({
 					oldValue,
 					newValue,
 				});
+
+				await cleanupRemovedBlobs(ctx.db, oldPost?.content, content);
 
 				if (updatedPost?.[0] && !isDraft && content) {
 					await sendMentionNotifications(content, {

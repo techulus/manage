@@ -30,11 +30,12 @@ export const searchRouter = createTRPCRouter({
 		.query(async ({ input, ctx }) => {
 			let accessibleProjectIds: number[];
 
-			if (ctx.isOrgAdmin) {
-				const allProjects = await ctx.db.query.project.findMany({
+			if (ctx.isOrgAdmin && ctx.orgId) {
+				const orgProjects = await ctx.db.query.project.findMany({
+					where: eq(project.organizationId, ctx.orgId),
 					columns: { id: true },
 				});
-				accessibleProjectIds = allProjects.map((p) => p.id);
+				accessibleProjectIds = orgProjects.map((p) => p.id);
 			} else {
 				const userProjectIds = await getUserProjectIds(ctx.db, ctx.userId);
 

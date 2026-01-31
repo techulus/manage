@@ -1,5 +1,5 @@
-import mime from "mime-types";
 import { eq } from "drizzle-orm";
+import mime from "mime-types";
 import { type NextRequest, NextResponse } from "next/server";
 import { blob } from "@/drizzle/schema";
 import { headObject } from "@/lib/blobStore";
@@ -17,10 +17,7 @@ export async function POST(request: NextRequest) {
 	const { fileId } = body as { fileId: string };
 
 	if (!fileId) {
-		return NextResponse.json(
-			{ error: "Missing fileId" },
-			{ status: 400 },
-		);
+		return NextResponse.json({ error: "Missing fileId" }, { status: 400 });
 	}
 
 	const db = database();

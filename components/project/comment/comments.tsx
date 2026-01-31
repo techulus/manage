@@ -50,6 +50,7 @@ function CommentThread({
 	const { data: replies = [], isLoading: repliesLoading } = useQuery({
 		...trpc.projects.getComments.queryOptions({
 			roomId: `comment-${comment.id}`,
+			projectId: +projectId,
 		}),
 		enabled: shouldLoadReplies,
 	});
@@ -136,6 +137,7 @@ function CommentThread({
 								queryClient.invalidateQueries({
 									queryKey: trpc.projects.getComments.queryKey({
 										roomId: `comment-${comment.id}`,
+										projectId: +projectId,
 									}),
 								});
 							}}
@@ -199,6 +201,7 @@ export function Comments({
 	const { data: comments = [], refetch } = useQuery(
 		trpc.projects.getComments.queryOptions({
 			roomId,
+			projectId: +projectId!,
 		}),
 	);
 

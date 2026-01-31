@@ -4,10 +4,17 @@ import { z } from "zod";
 import {
 	activity,
 	comment,
+	post,
 	project,
 	projectPermission,
+	task,
+	taskList,
 } from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
+import {
+	cleanupContentBlobs,
+	cleanupRemovedBlobs,
+} from "@/lib/blobStore/cleanup";
 import {
 	canEditProject,
 	canViewProject,
@@ -22,6 +29,7 @@ export const projectsRouter = createTRPCRouter({
 			z.object({
 				name: z.string(),
 				description: z.string().optional(),
+				metadata: z.any().optional(),
 				dueDate: z.date().optional(),
 			}),
 		)
@@ -38,6 +46,7 @@ export const projectsRouter = createTRPCRouter({
 				.values({
 					name: input.name,
 					description: input.description,
+					metadata: input.metadata,
 					dueDate: input.dueDate,
 					status: "active",
 					createdByUser: ctx.userId,
@@ -86,6 +95,7 @@ export const projectsRouter = createTRPCRouter({
 					z.object({
 						id: z.number(),
 						description: z.string(),
+						metadata: z.any().optional(),
 					}),
 				)
 				.or(
@@ -136,14 +146,22 @@ export const projectsRouter = createTRPCRouter({
 					projectId: +input.id,
 				});
 
-				if ("description" in input && input.description && currentProject) {
-					await sendMentionNotifications(input.description, {
-						type: "project",
-						entityName: currentProject.name,
-						entityId: +input.id,
-						orgSlug: ctx.orgSlug,
-						fromUserId: ctx.userId,
-					});
+				if ("description" in input && currentProject) {
+					await cleanupRemovedBlobs(
+						ctx.db,
+						currentProject.description,
+						input.description,
+					);
+
+					if (input.description) {
+						await sendMentionNotifications(input.description, {
+							type: "project",
+							entityName: currentProject.name,
+							entityId: +input.id,
+							orgSlug: ctx.orgSlug,
+							fromUserId: ctx.userId,
+						});
+					}
 				}
 			}
 
@@ -164,6 +182,34 @@ export const projectsRouter = createTRPCRouter({
 				});
 			}
 
+			const projectToDelete = await ctx.db.query.project.findFirst({
+				where: eq(project.id, input.id),
+			});
+
+			const projectPosts = await ctx.db.query.post.findMany({
+				where: eq(post.projectId, input.id),
+				columns: { content: true },
+			});
+
+			const projectTaskLists = await ctx.db.query.taskList.findMany({
+				where: eq(taskList.projectId, input.id),
+				columns: { id: true, description: true },
+			});
+
+			const taskListIds = projectTaskLists.map((tl) => tl.id);
+			const projectTasks =
+				taskListIds.length > 0
+					? await ctx.db.query.task.findMany({
+							where: inArray(task.taskListId, taskListIds),
+							columns: { description: true },
+						})
+					: [];
+
+			const projectComments = await ctx.db.query.comment.findMany({
+				where: eq(comment.roomId, `project-${input.id}`),
+				columns: { content: true },
+			});
+
 			const deletedProject = await ctx.db
 				.delete(project)
 				.where(eq(project.id, input.id))
@@ -175,6 +221,40 @@ export const projectsRouter = createTRPCRouter({
 				projectId: input.id,
 				oldValue: deletedProject[0],
 			});
+
+			const cleanupPromises: Promise<number>[] = [];
+
+			if (projectToDelete?.description) {
+				cleanupPromises.push(
+					cleanupContentBlobs(ctx.db, projectToDelete.description),
+				);
+			}
+
+			for (const p of projectPosts) {
+				if (p.content) {
+					cleanupPromises.push(cleanupContentBlobs(ctx.db, p.content));
+				}
+			}
+
+			for (const tl of projectTaskLists) {
+				if (tl.description) {
+					cleanupPromises.push(cleanupContentBlobs(ctx.db, tl.description));
+				}
+			}
+
+			for (const t of projectTasks) {
+				if (t.description) {
+					cleanupPromises.push(cleanupContentBlobs(ctx.db, t.description));
+				}
+			}
+
+			for (const c of projectComments) {
+				if (c.content) {
+					cleanupPromises.push(cleanupContentBlobs(ctx.db, c.content));
+				}
+			}
+
+			await Promise.all(cleanupPromises);
 
 			return deletedProject[0];
 		}),
@@ -224,9 +304,18 @@ export const projectsRouter = createTRPCRouter({
 		.input(
 			z.object({
 				roomId: z.string(),
+				projectId: z.number(),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
+			const hasAccess = await canViewProject(ctx, input.projectId);
+			if (!hasAccess) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Project access denied",
+				});
+			}
+
 			const comments = await ctx.db.query.comment.findMany({
 				where: eq(comment.roomId, input.roomId),
 				orderBy: desc(comment.createdAt),
@@ -315,12 +404,29 @@ export const projectsRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
+			const canEdit = await canEditProject(ctx, input.projectId);
+			if (!canEdit) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Project edit access denied",
+				});
+			}
+
+			const existingComment = await ctx.db.query.comment.findFirst({
+				where: eq(comment.id, input.id),
+			});
+
 			await ctx.db.delete(comment).where(eq(comment.id, input.id));
+
 			await logActivity({
 				action: "deleted",
 				type: "comment",
 				projectId: input.projectId,
 			});
+
+			if (existingComment?.content) {
+				await cleanupContentBlobs(ctx.db, existingComment.content);
+			}
 		}),
 	getActivities: protectedProcedure
 		.input(
@@ -330,6 +436,14 @@ export const projectsRouter = createTRPCRouter({
 			}),
 		)
 		.query(async ({ ctx, input }) => {
+			const hasAccess = await canViewProject(ctx, input.projectId);
+			if (!hasAccess) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Project access denied",
+				});
+			}
+
 			const activities = await ctx.db.query.activity
 				.findMany({
 					with: {

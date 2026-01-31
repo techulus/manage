@@ -1,8 +1,8 @@
 "use client";
 
-import { TaskListsProvider } from "@/hooks/use-tasklist";
-import { useProjectPrefetch } from "@/hooks/use-project-prefetch";
 import { useParams } from "next/navigation";
+import { useProjectPrefetch } from "@/hooks/use-project-prefetch";
+import { TaskListsProvider } from "@/hooks/use-tasklist";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
 	const params = useParams();

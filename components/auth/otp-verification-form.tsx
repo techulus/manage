@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth/client";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import {
 	InputOTP,
 	InputOTPGroup,
 	InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { authClient } from "@/lib/auth/client";
 
 interface OtpVerificationFormProps {
 	email: string;

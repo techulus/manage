@@ -1,7 +1,7 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import type { JSX, PropsWithChildren } from "react";
+import { cn } from "@/lib/utils";
 import EditableText from "../form/editable-text";
 
 interface Props {

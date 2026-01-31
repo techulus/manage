@@ -1,5 +1,8 @@
 "use client";
 
+import { useQueries } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
+import { parseAsBoolean, useQueryState } from "nuqs";
 import { PageLoading } from "@/components/core/loaders";
 import PageSection from "@/components/core/section";
 import { ConfirmButton } from "@/components/form/button";
@@ -13,9 +16,6 @@ import { useTaskLists } from "@/hooks/use-tasklist";
 import { TasksProvider } from "@/hooks/use-tasks";
 import { toStartOfDay } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
-import { useQueries } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
-import { parseAsBoolean, useQueryState } from "nuqs";
 
 export default function TaskLists() {
 	const { projectId, tasklistId } = useParams();

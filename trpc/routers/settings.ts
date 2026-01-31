@@ -1,18 +1,22 @@
-import { eq, sql } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { z } from "zod";
-import { blob, user } from "@/drizzle/schema";
+import { blob, member, user } from "@/drizzle/schema";
 import type { User } from "@/drizzle/types";
+import { getOwner } from "@/lib/utils/useOwner";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const settingsRouter = createTRPCRouter({
 	getStorageUsage: protectedProcedure.query(async ({ ctx }) => {
+		const { ownerId } = await getOwner();
+
 		const details = await ctx.db
 			.select({
 				count: sql<number>`count(*)`,
 				usage: sql<number>`sum(${blob.contentSize})`,
 			})
 			.from(blob)
+			.where(sql`${blob.key} LIKE ${`${ownerId}/%`}`)
 			.execute();
 
 		return {
@@ -46,7 +50,28 @@ export const settingsRouter = createTRPCRouter({
 	getAllUsers: protectedProcedure
 		.input(z.boolean().optional().default(false))
 		.query(async ({ ctx, input }) => {
-			const users: User[] = (await ctx.db.query.user.findMany()) ?? [];
-			return input ? users : users.filter((user) => user.id !== ctx.userId);
+			if (!ctx.orgId) {
+				const currentUser = await ctx.db.query.user.findFirst({
+					where: eq(user.id, ctx.userId),
+				});
+				return currentUser ? [currentUser] : [];
+			}
+
+			const orgMembers = await ctx.db.query.member.findMany({
+				where: eq(member.organizationId, ctx.orgId),
+				columns: { userId: true },
+			});
+
+			const memberUserIds = orgMembers.map((m) => m.userId);
+			if (memberUserIds.length === 0) {
+				return [];
+			}
+
+			const users: User[] =
+				(await ctx.db.query.user.findMany({
+					where: inArray(user.id, memberUserIds),
+				})) ?? [];
+
+			return input ? users : users.filter((u) => u.id !== ctx.userId);
 		}),
 });

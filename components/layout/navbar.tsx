@@ -20,8 +20,8 @@ import { useTRPC } from "@/trpc/client";
 import { CommandMenu } from "../core/cmd-menu";
 import { GlobalSearch } from "../core/global-search";
 import { Notifications } from "../core/notifications";
-import { SearchSheet } from "../core/search-panel";
 import { OrgSwitcher } from "../core/org-switcher";
+import { SearchSheet } from "../core/search-panel";
 import { UserMenu } from "../core/user-menu";
 
 interface NavLink {

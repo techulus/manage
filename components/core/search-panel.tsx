@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { HtmlPreview } from "@/components/core/html-view";
+import { Panel } from "@/components/core/panel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +31,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client";
-import { Panel } from "@/components/core/panel";
 
 interface SearchResult {
 	id: string;

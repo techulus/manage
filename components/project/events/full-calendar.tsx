@@ -1,13 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Kbd } from "@/components/ui/kbd";
-import type { CalendarEvent } from "@/drizzle/types";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/lib/utils";
-import { toDateString, toTimeString, toTimeZone } from "@/lib/utils/date";
-import { useTRPC } from "@/trpc/client";
 import { useQuery } from "@tanstack/react-query";
 import {
 	add,
@@ -29,7 +21,15 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useCallback, useMemo, useState } from "react";
 import { rrulestr } from "rrule";
+import { Button } from "@/components/ui/button";
+import { Kbd } from "@/components/ui/kbd";
+import { Separator } from "@/components/ui/separator";
+import type { CalendarEvent } from "@/drizzle/types";
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
+import { toDateString, toTimeString, toTimeZone } from "@/lib/utils/date";
+import { useTRPC } from "@/trpc/client";
 
 interface Event {
 	id: number;
