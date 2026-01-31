@@ -21,6 +21,7 @@ export const auth = betterAuth({
 		emailOTP({
 			otpLength: 6,
 			expiresIn: 600,
+			disableSignUp: isSignupDisabled(),
 			sendVerificationOTP: async ({ email, otp }) => {
 				await sendEmail({
 					to: email,
