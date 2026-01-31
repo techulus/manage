@@ -1,8 +1,8 @@
-import { UserAvatar } from "@/components/core/user-avatar";
 import type {
 	DefaultReactSuggestionItem,
 	SuggestionMenuProps,
 } from "@blocknote/react";
+import { UserAvatar } from "@/components/core/user-avatar";
 
 interface User {
 	id: string;

@@ -1,7 +1,8 @@
+import { and, desc, eq, inArray, isNull, or } from "drizzle-orm";
 import { headers } from "next/headers";
-import { and, desc, eq, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 import {
+	member,
 	notification,
 	project,
 	projectPermission,
@@ -154,7 +155,32 @@ export const userRouter = createTRPCRouter({
 			}),
 		)
 		.query(async ({ ctx, input }) => {
+			if (!ctx.orgId) {
+				const currentUser = await ctx.db.query.user.findFirst({
+					where: eq(user.id, ctx.userId),
+					columns: {
+						id: true,
+						email: true,
+						firstName: true,
+						lastName: true,
+						image: true,
+					},
+				});
+				return currentUser ? [currentUser] : [];
+			}
+
+			const orgMembers = await ctx.db.query.member.findMany({
+				where: eq(member.organizationId, ctx.orgId),
+				columns: { userId: true },
+			});
+
+			const memberUserIds = orgMembers.map((m) => m.userId);
+			if (memberUserIds.length === 0) {
+				return [];
+			}
+
 			const users = await ctx.db.query.user.findMany({
+				where: inArray(user.id, memberUserIds),
 				columns: {
 					id: true,
 					email: true,
@@ -166,10 +192,10 @@ export const userRouter = createTRPCRouter({
 
 			if (input.query) {
 				const query = input.query.toLowerCase();
-				return users.filter((user) => {
+				return users.filter((u) => {
 					const fullName =
-						`${user.firstName || ""} ${user.lastName || ""}`.toLowerCase();
-					const email = user.email.toLowerCase();
+						`${u.firstName || ""} ${u.lastName || ""}`.toLowerCase();
+					const email = u.email.toLowerCase();
 					return fullName.includes(query) || email.includes(query);
 				});
 			}

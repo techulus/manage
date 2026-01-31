@@ -1,8 +1,8 @@
 "use client";
 
 import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 import * as React from "react";
-
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
 
 type Props = {
 	name: string;

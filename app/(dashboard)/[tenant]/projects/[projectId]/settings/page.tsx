@@ -1,13 +1,13 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
+import { Settings2, Shield } from "lucide-react";
+import { useParams } from "next/navigation";
 import { PageLoading } from "@/components/core/loaders";
 import PermissionsManagement from "@/components/core/permissions-management";
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
 import { useTRPC } from "@/trpc/client";
-import { useQuery } from "@tanstack/react-query";
-import { Shield, Settings2 } from "lucide-react";
-import { useParams } from "next/navigation";
 
 export default function ProjectSettings() {
 	const params = useParams();

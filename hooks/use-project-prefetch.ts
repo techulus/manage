@@ -1,8 +1,8 @@
 "use client";
 
-import { useTRPC } from "@/trpc/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { useTRPC } from "@/trpc/client";
 
 export function useProjectPrefetch(projectId: number) {
 	const trpc = useTRPC();

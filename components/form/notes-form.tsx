@@ -1,5 +1,6 @@
 "use client";
 
+import type { PartialBlock } from "@blocknote/core";
 import { Edit } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
@@ -11,9 +12,11 @@ import { Spinner } from "../core/loaders";
 export default function NotesForm({
 	value,
 	name,
+	metadata,
 }: {
 	value: string | null | undefined;
 	name: string;
+	metadata?: PartialBlock[] | undefined;
 }) {
 	const { pending } = useFormStatus();
 	const [isEditing, setIsEditing] = useState(false);
@@ -27,7 +30,12 @@ export default function NotesForm({
 	if (isEditing)
 		return (
 			<div className="flex-grow">
-				<Editor defaultValue={value ?? ""} name={name} allowImageUpload />
+				<Editor
+					defaultValue={value ?? ""}
+					name={name}
+					metadata={metadata}
+					allowImageUpload
+				/>
 				<div className="mt-2">
 					<Button
 						type="button"

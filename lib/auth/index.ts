@@ -1,9 +1,9 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { emailOTP, organization } from "better-auth/plugins";
-import { database } from "@/lib/utils/useDatabase";
 import { isSignupDisabled } from "@/lib/config";
 import { sendEmail } from "@/lib/email";
+import { database } from "@/lib/utils/useDatabase";
 
 export const auth = betterAuth({
 	database: drizzleAdapter(database(), {

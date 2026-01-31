@@ -5,8 +5,8 @@ import { X } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Kbd } from "@/components/ui/kbd";
-import { cn } from "@/lib/utils";
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
+import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 
 export default function InlineTaskForm({

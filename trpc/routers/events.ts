@@ -127,6 +127,14 @@ export const eventsRouter = createTRPCRouter({
 		.query(async ({ ctx, input }) => {
 			const { date, projectId } = input;
 
+			const hasAccess = await canViewProject(ctx, projectId);
+			if (!hasAccess) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Project access denied",
+				});
+			}
+
 			const { start, end } = getStartEndMonthRangeInUtc(ctx.timezone, date);
 
 			const events = await ctx.db.query.calendarEvent

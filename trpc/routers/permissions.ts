@@ -1,12 +1,11 @@
-import { and, eq } from "drizzle-orm";
-import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { member, projectPermission } from "@/drizzle/schema";
+import { and, eq, inArray } from "drizzle-orm";
+import { z } from "zod";
+import { member, project, projectPermission, user } from "@/drizzle/schema";
 import { logActivity } from "@/lib/activity";
 import { createTRPCRouter, protectedProcedure } from "../init";
 
 export const permissionsRouter = createTRPCRouter({
-	// Get all permissions for a project
 	getProjectPermissions: protectedProcedure
 		.input(
 			z.object({
@@ -14,11 +13,22 @@ export const permissionsRouter = createTRPCRouter({
 			}),
 		)
 		.query(async ({ ctx, input }) => {
-			// Check if user is org admin
 			if (!ctx.isOrgAdmin) {
 				throw new TRPCError({
 					code: "FORBIDDEN",
 					message: "Only organization admins can view project permissions",
+				});
+			}
+
+			const proj = await ctx.db.query.project.findFirst({
+				where: eq(project.id, input.projectId),
+				columns: { organizationId: true },
+			});
+
+			if (!proj || proj.organizationId !== ctx.orgId) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Project not found or access denied",
 				});
 			}
 
@@ -40,7 +50,6 @@ export const permissionsRouter = createTRPCRouter({
 			return permissions;
 		}),
 
-	// Grant permission to a user
 	grantPermission: protectedProcedure
 		.input(
 			z.object({
@@ -50,7 +59,6 @@ export const permissionsRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			// Check if user is org admin
 			if (!ctx.isOrgAdmin) {
 				throw new TRPCError({
 					code: "FORBIDDEN",
@@ -58,7 +66,18 @@ export const permissionsRouter = createTRPCRouter({
 				});
 			}
 
-			// Check if permission already exists
+			const proj = await ctx.db.query.project.findFirst({
+				where: eq(project.id, input.projectId),
+				columns: { organizationId: true },
+			});
+
+			if (!proj || proj.organizationId !== ctx.orgId) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Project not found or access denied",
+				});
+			}
+
 			const existingPermission = await ctx.db.query.projectPermission.findFirst(
 				{
 					where: and(
@@ -109,7 +128,6 @@ export const permissionsRouter = createTRPCRouter({
 			return { success: true };
 		}),
 
-	// Revoke permission from a user
 	revokePermission: protectedProcedure
 		.input(
 			z.object({
@@ -118,11 +136,22 @@ export const permissionsRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			// Check if user is org admin
 			if (!ctx.isOrgAdmin) {
 				throw new TRPCError({
 					code: "FORBIDDEN",
 					message: "Only organization admins can revoke project permissions",
+				});
+			}
+
+			const proj = await ctx.db.query.project.findFirst({
+				where: eq(project.id, input.projectId),
+				columns: { organizationId: true },
+			});
+
+			if (!proj || proj.organizationId !== ctx.orgId) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Project not found or access denied",
 				});
 			}
 
@@ -169,9 +198,7 @@ export const permissionsRouter = createTRPCRouter({
 		return members;
 	}),
 
-	// Get all users in the organization (for permission management UI)
 	getOrganizationUsers: protectedProcedure.query(async ({ ctx }) => {
-		// Check if user is org admin
 		if (!ctx.isOrgAdmin) {
 			throw new TRPCError({
 				code: "FORBIDDEN",
@@ -179,8 +206,22 @@ export const permissionsRouter = createTRPCRouter({
 			});
 		}
 
-		// Get all users in the organization
-		const allUsers = await ctx.db.query.user.findMany({
+		if (!ctx.orgId) {
+			return [];
+		}
+
+		const orgMembers = await ctx.db.query.member.findMany({
+			where: eq(member.organizationId, ctx.orgId),
+			columns: { userId: true },
+		});
+
+		const memberUserIds = orgMembers.map((m) => m.userId);
+		if (memberUserIds.length === 0) {
+			return [];
+		}
+
+		const orgUsers = await ctx.db.query.user.findMany({
+			where: inArray(user.id, memberUserIds),
 			columns: {
 				id: true,
 				email: true,
@@ -190,9 +231,6 @@ export const permissionsRouter = createTRPCRouter({
 			},
 		});
 
-		// Filter out the current admin user since they already have access to all projects
-		const nonAdminUsers = allUsers.filter((user) => user.id !== ctx.userId);
-
-		return nonAdminUsers;
+		return orgUsers.filter((u) => u.id !== ctx.userId);
 	}),
 });

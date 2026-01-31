@@ -4,6 +4,10 @@ import { z } from "zod";
 import { task, taskList } from "@/drizzle/schema";
 import { TaskListStatus, TaskStatus } from "@/drizzle/types";
 import { logActivity } from "@/lib/activity";
+import {
+	cleanupContentBlobs,
+	cleanupRemovedBlobs,
+} from "@/lib/blobStore/cleanup";
 import { canEditProject, canViewProject } from "@/lib/permissions";
 import { sendMentionNotifications } from "@/lib/utils/mentionNotifications";
 import { notifyUser } from "@/lib/utils/useNotification";
@@ -58,6 +62,7 @@ export const tasksRouter = createTRPCRouter({
 					.string()
 					.nullable()
 					.transform((val) => (val?.trim()?.length ? val : null)),
+				metadata: z.any().optional(),
 				dueDate: z
 					.string()
 					.nullable()
@@ -79,6 +84,7 @@ export const tasksRouter = createTRPCRouter({
 				.values({
 					name: input.name,
 					description: input.description,
+					metadata: input.metadata,
 					dueDate: input.dueDate,
 					status: TaskListStatus.ACTIVE,
 					projectId: input.projectId,
@@ -122,6 +128,7 @@ export const tasksRouter = createTRPCRouter({
 							.string()
 							.nullable()
 							.transform((val) => (val?.trim()?.length ? val : null)),
+						metadata: z.any().optional(),
 					}),
 				)
 				.or(
@@ -179,15 +186,23 @@ export const tasksRouter = createTRPCRouter({
 					newValue: data[0],
 				});
 
-				if (data?.[0] && "description" in input && input.description) {
-					await sendMentionNotifications(input.description, {
-						type: "tasklist",
-						entityName: oldTaskList.name,
-						entityId: input.id,
-						projectId: oldTaskList.projectId,
-						orgSlug: ctx.orgSlug,
-						fromUserId: ctx.userId,
-					});
+				if ("description" in input) {
+					await cleanupRemovedBlobs(
+						ctx.db,
+						oldTaskList.description,
+						input.description,
+					);
+
+					if (data?.[0] && input.description) {
+						await sendMentionNotifications(input.description, {
+							type: "tasklist",
+							entityName: oldTaskList.name,
+							entityId: input.id,
+							projectId: oldTaskList.projectId,
+							orgSlug: ctx.orgSlug,
+							fromUserId: ctx.userId,
+						});
+					}
 				}
 			}
 
@@ -196,7 +211,6 @@ export const tasksRouter = createTRPCRouter({
 	deleteTaskList: protectedProcedure
 		.input(z.object({ id: z.number() }))
 		.mutation(async ({ ctx, input }) => {
-			// First get the task list to check permissions
 			const taskListToDelete = await ctx.db.query.taskList.findFirst({
 				where: eq(taskList.id, input.id),
 			});
@@ -212,6 +226,11 @@ export const tasksRouter = createTRPCRouter({
 				);
 			}
 
+			const tasksInList = await ctx.db.query.task.findMany({
+				where: eq(task.taskListId, input.id),
+				columns: { description: true },
+			});
+
 			const data = await ctx.db
 				.delete(taskList)
 				.where(eq(taskList.id, input.id))
@@ -224,6 +243,22 @@ export const tasksRouter = createTRPCRouter({
 					projectId: data[0].projectId,
 					oldValue: data[0],
 				});
+
+				const cleanupPromises: Promise<number>[] = [];
+
+				if (taskListToDelete.description) {
+					cleanupPromises.push(
+						cleanupContentBlobs(ctx.db, taskListToDelete.description),
+					);
+				}
+
+				for (const t of tasksInList) {
+					if (t.description) {
+						cleanupPromises.push(cleanupContentBlobs(ctx.db, t.description));
+					}
+				}
+
+				await Promise.all(cleanupPromises);
 			}
 
 			return data?.[0];
@@ -264,6 +299,14 @@ export const tasksRouter = createTRPCRouter({
 				throw new Error(`TaskList with id ${input.id} not found`);
 			}
 
+			const hasAccess = await canViewProject(ctx, data.projectId);
+			if (!hasAccess) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Project access denied",
+				});
+			}
+
 			return data;
 		}),
 
@@ -274,6 +317,7 @@ export const tasksRouter = createTRPCRouter({
 				status: z.nativeEnum(TaskStatus).optional().default(TaskStatus.TODO),
 				taskListId: z.number().optional().default(0),
 				description: z.string().optional(),
+				metadata: z.any().optional(),
 				assignedToUser: z.string().nullable().optional(),
 				dueDate: z
 					.string()
@@ -283,7 +327,6 @@ export const tasksRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			// Get the task list to find the project ID
 			const taskListDetails = await ctx.db.query.taskList.findFirst({
 				where: eq(taskList.id, input.taskListId),
 				columns: {
@@ -362,6 +405,7 @@ export const tasksRouter = createTRPCRouter({
 					z.object({
 						id: z.number(),
 						description: z.string(),
+						metadata: z.any().optional(),
 					}),
 				)
 				.or(
@@ -446,16 +490,24 @@ export const tasksRouter = createTRPCRouter({
 					newValue: updatedTask[0],
 				});
 
-				if (updatedTask?.[0] && "description" in input && input.description) {
-					await sendMentionNotifications(input.description, {
-						type: "task",
-						entityName: oldTask.name,
-						entityId: input.id,
-						projectId: oldTask.taskList.projectId,
-						taskListId: oldTask.taskListId,
-						orgSlug: ctx.orgSlug,
-						fromUserId: ctx.userId,
-					});
+				if ("description" in input) {
+					await cleanupRemovedBlobs(
+						ctx.db,
+						oldTask.description,
+						input.description,
+					);
+
+					if (updatedTask?.[0] && input.description) {
+						await sendMentionNotifications(input.description, {
+							type: "task",
+							entityName: oldTask.name,
+							entityId: input.id,
+							projectId: oldTask.taskList.projectId,
+							taskListId: oldTask.taskListId,
+							orgSlug: ctx.orgSlug,
+							fromUserId: ctx.userId,
+						});
+					}
 				}
 			}
 
@@ -495,6 +547,10 @@ export const tasksRouter = createTRPCRouter({
 					projectId: currentTask.taskList.projectId,
 					oldValue: currentTask,
 				});
+
+				if (currentTask.description) {
+					await cleanupContentBlobs(ctx.db, currentTask.description);
+				}
 			}
 
 			return currentTask;
@@ -502,7 +558,6 @@ export const tasksRouter = createTRPCRouter({
 	tidyUpTaskList: protectedProcedure
 		.input(z.object({ id: z.number() }))
 		.mutation(async ({ ctx, input }) => {
-			// Get the task list to check permissions
 			const taskListDetails = await ctx.db.query.taskList.findFirst({
 				where: eq(taskList.id, input.id),
 				columns: {
@@ -521,6 +576,14 @@ export const tasksRouter = createTRPCRouter({
 				);
 			}
 
+			const doneTasks = await ctx.db.query.task.findMany({
+				where: and(
+					eq(task.taskListId, input.id),
+					eq(task.status, TaskStatus.DONE),
+				),
+				columns: { id: true, description: true },
+			});
+
 			const data = await ctx.db
 				.update(task)
 				.set({ status: TaskStatus.DELETED })
@@ -528,6 +591,12 @@ export const tasksRouter = createTRPCRouter({
 					and(eq(task.taskListId, input.id), eq(task.status, TaskStatus.DONE)),
 				)
 				.returning();
+
+			await Promise.all(
+				doneTasks
+					.filter((t) => t.description)
+					.map((t) => cleanupContentBlobs(ctx.db, t.description)),
+			);
 
 			return data;
 		}),

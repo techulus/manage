@@ -1,11 +1,11 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { EventWithCreator } from "@/drizzle/types";
 import { toMachineDateString } from "@/lib/utils/date";
 import { useTRPC } from "@/trpc/client";
-import { useQuery } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
 import EventsList from "./events-list";
 
 export default function WeekCalendar({

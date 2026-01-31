@@ -1,10 +1,10 @@
 "use client";
 
-import { useTRPC } from "@/trpc/client";
 import { useQueries } from "@tanstack/react-query";
 import { Calendar, Menu, Plus, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useTRPC } from "@/trpc/client";
 import { Button } from "../ui/button";
 import {
 	CommandDialog,

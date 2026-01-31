@@ -54,13 +54,17 @@ export default function CommentForm({
 				});
 
 				queryClient.invalidateQueries({
-					queryKey: trpc.projects.getComments.queryKey({ roomId }),
+					queryKey: trpc.projects.getComments.queryKey({
+						roomId,
+						projectId: +projectId!,
+					}),
 				});
 
 				if (parentCommentId) {
 					queryClient.invalidateQueries({
 						queryKey: trpc.projects.getComments.queryKey({
 							roomId: `comment-${parentCommentId}`,
+							projectId: +projectId!,
 						}),
 					});
 				}

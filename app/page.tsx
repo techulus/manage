@@ -59,11 +59,7 @@ export default async function Home() {
 								href="https://railway.com/deploy/manage"
 								className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-lg font-semibold bg-violet-600 text-white shadow-sm shadow-violet-600/25 border-b-4 border-violet-700 hover:bg-violet-500 hover:border-violet-600 active:border-violet-600 active:shadow-sm active:translate-y-0.5 transition-all duration-150"
 							>
-								<svg
-									className="w-5 h-5"
-									viewBox="0 0 1024 1024"
-									fill="none"
-								>
+								<svg className="w-5 h-5" viewBox="0 0 1024 1024" fill="none">
 									<path
 										d="M4.756 438.175A520.713 520.713 0 0 0 0 489.735h777.799c-2.716-5.306-6.365-10.09-10.045-14.772-132.97-171.791-204.498-156.896-306.819-161.26-34.114-1.403-57.249-1.967-193.037-1.967-72.677 0-151.688.185-228.628.39-9.96 26.884-19.566 52.942-24.243 74.14h398.571v51.909H4.756ZM783.93 541.696H.399c.82 13.851 2.112 27.517 3.978 40.999h723.39c32.248 0 50.299-18.297 56.162-40.999ZM45.017 724.306S164.941 1018.77 511.46 1024c207.112 0 385.071-123.006 465.907-299.694H45.017Z"
 										fill="currentColor"
@@ -309,11 +305,7 @@ export default async function Home() {
 									href="https://railway.com/deploy/manage"
 									className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold bg-violet-600 text-white shadow-sm shadow-violet-600/25 border-b-4 border-violet-700 hover:bg-violet-500 hover:border-violet-600 active:border-violet-600 active:shadow-sm active:translate-y-0.5 transition-all duration-150"
 								>
-									<svg
-										className="w-5 h-5"
-										viewBox="0 0 1024 1024"
-										fill="none"
-									>
+									<svg className="w-5 h-5" viewBox="0 0 1024 1024" fill="none">
 										<path
 											d="M4.756 438.175A520.713 520.713 0 0 0 0 489.735h777.799c-2.716-5.306-6.365-10.09-10.045-14.772-132.97-171.791-204.498-156.896-306.819-161.26-34.114-1.403-57.249-1.967-193.037-1.967-72.677 0-151.688.185-228.628.39-9.96 26.884-19.566 52.942-24.243 74.14h398.571v51.909H4.756ZM783.93 541.696H.399c.82 13.851 2.112 27.517 3.978 40.999h723.39c32.248 0 50.299-18.297 56.162-40.999ZM45.017 724.306S164.941 1018.77 511.46 1024c207.112 0 385.071-123.006 465.907-299.694H45.017Z"
 											fill="currentColor"
