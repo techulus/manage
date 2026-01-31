@@ -34,7 +34,10 @@ export default function SharedForm({
 					Notes
 				</label>
 				<div className="mt-2 sm:col-span-2 sm:mt-0">
-					<Editor defaultValue={item?.description ?? ""} />
+					<Editor
+						defaultValue={item?.description ?? ""}
+						allowImageUpload={false}
+					/>
 				</div>
 			</div>
 

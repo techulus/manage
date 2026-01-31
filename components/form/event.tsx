@@ -198,6 +198,7 @@ const EventForm = memo(
 							<Editor
 								defaultValue={item?.description ?? ""}
 								name="description"
+								allowImageUpload={false}
 							/>
 						</div>
 					</div>

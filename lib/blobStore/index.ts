@@ -1,6 +1,7 @@
 import {
 	DeleteObjectCommand,
 	GetObjectCommand,
+	HeadObjectCommand,
 	ListObjectsV2Command,
 	PutObjectCommand,
 	S3Client,
@@ -78,4 +79,43 @@ const listFiles = async (prefix: string, maxKeys?: number) => {
 	return response.Contents || [];
 };
 
-export { bytesToMegabytes, deleteFile, getFileUrl, getUrl, listFiles, upload };
+const getUploadUrl = async (
+	key: string,
+	contentType: string,
+): Promise<string> => {
+	const command = new PutObjectCommand({
+		Bucket: process.env.S3_BUCKET_NAME,
+		Key: key,
+		ContentType: contentType,
+	});
+
+	const signedUrl = await getSignedUrl(blobStorage, command, {
+		expiresIn: 300,
+	});
+
+	return signedUrl;
+};
+
+const headObject = async (key: string): Promise<boolean> => {
+	try {
+		const command = new HeadObjectCommand({
+			Bucket: process.env.S3_BUCKET_NAME,
+			Key: key,
+		});
+		await blobStorage.send(command);
+		return true;
+	} catch {
+		return false;
+	}
+};
+
+export {
+	bytesToMegabytes,
+	deleteFile,
+	getFileUrl,
+	getUploadUrl,
+	getUrl,
+	headObject,
+	listFiles,
+	upload,
+};

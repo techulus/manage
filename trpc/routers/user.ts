@@ -71,7 +71,7 @@ export const userRouter = createTRPCRouter({
 		await broadcastEvent("notifications", ctx.userId);
 	}),
 	getTodayData: protectedProcedure.query(async ({ ctx }) => {
-		return getTodayDataForUser(ctx.db, ctx.timezone);
+		return getTodayDataForUser(ctx.db, ctx.timezone, ctx.orgId, ctx.userId);
 	}),
 	getProjects: protectedProcedure
 		.input(

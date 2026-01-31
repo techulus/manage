@@ -110,14 +110,46 @@ const Editor = memo(function Editor({
 				initialContent === "loading" ? undefined : metadata || initialContent,
 			uploadFile: allowImageUpload
 				? async (file) => {
-						const result: { url: string } = await fetch(
-							`/api/blob?name=${file.name}`,
-							{
-								method: "PUT",
-								body: file,
-							},
-						).then((res) => res.json());
-						return result.url;
+						const presignRes = await fetch("/api/blob/presign", {
+							method: "POST",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({
+								fileName: file.name,
+								contentType: file.type,
+								contentSize: file.size,
+							}),
+						});
+
+						if (!presignRes.ok) {
+							const error = await presignRes.json();
+							throw new Error(error.error || "Failed to get upload URL");
+						}
+
+						const { uploadUrl, fileId } = await presignRes.json();
+
+						const uploadRes = await fetch(uploadUrl, {
+							method: "PUT",
+							headers: { "Content-Type": file.type },
+							body: file,
+						});
+
+						if (!uploadRes.ok) {
+							throw new Error("Failed to upload file to storage");
+						}
+
+						const confirmRes = await fetch("/api/blob/confirm", {
+							method: "POST",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({ fileId }),
+						});
+
+						if (!confirmRes.ok) {
+							const error = await confirmRes.json();
+							throw new Error(error.error || "Failed to confirm upload");
+						}
+
+						const { url } = await confirmRes.json();
+						return url;
 					}
 				: undefined,
 		},

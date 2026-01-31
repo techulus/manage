@@ -158,6 +158,7 @@ export const blob = pgTable("blob", {
 	name: text("name").notNull(),
 	contentType: text("contentType").notNull(),
 	contentSize: integer("contentSize").notNull(),
+	status: text("status").notNull().default("confirmed"),
 	createdByUser: text("createdByUser")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" }),
