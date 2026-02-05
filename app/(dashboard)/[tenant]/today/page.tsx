@@ -27,6 +27,7 @@ import { Card } from "@/components/ui/card";
 import { toDateStringWithDay } from "@/lib/utils/date";
 import { displayMutationError } from "@/lib/utils/error";
 import { eventToHumanReadableString } from "@/lib/utils/useEvents";
+import { isPersonalTenant } from "@/lib/utils/tenant";
 import { useTRPC } from "@/trpc/client";
 
 export default function Today() {
@@ -52,7 +53,7 @@ export default function Today() {
 		});
 
 	const projects = projectsData?.projects;
-	const isOrgAdmin = projectsData?.isOrgAdmin ?? tenant === "me";
+	const isOrgAdmin = projectsData?.isOrgAdmin ?? isPersonalTenant(tenant);
 
 	const { dueToday = [], overDue = [], events = [] } = todayData ?? {};
 

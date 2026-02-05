@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { organization } from "@/drizzle/auth-schema";
 import { auth } from "@/lib/auth";
 import { database } from "@/lib/utils/useDatabase";
+import { PERSONAL_TENANT } from "@/lib/utils/tenant";
 
 type Result = {
 	userId: string;
@@ -24,7 +25,7 @@ export async function getOwner(): Promise<Result> {
 
 	const activeOrgId = session.session.activeOrganizationId;
 
-	let orgSlug = "me";
+	let orgSlug = PERSONAL_TENANT;
 	if (activeOrgId) {
 		const db = database();
 		const org = await db
