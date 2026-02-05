@@ -7,6 +7,7 @@ import { PageLoading } from "@/components/core/loaders";
 import PermissionsManagement from "@/components/core/permissions-management";
 import PageSection from "@/components/core/section";
 import PageTitle from "@/components/layout/page-title";
+import { isPersonalTenant } from "@/lib/utils/useOwner";
 import { useTRPC } from "@/trpc/client";
 
 export default function ProjectSettings() {
@@ -21,7 +22,7 @@ export default function ProjectSettings() {
 		}),
 	);
 
-	const isOrgAdmin = tenant === "me";
+	const isOrgAdmin = isPersonalTenant(tenant);
 
 	if (isLoading || !project) return <PageLoading />;
 

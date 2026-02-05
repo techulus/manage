@@ -5,9 +5,17 @@ import { ProfileSettings } from "@/components/settings/profile-settings";
 import { TeamSettings } from "@/components/settings/team-settings";
 import { WorkspaceSettings } from "@/components/settings/workspace-settings";
 import { bytesToMegabytes } from "@/lib/blobStore";
+import { isPersonalTenant } from "@/lib/utils/useOwner";
 import { caller } from "@/trpc/server";
 
-export default async function Settings() {
+export default async function Settings({
+	params,
+}: {
+	params: Promise<{ tenant: string }>;
+}) {
+	const { tenant } = await params;
+	const isPersonal = isPersonalTenant(tenant);
+
 	const [storage, timezone, projectsData] = await Promise.all([
 		caller.settings.getStorageUsage(),
 		caller.settings.getTimezone(),
@@ -20,21 +28,25 @@ export default async function Settings() {
 		<>
 			<PageTitle title="Settings" />
 
-			<PageSection
-				title="Workspace"
-				titleIcon={<Building2 className="w-5 h-5" />}
-				bottomMargin
-			>
-				<WorkspaceSettings />
-			</PageSection>
+			{!isPersonal && (
+				<PageSection
+					title="Workspace"
+					titleIcon={<Building2 className="w-5 h-5" />}
+					bottomMargin
+				>
+					<WorkspaceSettings />
+				</PageSection>
+			)}
 
-			<PageSection
-				title="Team"
-				titleIcon={<Users className="w-5 h-5" />}
-				bottomMargin
-			>
-				<TeamSettings />
-			</PageSection>
+			{!isPersonal && (
+				<PageSection
+					title="Team"
+					titleIcon={<Users className="w-5 h-5" />}
+					bottomMargin
+				>
+					<TeamSettings />
+				</PageSection>
+			)}
 
 			<PageSection
 				title="Usage"

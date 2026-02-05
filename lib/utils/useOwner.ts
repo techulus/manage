@@ -24,7 +24,7 @@ export async function getOwner(): Promise<Result> {
 
 	const activeOrgId = session.session.activeOrganizationId;
 
-	let orgSlug = "me";
+	let orgSlug = PERSONAL_TENANT;
 	if (activeOrgId) {
 		const db = database();
 		const org = await db
@@ -43,6 +43,12 @@ export async function getOwner(): Promise<Result> {
 		orgSlug,
 		ownerId: activeOrgId ?? session.user.id,
 	};
+}
+
+export const PERSONAL_TENANT = "me";
+
+export function isPersonalTenant(tenant: string) {
+	return tenant === PERSONAL_TENANT;
 }
 
 export async function getTimezone() {
