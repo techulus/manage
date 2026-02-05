@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { organization } from "@/drizzle/auth-schema";
 import { auth } from "@/lib/auth";
 import { database } from "@/lib/utils/useDatabase";
+import { PERSONAL_TENANT } from "@/lib/utils/tenant";
 
 type Result = {
 	userId: string;
@@ -43,12 +44,6 @@ export async function getOwner(): Promise<Result> {
 		orgSlug,
 		ownerId: activeOrgId ?? session.user.id,
 	};
-}
-
-export const PERSONAL_TENANT = "me";
-
-export function isPersonalTenant(tenant: string) {
-	return tenant === PERSONAL_TENANT;
 }
 
 export async function getTimezone() {

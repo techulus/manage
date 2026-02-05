@@ -5,7 +5,7 @@ import { ProfileSettings } from "@/components/settings/profile-settings";
 import { TeamSettings } from "@/components/settings/team-settings";
 import { WorkspaceSettings } from "@/components/settings/workspace-settings";
 import { bytesToMegabytes } from "@/lib/blobStore";
-import { isPersonalTenant } from "@/lib/utils/useOwner";
+import { isPersonalTenant } from "@/lib/utils/tenant";
 import { caller } from "@/trpc/server";
 
 export default async function Settings({
