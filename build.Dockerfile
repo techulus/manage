@@ -2,7 +2,7 @@ FROM oven/bun:slim AS base
 
 ARG NEXT_PUBLIC_APP_URL
 
-RUN apt-get update && apt-get install -y curl
+RUN apt-get update && apt-get install -y adduser curl
 
 # Stage 1: Install dependencies
 FROM base AS deps
