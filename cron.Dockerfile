@@ -27,9 +27,12 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+RUN BUN_INSTALL=/usr/local bun install --global vercel-cron-runner
+
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/vercel.json ./vercel.json
 COPY --from=builder --chown=nextjs:nodejs /app/entrypoint.sh ./entrypoint.sh
 
 RUN chmod +x /app/entrypoint.sh
@@ -43,4 +46,4 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 ENTRYPOINT ["/app/entrypoint.sh"]
-CMD ["bun", "server.js"]
+CMD ["sh", "-c", "bun server.js & bun /usr/local/bin/vercel-cron-runner"]

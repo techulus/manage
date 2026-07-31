@@ -46,7 +46,7 @@ export function TRPCReactProvider(
 				}),
 				httpBatchLink({
 					transformer: superjson,
-					url: `${process.env.NEXT_PUBLIC_APP_URL}/api/trpc`,
+					url: "/api/trpc",
 					methodOverride: "POST",
 				}),
 			],

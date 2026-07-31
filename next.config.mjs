@@ -1,4 +1,5 @@
 const nextConfig = {
+	output: "standalone",
 	typedRoutes: false,
 	reactCompiler: true,
 
