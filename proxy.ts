@@ -10,6 +10,7 @@ const publicRoutes = [
 	"/api/webhook",
 	"/api/jobs",
 	"/api/calendar",
+	"/api/cron",
 	"/callback",
 ];
 
